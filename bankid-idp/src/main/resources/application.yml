@@ -1,0 +1,141 @@
+#
+# Configuration for the BankID IdP.
+#
+
+server:
+  port: 8443
+  servlet:
+    context-path: /idp    
+  ssl:
+    enabled: true
+    key-store: classpath:ssl.jks
+    key-store-type: JKS
+    key-alias: local
+    key-store-password: secret
+    key-password: secret
+  error:
+    include-message: always
+    include-exception: true
+    include-stacktrace: always
+    
+spring:
+  messages:
+    basename: messages,idp-errors/idp-error-messages
+    
+bankid:
+  server-root-certificate: classpath:bankid-trust-prod.crt
+  service-url: https://appapi2.bankid.com/rp/v5.1
+  qr-code:
+    size: 300
+    image-format: PNG
+  authn:
+    resume-path: /resume 
+    provider-name: "BankID"   
+    supported-loas:
+    - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
+    entity-categories:
+    - http://id.elegnamnden.se/ec/1.0/loa3-pnr
+    - http://id.swedenconnect.se/ec/1.0/loa3-name
+    - http://id.elegnamnden.se/sprop/1.0/mobile-auth
+    - http://id.elegnamnden.se/sprop/1.0/scal2
+    - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
+    
+ui:
+  languages:
+  - tag: sv
+    text: Svenska
+  - tag: en
+    text: English    
+    
+#
+# The SAML IdP configuration
+#    
+saml:
+  idp:
+    entity-id: https://bankid.litsec.se/idp
+    base-url: https://local.dev.swedenconnect.se:8443/idp    
+    credentials:
+      sign:
+        resource: classpath:idp-credentials.jks
+        alias: sign
+        password: secret
+        type: JKS
+      encrypt:
+        resource: classpath:idp-credentials.jks
+        alias: encrypt
+        password: secret
+        type: JKS
+      metadata-sign:
+        resource: classpath:idp-credentials.jks
+        alias: metadata
+        password: secret
+        type: JKS
+    endpoints:
+      metadata: /saml2/metadata    
+    metadata-providers:
+    - location: https://eid.svelegtest.se/metadata/mdx/role/sp.xml
+      backup-location: target/metadata-backup.xml
+      validation-certificate: classpath:sandbox-metadata.crt
+    metadata:
+      ui-info:
+        display-names:
+          en: BankID
+          sv: BankID
+        descriptions:
+          en: BankID Identity Provider
+          sv: BankID legitimeringstjänst
+        logotypes:
+        - path: /images/BankID_logo.svg
+          height: 171
+          width: 206   
+      organization:
+        names:
+          en: Sweden Connect
+          sv: Sweden Connect
+        display-names:
+          en: Sweden Connect
+          sv: Sweden Connect
+        urls:
+          en: https://www.swedenconnect.se
+          sv: https://www.swedenconnect.se
+      contact-persons:
+        technical:
+          company: Sweden Connect
+          email-addresses:
+          - operations@swedenconnect.se
+        support:
+          company: Sweden Connect
+          email-addresses:
+          - operations@swedenconnect.se 
+              
+logging:
+  level:
+    se:
+      swedenconnect:
+        spring:
+          saml: TRACE
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+bankid:
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v5.1
+  shared-credentials:
+    test-cred:
+      name: "test-cred"
+      resource: classpath:FPTestcert4_20220818.p12
+      alias: "1"
+      password: "qwerty123"
+      type: "PKCS12"
+  relying-parties:
+  - entity-id: http://sandbox.swedenconnect.se/testmyeid
+    credential-ref: test-cred
+  - entity-id: http://sandbox.swedenconnect.se/testmyeid-sign
+    credential-ref: test-cred        
+      
+        
