@@ -52,8 +52,8 @@ ui:
 #    
 saml:
   idp:
-    entity-id: https://bankid.litsec.se/idp
-    base-url: https://local.dev.swedenconnect.se:8443/idp    
+    entity-id: https://bankid.swedenconnect.se/idp
+    base-url: https://local.dev.swedenconnect.se:${server.port}/idp    
     credentials:
       sign:
         resource: classpath:idp-credentials.jks
@@ -120,7 +120,7 @@ logging:
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: local
   
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
@@ -137,5 +137,12 @@ bankid:
     credential-ref: test-cred
   - entity-id: http://sandbox.swedenconnect.se/testmyeid-sign
     credential-ref: test-cred        
-      
-        
+
+saml:
+  idp:
+    entity-id: https://bankid.swedenconnect.se/idp/local
+    base-url: https://local.dev.swedenconnect.se:${server.port}/idp
+    metadata-providers:
+    - location: classpath:local/local-metadata.xml
+
+

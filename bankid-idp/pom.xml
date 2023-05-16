@@ -70,6 +70,21 @@
       <artifactId>bankid-rp-api</artifactId>
       <version>${project.version}</version>    
     </dependency>
+    
+    <!-- QR support -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${zxing.version}</version>
+      <optional>true</optional>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>${zxing.version}</version>
+      <optional>true</optional>
+    </dependency>    
         
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
@@ -109,10 +124,12 @@
       <scope>test</scope>
     </dependency>
 
+<!--
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
     </dependency>
+    -->
     
     <dependency>
       <groupId>org.webjars</groupId>

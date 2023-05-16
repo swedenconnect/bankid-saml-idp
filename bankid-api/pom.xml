@@ -51,8 +51,7 @@
     </developer>    
   </developers>
 
-  <properties>
-    <zxing.versison>3.5.1</zxing.versison>
+  <properties>    
   </properties>
     
   <dependencyManagement>
@@ -143,14 +142,14 @@
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>core</artifactId>
-      <version>${zxing.versison}</version>
+      <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>
     
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
-      <version>${zxing.versison}</version>
+      <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>    
 
