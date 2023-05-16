@@ -44,6 +44,8 @@ import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
+import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
+import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
@@ -96,8 +98,11 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
     final ModelAndView mav = new ModelAndView("bankid");
     mav.addObject("bankIdContext", context);
+    
+    // Dummy, just to get the IdP to return to the SP (for local dev testing) ...
+    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
 
-    return mav;
+    // return mav;
   }
 
   /**

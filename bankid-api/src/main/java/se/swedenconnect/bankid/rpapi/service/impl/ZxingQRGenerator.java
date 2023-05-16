@@ -85,8 +85,10 @@ public class ZxingQRGenerator extends AbstractQRGenerator {
   /** {@inheritDoc} */
   @Override
   public void setDefaultImageFormat(final ImageFormat defaultImageFormat) {
-    Assert.isTrue(ImageFormat.SVG.equals(defaultImageFormat),
+    if (ImageFormat.SVG.equals(defaultImageFormat)) {
+      throw new IllegalArgumentException(
         "Image format SVG is not supported by " + this.getClass().getSimpleName());
+    }
     super.setDefaultImageFormat(defaultImageFormat);
   }
 
