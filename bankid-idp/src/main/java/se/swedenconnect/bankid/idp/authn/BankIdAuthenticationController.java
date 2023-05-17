@@ -15,9 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +27,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
@@ -40,6 +40,7 @@ import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
+import se.swedenconnect.bankid.rpapi.types.Requirement;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
@@ -54,7 +55,7 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@Controller
+@RestController
 @Slf4j
 public class BankIdAuthenticationController extends AbstractAuthenticationController<BankIdAuthenticationProvider> {
 
@@ -88,21 +89,22 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
    * @return a {@link ModelAndView}
    */
   @GetMapping(AUTHN_PATH)
-  public ModelAndView authenticate(final HttpServletRequest request, final HttpServletResponse response) {
+  public ModelAndView authenticate() {
+    return new ModelAndView("bankid");
+  }
 
+  @GetMapping("/auth")
+  public Mono<Response> auth(final HttpServletRequest request) {
     final Saml2UserAuthenticationInputToken token = this.getInputToken(request).getAuthnInputToken();
-
     final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
-
     final BankIdContext context = this.buildInitialContext(token, request);
 
-    final ModelAndView mav = new ModelAndView("bankid");
-    mav.addObject("bankIdContext", context);
-    
-    // Dummy, just to get the IdP to return to the SP (for local dev testing) ...
-    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
-
-    // return mav;
+    Requirement requirement = new Requirement();
+    // TODO: 2023-05-17 Requirement factory per entityId
+    return relyingParty.getClient()
+        .authenticate(context.getPersonalNumber(), "", null, requirement)
+        .onErrorComplete()
+        .map(auth -> new Response());
   }
 
   /**

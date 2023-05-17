@@ -16,39 +16,42 @@
 package se.swedenconnect.bankid.idp.rp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Repository for relying parties.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public class RelyingPartyRepository {
 
-  /** The configured relying parties. */
-  private final List<RelyingPartyData> relyingParties;
+  /**
+   * The configured relying parties.
+   */
+  private final Map<String, RelyingPartyData> relyingParties;
 
   /**
    * Constructor.
-   * 
+   *
    * @param relyingParties the relying parties
    */
   public RelyingPartyRepository(final List<RelyingPartyData> relyingParties) {
-    this.relyingParties = Objects.requireNonNull(relyingParties, "relyingParties must not be null");
+    this.relyingParties = Objects.requireNonNull(relyingParties, "relyingParties must not be null")
+        .stream()
+        .collect(Collectors.toMap(RelyingPartyData::getEntityId, kv -> kv));
   }
 
   /**
    * Based on a SAML entityID we return the {@link RelyingPartyData} associated with this ID.
-   * 
+   *
    * @param entityId the SAML entityID for the RP
    * @return a {@link RelyingPartyData} or {@code null} if not present
    */
   public RelyingPartyData getRelyingParty(final String entityId) {
-    return this.relyingParties.stream()
-        .filter(r -> Objects.equals(entityId, r.getEntityId()))
-        .findFirst()
-        .orElse(null);
+    return this.relyingParties.get(entityId);
   }
 
 }
