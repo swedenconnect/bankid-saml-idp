@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.rpapi.service;
 
+import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -49,8 +50,8 @@ public interface BankIDClient {
    * @return an order response
    * @throws BankIDException for errors
    */
-  OrderResponse authenticate(final String personalIdentityNumber, final String endUserIp,
-      final UserVisibleData userVisibleData, final Requirement requirement) throws BankIDException;
+  Mono<OrderResponse> authenticate(final String personalIdentityNumber, final String endUserIp,
+                                   final UserVisibleData userVisibleData, final Requirement requirement) throws BankIDException;
 
   /**
    * Request a signing order. The {@link #collect(String)} method is used to query the status of the order.
@@ -65,7 +66,7 @@ public interface BankIDClient {
    * @return an order response
    * @throws BankIDException for errors
    */
-  OrderResponse sign(final String personalIdentityNumber, final String endUserIp,
+  Mono<OrderResponse> sign(final String personalIdentityNumber, final String endUserIp,
       final DataToSign dataToSign, final Requirement requirement) throws BankIDException;
 
   /**
@@ -74,7 +75,7 @@ public interface BankIDClient {
    * @param orderReference the order reference
    * @throws BankIDException for errors
    */
-  void cancel(final String orderReference) throws BankIDException;
+  Mono<Void> cancel(final String orderReference) throws BankIDException;
 
   /**
    * Collects the result from {@link #authenticate(String, String, Requirement)} or
@@ -85,7 +86,7 @@ public interface BankIDClient {
    * @throws UserCancelException if the user cancels the operation
    * @throws BankIDException for errors
    */
-  CollectResponse collect(final String orderReference) throws UserCancelException, BankIDException;
+  Mono<? extends CollectResponse> collect(final String orderReference) throws UserCancelException, BankIDException;
 
   /**
    * Returns the QR generator that should be used to generate QR codes.

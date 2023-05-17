@@ -22,7 +22,7 @@ import se.swedenconnect.bankid.rpapi.LibraryVersion;
  *
  * @author Martin Lindström
  */
-public class BankIDException extends Exception {
+public class BankIDException extends RuntimeException {
 
   /** For serializing. */
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;

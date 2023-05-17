@@ -17,7 +17,7 @@ package se.swedenconnect.bankid.rpapi.service;
 
 /**
  * Testing the {@link BankIDClient}.
- * 
+ *
  * @author Martin Lindström
  */
 public class BankIDClientTest {
