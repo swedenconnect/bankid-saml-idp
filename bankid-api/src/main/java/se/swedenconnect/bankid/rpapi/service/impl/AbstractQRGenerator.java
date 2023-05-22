@@ -16,6 +16,7 @@
 package se.swedenconnect.bankid.rpapi.service.impl;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -65,7 +66,7 @@ public abstract class AbstractQRGenerator implements QRGenerator {
 
   /**
    * Generates the QR data for an "animated" QR code.
-   * 
+   *
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
    * @param orderTime the instant when the result from an
@@ -126,17 +127,20 @@ public abstract class AbstractQRGenerator implements QRGenerator {
   /** {@inheritDoc} */
   @Override
   public String generateAnimatedQRCodeBase64Image(final String qrStartToken, final String qrStartSecret,
-      final Instant orderTime, final int size, final ImageFormat format) throws IOException {
-    final byte[] imageBytes =
-        this.generateAnimatedQRCodeImage(qrStartToken, qrStartSecret, orderTime, size, format);
-    return String.format("data:image/%s;base64, %s",
-        format.getImageFormatName().toLowerCase(), Base64.getEncoder().encodeToString(imageBytes));
+      final Instant orderTime, final int size, final ImageFormat format) {
+    try {
+      final byte[] imageBytes = this.generateAnimatedQRCodeImage(qrStartToken, qrStartSecret, orderTime, size, format);
+      return String.format("data:image/%s;base64, %s", format.getImageFormatName().toLowerCase(), Base64.getEncoder().encodeToString(imageBytes));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+
   }
 
   /** {@inheritDoc} */
   @Override
   public String generateAnimatedQRCodeBase64Image(
-      final String qrStartToken, final String qrStartSecret, final Instant orderTime) throws IOException {
+      final String qrStartToken, final String qrStartSecret, final Instant orderTime) {
     return this.generateAnimatedQRCodeBase64Image(qrStartToken, qrStartSecret, orderTime,
         this.defaultSize, this.defaultImageFormat);
   }

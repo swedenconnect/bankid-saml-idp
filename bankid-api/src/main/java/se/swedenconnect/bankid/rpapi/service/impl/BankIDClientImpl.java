@@ -18,10 +18,13 @@ package se.swedenconnect.bankid.rpapi.service.impl;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
+import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -33,6 +36,7 @@ import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +53,7 @@ public class BankIDClientImpl implements BankIDClient {
    * Class logger.
    */
   private static final Logger log = LoggerFactory.getLogger(BankIDClientImpl.class);
-  public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+  public final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
   /**
    * The unique client identifier.
@@ -111,22 +115,36 @@ public class BankIDClientImpl implements BankIDClient {
     //
     final AuthnRequest request = new AuthnRequest(personalIdentityNumber, endUserIp, requirement, userVisibleData);
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
-
+    try {
+      log.info("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(request));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
     try {
       return this.webClient.post()
           .uri(AUTH_PATH)
+          .contentType(MediaType.APPLICATION_JSON)
           .bodyValue(request)
           .retrieve()
+          .onRawStatus(s -> s == 400, c -> {
+            return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+              return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
+            });
+          })
           .bodyToMono(OrderResponse.class)
           .map(m -> {
-            log.debug("{}: authenticate. response: [{}]", this.identifier, m.toString());
+            log.info("{}: authenticate. response: [{}]", this.identifier, m.toString());
             return m;
-          });
-    } catch (final WebClientResponseException e) {
+          })
+          .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
+      //.log();
+    } catch (
+        final WebClientResponseException e) {
       log.info("{}: authenticate. Error during auth-call - {} - {} - {}",
           this.identifier, e.getMessage(), e.getStatusCode(), e.getResponseBodyAsString());
       throw new BankIDException(this.getErrorResponse(e), "Auth-call failed", e);
-    } catch (final Exception e) {
+    } catch (
+        final Exception e) {
       log.error("{}: authenticate. Error during auth-call - {}", this.identifier, e.getMessage(), e);
       throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during auth", e);
     }
@@ -150,7 +168,14 @@ public class BankIDClientImpl implements BankIDClient {
           .uri(SIGN_PATH)
           .bodyValue(request)
           .retrieve()
-          .bodyToMono(OrderResponse.class);
+          .onRawStatus(s -> s == 400, c -> {
+            return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+              return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
+            });
+          })
+          .bodyToMono(OrderResponse.class)
+          .onErrorComplete()
+          .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
 
       //log.debug("{}: sign. response: [{}]", this.identifier, response);
     } catch (final WebClientResponseException e) {
@@ -204,15 +229,20 @@ public class BankIDClientImpl implements BankIDClient {
         .uri(COLLECT_PATH)
         .bodyValue(request)
         .retrieve()
+        .onRawStatus(s -> s == 400, c -> {
+          return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+            return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
+          });
+        })
         .bodyToMono(CollectResponseJson.class)
-        .publishOn(Schedulers.fromExecutor(EXECUTOR_SERVICE))
         .map(c -> {
           if (c.getStatus().equals(CollectResponseJson.Status.FAILED)) {
             throw new BankIDException(c.getErrorCode(), String.format("Order '%s' failed with code '%s'", orderReference, c.getErrorCode().getValue()));
           }
           return c;
         })
-        .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c))
+        .onErrorComplete()
+        .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
           if (e instanceof WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
@@ -260,11 +290,11 @@ public class BankIDClientImpl implements BankIDClient {
   @JsonInclude(Include.NON_NULL)
   private static class AuthnRequest {
 
-    private final String personalNumber;
-    private final String endUserIp;
-    private final Requirement requirement;
-    private final String userVisibleData;
-    private final String userVisibleDataFormat;
+    private String personalNumber;
+    private String endUserIp;
+    private Requirement requirement;
+    private String userVisibleData;
+    private String userVisibleDataFormat;
 
     public AuthnRequest(final String personalNumber, final String endUserIp,
                         final Requirement requirement, final UserVisibleData userVisibleData) {
@@ -276,6 +306,10 @@ public class BankIDClientImpl implements BankIDClient {
           Optional.ofNullable(userVisibleData).map(UserVisibleData::getUserVisibleDataFormat).orElse(null);
     }
 
+    public AuthnRequest() {
+
+    }
+
     @Override
     public String toString() {
       return String.format(
@@ -283,6 +317,26 @@ public class BankIDClientImpl implements BankIDClient {
           this.personalNumber, this.endUserIp, this.requirement,
           Optional.ofNullable(this.userVisibleData).orElseGet(() -> "not-set"),
           Optional.ofNullable(this.userVisibleDataFormat).orElseGet(() -> "not-set"));
+    }
+
+    public void setPersonalNumber(String personalNumber) {
+      this.personalNumber = personalNumber;
+    }
+
+    public void setEndUserIp(String endUserIp) {
+      this.endUserIp = endUserIp;
+    }
+
+    public void setRequirement(Requirement requirement) {
+      this.requirement = requirement;
+    }
+
+    public void setUserVisibleData(String userVisibleData) {
+      this.userVisibleData = userVisibleData;
+    }
+
+    public void setUserVisibleDataFormat(String userVisibleDataFormat) {
+      this.userVisibleDataFormat = userVisibleDataFormat;
     }
   }
 

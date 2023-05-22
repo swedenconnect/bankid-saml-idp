@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Litsec AB
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Verson 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -91,8 +91,9 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
    */
   public WebClientFactoryBean(final String webServiceUrl, final Resource trustedRoot,
       final PkiCredential rpCredential) {
+    setSingleton(false);
     this.webServiceUrl = Optional.ofNullable(webServiceUrl)
-        .filter(u -> !StringUtils.hasText(u))
+        .filter(StringUtils::hasText)
         .orElseGet(() -> {
           log.info("Applying default setting for webServiceUrl: {}", PRODUCTION_WEB_SERVICE_URL);
           return PRODUCTION_WEB_SERVICE_URL;
@@ -172,8 +173,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
 
   /** {@inheritDoc} */
   @Override
-  protected WebClient createInstance() throws Exception {
-
+  public WebClient createInstance() throws Exception {
     final SslContext sslContext = SslContextBuilder.forClient()
         .keyManager(this.rpCredential.getPrivateKey(), this.rpCredential.getCertificate())
         .trustManager(X509Utils.decodeCertificate(this.trustedRoot))

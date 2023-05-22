@@ -34,8 +34,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -57,20 +59,21 @@ import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.RequestedPrincipalS
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
 import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
+import se.swedenconnect.spring.saml.idp.authentication.provider.external.UserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
 
 /**
  * BankID IdP configuration.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @Configuration
 @EnableConfigurationProperties(BankIdConfigurationProperties.class)
 public class BankIdConfiguration {
-  
+
   /** The context path. */
   @Setter
   @Value("${server.servlet.context-path:/}")
@@ -81,13 +84,13 @@ public class BankIdConfiguration {
 
   /**
    * Constructor.
-   * 
+   *
    * @param properties the BankID configuration properties
    */
   public BankIdConfiguration(final BankIdConfigurationProperties properties) {
     this.properties = Objects.requireNonNull(properties, "properties must not be null");
   }
-  
+
   /**
    * Gets a default {@link SecurityFilterChain} protecting other resources.
    * <p>
@@ -101,20 +104,20 @@ public class BankIdConfiguration {
   @Bean
   @Order(2)
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
-
     http
         .csrf().disable()
+        .cors().disable()
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/error", "/css/**", "/scripts/**", "/webjars/**").permitAll()
+            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/auth", "/poll", "/complete", "/resume", "/**/resume").permitAll()
             .anyRequest().denyAll());
 
     return http.build();
-  }  
-    
+  }
+
   /**
    * Creates the {@link QRGenerator} to use when generating QR code images.
-   * 
+   *
    * @return a {@link QRGenerator}
    */
   @Bean
@@ -127,7 +130,7 @@ public class BankIdConfiguration {
 
   /**
    * Gets the {@link RelyingPartyRepository} bean.
-   * 
+   *
    * @param qrGenerator the {@link QRGenerator} bean
    * @return a {@link RelyingPartyRepository}
    * @throws Exception for errors creating the RP data
@@ -157,13 +160,11 @@ public class BankIdConfiguration {
         }
       }
 
-      final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
+      final WebClientFactoryBean webClientFactory = WebClientFactoryBean.forTest(); /* new WebClientFactoryBean(
           this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), credential);
-      webClientFactory.afterPropertiesSet();
+      webClientFactory.afterPropertiesSet();*/
 
-      final BankIDClient client =
-          new BankIDClientImpl(rp.getEntityId(), webClientFactory.getObject(), qrGenerator);
-
+      final BankIDClient client = new BankIDClientImpl(rp.getEntityId(), webClientFactory.createInstance(), qrGenerator);
       relyingParties.add(new RelyingPartyData(rp.getEntityId(), client));
     }
     return new RelyingPartyRepository(relyingParties);
@@ -171,7 +172,7 @@ public class BankIdConfiguration {
 
   /**
    * Given a {@link PkiCredentialConfigurationProperties} a {@link PkiCredential} is created.
-   * 
+   *
    * @param cred the properties
    * @return a {@link PkiCredential}
    * @throws Exception for creation errors
@@ -181,11 +182,11 @@ public class BankIdConfiguration {
     factory.afterPropertiesSet();
     return factory.getObject();
   }
-  
+
   /**
    * Creates the {@link SimulatedAuthenticationProvider} which is the {@link AuthenticationProvider} that is responsible
    * of the user authentication.
-   * 
+   *
    * @return a {@link SimulatedAuthenticationProvider}
    */
   @Bean
@@ -195,11 +196,11 @@ public class BankIdConfiguration {
         this.properties.getAuthn().getSupportedLoas(), this.properties.getAuthn().getEntityCategories());
     provider.setName(this.properties.getAuthn().getProviderName());
     return provider;
-  }  
+  }
 
   /**
    * Gets a {@link Saml2IdpConfigurerAdapter} that applies custom configuration for the IdP.
-   * 
+   *
    * @param signMessageProcessor a {@link SignatureMessagePreprocessor} for display of sign messages
    * @return a {@link Saml2IdpConfigurerAdapter}
    */
@@ -262,7 +263,7 @@ public class BankIdConfiguration {
 
   /**
    * A response page using Thymeleaf to post the response.
-   * 
+   *
    * @param templateEngine the template engine
    * @return a {@link ThymeleafResponsePage}
    */
@@ -270,5 +271,5 @@ public class BankIdConfiguration {
   ThymeleafResponsePage responsePage(final SpringTemplateEngine templateEngine) {
     return new ThymeleafResponsePage(templateEngine, "post-response.html");
   }
-  
+
 }

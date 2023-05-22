@@ -186,11 +186,10 @@ public interface QRGenerator {
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
    * @param noSeconds the number of seconds since the response from auth or sign was returned
    * @return the base64 encoded image
-   * @throws IOException for errors during generation
    * @see #generateAnimatedQRCodeBase64Image(String, String, int, int, ImageFormat)
    */
   String generateAnimatedQRCodeBase64Image(final String qrStartToken, final String qrStartSecret,
-      final Instant orderTime) throws IOException;
+      final Instant orderTime);
 
   /**
    * Enum representing an image format.

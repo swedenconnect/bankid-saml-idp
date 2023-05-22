@@ -1,7 +1,6 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import OtherDeviceView from "@/views/AuthenticateView.vue";
-import DeviceSelectView from "@/views/DeviceSelectView.vue";
 import AuthenticateView from "@/views/AuthenticateView.vue";
+import DeviceSelectView from "@/views/DeviceSelectView.vue";
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),

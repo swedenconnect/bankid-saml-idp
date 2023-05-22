@@ -20,7 +20,7 @@ export default {
     },
     methods: {
         base64Image: function () {
-            return "data:image/png;base64, " + this.image;
+            return this.image;
         }
     }
 }
