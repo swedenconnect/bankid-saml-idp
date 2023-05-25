@@ -20,7 +20,6 @@ export default {
                     console.log(r);
                     this.$router.push({name: pushLocation, params:{"data":r}});
                 });
-            //this.$router.push({name: pushLocation});
         }
     }
 }
