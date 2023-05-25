@@ -51,7 +51,7 @@ public interface BankIDClient {
    * @throws BankIDException for errors
    */
   Mono<OrderResponse> authenticate(final String personalIdentityNumber, final String endUserIp,
-                                   final UserVisibleData userVisibleData, final Requirement requirement) throws BankIDException;
+                                   final UserVisibleData userVisibleData, final Requirement requirement);
 
   /**
    * Request a signing order. The {@link #collect(String)} method is used to query the status of the order.
@@ -67,7 +67,7 @@ public interface BankIDClient {
    * @throws BankIDException for errors
    */
   Mono<OrderResponse> sign(final String personalIdentityNumber, final String endUserIp,
-      final DataToSign dataToSign, final Requirement requirement) throws BankIDException;
+      final DataToSign dataToSign, final Requirement requirement);
 
   /**
    * Cancels an ongoing order.
@@ -75,7 +75,7 @@ public interface BankIDClient {
    * @param orderReference the order reference
    * @throws BankIDException for errors
    */
-  Mono<Void> cancel(final String orderReference) throws BankIDException;
+  Mono<Void> cancel(final String orderReference);
 
   /**
    * Collects the result from {@link #authenticate(String, String, Requirement)} or
@@ -86,7 +86,7 @@ public interface BankIDClient {
    * @throws UserCancelException if the user cancels the operation
    * @throws BankIDException for errors
    */
-  Mono<? extends CollectResponse> collect(final String orderReference) throws UserCancelException, BankIDException;
+  Mono<? extends CollectResponse> collect(final String orderReference);
 
   /**
    * Returns the QR generator that should be used to generate QR codes.
