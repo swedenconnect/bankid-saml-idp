@@ -17,16 +17,15 @@
       
         <div class="col-sm-12 content-container">
         
-          <div class="row" id="spInfoText" th:with="isSign = ${ui.isSignature()}">
+          <div class="row" id="spInfoText" th:with="isSign = false">
             <div class="col-sm-12 content-heading">
               <h2 th:text="#{idp.msg.heading}">BankID</h2>
             </div>
                         
-            <div class="col-sm-12" th:with="isFixed = ${ui.isFixedSelectedUser()}">
+            <div class="col-sm-12" th:with="isFixed = false">
               <p class="info">
-                <span th:if="${ui.getSpDisplayName() != null}" th:utext="${ui.getSpDisplayName()}">Example organization</span>
-                <span th:unless="${ui.getSpDisplayName() != null}" th:text="#{idp.msg.sp-generic}">A service provider</span>
-                <span th:text="${isSign} ? #{idp.msg.request-sign} : #{idp.msg.request-authn}">
+                <span utext="SP Display Name">Example organization</span>
+                <span th:text="false ? #{idp.msg.request-sign} : #{idp.msg.request-authn}">
                   requests your authentication OR requests your signature of the text below.
                 </span>
                 <span th:if="${isFixed == false}" th:text="${isSign} ? #{idp.msg.request-sign.select} : #{idp.msg.request-authn.select}">
@@ -34,7 +33,7 @@
                 </span>
               </p>              
             </div>
-            <th:block th:if="${ui.getPossibleAuthnContextUris().size() == 1}">
+            <!-- <th:block th:if="${ui.getPossibleAuthnContextUris().size() == 1}">
               <div class="col-sm-12">
                 <p class="info">
                   <span th:if="${isSign}" th:text="#{idp.msg.sign.authn-context-class.info(${ui.getPossibleAuthnContextUris().get(0)})}">
@@ -47,37 +46,37 @@
               </div>
               <input type="hidden" name="loa" th:value="${ui.getPossibleAuthnContextUris().get(0)}" />
             </th:block>
-          </div> <!-- spInfoText -->
+          </div> --><!-- spInfoText -->
             
           <hr class="full-width">
         
-          <th:block th:if="${ui.getSignMessage() != null}">
+          <th:block th:if="false">
             <div class="full-width sign-message">
               <div class="row no-gutters">
                 <div class="col">
-                  <span th:utext="${ui.getSignMessage()}">Sign message</span>
+                  <span utext="signmessage">Sign message</span>
                 </div>
               </div>
             </div>
           </th:block>
-          <input type="hidden" name="signMessageDisplayed" th:value="${ui.getSignMessage() != null ? true : false}" />
+          <input type="hidden" name="signMessageDisplayed" th:value="false" />
                   
           <div class="row section" id="selectSimulatedUserDiv">
             
             <div class="col-sm-12 section">
           
-              <select id="selectSimulatedUser" class="form-control" name="personalIdentityNumber" th:disabled="${ui.fixedSelectedUser}">
+              <select id="selectSimulatedUser" class="form-control" name="personalIdentityNumber" th:disabled="true">
                 <option value="NONE" th:text="#{idp.msg.auth.select-user-option-text}">Select user to authenticate as</option>
                 <option th:each="u : ${users}" th:value="${u.getPersonalNumber()}" 
                         th:text="${u.toViewString()}" th:selected="${ui.isSelectedUser(u.getPersonalNumber())}">
                   User info
                 </option>
               </select>
-              <th:block th:if="${ui.fixedSelectedUser}">
+              <th:block th:if="false">
                 <input type="hidden" name="personalIdentityNumber" th:value="${ui.getSelectedUser()}" />
               </th:block>
                 
-              <th:block th:if="${ui.fixedSelectedUser == false}">
+              <th:block th:if="true">
                 <div class="noscripthide">
                   <button id="advancedButton" class="btn btn-link float-right" type="button">
                     <span th:text="#{idp.msg.button.advanced}">Advanced</span>
@@ -136,7 +135,7 @@
             </div>
           </div>          
                     
-          <th:block th:if="${ui.getPossibleAuthnContextUris().size() > 1}">
+          <!--<th:block th:if="${ui.getPossibleAuthnContextUris().size() > 1}">
             <div class="row section" id="selectLoaDiv">
               <div class="col-sm-12">
                 <label for="selectLoa" th:text="#{idp.msg.authn-context-class.label}">Select assurance level:</label>
@@ -148,7 +147,7 @@
                 </select>
               </div>
             </div>
-          </th:block>
+          </th:block>-->
         
           <div class="row section" id="submitDiv">
             <div class="col-12">

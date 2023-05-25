@@ -1,11 +1,13 @@
 #
 # Configuration for the BankID IdP.
 #
-
 server:
   port: 8443
   servlet:
-    context-path: /idp    
+    session:
+      cookie:
+        name: BANKIDSESSION
+    context-path: /idp
   ssl:
     enabled: true
     key-store: classpath:ssl.jks
@@ -30,7 +32,7 @@ bankid:
     image-format: PNG
   authn:
     resume-path: /resume 
-    provider-name: "BankID"   
+    provider-name: "BankID"
     supported-loas:
     - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
     entity-categories:
@@ -116,6 +118,13 @@ logging:
           saml: TRACE
 
 ---
+
+logging:
+  level:
+    se:
+      swedenconnect:
+        spring:
+          saml: TRACE
 
 spring:
   config:

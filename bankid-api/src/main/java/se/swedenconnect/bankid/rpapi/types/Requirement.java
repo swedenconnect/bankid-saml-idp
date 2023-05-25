@@ -18,11 +18,8 @@ package se.swedenconnect.bankid.rpapi.types;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Represents the structure in which a relying party can define how an authentication or signature process should be
@@ -115,6 +112,7 @@ public class Requirement {
    *
    * @return true if not properties have been assigned, and false otherwise
    */
+  @JsonIgnore
   public boolean isEmpty() {
     return this.cardReader == null && this.autoStartTokenRequired == null && this.tokenStartRequired == null
         && (this.certificatePolicies == null || this.certificatePolicies.isEmpty())

@@ -15,24 +15,16 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
@@ -40,69 +32,128 @@ import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
+import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.service.QRGenerator;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
+import se.swedenconnect.bankid.rpapi.types.CompletionData;
+import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
+import se.swedenconnect.bankid.rpapi.types.Requirement;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
-import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
-import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
  * authentication/signature.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@Controller
+@RestController
 @Slf4j
 public class BankIdAuthenticationController extends AbstractAuthenticationController<BankIdAuthenticationProvider> {
 
-  /** The path to where the Spring Security SAML IdP flow directs the user agent to. */
+  /**
+   * The path to where the Spring Security SAML IdP flow directs the user agent to.
+   */
   public static final String AUTHN_PATH = "/bankid";
 
-  /** The session attribute where we store whether we selected "this device" or "other device". */
+  /**
+   * The session attribute where we store whether we selected "this device" or "other device".
+   */
   private static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE =
       BankIdAuthenticationController.class.getPackageName() + ".DeviceSelection";
 
-  /** Relying parties that we serve. */
+  /**
+   * Relying parties that we serve.
+   */
   @Setter
   @Autowired
   private RelyingPartyRepository rpRepository;
 
-  /** The authentication provider that is the "manager" for this authentication. */
+  /**
+   * The authentication provider that is the "manager" for this authentication.
+   */
   @Setter
   @Autowired
   private BankIdAuthenticationProvider provider;
 
-  /** Possible languages for the UI. */
+  /**
+   * Possible languages for the UI.
+   */
   @Setter
   @Autowired
   private List<Language> languages;
 
   /**
    * The entry point for the BankID authentication/signature process.
-   * 
-   * @param request the HTTP servlet request
+   *
+   * @param request  the HTTP servlet request
    * @param response the HTTP servlet response
    * @return a {@link ModelAndView}
    */
   @GetMapping(AUTHN_PATH)
-  public ModelAndView authenticate(final HttpServletRequest request, final HttpServletResponse response) {
+  public ModelAndView authenticate() {
+    return new ModelAndView("index");
+  }
 
+  @GetMapping("/auth") // TODO: 2023-05-22 Post
+  public Mono<AuthResponse> auth(final HttpServletRequest request) {
     final Saml2UserAuthenticationInputToken token = this.getInputToken(request).getAuthnInputToken();
-
     final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
-
     final BankIdContext context = this.buildInitialContext(token, request);
 
-    final ModelAndView mav = new ModelAndView("bankid");
-    mav.addObject("bankIdContext", context);
-    
-    // Dummy, just to get the IdP to return to the SP (for local dev testing) ...
-    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
+    Requirement requirement = new Requirement();
+    // TODO: 2023-05-17 Requirement factory per entityId
+    UserVisibleData userVisibleData = new UserVisibleData();
+    userVisibleData.setUserVisibleData(new String(Base64.getEncoder().encode("Text".getBytes()), StandardCharsets.UTF_8));
+    BankIDClient client = relyingParty.getClient();
+    QRGenerator qrGenerator = client.getQRGenerator();
+    return client
+        .authenticate(context.getPersonalNumber(), request.getRemoteAddr(), userVisibleData, requirement)
+        .onErrorComplete()
+        .map(auth -> {
+          request.getSession().setAttribute("BANKID-STATE", BankIdSessionData.of(auth));
+          log.info("Auth from service saved {}", auth);
+          return new AuthResponse(auth.getAutoStartToken(), qrGenerator.generateAnimatedQRCodeBase64Image(auth.getQrStartToken(), auth.getQrStartSecret(), auth.getOrderTime()));
+        });
+  }
 
-    // return mav;
+  @GetMapping("/poll") // TODO: 2023-05-23 POST
+  public Mono<PollResponse> poll(final HttpServletRequest request) {
+    final Saml2UserAuthenticationInputToken token = this.getInputToken(request).getAuthnInputToken();
+    final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
+    BankIdSessionData sessionData = (BankIdSessionData) request.getSession().getAttribute("BANKID-STATE");
+    final String qrCode = relyingParty.getClient().getQRGenerator().generateAnimatedQRCodeBase64Image(sessionData.getQrStartToken(), sessionData.getQrStartSecret(), sessionData.getStartTime());
+    return relyingParty.getClient()
+        .collect(sessionData.getOrderReference())
+        .map(c -> {
+          request.getSession().setAttribute("BANKID-STATE", BankIdSessionData.of(sessionData, c));
+          if (c.getProgressStatus() == ProgressStatus.COMPLETE) {
+            request.getSession().setAttribute("BANKID-COMPLETION-DATA", c.getCompletionData());
+          }
+          return switch (c.getProgressStatus()) {
+            case COMPLETE:
+              yield PollResponse.Status.COMPLETE;
+            default:
+              yield PollResponse.Status.IN_PROGRESS;
+          };
+        }).map(s -> new PollResponse(s, qrCode));
+  }
+
+  @GetMapping("/complete")
+  public ModelAndView complete(final HttpServletRequest request) {
+    CompletionData data = (CompletionData) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
+    return complete(request, new BankIdAuthenticationToken(data));
   }
 
   /**
@@ -121,13 +172,12 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   /**
    * When a SAML {@code AuthnRequest} is received we set up an initial {@link BankIdContext}.
-   * 
-   * @param token the input token
+   *
+   * @param token   the input token
    * @param request the HTTP servlet request
    * @return a {@link BankIdContext}
    */
-  private BankIdContext buildInitialContext(
-      final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
+  private BankIdContext buildInitialContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
 
     final BankIdContext context = new BankIdContext();
     context.setState(BankIdState.INIT);
@@ -158,8 +208,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
             .map(d -> {
               try {
                 return PreviousDeviceSelection.forValue(d);
-              }
-              catch (final IllegalArgumentException e) {
+              } catch (final IllegalArgumentException e) {
                 return null;
               }
             })
@@ -178,7 +227,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return rp;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected BankIdAuthenticationProvider getProvider() {
     return this.provider;

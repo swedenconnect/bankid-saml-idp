@@ -11,11 +11,11 @@
     <artifactId>saml-bankid-idp-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  
+
   <name>Sweden Connect :: BankID :: Relying Party API</name>
   <description>Library implementing the BankID Relying Party API</description>
   <url>https://docs.swedenconnect.se/bankid-saml-idp</url>
-  
+
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -42,7 +42,7 @@
       <organization>IDsec Solutions AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
     </developer>
-    
+
     <developer>
       <name>Felix Hellman</name>
       <email>felix@idsec.se</email>
@@ -53,9 +53,9 @@
 
   <properties>
   </properties>
-  
+
   <dependencyManagement>
-  
+
   </dependencyManagement>
 
   <dependencies>
@@ -64,27 +64,27 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webflux</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>io.projectreactor.netty</groupId>
       <artifactId>reactor-netty</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
@@ -129,17 +129,31 @@
       <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <version>2.27.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
-  
+
   <build>
-    
+
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -153,7 +167,7 @@
         <filtering>false</filtering>
       </testResource>
     </testResources>
-    
+
   </build>
 
 </project>
