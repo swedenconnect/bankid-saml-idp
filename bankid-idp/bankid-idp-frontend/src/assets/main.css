@@ -246,8 +246,7 @@ a {
 }
 
 .providers .provider {
-  /*margin-top: 9px;*/
-  padding: 20px;
+  margin: 9px auto;
   background-color: #F7F7F7;
   border: 1px solid #D8D8D8;
   border-radius: 3px;
@@ -260,7 +259,8 @@ a {
   display: block;
   width: 100%;
   border: none;
-  padding: 14px 28px;
+  padding: 0px 28px;
+  margin-bottom: 12px;
   font-size: 16px;
   cursor: pointer;
   text-align: center;
