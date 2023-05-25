@@ -1,13 +1,12 @@
 <template>
-  <ul>
-    <li>
-      <Button @click="this.authenticate('auto')">This Device</Button>
-    </li>
-    <li>
-      <Button @click="this.authenticate('qr')">Other Device</Button>
-    </li>
-  </ul>
-
+    <div class="providers">
+        <div class="provider">
+            <Button class="provider-button" @click="this.authenticate('auto')">BankID on This Device</Button>
+        </div>
+        <div class="provider">
+            <Button class="provider-button" @click="this.authenticate('qr')">Mobile BankID on Other Device</Button>
+        </div>
+    </div>
 </template>
 <script>
 import {auth} from "@/service";
@@ -18,7 +17,7 @@ export default {
             auth()
                 .then(r => {
                     console.log(r);
-                    this.$router.push({name: pushLocation, params:{"data":r}});
+                    this.$router.push({name: pushLocation, params: {"data": r}});
                 });
         }
     }

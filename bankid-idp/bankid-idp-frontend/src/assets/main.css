@@ -260,11 +260,11 @@ a {
   display: block;
   width: 100%;
   border: none;
-  background-color: #04AA6D;
   padding: 14px 28px;
   font-size: 16px;
   cursor: pointer;
   text-align: center;
+  background: none;
 }
 
 .providers .provider img,
