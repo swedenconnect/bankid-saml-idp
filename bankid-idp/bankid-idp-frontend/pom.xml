@@ -2,9 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.mydeveloperplanet.myspringbootvueplanet</groupId>
-  <artifactId>frontend</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>bankid-idp-frontend</artifactId>
+
+  <parent>
+    <groupId>se.swedenconnect.bankid</groupId>
+    <artifactId>saml-bankid-idp-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <name>Sweden Connect :: BankID :: SAML Identity Provider :: Frontend</name>
+  <description>BankID SAML Identity Provider Frontend</description>
+  <url>https://docs.swedenconnect.se/bankid-saml-idp</url>
 
   <build>
     <plugins>
@@ -18,7 +26,7 @@
               <followSymlinks>false</followSymlinks>
             </fileset>
             <fileset>
-              <directory>../src/main/resources/static/assets/</directory>
+              <directory>../bankid-idp-backend/src/main/resources/static/assets/</directory>
               <followSymlinks>false</followSymlinks>
               <includes>
                 <include>*</include>
@@ -72,7 +80,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/../src/main/resources/templates/</outputDirectory>
+              <outputDirectory>${basedir}/../bankid-idp-backend/src/main/resources/templates/</outputDirectory>
               <resources>
                 <resource>
                   <directory>dist</directory>
@@ -88,7 +96,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/../src/main/resources/static/assets</outputDirectory>
+              <outputDirectory>${basedir}/../bankid-idp-backend/src/main/resources/static/assets</outputDirectory>
               <resources>
                 <resource>
                   <directory>dist/assets/</directory>
