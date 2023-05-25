@@ -508,7 +508,8 @@ a {
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
-  margin-left: auto;
+  margin-left: -20px;
+  margin-top: -20px;
 }
 
 .hide {
