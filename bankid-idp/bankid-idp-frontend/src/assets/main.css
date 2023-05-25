@@ -254,16 +254,17 @@ a {
   cursor: pointer;
 }
 
+
+
 .providers .provider-button {
-  background: none;
-  color: inherit;
+  display: block;
+  width: 100%;
   border: none;
-  padding: 0;
-  margin-top: 9px;
-  font: inherit;
+  background-color: #04AA6D;
+  padding: 14px 28px;
+  font-size: 16px;
   cursor: pointer;
-  outline: inherit;
-  width: calc(100%);
+  text-align: center;
 }
 
 .providers .provider img,
@@ -437,21 +438,14 @@ a {
 
 .column {
   float: left;
-  width: 45%;
+  width: 100%;
   padding: 0;
-  margin-left: 20px;
 }
 
 .row::after {
   content: "";
   clear: both;
   display: table;
-}
-
-.header {
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: -20px;
 }
 
 .header {
@@ -491,6 +485,14 @@ a {
 .full-width {
   margin-left: -29px;
   margin-right: -29px;
+}
+
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .hide {
