@@ -36,7 +36,7 @@ a {
 
 .lang {
   padding-top: 29px;
-  padding-bottom: 24px;
+  padding-bottom: 5px;
   padding-left: 15px;
   padding-right: 15px;
   display: block;
@@ -45,9 +45,18 @@ a {
 .content-container {
   background: #FFFFFF;
   padding: 29px;
+  margin-top: 20px;
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.info-intro {
+  padding-top: 27px;
+}
+
+.sign-provider {
+  padding-bottom: 27px;
 }
 
 .content-heading {
@@ -73,13 +82,67 @@ a {
   line-height: 24px;
 }
 
+.authn-listing {
+	padding: 20px;
+}
+
+.authn-listing .row {
+	padding-bottom: 10px;
+	padding-top: 10px;
+}
+
+.authn-listing .attribute-row {
+  border-bottom: 1px solid #D0CACA;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.authn-listing .attribute-value {
+	font-weight: bold;
+	
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;	
+}
+
+.dont-break-out {
+
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
 .expand-button {
   background-image: url("../images/arrow_dropdown_down.svg");
   background-size: 8px 8px;
 }
 
 .collapse-button {
-  background-image: url("../images/arrow_dropdown_up.svg");
+  background-image: url("arrow_dropdown_up.svg");
   background-size: 8px 8px;
 }
 
@@ -119,6 +182,11 @@ a {
   display: none;
 }
 
+.underlined-clickable {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 .drop-down-container .drop-down {
   padding: 0;
   background-color: #F7F7F7;
@@ -134,7 +202,7 @@ a {
 
 .drop-down-container .drop-down > p {
   cursor: pointer;
-  background-image: url("../images/arrow_dropdown.svg");
+  background-image: url("arrow_dropdown.svg");
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: calc(100% - 20px) 50%;
@@ -145,7 +213,7 @@ a {
 }
 
 .drop-down-container .drop-down.open > p {
-  background-image: url("../images/arrow_dropdown_up.svg");
+  background-image: url("arrow_dropdown_up.svg");
 }
 
 .drop-down-container .drop-down.open .drop-down-info {
@@ -158,7 +226,7 @@ a {
 }
 
 .drop-down-container .drop-down:first-of-type {
-  margin-top: 55px;
+  margin-top: 20px;
 }
 
 .drop-down-container .drop-down p {
@@ -170,7 +238,7 @@ a {
 }
 
 .providers {
-  margin-top: 33px;
+  margin-top: 20px;
 }
 
 .providers p.info {
@@ -179,12 +247,24 @@ a {
 }
 
 .providers .provider {
-  margin-top: 9px;
+  /*margin-top: 9px;*/
   padding: 20px;
   background-color: #F7F7F7;
   border: 1px solid #D8D8D8;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.providers .provider-button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  margin-top: 9px;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  width: calc(100%);
 }
 
 .providers .provider img,
@@ -193,18 +273,32 @@ a {
 }
 
 .providers .provider img {
-  width: 33px;
+  width: 53px;
 }
 
 .providers .provider p {
   margin: 0 0 0 8px;
-  width: calc(100% - 46px);
+  width: calc(100% - 66px);
   vertical-align: middle;
+  text-align: left;
 }
 
+.providers .provider p.idp-description {
+  margin-left: 65px;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.providers .provider-button:first-of-type {
+  margin-top: 23px;
+}
+
+/*
 .providers .provider:first-of-type {
   margin-top: 23px;
 }
+*/
 
 .ns-providers {
   margin-top: 44px;
@@ -265,7 +359,6 @@ a {
   background-color: #F7F7F7;
   border: 1px solid #D8D8D8;
   border-radius: 3px;
-  cursor: pointer;
   margin-bottom: 33px;
 }
 
@@ -321,11 +414,15 @@ a {
   margin-bottom: 0;
 }
 
+.error .error-details {
+  font-size: 14px;
+  line-height: 24px;
+}
+
 .sign-message {
   margin-bottom: 30px;
   background-color: #F7F7F7;
-  border-top: 1px solid #D0CACA;
-  border-bottom: 1px solid #D0CACA;
+  border: 1px solid #D0CACA;
   padding: 23px 28px;
 }
 
@@ -363,7 +460,7 @@ a {
 
 .return {
   padding: 23px;
-  border-bottom: 1px solid #D0CACA;
+  /* border-bottom: 1px solid #D0CACA;*/
 }
 
 /* Helpers */

@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>bankid-idp</artifactId>
-  <packaging>jar</packaging>
-  
+  <packaging>pom</packaging>
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-  </parent>  
-
+  </parent>
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
-  <description>BankID SAML Identity Provider</description>
   <url>https://docs.swedenconnect.se/bankid-saml-idp</url>
 
   <licenses>
@@ -23,12 +19,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <scm>
-    <connection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</connection>
-    <developerConnection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</developerConnection>
-    <url>https://github.com/swedenconnect/bankid-saml-idp/tree/master</url>
-  </scm>
 
   <organization>
     <name>Sweden Connect</name>
@@ -42,160 +32,19 @@
       <organization>IDsec Solutions AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
     </developer>
-    
+
     <developer>
       <name>Felix Hellman</name>
       <email>felix@idsec.se</email>
       <organization>Helagon AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
-    </developer>    
+    </developer>
   </developers>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>17</java.version>
-  </properties>
-    
-  <dependencyManagement>
-
-    <dependencies>
-      
-    </dependencies>
-  </dependencyManagement>  
-  
-  <dependencies>
-    
-    <dependency>
-      <groupId>se.swedenconnect.bankid</groupId>
-      <artifactId>bankid-rp-api</artifactId>
-      <version>${project.version}</version>    
-    </dependency>
-    
-    <!-- QR support -->
-    <dependency>
-      <groupId>com.google.zxing</groupId>
-      <artifactId>core</artifactId>
-      <version>${zxing.version}</version>
-      <optional>true</optional>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.google.zxing</groupId>
-      <artifactId>javase</artifactId>
-      <version>${zxing.version}</version>
-      <optional>true</optional>
-    </dependency>    
-        
-    <dependency>
-      <groupId>se.swedenconnect.spring.saml.idp</groupId>
-      <artifactId>saml-idp-spring-boot-starter</artifactId>
-      <version>1.0.0</version>
-    </dependency>    
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>      
-    </dependency>    
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-<!--
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-    </dependency>
-    -->
-    
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
-      <version>4.6.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>jquery</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>popper.js</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>popper.js</artifactId>
-      <version>1.16.1-lts</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-      <version>3.6.1</version>
-    </dependency>
-    
-  </dependencies>
-
-  <build>
-    
-    <plugins>      
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <delimiters>
-            <delimiter>@</delimiter>
-          </delimiters>
-          <nonFilteredFileExtensions>
-            <nonFilteredFileExtension>jks</nonFilteredFileExtension>
-            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring.boot.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>repackage</goal>
-              <goal>build-info</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-
-  </build>
+  <modules>
+    <module>bankid-idp-frontend</module>
+    <module>bankid-idp-backend</module>
+  </modules>
 
 </project>
+
