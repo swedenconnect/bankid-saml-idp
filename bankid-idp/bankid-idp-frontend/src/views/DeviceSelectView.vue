@@ -3,7 +3,8 @@
     <div class="row" id="mainRow">
 
       <div class="col-sm-12 content-container">
-        <p>Do you want to log in using this device or another one?</p>
+        <h2>BankID</h2>
+        <p>Log in using your BankID</p>
 
         <hr class="full-width">
         <br/> <!-- TODO padding -->
