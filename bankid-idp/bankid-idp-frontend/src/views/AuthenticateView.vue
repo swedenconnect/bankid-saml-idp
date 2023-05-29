@@ -9,8 +9,13 @@
             :image=qrImage
         />
       </div>
+      <p v-if="shouldCancel"> Stopping authentication ... </p>
     </div>
-    <CancelButton/>
+    <div class="col-sm-12 return">
+      <button @click="cancelRequest" class="btn btn-link" type="submit" name="action" value="cancel">
+        <span>Cancel</span>
+      </button>
+    </div>
   </div>
 
 </template>
@@ -18,14 +23,15 @@
 import QRDisplay from "@/components/QRDisplay.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import Status from "@/components/Status.vue";
-import {auth, poll} from "@/service";
+import {auth, cancel, poll} from "@/service";
 
 export default {
   data() {
     return {
       qrImage: "",
       token: "",
-      pollingActive: true
+      pollingActive: false,
+      shouldCancel: false
     }
   },
   components: {Status, CancelButton, QRDisplay},
@@ -36,9 +42,12 @@ export default {
     auth().then(r => {
       this.token = r["autoStartToken"];
       this.qrImage = r["qrCode"];
+      this.pollingActive = true;
       this.poll();
     })
-
+  },
+  beforeUnmount() {
+    this.pollingActive = false;
   },
   methods: {
     poll: function () {
@@ -46,15 +55,24 @@ export default {
         this.qrImage = r["qrCode"];
         this.pollingActive = r["status"] === "IN_PROGRESS";
       }).then(r => {
-        if (this.pollingActive) {
-          window.setTimeout(() => this.poll(), 500);
+        if (this.shouldCancel) {
+          cancel().then(r => {
+            window.location.href = "/idp/view/cancel";
+          });
         } else {
-          window.location.href = "/idp/complete";
+          if (this.pollingActive) {
+            window.setTimeout(() => this.poll(), 500);
+          } else {
+            window.location.href = "/idp/view/complete";
+          }
         }
       })
     },
     base64Image: function () {
       return "data:image/png;base64, " + this.qrImage;
+    },
+    cancelRequest: function () {
+      this.shouldCancel = true;
     }
   }
 }

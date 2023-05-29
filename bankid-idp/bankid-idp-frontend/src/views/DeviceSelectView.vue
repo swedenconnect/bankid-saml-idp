@@ -14,12 +14,23 @@
       </div> <!-- ./col-sm-12 content-container -->
 
 
-      <CancelButton/>
+      <div class="col-sm-12 return">
+        <button @click="cancelSelection" class="btn btn-link" type="submit" name="action" value="cancel">
+          <span>Cancel</span>
+        </button>
+      </div>
     </div>
 
   </div> <!-- main -->
 </template>
-<script setup>
+<script>
 import DeviceSelect from "@/components/DeviceSelect.vue";
-import CancelButton from "@/components/CancelButton.vue";
+export default {
+  components: {DeviceSelect},
+  methods: {
+    cancelSelection: function () {
+      window.location.href = "/idp/view/cancel"
+    }
+  }
+}
 </script>

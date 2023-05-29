@@ -19,7 +19,7 @@ server:
     include-message: always
     include-exception: true
     include-stacktrace: always
-    
+    path: "/icandothis"
 spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
