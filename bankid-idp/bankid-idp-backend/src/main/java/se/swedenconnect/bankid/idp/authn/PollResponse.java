@@ -17,4 +17,6 @@ public class PollResponse {
     private Status status;
 
     private String qrCode;
+
+    private String autoStartToken;
 }

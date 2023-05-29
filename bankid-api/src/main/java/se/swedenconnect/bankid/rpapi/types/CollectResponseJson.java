@@ -15,10 +15,7 @@
  */
 package se.swedenconnect.bankid.rpapi.types;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 
 /**
  * Representation of the response received from a collect call.
@@ -43,6 +40,16 @@ public class CollectResponseJson implements CollectResponse {
   /** The completion data. Present if status=complete. */
   @JsonProperty(value = "completionData", required = false)
   private CompletionData completionData;
+
+  @JsonIgnore
+  @Override
+  public String toString() {
+    return "CollectResponseJson{" + "orderReference='" + orderReference + '\'' +
+        ", status=" + status +
+        ", hintCode='" + hintCode + '\'' +
+        ", completionData=" + completionData +
+        '}';
+  }
 
   /** {@inheritDoc} */
   @Override

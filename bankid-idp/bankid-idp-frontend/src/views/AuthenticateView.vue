@@ -39,21 +39,15 @@ export default {
     showQR: Boolean
   },
   mounted() {
-    auth().then(r => {
-      this.token = r["autoStartToken"];
-      this.qrImage = r["qrCode"];
-      this.pollingActive = true;
-      this.poll();
-    })
-  },
-  beforeUnmount() {
-    this.pollingActive = false;
+    this.pollingActive = true;
+    this.poll();
   },
   methods: {
     poll: function () {
       poll().then(r => {
         this.qrImage = r["qrCode"];
         this.pollingActive = r["status"] === "IN_PROGRESS";
+        this.token = r["autoStartToken"];
       }).then(r => {
         if (this.shouldCancel) {
           cancel().then(r => {

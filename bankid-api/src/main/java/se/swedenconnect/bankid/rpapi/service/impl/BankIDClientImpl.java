@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.BodyExtractors;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -216,32 +217,36 @@ public class BankIDClientImpl implements BankIDClient {
     }
   }
 
+
+  private Mono<? extends Throwable> defaultErrorHandler(ClientResponse clientResponse) {
+    return clientResponse.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+      return new BankIDException("Error to communicate with BankID API response:" + m.toString());
+    });
+  }
+
   /**
    * {@inheritDoc}
    */
+
   @Override
-  public Mono<? extends CollectResponse> collect(final String orderReference) throws UserCancelException, BankIDException {
+  public Mono<? extends CollectResponseJson> collect(final String orderReference) throws UserCancelException, BankIDException {
     Assert.hasText(orderReference, "'orderReference' must not be null or empty");
     log.info("{}: collect: Request for collecting order {}", this.identifier, orderReference);
 
     final OrderRefRequest request = new OrderRefRequest(orderReference);
-    return this.webClient.post()
+    WebClient.ResponseSpec retrieve = this.webClient.post()
         .uri(COLLECT_PATH)
         .bodyValue(request)
-        .retrieve()
-        .onRawStatus(s -> s == 400, c -> {
-          return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
-            return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
-          });
-        })
+        .retrieve();
+    return retrieve
+        .onRawStatus(s -> s >= 400, this::defaultErrorHandler)
         .bodyToMono(CollectResponseJson.class)
         .map(c -> {
-          if (c.getStatus().equals(CollectResponseJson.Status.FAILED)) {
+          if (c.getStatus().equals(CollectResponseJson.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
             throw new BankIDException(c.getErrorCode(), String.format("Order '%s' failed with code '%s'", orderReference, c.getErrorCode().getValue()));
           }
           return c;
         })
-        .onErrorComplete()
         .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
           if (e instanceof WebClientResponseException webClientResponseException) {

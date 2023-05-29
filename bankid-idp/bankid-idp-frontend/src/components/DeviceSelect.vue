@@ -9,16 +9,11 @@
     </div>
 </template>
 <script>
-import {auth} from "@/service";
 
 export default {
     methods: {
         authenticate: function (pushLocation) {
-            auth()
-                .then(r => {
-                    console.log(r);
-                    this.$router.push({name: pushLocation, params: {"data": r}});
-                });
+            this.$router.push({name: pushLocation});
         }
     }
 }

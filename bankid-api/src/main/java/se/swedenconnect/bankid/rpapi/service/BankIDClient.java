@@ -16,11 +16,7 @@
 package se.swedenconnect.bankid.rpapi.service;
 
 import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.rpapi.types.BankIDException;
-import se.swedenconnect.bankid.rpapi.types.CollectResponse;
-import se.swedenconnect.bankid.rpapi.types.OrderResponse;
-import se.swedenconnect.bankid.rpapi.types.Requirement;
-import se.swedenconnect.bankid.rpapi.types.UserCancelException;
+import se.swedenconnect.bankid.rpapi.types.*;
 
 /**
  * An interface that declares the methods for a BankID Relying Party (client).
@@ -86,7 +82,7 @@ public interface BankIDClient {
    * @throws UserCancelException if the user cancels the operation
    * @throws BankIDException for errors
    */
-  Mono<? extends CollectResponse> collect(final String orderReference);
+  Mono<? extends CollectResponseJson> collect(final String orderReference);
 
   /**
    * Returns the QR generator that should be used to generate QR codes.

@@ -28,6 +28,7 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.idp.authn.events.*;
 import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
@@ -35,7 +36,7 @@ import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
-import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
+import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -46,7 +47,10 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -89,7 +93,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   private final List<Language> languages;
 
 
-  private final UserDataService userDataService;
+  private final BankIdSessionLoader bankIdSessionLoader;
+
+  private final BankIdEventPublisher eventPublisher;
 
   /**
    * The entry point for the BankID authentication/signature process.
@@ -103,8 +109,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return new ModelAndView("index");
   }
 
-  @GetMapping("/api/auth") // TODO: 2023-05-22 Post
-  public Mono<AuthResponse> auth(final HttpServletRequest request) {
+  //@GetMapping("/api/auth") // TODO: 2023-05-22 Post
+  public Mono<OrderResponse> auth(final HttpServletRequest request) {
     final Saml2UserAuthenticationInputToken token = this.getInputToken(request).getAuthnInputToken();
     final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
     final BankIdContext context = this.buildInitialContext(token, request);
@@ -114,55 +120,78 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     UserVisibleData userVisibleData = new UserVisibleData();
     userVisibleData.setUserVisibleData(new String(Base64.getEncoder().encode("Text".getBytes()), StandardCharsets.UTF_8));
     BankIDClient client = relyingParty.getClient();
-    QRGenerator qrGenerator = client.getQRGenerator();
-    return client
-        .authenticate(context.getPersonalNumber(), request.getRemoteAddr(), userVisibleData, requirement)
-        .onErrorComplete()
-        .map(auth -> {
-          request.getSession().setAttribute("BANKID-STATE", BankIdSessionData.of(auth));
-          log.info("Auth from service saved {}", auth);
-          return new AuthResponse(auth.getAutoStartToken(), qrGenerator.generateAnimatedQRCodeBase64Image(auth.getQrStartToken(), auth.getQrStartSecret(), auth.getOrderTime()));
+    return client.authenticate(context.getPersonalNumber(), request.getRemoteAddr(), userVisibleData, requirement)
+        .map(o -> {
+          eventPublisher.orderResponse(request, o).publish();
+          return o;
         });
   }
 
   @GetMapping("/api/poll") // TODO: 2023-05-23 POST
   public Mono<PollResponse> poll(final HttpServletRequest request) {
-    final BankIdUserData data = userDataService.resolve(request, this.getInputToken(request).getAuthnInputToken());
+    final BankIdUserData data = bankIdSessionLoader.load(request, this.getInputToken(request).getAuthnInputToken());
+    BankIdSessionData bankIdSessionData = data.getBankIdSessionData();
     BankIDClient client = data.getRelyingPartyData().getClient();
-    BankIdSessionData sessionData = data.getBankIdSessionData();
-    final String qrCode = client.getQRGenerator().generateAnimatedQRCodeBase64Image(sessionData.getQrStartToken(), sessionData.getQrStartSecret(), sessionData.getStartTime());
-    return client
-        .collect(sessionData.getOrderReference())
-        .map(c -> {
-          request.getSession().setAttribute("BANKID-STATE", BankIdSessionData.of(sessionData, c));
-          if (c.getProgressStatus() == ProgressStatus.COMPLETE) {
-            request.getSession().setAttribute("BANKID-COMPLETION-DATA", c.getCompletionData());
-          }
-          return switch (c.getProgressStatus()) {
-            case COMPLETE:
-              yield PollResponse.Status.COMPLETE;
-            default:
-              yield PollResponse.Status.IN_PROGRESS;
-          };
-        }).map(s -> new PollResponse(s, qrCode));
+    if (bankIdSessionData == null) {
+      // No auth has been done yet
+      return auth(request).map(o -> {
+        BankIdSessionData first = BankIdSessionData.of(o);
+        return pollResponseFrom(first, client.getQRGenerator());
+      });
+    } else {
+      // Auth has been done at some point, it might be fresh or expired
+      return client.collect(bankIdSessionData.getOrderReference())
+          .flatMap(c -> {
+            eventPublisher.collectResponse(request, c).publish();
+            BankIdSessionData updated = BankIdSessionData.of(bankIdSessionData, c);
+            if (updated.getExpired()) {
+              // Auth has expired, we fetch a new one
+              // If a user scans their QR code in this
+              // short timespan they will get an error
+              // in the BankID client but will be able
+              // to scan again after that
+              return auth(request).map(o -> {
+                return pollResponseFrom(BankIdSessionData.of(o), client.getQRGenerator());
+              });
+            }
+            // Authentication was fresh, we save and move on
+            BankIdSessionData updatedSession = BankIdSessionData.of(bankIdSessionData, c);
+            return Mono.just(pollResponseFrom(updatedSession, client.getQRGenerator()));
+          });
+    }
+  }
+
+  private PollResponse pollResponseFrom(BankIdSessionData data, QRGenerator generator) {
+    return new PollResponse(statusOf(data), generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime()), data.getAutoStartToken());
+  }
+
+  private PollResponse.Status statusOf(BankIdSessionData d) {
+    return switch (d.getStatus()) {
+      case COMPLETE:
+        yield PollResponse.Status.COMPLETE;
+      default:
+        yield PollResponse.Status.IN_PROGRESS;
+    };
   }
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
     CompletionData data = (CompletionData) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
+    eventPublisher.orderCompletion(request).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
 
   @GetMapping("/view/cancel")
   public ModelAndView cancelView(final HttpServletRequest request) {
+    eventPublisher.orderCancellation(request).publish();
     return complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 
   @GetMapping("/api/cancel") // TODO: 2023-05-29 post
   public Mono<Void> cancelRequest(HttpServletRequest request) {
-    final BankIdUserData data = userDataService.resolve(request, this.getInputToken(request).getAuthnInputToken());
+    final BankIdUserData data = bankIdSessionLoader.load(request, this.getInputToken(request).getAuthnInputToken());
     return data.getRelyingPartyData()
-            .getClient().cancel(data.getBankIdSessionData().getOrderReference());
+        .getClient().cancel(data.getBankIdSessionData().getOrderReference());
   }
 
   /**
