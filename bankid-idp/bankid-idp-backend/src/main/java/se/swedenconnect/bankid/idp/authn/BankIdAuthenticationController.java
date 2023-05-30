@@ -28,7 +28,10 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.events.*;
+import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
@@ -47,6 +50,8 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
@@ -93,7 +98,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   private final List<Language> languages;
 
 
-  private final BankIdSessionLoader bankIdSessionLoader;
+  private final BankIdSessionReader sessionReader;
 
   private final BankIdEventPublisher eventPublisher;
 
@@ -129,16 +134,18 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/api/poll") // TODO: 2023-05-23 POST
   public Mono<PollResponse> poll(final HttpServletRequest request) {
-    final BankIdUserData data = bankIdSessionLoader.load(request, this.getInputToken(request).getAuthnInputToken());
-    BankIdSessionData bankIdSessionData = data.getBankIdSessionData();
-    BankIDClient client = data.getRelyingPartyData().getClient();
-    if (bankIdSessionData == null) {
+
+    BankIdSessionState state = sessionReader.loadSessionData(request);
+    final RelyingPartyData relyingParty = this.getRelyingParty(getInputToken(request).getAuthnInputToken().getAuthnRequestToken().getEntityId());
+    BankIDClient client = relyingParty.getClient();
+    if (state == null) {
       // No auth has been done yet
       return auth(request).map(o -> {
         BankIdSessionData first = BankIdSessionData.of(o);
         return pollResponseFrom(first, client.getQRGenerator());
       });
     } else {
+      BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
       // Auth has been done at some point, it might be fresh or expired
       return client.collect(bankIdSessionData.getOrderReference())
           .flatMap(c -> {
@@ -150,6 +157,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
               // short timespan they will get an error
               // in the BankID client but will be able
               // to scan again after that
+              if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
+                return Mono.error(new IllegalStateException("Too many reattemps for this user, user has to try again with new session"));
+              }
               return auth(request).map(o -> {
                 return pollResponseFrom(BankIdSessionData.of(o), client.getQRGenerator());
               });
@@ -189,9 +199,11 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/api/cancel") // TODO: 2023-05-29 post
   public Mono<Void> cancelRequest(HttpServletRequest request) {
-    final BankIdUserData data = bankIdSessionLoader.load(request, this.getInputToken(request).getAuthnInputToken());
-    return data.getRelyingPartyData()
-        .getClient().cancel(data.getBankIdSessionData().getOrderReference());
+    BankIdSessionState state = sessionReader.loadSessionData(request);
+    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+    final RelyingPartyData relyingParty = this.getRelyingParty(getInputToken(request).getAuthnInputToken().getAuthnRequestToken().getEntityId());
+    BankIDClient client = relyingParty.getClient();
+    return client.cancel(state.getBankIdSessionData().getOrderReference());
   }
 
   /**
