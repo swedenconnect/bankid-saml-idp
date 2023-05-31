@@ -34,7 +34,11 @@ export const messages = {
                 "ext1": "Should BankID be started using QR code or personal identity number?",
                 "ext2": "Start the BankID app and read the QR code.",
                 "ext3": "Since you are not using Safari the BankID app can not be automatically started. \\",
-                "ext4": "The BankID app can not be started automatically. Therefore, you need to provide your personal identity number."
+                "blank": "",
+                "btn-this": "BankID on this device",
+                "btn-other": "Mobile BankID on Other Device",
+                "btn-cancel": "Cancel",
+                "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds."
             }
         }
     },
@@ -67,7 +71,11 @@ export const messages = {
                 "ext1": "Ska BankID startas med QR-kod eller genom inmatning av personnummer?",
                 "ext2": "Starta BankID-appen och läs av QR-koden.",
                 "ext3": "Eftersom du inte använder Safari kan BankID-appen inte startas automatiskt.",
-                "blank": ""
+                "blank": "",
+                "btn-this": "BankID på den här enheten",
+                "btn-other": "Mobilt BankID på annan enhet",
+                "btn-cancel": "Avbryt",
+                "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder."
             }
         }
     }

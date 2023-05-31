@@ -2,6 +2,11 @@
     <div>
         <p> {{ $t(message) }}</p>
     </div>
+    <div :hidden=qr>
+        <button @click=navigateToApp>
+            {{ $t("bankid.msg.btn-autostart") }}
+        </button>
+    </div>
 </template>
 <script>
 

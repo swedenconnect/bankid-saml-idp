@@ -1,10 +1,14 @@
 <template>
     <div class="providers">
         <div class="provider">
-            <Button class="provider-button" @click="this.authenticate('auto')">BankID on This Device</Button>
+            <Button class="provider-button" @click="this.authenticate('auto')">
+                {{ $t("bankid.msg.btn-this") }}
+            </Button>
         </div>
         <div class="provider">
-            <Button class="provider-button" @click="this.authenticate('qr')">Mobile BankID on Other Device</Button>
+            <Button class="provider-button" @click="this.authenticate('qr')">
+                {{ $t("bankid.msg.btn-other") }}
+            </Button>
         </div>
     </div>
 </template>

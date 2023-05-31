@@ -16,7 +16,7 @@
     </div>
     <div class="col-sm-12 return">
       <button @click="cancelRequest" class="btn btn-link" type="submit" name="action" value="cancel">
-        <span>Cancel</span>
+        <span>{{ $t("bankid.msg.btn-cancel") }}</span>
       </button>
     </div>
   </div>
@@ -24,7 +24,6 @@
 </template>
 <script>
 import QRDisplay from "@/components/QRDisplay.vue";
-import CancelButton from "@/components/CancelButton.vue";
 import Status from "@/components/Status.vue";
 import {cancel, poll} from "@/service";
 
@@ -38,7 +37,7 @@ export default {
       messageCode: "bankid.msg.rfa13"
     }
   },
-  components: {Status, CancelButton, QRDisplay},
+  components: {Status, QRDisplay},
   props: {
     showQR: Boolean
   },
