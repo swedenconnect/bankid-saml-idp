@@ -22,7 +22,9 @@ public class StatusCodeFactory {
       c -> FAILED.equals(c.getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getProgressStatus()), "rfa6",
       c -> FAILED.equals(c.getStatus()) && ProgressStatus.EXPIRED_TRANSACTION.equals(c.getProgressStatus()), "rfa8",
       c -> PENDING.equals(c.getStatus()) && ProgressStatus.USER_SIGN.equals(c.getProgressStatus()), "rfa9",
-      c -> PENDING.equals(c.getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getProgressStatus()), "rfa13"
+      c -> PENDING.equals(c.getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getProgressStatus()), "rfa13",
+      c -> PENDING.equals(c.getStatus()), "rfa21",
+      c -> FAILED.equals(c.getStatus()), "rfa22"
   );
 
   public static String statusCode(CollectResponseJson json) {
@@ -30,6 +32,6 @@ public class StatusCodeFactory {
         .filter(kv -> kv.getKey().test(json))
         .map(Map.Entry::getValue)
         .findFirst();
-    return "bankid.msg." + message.orElseGet(() -> "rfa22");
+    return "bankid.msg." + message.orElseGet(() -> "blank");
   }
 }
