@@ -11,6 +11,5 @@
                 </div>
             </div>
         </center>
-        <hr>
     </div>
 </template>
