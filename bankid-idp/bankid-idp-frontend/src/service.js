@@ -1,5 +1,5 @@
-export async function poll() {
-    const response = await  fetch("/idp/api/poll");
+export async function poll(showQr) {
+    const response = await  fetch("/idp/api/poll?qr=" + showQr);
     return await response.json();
 }
 

@@ -21,6 +21,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import reactor.core.publisher.Mono;
@@ -133,7 +134,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @GetMapping("/api/poll") // TODO: 2023-05-23 POST
-  public Mono<PollResponse> poll(final HttpServletRequest request) {
+  public Mono<PollResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
 
     BankIdSessionState state = sessionReader.loadSessionData(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(getInputToken(request).getAuthnInputToken().getAuthnRequestToken().getEntityId());
@@ -142,7 +143,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
       // No auth has been done yet
       return auth(request).map(o -> {
         BankIdSessionData first = BankIdSessionData.of(o);
-        return pollResponseFrom(first, client.getQRGenerator());
+        return pollResponseFrom(first, client.getQRGenerator(), qr);
       });
     } else {
       BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
@@ -161,18 +162,22 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
                 return Mono.error(new IllegalStateException("Too many reattemps for this user, user has to try again with new session"));
               }
               return auth(request).map(o -> {
-                return pollResponseFrom(BankIdSessionData.of(o), client.getQRGenerator());
+                return pollResponseFrom(BankIdSessionData.of(o), client.getQRGenerator(), qr);
               });
             }
             // Authentication was fresh, we save and move on
             BankIdSessionData updatedSession = BankIdSessionData.of(bankIdSessionData, c);
-            return Mono.just(pollResponseFrom(updatedSession, client.getQRGenerator()));
+            return Mono.just(pollResponseFrom(updatedSession, client.getQRGenerator(), qr));
           });
     }
   }
 
-  private PollResponse pollResponseFrom(BankIdSessionData data, QRGenerator generator) {
-    return new PollResponse(statusOf(data), generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime()), data.getAutoStartToken());
+  private PollResponse pollResponseFrom(BankIdSessionData data, QRGenerator generator, boolean showQr) {
+    String qrCode = "";
+    if (showQr) {
+      qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime());
+    }
+    return new PollResponse(statusOf(data), qrCode, data.getAutoStartToken());
   }
 
   private PollResponse.Status statusOf(BankIdSessionData d) {

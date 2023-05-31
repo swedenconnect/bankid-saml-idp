@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     poll: function () {
-      poll().then(r => {
+      poll(this.showQR).then(r => {
         this.qrImage = r["qrCode"];
         this.pollingActive = r["status"] === "IN_PROGRESS";
         this.token = r["autoStartToken"];
