@@ -1,6 +1,5 @@
 <template>
     <div class="providers">
-        <p>{{ $t('test.message') }}</p>
         <div class="provider">
             <Button class="provider-button" @click="this.authenticate('auto')">BankID on This Device</Button>
         </div>

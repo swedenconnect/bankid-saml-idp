@@ -2,8 +2,10 @@
   <div class="container main" id="main">
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
-         <p> {{ $t(messageCode) }}</p>
-        <Status :qr=showQR :autoStartToken=token
+        <Status
+            :qr=showQR
+            :autoStartToken=token
+            :message=messageCode
         />
         <QRDisplay
             :qr=showQR
