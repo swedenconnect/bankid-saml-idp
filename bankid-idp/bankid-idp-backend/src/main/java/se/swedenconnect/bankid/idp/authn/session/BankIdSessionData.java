@@ -3,6 +3,7 @@ package se.swedenconnect.bankid.idp.authn.session;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import se.swedenconnect.bankid.idp.authn.StatusCodeFactory;
 import se.swedenconnect.bankid.rpapi.types.*;
 
 import java.time.Instant;
@@ -18,6 +19,7 @@ public class BankIdSessionData {
   private String orderReference;
   private ProgressStatus status;
   private Boolean expired;
+  private String messageCode;
 
   public static BankIdSessionData of(OrderResponse response) {
     return new BankIdSessionData(
@@ -27,7 +29,8 @@ public class BankIdSessionData {
         response.getOrderTime(),
         response.getOrderReference(),
         ProgressStatus.STARTED,
-        false);
+        false,
+        "");
   }
 
   public static BankIdSessionData of(BankIdSessionData previous, CollectResponseJson json) {
@@ -38,7 +41,8 @@ public class BankIdSessionData {
         previous.getStartTime(),
         previous.getOrderReference(),
         json.getProgressStatus(),
-        json.getErrorCode() == ErrorCode.START_FAILED
+        json.getErrorCode() == ErrorCode.START_FAILED,
+        StatusCodeFactory.statusCode(json)
     );
   }
 }

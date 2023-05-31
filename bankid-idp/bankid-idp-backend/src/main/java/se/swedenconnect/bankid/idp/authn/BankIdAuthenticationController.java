@@ -135,7 +135,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/api/poll") // TODO: 2023-05-23 POST
   public Mono<PollResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
-
     BankIdSessionState state = sessionReader.loadSessionData(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(getInputToken(request).getAuthnInputToken().getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
@@ -177,7 +176,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     if (showQr) {
       qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime());
     }
-    return new PollResponse(statusOf(data), qrCode, data.getAutoStartToken());
+    return new PollResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
   }
 
   private PollResponse.Status statusOf(BankIdSessionData d) {

@@ -51,6 +51,10 @@ public class CollectResponseJson implements CollectResponse {
         '}';
   }
 
+  public String getHintCode() {
+    return hintCode;
+  }
+
   /** {@inheritDoc} */
   @Override
   public String getOrderReference() {

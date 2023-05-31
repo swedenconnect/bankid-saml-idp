@@ -2,6 +2,7 @@
   <div class="container main" id="main">
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
+         <p> {{ $t(messageCode) }}</p>
         <Status :qr=showQR :autoStartToken=token
         />
         <QRDisplay
@@ -23,7 +24,7 @@
 import QRDisplay from "@/components/QRDisplay.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import Status from "@/components/Status.vue";
-import {auth, cancel, poll} from "@/service";
+import {cancel, poll} from "@/service";
 
 export default {
   data() {
@@ -31,7 +32,8 @@ export default {
       qrImage: "",
       token: "",
       pollingActive: false,
-      shouldCancel: false
+      shouldCancel: false,
+      messageCode: "bankid.msg.rfa13"
     }
   },
   components: {Status, CancelButton, QRDisplay},
@@ -48,6 +50,7 @@ export default {
         this.qrImage = r["qrCode"];
         this.pollingActive = r["status"] === "IN_PROGRESS";
         this.token = r["autoStartToken"];
+        this.messageCode = r["messageCode"];
       }).then(r => {
         if (this.shouldCancel) {
           cancel().then(r => {

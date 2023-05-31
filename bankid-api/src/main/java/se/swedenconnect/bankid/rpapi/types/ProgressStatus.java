@@ -57,7 +57,11 @@ public enum ProgressStatus {
    * The user has provided the security code and completed the order. Collect response includes the signature, user
    * information and the ocsp response.
    */
-  COMPLETE("complete");
+  COMPLETE("complete"),
+  /**
+   * TODO WRITE DESCRIPTION
+   */
+  EXPIRED_TRANSACTION("expiredTransaction");
 
   /** The string representation of the enum. */
   private String value;
