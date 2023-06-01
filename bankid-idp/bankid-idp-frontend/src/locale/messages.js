@@ -38,7 +38,10 @@ export const messages = {
                 "btn-this": "BankID on this device",
                 "btn-other": "Mobile BankID on Other Device",
                 "btn-cancel": "Cancel",
-                "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds."
+                "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds.",
+                error: {
+                    "timeout": "The time for starting a new authentication has expired. Please try again."
+                }
             }
         }
     },
@@ -75,7 +78,10 @@ export const messages = {
                 "btn-this": "BankID på den här enheten",
                 "btn-other": "Mobilt BankID på annan enhet",
                 "btn-cancel": "Avbryt",
-                "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder."
+                "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder.",
+                error: {
+                    "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen."
+                }
             }
         }
     }

@@ -158,7 +158,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
               // in the BankID client but will be able
               // to scan again after that
               if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
-                return Mono.error(new IllegalStateException("Too many reattemps for this user, user has to try again with new session"));
+                eventPublisher.orderCancellation(request).publish();
+                return Mono.just(PollResponse.timeExpired());
               }
               return auth(request).map(o -> {
                 return pollResponseFrom(BankIdSessionData.of(o), client.getQRGenerator(), qr);

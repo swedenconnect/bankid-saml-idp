@@ -30,7 +30,7 @@ public class BankIdSessionData {
         response.getOrderReference(),
         ProgressStatus.STARTED,
         false,
-        "");
+        "bankid.msg.rfa21");
   }
 
   public static BankIdSessionData of(BankIdSessionData previous, CollectResponseJson json) {

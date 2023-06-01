@@ -21,4 +21,8 @@ public class PollResponse {
     private String autoStartToken;
 
     private String messageCode;
+
+    public static PollResponse timeExpired() {
+        return new PollResponse(Status.ERROR, "", "", "bankid.msg.error.timeout");
+    }
 }

@@ -61,7 +61,9 @@ export default {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
-            window.location.href = "/idp/view/complete";
+              if (r["status"] !== "ERROR") {
+                  window.location.href = "/idp/view/complete";
+              }
           }
         }
       })
@@ -70,7 +72,13 @@ export default {
       return "data:image/png;base64, " + this.qrImage;
     },
     cancelRequest: function () {
-      this.shouldCancel = true;
+      if (!this.pollingActive) {
+          cancel().then(r => {
+              window.location.href = "/idp/view/cancel";
+          });
+      } else {
+          this.shouldCancel = true;
+      }
     }
   }
 }
