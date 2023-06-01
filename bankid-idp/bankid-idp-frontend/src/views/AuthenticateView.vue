@@ -47,21 +47,22 @@ export default {
   },
   methods: {
     poll: function () {
-      poll(this.showQR).then(r => {
-        this.qrImage = r["qrCode"];
-        this.pollingActive = r["status"] === "IN_PROGRESS";
-        this.token = r["autoStartToken"];
-        this.messageCode = r["messageCode"];
-      }).then(r => {
+      poll(this.showQR).then(response => {
+        this.qrImage = response["qrCode"];
+        this.pollingActive = response["status"] === "IN_PROGRESS";
+        this.token = response["autoStartToken"];
+        this.messageCode = response["messageCode"];
+        return response;
+      }).then(response => {
         if (this.shouldCancel) {
-          cancel().then(r => {
+          cancel().then(canel => {
             window.location.href = "/idp/view/cancel";
           });
         } else {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
-              if (r["status"] !== "ERROR") {
+              if (response["status"] !== "ERROR") {
                   window.location.href = "/idp/view/complete";
               }
           }
