@@ -19,10 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
@@ -111,7 +108,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
 
-  @GetMapping("/api/poll") // TODO: 2023-05-23 POST
+  @PostMapping("/api/poll")
   public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
     BankIdSessionState state = sessionReader.loadSessionData(request);
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
@@ -119,6 +116,19 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
     return service.poll(request, qr, state, authnInputToken, bankIdContext, client);
+  }
+
+  @PostMapping("/api/cancel")
+  public Mono<Void> cancelRequest(HttpServletRequest request) {
+    BankIdSessionState state = sessionReader.loadSessionData(request);
+    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+    if (Objects.nonNull(bankIdSessionData)) {
+      Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+      String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+      BankIDClient client = this.getRelyingParty(entityId).getClient();
+      return service.cancel(request, state, client);
+    }
+    return Mono.empty();
   }
 
   @GetMapping("/view/complete")
@@ -133,31 +143,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 
-  @GetMapping("/api/cancel") // TODO: 2023-05-29 post
-  public Mono<Void> cancelRequest(HttpServletRequest request) {
-    BankIdSessionState state = sessionReader.loadSessionData(request);
-    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
-    if (Objects.nonNull(bankIdSessionData)) {
-      Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
-      String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-      BankIDClient client = this.getRelyingParty(entityId).getClient();
-      return service.cancel(request, state, client);
-    }
+  @GetMapping("/api/sp")
+  public Mono<Void> spInformation(final HttpServletRequest request) {
     return Mono.empty();
-  }
-
-  /**
-   * Updates the MVC model with common attributes such as possible languages.
-   *
-   * @param model the model
-   */
-  @ModelAttribute
-  public void updateModel(final Model model) {
-    final Locale locale = LocaleContextHolder.getLocale();
-
-    model.addAttribute("languages", this.languages.stream()
-        .filter(lang -> !lang.getTag().equals(locale.getLanguage()))
-        .collect(Collectors.toList()));
   }
 
   /**
