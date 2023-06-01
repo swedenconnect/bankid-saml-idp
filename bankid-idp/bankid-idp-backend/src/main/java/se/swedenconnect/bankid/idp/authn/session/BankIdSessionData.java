@@ -20,8 +20,9 @@ public class BankIdSessionData {
   private ProgressStatus status;
   private Boolean expired;
   private String messageCode;
+  private Boolean showQr;
 
-  public static BankIdSessionData of(OrderResponse response) {
+  public static BankIdSessionData of(OrderResponse response, Boolean showQr) {
     return new BankIdSessionData(
         response.getAutoStartToken(),
         response.getQrStartToken(),
@@ -30,7 +31,9 @@ public class BankIdSessionData {
         response.getOrderReference(),
         ProgressStatus.STARTED,
         false,
-        "bankid.msg.rfa21");
+        "bankid.msg.rfa21",
+        showQr
+    );
   }
 
   public static BankIdSessionData of(BankIdSessionData previous, CollectResponse json) {
@@ -42,7 +45,8 @@ public class BankIdSessionData {
         previous.getOrderReference(),
         json.getProgressStatus(),
         json.getErrorCode() == ErrorCode.START_FAILED,
-        StatusCodeFactory.statusCode(json)
+        StatusCodeFactory.statusCode(json, previous.getShowQr()),
+        previous.getShowQr()
     );
   }
 }

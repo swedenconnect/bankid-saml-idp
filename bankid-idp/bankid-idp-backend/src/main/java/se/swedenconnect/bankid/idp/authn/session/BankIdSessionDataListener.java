@@ -25,7 +25,7 @@ public class BankIdSessionDataListener {
     @EventListener
     public void handleOrderResponse(OrderResponseEvent event) {
         log.info("Order response event was published {} for session {}", event.getOrderResponse(), event.getRequest().getSession().getId());
-        BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getOrderResponse());
+        BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getOrderResponse(), event.getShowQr());
         writer.save(event.getRequest(), bankIdSessionData);
     }
 

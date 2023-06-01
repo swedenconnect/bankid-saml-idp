@@ -33,7 +33,7 @@ public class BankIdService {
         .map(BankIdSessionState::getBankIdSessionData)
         .map(sessionData -> collect(request, client, sessionData)
             .map(c -> BankIdSessionData.of(sessionData, c))
-            .flatMap(b -> reAuthIfExpired(request, state, bankIdContext, client, b))
+            .flatMap(b -> reAuthIfExpired(request, state, bankIdContext, client))
             .map(b -> ApiResponseFactory.create(b, client.getQRGenerator(), qr))
             .onErrorResume(this::handleError))
         .orElseGet(() -> onNoSession(request, qr, bankIdContext, client));
@@ -44,21 +44,21 @@ public class BankIdService {
     return client.cancel(state.getBankIdSessionData().getOrderReference());
   }
 
-  private Mono<OrderResponse> auth(final HttpServletRequest request, String personalNumber, BankIDClient client) {
+  private Mono<OrderResponse> auth(final HttpServletRequest request, String personalNumber, BankIDClient client, Boolean showQr) {
     Requirement requirement = new Requirement();
     // TODO: 2023-05-17 Requirement factory per entityId
     UserVisibleData userVisibleData = new UserVisibleData();
     userVisibleData.setUserVisibleData(new String(Base64.getEncoder().encode("Text".getBytes()), StandardCharsets.UTF_8));
     return client.authenticate(personalNumber, request.getRemoteAddr(), userVisibleData, requirement)
         .map(o -> {
-          eventPublisher.orderResponse(request, o).publish();
+          eventPublisher.orderResponse(request, o, showQr).publish();
           return o;
         });
   }
 
   private Mono<ApiResponse> onNoSession(HttpServletRequest request, Boolean qr, BankIdContext bankIdContext, BankIDClient client) {
-    return auth(request, bankIdContext.getPersonalNumber(), client)
-        .map(BankIdSessionData::of)
+    return auth(request, bankIdContext.getPersonalNumber(), client, qr)
+        .map(b -> BankIdSessionData.of(b, qr))
         .flatMap(b -> collect(request, client, b)
             .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), client.getQRGenerator(), qr)));
   }
@@ -70,15 +70,16 @@ public class BankIdService {
     return Mono.error(e);
   }
 
-  private Mono<BankIdSessionData> reAuthIfExpired(HttpServletRequest request, BankIdSessionState state, BankIdContext bankIdContext, BankIDClient client, BankIdSessionData b) {
-    if (b.getExpired()) {
+  private Mono<BankIdSessionData> reAuthIfExpired(HttpServletRequest request, BankIdSessionState state, BankIdContext bankIdContext, BankIDClient client) {
+    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+    if (bankIdSessionData.getExpired()) {
       if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
-      return auth(request, bankIdContext.getPersonalNumber(), client)
-          .map(BankIdSessionData::of);
+      return auth(request, bankIdContext.getPersonalNumber(), client, bankIdSessionData.getShowQr())
+          .map(orderResponse -> BankIdSessionData.of(orderResponse, bankIdSessionData.getShowQr()));
     }
-    return Mono.just(b);
+    return Mono.just(bankIdSessionData);
   }
 
   private Mono<CollectResponse> collect(HttpServletRequest request, BankIDClient client, BankIdSessionData data) {

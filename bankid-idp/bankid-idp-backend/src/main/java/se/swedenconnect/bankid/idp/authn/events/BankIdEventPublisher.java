@@ -16,8 +16,8 @@ public class BankIdEventPublisher {
 
 
 
-  public EventBuilder orderResponse(HttpServletRequest request, OrderResponse response) {
-    return new EventBuilder(new OrderResponseEvent(request, response), publisher);
+  public EventBuilder orderResponse(HttpServletRequest request, OrderResponse response, Boolean showQr) {
+    return new EventBuilder(new OrderResponseEvent(request, response, showQr), publisher);
   }
 
   public EventBuilder collectResponse(HttpServletRequest request, CollectResponse collectResponse) {

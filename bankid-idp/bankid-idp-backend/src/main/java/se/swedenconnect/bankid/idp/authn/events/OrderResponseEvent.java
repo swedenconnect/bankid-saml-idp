@@ -11,4 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 public class OrderResponseEvent {
   private final HttpServletRequest request;
   private final OrderResponse orderResponse;
+
+  private final Boolean showQr;
 }
