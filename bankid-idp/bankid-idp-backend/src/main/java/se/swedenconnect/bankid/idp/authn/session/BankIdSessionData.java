@@ -33,7 +33,7 @@ public class BankIdSessionData {
         "bankid.msg.rfa21");
   }
 
-  public static BankIdSessionData of(BankIdSessionData previous, CollectResponseJson json) {
+  public static BankIdSessionData of(BankIdSessionData previous, CollectResponse json) {
     return new BankIdSessionData(
         previous.autoStartToken,
         previous.qrStartToken,

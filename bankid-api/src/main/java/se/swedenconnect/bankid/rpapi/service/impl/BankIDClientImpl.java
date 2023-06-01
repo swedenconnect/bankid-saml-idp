@@ -229,7 +229,7 @@ public class BankIDClientImpl implements BankIDClient {
    */
 
   @Override
-  public Mono<? extends CollectResponseJson> collect(final String orderReference) throws UserCancelException, BankIDException {
+  public Mono<? extends CollectResponse> collect(final String orderReference) throws UserCancelException, BankIDException {
     Assert.hasText(orderReference, "'orderReference' must not be null or empty");
     log.info("{}: collect: Request for collecting order {}", this.identifier, orderReference);
 
@@ -240,9 +240,9 @@ public class BankIDClientImpl implements BankIDClient {
         .retrieve();
     return retrieve
         .onRawStatus(s -> s >= 400, this::defaultErrorHandler)
-        .bodyToMono(CollectResponseJson.class)
+        .bodyToMono(CollectResponse.class)
         .map(c -> {
-          if (c.getStatus().equals(CollectResponseJson.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
+          if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
             throw new BankIDException(c.getErrorCode(), String.format("Order '%s' failed with code '%s'", orderReference, c.getErrorCode().getValue()));
           }
           return c;

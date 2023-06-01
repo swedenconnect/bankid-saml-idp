@@ -8,7 +8,7 @@ import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
-import se.swedenconnect.bankid.rpapi.types.CollectResponseJson;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 import javax.servlet.http.HttpSession;
@@ -35,7 +35,7 @@ public class BankIdSessionDataListener {
         log.info("Collect response event was published {} for session {}", event.getCollectResponse(), session.getId());
         BankIdSessionData previous = reader.loadSessionData(event.getRequest()).getBankIdSessionData();
         writer.save(event.getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
-        if (event.getCollectResponse().getStatus().equals(CollectResponseJson.Status.COMPLETE)) {
+        if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
             CompletionData completionData = event.getCollectResponse().getCompletionData();
             writer.save(event.getRequest(), completionData);
         }

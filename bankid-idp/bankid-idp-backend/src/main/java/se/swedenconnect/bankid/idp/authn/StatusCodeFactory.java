@@ -1,6 +1,6 @@
 package se.swedenconnect.bankid.idp.authn;
 
-import se.swedenconnect.bankid.rpapi.types.CollectResponseJson;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static se.swedenconnect.bankid.rpapi.types.CollectResponseJson.Status.FAILED;
-import static se.swedenconnect.bankid.rpapi.types.CollectResponseJson.Status.PENDING;
+import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.FAILED;
+import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.PENDING;
 
 public class StatusCodeFactory {
 
-  private static final Map<Predicate<CollectResponseJson>, String> MESSAGE_CONDITIONS = Map.of(
+  private static final Map<Predicate<CollectResponse>, String> MESSAGE_CONDITIONS = Map.of(
       c -> PENDING.equals(c.getStatus()) && List.of(ProgressStatus.OUTSTANDING_TRANSACTION, ProgressStatus.NO_CLIENT).contains(c.getProgressStatus()), "rfa1",
       c -> ErrorCode.CANCELLED.equals(c.getErrorCode()), "rfa3",
       c -> ErrorCode.ALREADY_IN_PROGRESS.equals(c.getErrorCode()), "rfa4",
@@ -27,7 +27,7 @@ public class StatusCodeFactory {
       c -> FAILED.equals(c.getStatus()), "rfa22"
   );
 
-  public static String statusCode(CollectResponseJson json) {
+  public static String statusCode(CollectResponse json) {
     Optional<String> message = MESSAGE_CONDITIONS.entrySet().stream()
         .filter(kv -> kv.getKey().test(json))
         .map(Map.Entry::getValue)

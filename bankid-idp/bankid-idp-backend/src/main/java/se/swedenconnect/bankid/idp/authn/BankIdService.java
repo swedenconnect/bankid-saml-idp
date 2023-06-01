@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.ApiResponseFactory;
-import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
-import se.swedenconnect.bankid.idp.authn.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
-import se.swedenconnect.bankid.rpapi.types.CollectResponseJson;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
@@ -84,7 +81,7 @@ public class BankIdService {
     return Mono.just(b);
   }
 
-  private Mono<CollectResponseJson> collect(HttpServletRequest request, BankIDClient client, BankIdSessionData data) {
+  private Mono<CollectResponse> collect(HttpServletRequest request, BankIDClient client, BankIdSessionData data) {
     return client.collect(data.getOrderReference())
         .map(c -> {
           eventPublisher.collectResponse(request, c).publish();

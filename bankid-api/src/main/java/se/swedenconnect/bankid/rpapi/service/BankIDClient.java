@@ -82,7 +82,7 @@ public interface BankIDClient {
    * @throws UserCancelException if the user cancels the operation
    * @throws BankIDException for errors
    */
-  Mono<? extends CollectResponseJson> collect(final String orderReference);
+  Mono<? extends CollectResponse> collect(final String orderReference);
 
   /**
    * Returns the QR generator that should be used to generate QR codes.
