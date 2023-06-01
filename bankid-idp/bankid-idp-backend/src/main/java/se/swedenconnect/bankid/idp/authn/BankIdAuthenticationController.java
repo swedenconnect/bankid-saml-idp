@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.idp.BankIdService;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
@@ -38,7 +37,6 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -48,8 +46,6 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -116,7 +112,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
 
   @GetMapping("/api/poll") // TODO: 2023-05-23 POST
-  public Mono<PollResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
+  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
     BankIdSessionState state = sessionReader.loadSessionData(request);
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);

@@ -1,10 +1,11 @@
-package se.swedenconnect.bankid.idp;
+package se.swedenconnect.bankid.idp.authn;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.idp.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
-import se.swedenconnect.bankid.idp.authn.PollResponse;
+import se.swedenconnect.bankid.idp.authn.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
@@ -30,6 +31,17 @@ public class BankIdService {
 
   private final BankIdEventPublisher eventPublisher;
 
+  public Mono<ApiResponse> poll(HttpServletRequest request, Boolean qr, BankIdSessionState state, Saml2UserAuthenticationInputToken authnInputToken, BankIdContext bankIdContext, BankIDClient client) {
+    return Optional.ofNullable(state)
+        .map(BankIdSessionState::getBankIdSessionData)
+        .map(sessionData -> collect(request, client, sessionData)
+            .map(c -> BankIdSessionData.of(sessionData, c))
+            .flatMap(b -> reAuthIfExpired(request, state, bankIdContext, client, b))
+            .map(b -> ApiResponseFactory.create(b, client.getQRGenerator(), qr))
+            .onErrorResume(this::handleError))
+        .orElseGet(() -> onNoSession(request, qr, bankIdContext, client));
+  }
+
   private Mono<OrderResponse> auth(final HttpServletRequest request, String personalNumber, BankIDClient client) {
     Requirement requirement = new Requirement();
     // TODO: 2023-05-17 Requirement factory per entityId
@@ -42,25 +54,14 @@ public class BankIdService {
         });
   }
 
-  public Mono<PollResponse> poll(HttpServletRequest request, Boolean qr, BankIdSessionState state, Saml2UserAuthenticationInputToken authnInputToken, BankIdContext bankIdContext, BankIDClient client) {
-    return Optional.ofNullable(state)
-        .map(BankIdSessionState::getBankIdSessionData)
-        .map(sessionData -> collect(request, client, sessionData)
-            .map(c -> BankIdSessionData.of(sessionData, c))
-            .flatMap(b -> reAuthIfExpired(request, state, bankIdContext, client, b))
-            .map(b -> pollResponseFrom(b, client.getQRGenerator(), qr))
-            .onErrorResume(this::handleError))
-        .orElseGet(() -> onNoSession(request, qr, bankIdContext, client));
-  }
-
-  private Mono<PollResponse> onNoSession(HttpServletRequest request, Boolean qr, BankIdContext bankIdContext, BankIDClient client) {
+  private Mono<ApiResponse> onNoSession(HttpServletRequest request, Boolean qr, BankIdContext bankIdContext, BankIDClient client) {
     return auth(request, bankIdContext.getPersonalNumber(), client)
         .map(BankIdSessionData::of)
         .flatMap(b -> collect(request, client, b)
-            .map(c -> pollResponseFrom(BankIdSessionData.of(b, c), client.getQRGenerator(), qr)));
+            .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), client.getQRGenerator(), qr)));
   }
 
-  private Mono<PollResponse> handleError(Throwable e) {
+  private Mono<ApiResponse> handleError(Throwable e) {
     if (e instanceof BankIdSessionExpiredException bankIdSessionExpiredException) {
       return this.sessionExpired(bankIdSessionExpiredException.getExpiredSessionHolder());
     }
@@ -86,26 +87,8 @@ public class BankIdService {
         });
   }
 
-  private Mono<PollResponse> sessionExpired(HttpServletRequest request) {
+  private Mono<ApiResponse> sessionExpired(HttpServletRequest request) {
     eventPublisher.orderCancellation(request).publish();
-    return Mono.just(PollResponse.timeExpired());
-  }
-
-
-  private PollResponse pollResponseFrom(BankIdSessionData data, QRGenerator generator, boolean showQr) {
-    String qrCode = "";
-    if (showQr) {
-      qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime());
-    }
-    return new PollResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
-  }
-
-  private PollResponse.Status statusOf(BankIdSessionData d) {
-    return switch (d.getStatus()) {
-      case COMPLETE:
-        yield PollResponse.Status.COMPLETE;
-      default:
-        yield PollResponse.Status.IN_PROGRESS;
-    };
+    return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
   }
 }
