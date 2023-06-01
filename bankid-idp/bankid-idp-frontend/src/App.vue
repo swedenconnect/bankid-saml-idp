@@ -11,3 +11,13 @@ import Localechanger from "@/components/LanguageSelector.vue";
   <RouterView/>
   <Footer/>
 </template>
+
+<script>
+import {spInformation} from "@/service";
+
+export default {
+    mounted() {
+        spInformation()
+    }
+}
+</script>

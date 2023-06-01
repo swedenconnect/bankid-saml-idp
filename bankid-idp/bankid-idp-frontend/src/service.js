@@ -17,7 +17,10 @@ export async function cancel() {
         headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
         credentials: 'include',
     };
-    const response = await fetch("/idp/api/cancel", requestOptions);
-    return await response;
+    return await fetch("/idp/api/cancel", requestOptions);
+}
+
+export async function spInformation() {
+    return await fetch("/idp/api/sp");
 }
 
