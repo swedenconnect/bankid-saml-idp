@@ -138,10 +138,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     BankIdSessionState state = sessionReader.loadSessionData(request);
     BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
     if (Objects.nonNull(bankIdSessionData)) {
-      final RelyingPartyData relyingParty = this.getRelyingParty(getInputToken(request).getAuthnInputToken().getAuthnRequestToken().getEntityId());
-      BankIDClient client = relyingParty.getClient();
-      eventPublisher.orderCancellation(request).publish();
-      return client.cancel(state.getBankIdSessionData().getOrderReference());
+      Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+      String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+      BankIDClient client = this.getRelyingParty(entityId).getClient();
+      return service.cancel(request, state, client);
     }
     return Mono.empty();
   }

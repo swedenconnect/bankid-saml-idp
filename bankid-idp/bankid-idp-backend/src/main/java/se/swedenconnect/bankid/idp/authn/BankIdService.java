@@ -42,6 +42,11 @@ public class BankIdService {
         .orElseGet(() -> onNoSession(request, qr, bankIdContext, client));
   }
 
+  public Mono<Void> cancel(HttpServletRequest request, BankIdSessionState state, BankIDClient client) {
+    eventPublisher.orderCancellation(request).publish();
+    return client.cancel(state.getBankIdSessionData().getOrderReference());
+  }
+
   private Mono<OrderResponse> auth(final HttpServletRequest request, String personalNumber, BankIDClient client) {
     Requirement requirement = new Requirement();
     // TODO: 2023-05-17 Requirement factory per entityId
