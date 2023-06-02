@@ -59,7 +59,8 @@ public enum ProgressStatus {
    */
   COMPLETE("complete"),
   /**
-   * TODO WRITE DESCRIPTION
+   * The order has expired. The BankID security RP must inform the user.
+   * Message app/program did not start
    */
   EXPIRED_TRANSACTION("expiredTransaction");
 

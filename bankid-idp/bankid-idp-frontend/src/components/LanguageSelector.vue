@@ -2,11 +2,12 @@
     <div class="container main" id="languageDiv">
         <br/>
         <div class="col-sm-12 float-right">
-            <select v-model="$i18n.locale">
-                <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
-                    {{ lang }}
-                </option>
-            </select>
+            <button class="btn btn-link" v-if="getLanguage() === 'en'" @click="selectLanguage('sv')" >
+                <span> Svenska </span>
+            </button>
+            <button class="btn btn-link" v-if="getLanguage() === 'sv'" @click="selectLanguage('en')" >
+                <span> English </span>
+            </button>
         </div>
     </div>
     <br/>
@@ -14,8 +15,13 @@
 <script>
 export default {
     name: 'localechanger',
-    data() {
-        return { langs: ['sv', 'en'] };
+    methods: {
+        selectLanguage: function(lang) {
+            this.$i18n.locale = lang;
+        },
+        getLanguage: function () {
+            return this.$i18n.locale;
+        }
     },
 };
 </script>

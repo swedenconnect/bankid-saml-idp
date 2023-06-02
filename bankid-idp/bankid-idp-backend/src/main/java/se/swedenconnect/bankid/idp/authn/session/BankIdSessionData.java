@@ -19,6 +19,7 @@ public class BankIdSessionData {
   private String orderReference;
   private ProgressStatus status;
   private Boolean expired;
+  private String hintCode;
   private String messageCode;
   private Boolean showQr;
 
@@ -31,6 +32,7 @@ public class BankIdSessionData {
         response.getOrderReference(),
         ProgressStatus.STARTED,
         false,
+        "",
         "bankid.msg.rfa21",
         showQr
     );
@@ -45,6 +47,7 @@ public class BankIdSessionData {
         previous.getOrderReference(),
         json.getProgressStatus(),
         json.getErrorCode() == ErrorCode.START_FAILED,
+        json.getHintCode(),
         StatusCodeFactory.statusCode(json, previous.getShowQr()),
         previous.getShowQr()
     );

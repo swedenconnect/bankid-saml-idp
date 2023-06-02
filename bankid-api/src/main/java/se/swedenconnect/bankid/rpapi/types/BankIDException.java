@@ -127,7 +127,7 @@ public class BankIDException extends RuntimeException {
 
   public BankIDException(String message) {
     super(message);
-    this.errorCode = ErrorCode.UNKNOWN_ERROR; // TODO: 2023-05-29 Check fields
+    this.errorCode = ErrorCode.UNKNOWN_ERROR;
   }
 
   /**

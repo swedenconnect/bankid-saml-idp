@@ -31,7 +31,8 @@ public class StatusCodeFactory {
   );
 
   private static final Map<Predicate<StatusData>, String> QR_MESSAGE_CONDITIONS = Map.of(
-    c -> c.getShowQr() && PENDING.equals(c.getCollectResponse().getStatus()), "ext2"
+      c ->  c.getShowQr() && PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()), "rfa9",
+      c -> c.getShowQr() && PENDING.equals(c.getCollectResponse().getStatus()), "ext2"
   );
 
 
