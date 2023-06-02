@@ -6,7 +6,7 @@ import Localechanger from "@/components/LanguageSelector.vue";
 
 <template>
 
-  <Header/>
+  <Header :sp-info=spInfo />
   <Localechanger/>
   <RouterView/>
   <Footer/>
@@ -16,8 +16,15 @@ import Localechanger from "@/components/LanguageSelector.vue";
 import {spInformation} from "@/service";
 
 export default {
+    data() {
+        return {
+            spInfo: {}
+        }
+    },
     mounted() {
-        spInformation()
+        spInformation().then(r => {
+            this.spInfo = r;
+        });
     }
 }
 </script>

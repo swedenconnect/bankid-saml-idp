@@ -21,6 +21,6 @@ export async function cancel() {
 }
 
 export async function spInformation() {
-    return await fetch("/idp/api/sp");
+    return (await fetch("/idp/api/sp")).json();
 }
 

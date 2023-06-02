@@ -19,12 +19,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opensaml.core.xml.LangBearing;
 import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
-import org.opensaml.saml.saml2.metadata.Organization;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
@@ -49,7 +50,10 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -151,12 +155,17 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession().getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
     Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
         .stream()
+        .filter(v -> v.getXMLLang() != null && v.getValue() != null)
         .collect(Collectors.toMap(LangBearing::getXMLLang, XSString::getValue));
-    List<LogoImpl> images = attribute.getPeerMetadata().getRoleDescriptors()
-        .get(0).getExtensions().getUnknownXMLObjects().get(0).getOrderedChildren().stream()
-        .filter(x -> x instanceof LogoImpl)
-        .map(LogoImpl.class::cast).toList();
-    return Mono.just(new SpInformation(displayNames, images.get(0).toString()));
+    List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
+        .flatMap(d -> Optional.ofNullable(d.getExtensions().getUnknownXMLObjects().get(0)))
+        .flatMap(e -> Optional.ofNullable(e.getOrderedChildren()))
+        .map(c -> c.stream()
+            .filter(x -> x instanceof LogoImpl)
+            .map(LogoImpl.class::cast)
+            .toList()).orElseGet(List::of);
+    SpInformation data = new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
+    return Mono.just(data);
   }
 
   /**
