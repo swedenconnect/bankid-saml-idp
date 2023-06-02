@@ -3,11 +3,11 @@
         <center>
             <div class="row">
                 <div class="column">
-                    <img class="top-logo-dim" :src=getImage() alt="Logo" :hidden=hideImage() />
+                    <img class="top-logo-dim" :src=getImage() alt="Logo" :hidden=hideImage()
+                    />
                 </div>
                 <div class="column">
-                    <img class="top-logo-dim" src="@/assets/BankID_logo.svg"
-                         alt="Logo"/>
+                    <img class="top-logo-dim" src="@/assets/BankID_logo.svg" alt="Logo"/>
                 </div>
             </div>
         </center>

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.idp.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
@@ -120,7 +121,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     BankIdSessionState state = sessionReader.loadSessionData(request);
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
-    final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
+    final RelyingPartyData relyingParty = this. getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
     return service.poll(request, qr, state, authnInputToken, bankIdContext, client);
   }
@@ -220,7 +221,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     final RelyingPartyData rp = this.rpRepository.getRelyingParty(entityId);
     if (rp == null) {
       log.info("SAML SP '{}' is not a registered BankID Relying Party", entityId);
-      throw new RuntimeException("Not registered"); // TODO: handle
+      throw new NoSuchRelyingPartyException();
     }
     return rp;
   }
