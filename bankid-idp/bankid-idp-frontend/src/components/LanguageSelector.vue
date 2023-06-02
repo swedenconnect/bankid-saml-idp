@@ -1,6 +1,7 @@
 <template>
     <div class="container main" id="languageDiv">
-        <div class="col-sm-12">
+        <br/>
+        <div class="col-sm-12 float-right">
             <select v-model="$i18n.locale">
                 <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
                     {{ lang }}
@@ -8,6 +9,7 @@
             </select>
         </div>
     </div>
+    <br/>
 </template>
 <script>
 export default {
