@@ -28,6 +28,8 @@ import java.util.TimeZone;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 
+import org.springframework.util.Assert;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
@@ -94,35 +96,32 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
       throws Saml2ErrorStatusException {
 
     final BankIdAuthenticationToken bankIdToken = BankIdAuthenticationToken.class.cast(token.getAuthnToken());
-    final CompletionData authnData = (CompletionData) bankIdToken.getDetails();
-
+    final CollectResponse authnData = (CollectResponse) bankIdToken.getDetails();
+    Objects.requireNonNull(authnData.getCompletionData());
     // TODO: Compare pnr from principal selection with pnr from authnData
-    
     // TODO: We should not hardwire loa3-uncertified
     
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
         LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3,
-        Instant.now(), authnData.getDevice().getIpAddress());
+        Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
     return new Saml2UserAuthentication(userDetails);
   }
 
-  private static List<UserAttribute> mapUserAttributes(final CompletionData authnData) {
-    final CompletionData.User user = authnData.getUser();
-
-    // TODO: We need the orderRef also. It should be mapped against the transactionIdentifier
-    // (urn:oid:1.2.752.201.3.2) attribute.
+  private static List<UserAttribute> mapUserAttributes(final CollectResponse authnData) {
+    CompletionData completionData = authnData.getCompletionData();
+    final CompletionData.User user = completionData.getUser();
 
     // Build the authnContextParams attribute ...
     //
     final String authnContextParams = String.format("bankidNotBefore=%s;bankidNotAfter=%s;bankidUserAgentAddress=%s",
-        URLEncoder.encode(iso8601DateFormatter.format(new Date(authnData.getCert().getNotBefore())),
+        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotBefore())),
             StandardCharsets.UTF_8),
-        URLEncoder.encode(iso8601DateFormatter.format(new Date(authnData.getCert().getNotAfter())),
+        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotAfter())),
             StandardCharsets.UTF_8),
-        URLEncoder.encode(authnData.getDevice().getIpAddress(), StandardCharsets.UTF_8));
+        URLEncoder.encode(completionData.getDevice().getIpAddress(), StandardCharsets.UTF_8));
 
     // authnData.getCert().getNotBefore()
 
@@ -149,11 +148,17 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         new UserAttribute(
             AttributeConstants.ATTRIBUTE_NAME_USER_SIGNATURE,
             AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_USER_SIGNATURE,
-            authnData.getSignature()),
+            completionData.getSignature()),
         new UserAttribute(
             AttributeConstants.ATTRIBUTE_NAME_AUTH_SERVER_SIGNATURE,
             AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_AUTH_SERVER_SIGNATURE,
-            authnData.getOcspResponse()));
+            completionData.getOcspResponse()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_TRANSACTION_IDENTIFIER,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_TRANSACTION_IDENTIFIER,
+            authnData.getOrderReference()
+        )
+    );
 
   }
 

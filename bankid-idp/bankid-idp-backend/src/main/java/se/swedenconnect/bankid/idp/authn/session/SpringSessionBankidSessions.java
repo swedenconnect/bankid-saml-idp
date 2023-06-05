@@ -1,5 +1,6 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdS
     }
 
     @Override
-    public void save(HttpServletRequest request, CompletionData data) {
+    public void save(HttpServletRequest request, CollectResponse data) {
         HttpSession session = request.getSession();
         session.setAttribute("BANKID-COMPLETION-DATA", data);
     }

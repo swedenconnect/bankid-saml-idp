@@ -41,6 +41,7 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -141,7 +142,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    CompletionData data = (CompletionData) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
+    CollectResponse data = (CollectResponse) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
     eventPublisher.orderCompletion(request).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }

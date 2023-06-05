@@ -21,6 +21,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import se.swedenconnect.bankid.idp.ApplicationVersion;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 /**
@@ -36,11 +37,11 @@ public class BankIdAuthenticationToken extends AbstractAuthenticationToken {
   /**
    * Constructor.
    * 
-   * @param completionData the {@link CompletionData} received from the BankID server
+   * @param collectResponse the {@link CollectResponse} received from the BankID server
    */
-  public BankIdAuthenticationToken(final CompletionData completionData) {
+  public BankIdAuthenticationToken(final CollectResponse collectResponse) {
     super(Collections.emptyList());
-    this.setDetails(completionData);
+    this.setDetails(collectResponse);
     this.setAuthenticated(true);
   }
 

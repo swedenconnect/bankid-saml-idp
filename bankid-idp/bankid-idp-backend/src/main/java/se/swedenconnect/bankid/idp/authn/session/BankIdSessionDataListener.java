@@ -36,8 +36,7 @@ public class BankIdSessionDataListener {
         BankIdSessionData previous = reader.loadSessionData(event.getRequest()).getBankIdSessionData();
         writer.save(event.getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
         if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
-            CompletionData completionData = event.getCollectResponse().getCompletionData();
-            writer.save(event.getRequest(), completionData);
+            writer.save(event.getRequest(), event.getCollectResponse());
         }
     }
 
