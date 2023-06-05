@@ -15,21 +15,30 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TimeZone;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
+
 import org.springframework.util.Assert;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
+import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
+import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.spring.saml.idp.attributes.UserAttribute;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthentication;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * The BankID {@link AuthenticationProvider}.
@@ -38,6 +47,8 @@ import java.util.Optional;
  * @author Felix Hellman
  */
 public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthenticationProvider {
+
+  private static final SimpleDateFormat iso8601DateFormatter = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 
   /**
    * The provider name.
@@ -54,17 +65,22 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
    */
   private final List<String> entityCategories;
 
+  static {
+    iso8601DateFormatter.setLenient(false);
+    iso8601DateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
+
   /**
    * Constructor.
    *
-   * @param authnPath                 the path to where we redirect the user for authentication
-   * @param resumeAuthnPath           the path that the authentication process uses to redirect the user back after a completed
-   *                                  authentication
+   * @param authnPath the path to where we redirect the user for authentication
+   * @param resumeAuthnPath the path that the authentication process uses to redirect the user back after a completed
+   *          authentication
    * @param supportedAuthnContextUris the supported LoA:s
-   * @param entityCategories          declared/supported entity categories
+   * @param entityCategories declared/supported entity categories
    */
   public BankIdAuthenticationProvider(final String authnPath, final String resumeAuthnPath,
-                                      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
+      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
     super(authnPath, resumeAuthnPath);
     this.supportedAuthnContextUris = Optional.ofNullable(supportedAuthnContextUris)
         .filter(s -> !s.isEmpty())
@@ -80,24 +96,70 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
       throws Saml2ErrorStatusException {
 
     final BankIdAuthenticationToken bankIdToken = BankIdAuthenticationToken.class.cast(token.getAuthnToken());
-    final CompletionData authnData = (CompletionData) bankIdToken.getDetails();
-
+    final CollectResponse authnData = (CollectResponse) bankIdToken.getDetails();
+    Objects.requireNonNull(authnData.getCompletionData());
     // TODO: Compare pnr from principal selection with pnr from authnData
-
-    List<UserAttribute> userAttributes = mapUserAttrinutes(authnData);
-    Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes, "urn:oid:1.2.752.29.4.13", "http://id.swedenconnect.se/loa/1.0/uncertified-loa3", Instant.now(), authnData.getDevice().getIpAddress());
+    // TODO: We should not hardwire loa3-uncertified
+    
+    final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
+    final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
+        AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
+        LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3,
+        Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
     return new Saml2UserAuthentication(userDetails);
   }
 
-  private static List<UserAttribute> mapUserAttrinutes(CompletionData authnData) {
-    CompletionData.User user = authnData.getUser();
+  private static List<UserAttribute> mapUserAttributes(final CollectResponse authnData) {
+    CompletionData completionData = authnData.getCompletionData();
+    final CompletionData.User user = completionData.getUser();
+
+    // Build the authnContextParams attribute ...
+    //
+    final String authnContextParams = String.format("bankidNotBefore=%s;bankidNotAfter=%s;bankidUserAgentAddress=%s",
+        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotBefore())),
+            StandardCharsets.UTF_8),
+        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotAfter())),
+            StandardCharsets.UTF_8),
+        URLEncoder.encode(completionData.getDevice().getIpAddress(), StandardCharsets.UTF_8));
+
+    // authnData.getCert().getNotBefore()
+
     return List.of(
-            new UserAttribute("urn:oid:1.2.752.29.4.13", "personalIdentityNumber", user.getPersonalNumber()),
-            new UserAttribute("urn:oid:2.16.840.1.113730.3.1.241", "displayName", user.getName()),
-            new UserAttribute("urn:oid:2.5.4.42", "givenName", user.getGivenName()),
-            new UserAttribute("urn:oid:2.5.4.4", "surname", user.getSurname())
+        new UserAttribute(AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_PERSONAL_IDENTITY_NUMBER,
+            user.getPersonalNumber()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_DISPLAY_NAME,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_DISPLAY_NAME,
+            user.getName()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_GIVEN_NAME,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_GIVEN_NAME,
+            user.getGivenName()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_SN,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_SN,
+            user.getSurname()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_AUTH_CONTEXT_PARAMS,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_AUTH_CONTEXT_PARAMS,
+            authnContextParams),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_USER_SIGNATURE,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_USER_SIGNATURE,
+            completionData.getSignature()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_AUTH_SERVER_SIGNATURE,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_AUTH_SERVER_SIGNATURE,
+            completionData.getOcspResponse()),
+        new UserAttribute(
+            AttributeConstants.ATTRIBUTE_NAME_TRANSACTION_IDENTIFIER,
+            AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_TRANSACTION_IDENTIFIER,
+            authnData.getOrderReference()
+        )
     );
+
   }
 
   /**

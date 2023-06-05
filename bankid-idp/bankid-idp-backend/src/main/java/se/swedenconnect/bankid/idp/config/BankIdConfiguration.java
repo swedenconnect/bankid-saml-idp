@@ -15,34 +15,22 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import lombok.Setter;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.metadata.EncryptionMethod;
-import org.opensaml.saml.saml2.metadata.EntityDescriptor;
-import org.opensaml.saml.saml2.metadata.Extensions;
-import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-import org.opensaml.saml.saml2.metadata.KeyDescriptor;
+import org.opensaml.saml.saml2.metadata.*;
 import org.opensaml.security.credential.UsageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-
-import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -59,10 +47,11 @@ import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.RequestedPrincipalS
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
 import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
-import se.swedenconnect.spring.saml.idp.authentication.provider.external.UserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
+
+import java.util.*;
 
 /**
  * BankID IdP configuration.
@@ -74,12 +63,16 @@ import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
 @EnableConfigurationProperties(BankIdConfigurationProperties.class)
 public class BankIdConfiguration {
 
-  /** The context path. */
+  /**
+   * The context path.
+   */
   @Setter
   @Value("${server.servlet.context-path:/}")
   private String contextPath;
 
-  /** BankID configuration properties. */
+  /**
+   * BankID configuration properties.
+   */
   private final BankIdConfigurationProperties properties;
 
   /**
@@ -105,11 +98,11 @@ public class BankIdConfiguration {
   @Order(2)
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
     http
-        .csrf().disable()
-        .cors().disable()
+        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+        .cors().and()
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/auth", "/poll", "/complete", "/resume", "/**/resume").permitAll()
+            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**", "/**/resume").permitAll()
             .anyRequest().denyAll());
 
     return http.build();
@@ -151,8 +144,7 @@ public class BankIdConfiguration {
       final PkiCredential credential;
       if (rp.getCredential() != null) {
         credential = this.createPkiCredential(rp.getCredential());
-      }
-      else { // ref
+      } else { // ref
         credential = sharedCredentials.get(rp.getCredentialRef());
         if (credential == null) {
           throw new IllegalArgumentException(
@@ -245,7 +237,7 @@ public class BankIdConfiguration {
         }
       }
       if (encryption != null) {
-        final String[] algs = { "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
+        final String[] algs = {"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
             "http://www.w3.org/2009/xmlenc11#aes192-gcm",
             "http://www.w3.org/2009/xmlenc11#aes128-gcm"

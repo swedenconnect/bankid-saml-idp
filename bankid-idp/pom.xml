@@ -8,6 +8,7 @@
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <relativePath/>
   </parent>
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
   <url>https://docs.swedenconnect.se/bankid-saml-idp</url>

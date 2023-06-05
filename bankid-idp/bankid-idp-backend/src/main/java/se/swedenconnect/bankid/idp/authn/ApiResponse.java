@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PollResponse {
+public class ApiResponse {
     public enum Status {
         IN_PROGRESS,
         ERROR,
@@ -17,4 +17,8 @@ public class PollResponse {
     private Status status;
 
     private String qrCode;
+
+    private String autoStartToken;
+
+    private String messageCode;
 }

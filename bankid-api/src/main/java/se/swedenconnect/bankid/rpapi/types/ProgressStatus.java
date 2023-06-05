@@ -57,7 +57,12 @@ public enum ProgressStatus {
    * The user has provided the security code and completed the order. Collect response includes the signature, user
    * information and the ocsp response.
    */
-  COMPLETE("complete");
+  COMPLETE("complete"),
+  /**
+   * The order has expired. The BankID security RP must inform the user.
+   * Message app/program did not start
+   */
+  EXPIRED_TRANSACTION("expiredTransaction");
 
   /** The string representation of the enum. */
   private String value;

@@ -125,6 +125,11 @@ public class BankIDException extends RuntimeException {
     this.errorCode = errorCode;
   }
 
+  public BankIDException(String message) {
+    super(message);
+    this.errorCode = ErrorCode.UNKNOWN_ERROR;
+  }
+
   /**
    * Returns the error code.
    *

@@ -1,9 +1,26 @@
-export async function auth() {
-    const response = await fetch('/idp/auth');
+import {getXSRFCookie} from "@/cookies";
+
+export async function poll(showQr) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
+        credentials: 'include',
+    };
+    const response = await fetch("/idp/api/poll?qr=" + showQr, requestOptions);
     return await response.json();
 }
 
-export async function poll() {
-    const response = await  fetch("/idp/poll");
-    return await response.json();
+export async function cancel() {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
+        credentials: 'include',
+    };
+    return await fetch("/idp/api/cancel", requestOptions);
 }
+
+export async function spInformation() {
+    return (await fetch("/idp/api/sp")).json();
+}
+
