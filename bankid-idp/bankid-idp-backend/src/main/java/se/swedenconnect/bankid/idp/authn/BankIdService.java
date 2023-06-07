@@ -62,7 +62,7 @@ public class BankIdService {
   private Mono<OrderResponse> init(BankIdContext bankIdContext, HttpServletRequest request, BankIDClient client, boolean qr, String message) {
     if (bankIdContext.getOperation().equals(BankIdOperation.SIGN)) {
       DataToSign dataToSign = new DataToSign();
-      dataToSign.setUserVisibleData(new String(Base64.getEncoder().encode(message.getBytes()), StandardCharsets.UTF_8));
+      dataToSign.setUserVisibleData(new String(message.getBytes()));
       return client.sign(bankIdContext.getPersonalNumber(), request.getRemoteAddr(), dataToSign, new Requirement())
           .map(o -> {
             eventPublisher.orderResponse(request, o, qr).publish();
