@@ -14,6 +14,8 @@
 </template>
 <script>
 
+import {shallSelectDeviceAutomatically} from "@/AutoStartLinkFactory";
+
 export default {
     methods: {
         authenticate: function (pushLocation) {

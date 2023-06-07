@@ -20,7 +20,7 @@ export default {
     },
     methods: {
         getAutoStartLink: function () {
-            return createLink(window.navigator.userAgent, this.autoStartToken);
+            return createLink(window.navigator.userAgent, this.autoStartToken, window.location.href);
         },
         navigateToApp: function () {
             window.location.href = this.getAutoStartLink();
