@@ -10,6 +10,8 @@
 </template>
 <script>
 
+import {createLink} from "@/AutoStartLinkFactory";
+
 export default {
     props: {
         qr: Boolean,
@@ -18,7 +20,7 @@ export default {
     },
     methods: {
         getAutoStartLink: function () {
-            return "bankid:///?autostarttoken=" + this.autoStartToken + "&redirect=null";
+            return createLink(window.navigator.userAgent, this.autoStartToken);
         },
         navigateToApp: function () {
             window.location.href = this.getAutoStartLink();

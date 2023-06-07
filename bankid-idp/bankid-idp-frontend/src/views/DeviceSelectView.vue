@@ -25,8 +25,9 @@
 </template>
 <script>
 import DeviceSelect from "@/components/DeviceSelect.vue";
+
 export default {
-  components: {DeviceSelect},
+    components: {DeviceSelect},
   methods: {
     cancelSelection: function () {
       window.location.href = "/idp/view/cancel"
