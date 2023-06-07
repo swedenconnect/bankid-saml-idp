@@ -25,6 +25,11 @@ export default {
         navigateToApp: function () {
             window.location.href = this.getAutoStartLink();
         }
+    },
+    watch: {
+        autoStartToken(oldToken, newToken) {
+            this.navigateToApp();
+        }
     }
 }
 </script>

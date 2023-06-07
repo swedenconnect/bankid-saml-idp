@@ -19,6 +19,11 @@ export default {
         authenticate: function (pushLocation) {
             this.$router.push({name: pushLocation});
         }
+    },
+    mounted() {
+        if (shallSelectDeviceAutomatically(window.navigator.userAgent)) {
+            this.authenticate('auto');
+        }
     }
 }
 </script>

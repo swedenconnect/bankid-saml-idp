@@ -22,7 +22,7 @@ function getDefaultRedirect(token) {
     return "bankid:///?autostarttoken=" + token + "&redirect=null";
 }
 
-export function shallStartAutomatically(userAgent) {
+export function shallSelectDeviceAutomatically(userAgent) {
     let uap = new UAParser(userAgent);
     let ua = uap.getResult();
     switch (getType(ua)) {
