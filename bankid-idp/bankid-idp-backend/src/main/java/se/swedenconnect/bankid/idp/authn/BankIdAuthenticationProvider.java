@@ -15,30 +15,30 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimeZone;
-
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
-
-import org.springframework.util.Assert;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.w3c.dom.Attr;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.spring.saml.idp.attributes.UserAttribute;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthentication;
+import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * The BankID {@link AuthenticationProvider}.
@@ -100,7 +100,7 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
     Objects.requireNonNull(authnData.getCompletionData());
     // TODO: Compare pnr from principal selection with pnr from authnData
     // TODO: We should not hardwire loa3-uncertified
-    
+
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,

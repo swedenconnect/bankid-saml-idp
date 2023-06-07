@@ -28,6 +28,7 @@ import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -125,9 +126,15 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this. getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
-    return service.poll(request, qr, state, authnInputToken, bankIdContext, client);
+    return service.poll(request, qr, state, authnInputToken, bankIdContext, client, getMessage(bankIdContext, authnInputToken));
   }
 
+  private String getMessage(BankIdContext context, Saml2UserAuthenticationInputToken token) {
+    if (context.getOperation() == BankIdOperation.SIGN){
+      return token.getAuthnRequirements().getSignatureMessageExtension().getMessage();
+    }
+    return "Text";
+  }
   @PostMapping("/api/cancel")
   public Mono<Void> cancelRequest(HttpServletRequest request) {
     BankIdSessionState state = sessionReader.loadSessionData(request);

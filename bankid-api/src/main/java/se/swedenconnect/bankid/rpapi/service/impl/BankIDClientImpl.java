@@ -29,7 +29,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
@@ -164,7 +163,7 @@ public class BankIDClientImpl implements BankIDClient {
     final SignRequest request = new SignRequest(personalIdentityNumber, endUserIp, requirement, dataToSign);
     log.debug("{}: sign. request: [{}] [path: {}]", this.identifier, request, SIGN_PATH);
 
-    try {
+
       return this.webClient.post()
           .uri(SIGN_PATH)
           .bodyValue(request)
@@ -176,17 +175,16 @@ public class BankIDClientImpl implements BankIDClient {
           })
           .bodyToMono(OrderResponse.class)
           .onErrorComplete()
-          .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
-
-      //log.debug("{}: sign. response: [{}]", this.identifier, response);
-    } catch (final WebClientResponseException e) {
-      log.info("{}: sign. Error during sign-call - {} - {} - {}",
-          this.identifier, e.getMessage(), e.getStatusCode(), e.getResponseBodyAsString());
-      throw new BankIDException(this.getErrorResponse(e), "Sign-call failed", e);
-    } catch (final Exception e) {
-      log.error("{}: sign. Error during sign-call - {}", this.identifier, e.getMessage(), e);
-      throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during sign", e);
-    }
+          .doOnError(e -> {
+            if (e instanceof WebClientResponseException webClientResponseException) {
+              log.info("{}: collect. Error during collect-call - {} - {} - {}",
+                  this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
+              throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
+            } else {
+              log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
+              throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
+            }
+          });
   }
 
   /**
@@ -199,22 +197,23 @@ public class BankIDClientImpl implements BankIDClient {
 
     final OrderRefRequest request = new OrderRefRequest(orderReference);
 
-    try {
-      return this.webClient.post()
-          .uri(CANCEL_PATH)
-          .bodyValue(request)
-          .retrieve()
-          .bodyToMono(Void.class)
-          .publishOn(Schedulers.fromExecutor(EXECUTOR_SERVICE))
-          .doOnSuccess(n -> log.info("{}: cancel. Order {} successfully cancelled", this.identifier, orderReference));
-    } catch (final WebClientResponseException e) {
-      log.info("{}: cancel. Error during cancel-call - {} - {} - {}",
-          this.identifier, e.getMessage(), e.getStatusCode(), e.getResponseBodyAsString());
-      throw new BankIDException(this.getErrorResponse(e), "Cancel-call failed", e);
-    } catch (final Exception e) {
-      log.error("{}: cancel. Error during cancel-call - {}", this.identifier, e.getMessage(), e);
-      throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during cancel", e);
-    }
+    return this.webClient.post()
+        .uri(CANCEL_PATH)
+        .bodyValue(request)
+        .retrieve()
+        .bodyToMono(Void.class)
+        .doOnSuccess(n -> log.info("{}: cancel. Order {} successfully cancelled", this.identifier, orderReference))
+        .doOnError(e -> {
+          if (e instanceof WebClientResponseException webClientResponseException) {
+            log.info("{}: collect. Error during collect-call - {} - {} - {}",
+                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
+            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
+          } else {
+            log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
+            throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
+          }
+        });
+
   }
 
 
