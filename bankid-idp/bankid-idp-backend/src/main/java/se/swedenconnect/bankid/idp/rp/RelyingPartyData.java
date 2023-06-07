@@ -15,9 +15,11 @@
  */
 package se.swedenconnect.bankid.idp.rp;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 
 /**
@@ -26,21 +28,65 @@ import se.swedenconnect.bankid.rpapi.service.BankIDClient;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class RelyingPartyData {
-  
+
   /**
-   * The SAML entityID for the relying party.
+   * The SAML entityID:s for the relying party.
    */
-  private String entityId;
-  
+  private List<String> entityIds;
+
   /**
    * The BankID client that contains the RP-certificate for the client.
    */
-  private BankIDClient client;
-  
+  private final BankIDClient client;
+
   // TODO: custom display texts, custom logo ...
+
+  public RelyingPartyData(final BankIDClient client, final List<String> entityIds) {
+    this.client = Objects.requireNonNull(client, "client must not be null");
+    this.entityIds = Optional.ofNullable(entityIds)
+        .map(Collections::unmodifiableList)
+        .orElseGet(Collections::emptyList);
+  }
+
+  /**
+   * Gets the ID for this Relying Party.
+   * 
+   * @return the ID
+   */
+  public String getId() {
+    return this.client.getIdentifier();
+  }
+
+  /**
+   * Gets the BankID client for this Relying Party.
+   * 
+   * @return a {@link BankIDClient}
+   */
+  public BankIDClient getClient() {
+    return this.client;
+  }
+
+  /**
+   * Gets a list of all SAML entityID:s (SP:s) that this Relying Party serves.
+   * <p>
+   * If the list is empty and the IdP is in test mode, this means that all SP:s are served by this RP.
+   * </p>
+   * 
+   * @return a list of entityID:s
+   */
+  public List<String> getEntityIds() {
+    return this.entityIds;
+  }
+
+  /**
+   * Predicate that tells whether the supplied SAML entityID is served by this RP.
+   * 
+   * @param entityId the SAML SP entityID
+   * @return {@code true} if this RP serves this SP and {@code false} otherwise
+   */
+  public boolean matches(final String entityId) {
+    return this.entityIds.isEmpty() ? true : this.entityIds.contains(entityId);
+  }
 
 }

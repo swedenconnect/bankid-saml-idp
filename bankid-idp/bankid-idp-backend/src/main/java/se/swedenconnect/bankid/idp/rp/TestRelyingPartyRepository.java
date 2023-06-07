@@ -16,19 +16,21 @@
 package se.swedenconnect.bankid.idp.rp;
 
 /**
- * Interface for storing and obtaining {@link RelyingPartyData} objects.
+ * A {@link RelyingPartyRepository} implementation that is used when the BankID SAML IdP
+ * allows any SAML SP to invoke it. This is typically only used for testing.
  * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public interface RelyingPartyRepository {
+public class TestRelyingPartyRepository implements RelyingPartyRepository {
+  
+  public TestRelyingPartyRepository() {    
+  }
 
-  /**
-   * Based on a SAML entityID the repository returns the {@link RelyingPartyData} associated with this ID.
-   *
-   * @param entityId the SAML entityID for the RP
-   * @return a {@link RelyingPartyData} or {@code null} if not present
-   */
-  RelyingPartyData getRelyingParty(final String entityId);
+  /** {@inheritDoc} */
+  @Override
+  public RelyingPartyData getRelyingParty(final String entityId) {
+    return null;
+  }
 
 }
