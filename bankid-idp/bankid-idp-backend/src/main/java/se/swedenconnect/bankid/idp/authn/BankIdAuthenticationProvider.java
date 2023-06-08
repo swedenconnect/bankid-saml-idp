@@ -15,30 +15,26 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimeZone;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
-
-import org.springframework.util.Assert;
+import org.springframework.security.core.context.SecurityContextHolder;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.spring.saml.idp.attributes.UserAttribute;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthentication;
+import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * The BankID {@link AuthenticationProvider}.
@@ -73,14 +69,14 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
   /**
    * Constructor.
    *
-   * @param authnPath the path to where we redirect the user for authentication
-   * @param resumeAuthnPath the path that the authentication process uses to redirect the user back after a completed
-   *          authentication
+   * @param authnPath                 the path to where we redirect the user for authentication
+   * @param resumeAuthnPath           the path that the authentication process uses to redirect the user back after a completed
+   *                                  authentication
    * @param supportedAuthnContextUris the supported LoA:s
-   * @param entityCategories declared/supported entity categories
+   * @param entityCategories          declared/supported entity categories
    */
   public BankIdAuthenticationProvider(final String authnPath, final String resumeAuthnPath,
-      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
+                                      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
     super(authnPath, resumeAuthnPath);
     this.supportedAuthnContextUris = Optional.ofNullable(supportedAuthnContextUris)
         .filter(s -> !s.isEmpty())
@@ -100,14 +96,17 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
     Objects.requireNonNull(authnData.getCompletionData());
     // TODO: Compare pnr from principal selection with pnr from authnData
     // TODO: We should not hardwire loa3-uncertified
-    
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
         LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3,
         Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
-    return new Saml2UserAuthentication(userDetails);
+    Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
+    if (SecurityContextHolder.getContext().getAuthentication() instanceof Saml2UserAuthenticationInputToken saml && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
+      saml2UserAuthentication.getSaml2UserDetails().setSignMessageDisplayed(true);
+    }
+    return saml2UserAuthentication;
   }
 
   private static List<UserAttribute> mapUserAttributes(final CollectResponse authnData) {
@@ -159,7 +158,6 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
             authnData.getOrderReference()
         )
     );
-
   }
 
   /**
