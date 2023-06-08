@@ -214,8 +214,8 @@
               <jvmFlag>-Dorg.apache.xml.security.ignoreLineBreaks=true</jvmFlag>
             </jvmFlags>
             <ports>
-              <port>8009</port>
-              <port>8443</port>
+              <port>8012</port>
+              <port>8082</port>
             </ports>
           </container>
         </configuration>

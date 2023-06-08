@@ -56,14 +56,14 @@ export default {
       }).then(response => {
         if (this.shouldCancel) {
           cancel().then(canel => {
-            window.location.href = "/idp/view/cancel";
+            window.location.href = "/bankid/idp/view/cancel";
           });
         } else {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
               if (response["status"] !== "ERROR") {
-                  window.location.href = "/idp/view/complete";
+                  window.location.href = "/bankid/idp/view/complete";
               }
           }
         }
@@ -75,7 +75,7 @@ export default {
     cancelRequest: function () {
       if (!this.pollingActive) {
           cancel().then(r => {
-              window.location.href = "/idp/view/cancel";
+              window.location.href = "/bankid/idp/view/cancel";
           });
       } else {
           this.shouldCancel = true;

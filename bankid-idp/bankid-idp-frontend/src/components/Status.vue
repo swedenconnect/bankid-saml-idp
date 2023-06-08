@@ -28,7 +28,9 @@ export default {
     },
     watch: {
         autoStartToken(oldToken, newToken) {
-            this.navigateToApp();
+            if(!this.qr) {
+                this.navigateToApp();
+            }
         }
     }
 }

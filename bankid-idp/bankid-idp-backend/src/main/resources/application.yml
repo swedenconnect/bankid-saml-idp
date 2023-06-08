@@ -2,7 +2,7 @@
 # Configuration for the BankID IdP.
 #
 server:
-  port: 8443
+  port: 8082
   servlet:
     session:
       cookie:
@@ -158,7 +158,8 @@ tomcat:
     enabled: true
     secret-required: true
     # secret is not set here ...
-  
+    port: 8012
+
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1

@@ -8,12 +8,12 @@ export function createLink(userAgent, token, location) {
             return getDefaultRedirect(token);
         case "iphone-phone":
             if (ua.browser.name === "Mobile Safari" || ua.browser.name === "Safari") {
-                return "bankid:///?autostarttoken=" + token + "&redirect=https://" + location;
+                return "https://app.bankid.com/?autostarttoken="+token+"&redirect=" + location
             }
             // Unsupported browser on iphone
             return getDefaultRedirect()
         case "android-phone":
-            return "bankid:///?autostarttoken=" + token + "&redirect=https://" + location;
+            return "https://app.bankid.com/?autostarttoken="+token+"&redirect=" + location
     }
     return getDefaultRedirect(token);
 }

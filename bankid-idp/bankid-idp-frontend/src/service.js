@@ -7,7 +7,7 @@ export async function poll(showQr) {
         headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
         credentials: 'include',
     };
-    const response = await fetch("/idp/api/poll?qr=" + showQr, requestOptions);
+    const response = await fetch("/bankid/idp/api/poll?qr=" + showQr, requestOptions);
     return await response.json();
 }
 
@@ -17,10 +17,10 @@ export async function cancel() {
         headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
         credentials: 'include',
     };
-    return await fetch("/idp/api/cancel", requestOptions);
+    return await fetch("/bankid/idp/api/cancel", requestOptions);
 }
 
 export async function spInformation() {
-    return (await fetch("/idp/api/sp")).json();
+    return (await fetch("/bankid/idp/api/sp")).json();
 }
 

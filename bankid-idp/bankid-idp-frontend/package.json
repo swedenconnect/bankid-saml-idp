@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/idp/",
+    "build": "vite build --base=/bankid/idp",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage"
