@@ -5,13 +5,13 @@
 
   <artifactId>bankid-idp-backend</artifactId>
   <packaging>jar</packaging>
-  
+
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath/>
-  </parent>  
+  </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider :: Backend</name>
   <description>BankID SAML Identity Provider Backend</description>
@@ -43,35 +43,35 @@
       <organization>IDsec Solutions AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
     </developer>
-    
+
     <developer>
       <name>Felix Hellman</name>
       <email>felix@idsec.se</email>
       <organization>Helagon AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
-    </developer>    
+    </developer>
   </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
   </properties>
-    
+
   <dependencyManagement>
 
     <dependencies>
-      
+
     </dependencies>
-  </dependencyManagement>  
-  
+  </dependencyManagement>
+
   <dependencies>
-    
+
     <dependency>
       <groupId>se.swedenconnect.bankid</groupId>
       <artifactId>bankid-rp-api</artifactId>
-      <version>${project.version}</version>    
+      <version>${project.version}</version>
     </dependency>
-    
+
     <!-- QR support -->
     <dependency>
       <groupId>com.google.zxing</groupId>
@@ -79,29 +79,29 @@
       <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>${zxing.version}</version>
       <optional>true</optional>
-    </dependency>    
-        
+    </dependency>
+
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
       <artifactId>saml-idp-spring-boot-starter</artifactId>
       <version>1.0.0</version>
-    </dependency>    
-    
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>      
-    </dependency>    
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -131,7 +131,7 @@
       <artifactId>spring-boot-devtools</artifactId>
     </dependency>
     -->
-    
+
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
@@ -159,12 +159,12 @@
       <artifactId>jquery</artifactId>
       <version>3.6.1</version>
     </dependency>
-    
+
   </dependencies>
 
   <build>
-    
-    <plugins>      
+
+    <plugins>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -199,6 +199,17 @@
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
         <version>3.3.1</version>
+        <executions>
+          <execution>
+              <id>build-image</id>
+              <phase>deploy</phase>
+            <goals>
+              <goal>
+                build
+              </goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <from>
             <image>openjdk:18.0.2.1-slim</image>
