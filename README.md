@@ -23,7 +23,21 @@ The repository also contains a Java library implementing the [BankID Relying Par
 ## Configuring the IdP
 
 > TODO
+>
 
+## Building docker image and pushing to registry
+```bash
+export DOCKER_REPO=yourdockerrepo:port
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:build
+```
+
+## Building, local docker file only
+```bash
+export DOCKER_REPO=local
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
+```
 
 -----
 
