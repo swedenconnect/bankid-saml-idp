@@ -24,6 +24,21 @@ The repository also contains a Java library implementing the [BankID Relying Par
 
 > TODO
 
+### Building docker image and pushing to registry
+
+```bash
+export DOCKER_REPO=yourdockerrepo:port
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:build
+```
+
+### Building, local docker file only
+```bash
+export DOCKER_REPO=local
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
+```
+
 ## Configuring the IdP
 
 There are three distinct parts in configuring the BankID SAML IdP:
@@ -68,7 +83,6 @@ Below follows all BankID-specific settings:
 ### Audit Logging
 
 ### Session Handling
-
 
 -----
 

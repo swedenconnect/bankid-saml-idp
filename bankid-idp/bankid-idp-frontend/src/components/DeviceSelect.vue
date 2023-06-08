@@ -14,10 +14,17 @@
 </template>
 <script>
 
+import {shallSelectDeviceAutomatically} from "@/AutoStartLinkFactory";
+
 export default {
     methods: {
         authenticate: function (pushLocation) {
             this.$router.push({name: pushLocation});
+        }
+    },
+    mounted() {
+        if (shallSelectDeviceAutomatically(window.navigator.userAgent)) {
+            this.authenticate('auto');
         }
     }
 }

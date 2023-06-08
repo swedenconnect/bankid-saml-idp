@@ -119,13 +119,6 @@ logging:
 
 ---
 
-logging:
-  level:
-    se:
-      swedenconnect:
-        spring:
-          saml: TRACE
-
 spring:
   config:
     activate:
@@ -134,18 +127,17 @@ spring:
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1
-  shared-credentials:
-    test-cred:
+  relying-parties:
+  - id: test-my-eid
+    entity-ids:
+    - http://sandbox.swedenconnect.se/testmyeid
+    - http://sandbox.swedenconnect.se/testmyeid-sign
+    credential:
       name: "test-cred"
       resource: classpath:FPTestcert4_20220818.p12
       alias: "1"
       password: "qwerty123"
       type: "PKCS12"
-  relying-parties:
-  - entity-id: http://sandbox.swedenconnect.se/testmyeid
-    credential-ref: test-cred
-  - entity-id: http://sandbox.swedenconnect.se/testmyeid-sign
-    credential-ref: test-cred        
 
 saml:
   idp:
@@ -154,4 +146,45 @@ saml:
     metadata-providers:
     - location: classpath:local/local-metadata.xml
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: sandbox
+      
+tomcat:
+  ajp:
+    enabled: true
+    secret-required: true
+    # secret is not set here ...
+  
+bankid:
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v5.1
+  test-mode: true
+  
+  # Only one RP. This serves all SAML SP:s ... 
+  relying-parties:
+  - id: "test-rp"
+    credential:
+      name: "test-cred"
+      resource: classpath:FPTestcert4_20220818.p12
+      alias: "1"
+      password: "qwerty123"
+      type: "PKCS12"
+
+saml:
+  idp:
+    entity-id: https://sandbox.swedenconnect.se/bankid/idp
+    base-url: https://sandbox.swedenconnect.se/bankid/idp
+
+    
+logging:
+  level:
+    se:
+      swedenconnect:
+        spring:
+          saml: DEBUG
+    
 
