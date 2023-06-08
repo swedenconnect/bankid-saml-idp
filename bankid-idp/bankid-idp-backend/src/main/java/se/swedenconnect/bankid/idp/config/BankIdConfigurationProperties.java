@@ -167,8 +167,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
     /**
      * The BankID relying party credential.
      */
-    @NestedConfigurationProperty
     @Getter
+    @Setter
     private PkiCredentialConfigurationProperties credential;
 
     /**
@@ -176,7 +176,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-      Assert.hasText(id, "bankid.relying-parties[].id must be set");
+      Assert.hasText(this.id, "bankid.relying-parties[].id must be set");
+      Assert.notNull(this.credential, "bankid.relying-parties[].credential.* must be set");
       if (this.credential.isEmpty()) {
         throw new IllegalArgumentException("bankid.relying-parties[].credential.* must be set");
       }
