@@ -1,14 +1,15 @@
 package se.swedenconnect.bankid.idp.authn;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Component;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @AllArgsConstructor
@@ -19,8 +20,8 @@ public class BankIdSessionLoader {
 
   public BankIdUserData load(HttpServletRequest request, Saml2UserAuthenticationInputToken token) {
     final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
-    BankIdSessionData sessionData = (BankIdSessionData) request.getSession().getAttribute("BANKID-STATE");
-    return new BankIdUserData(sessionData, getRelyingParty(relyingParty.getEntityId()));
+    final BankIdSessionData sessionData = (BankIdSessionData) request.getSession().getAttribute("BANKID-STATE");
+    return new BankIdUserData(sessionData, relyingParty);
   }
 
   public void save(HttpServletRequest request, BankIdSessionData data) {

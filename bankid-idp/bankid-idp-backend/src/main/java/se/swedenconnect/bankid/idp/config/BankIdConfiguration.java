@@ -15,10 +15,17 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.metadata.*;
+import org.opensaml.saml.saml2.metadata.EncryptionMethod;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.saml.saml2.metadata.Extensions;
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import org.opensaml.saml.saml2.metadata.KeyDescriptor;
 import org.opensaml.security.credential.UsageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,8 +38,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
+import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
@@ -50,8 +60,6 @@ import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
-
-import java.util.*;
 
 /**
  * BankID IdP configuration.
@@ -102,7 +110,9 @@ public class BankIdConfiguration {
         .cors().and()
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**", "/**/resume").permitAll()
+            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
+                "/**/resume")
+            .permitAll()
             .anyRequest().denyAll());
 
     return http.build();
@@ -131,35 +141,32 @@ public class BankIdConfiguration {
   @Bean
   RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator) throws Exception {
 
-    // Shared credentials ...
-    //
-    final Map<String, PkiCredential> sharedCredentials = new HashMap<>();
-    for (final Map.Entry<String, PkiCredentialConfigurationProperties> e : this.properties.getSharedCredentials()
-        .entrySet()) {
-      sharedCredentials.put(e.getKey(), this.createPkiCredential(e.getValue()));
-    }
-
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
     for (final RelyingParty rp : this.properties.getRelyingParties()) {
-      final PkiCredential credential;
-      if (rp.getCredential() != null) {
-        credential = this.createPkiCredential(rp.getCredential());
-      } else { // ref
-        credential = sharedCredentials.get(rp.getCredentialRef());
-        if (credential == null) {
+
+      if (rp.getEntityIds().isEmpty()) {
+        if (!this.properties.isTestMode()) {
           throw new IllegalArgumentException(
-              String.format("Shared credential '%s' not available", rp.getCredentialRef()));
+              "IdP is not in test mode, but Relying Party '%s' does not declare any SP:s".formatted(rp.getId()));
+        }
+        else if (this.properties.getRelyingParties().size() > 1) {
+          throw new IllegalArgumentException("Relying Party '%s' configured to serve all SP:s, but there are more RP"
+              + " configurations - This is not permitted");
         }
       }
 
-      final WebClientFactoryBean webClientFactory = WebClientFactoryBean.forTest(); /* new WebClientFactoryBean(
-          this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), credential);
-      webClientFactory.afterPropertiesSet();*/
+      final PkiCredential credential = this.createPkiCredential(rp.getCredential());
 
-      final BankIDClient client = new BankIDClientImpl(rp.getEntityId(), webClientFactory.createInstance(), qrGenerator);
-      relyingParties.add(new RelyingPartyData(rp.getEntityId(), client));
+      final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
+          this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), credential);
+      webClientFactory.afterPropertiesSet();
+
+      final BankIDClient client =
+          new BankIDClientImpl(rp.getId(), webClientFactory.createInstance(), qrGenerator);
+
+      relyingParties.add(new RelyingPartyData(client, rp.getEntityIds()));
     }
-    return new RelyingPartyRepository(relyingParties);
+    return new InMemoryRelyingPartyRepository(relyingParties);
   }
 
   /**
@@ -237,7 +244,7 @@ public class BankIdConfiguration {
         }
       }
       if (encryption != null) {
-        final String[] algs = {"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
+        final String[] algs = { "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
             "http://www.w3.org/2009/xmlenc11#aes192-gcm",
             "http://www.w3.org/2009/xmlenc11#aes128-gcm"

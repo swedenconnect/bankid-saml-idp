@@ -195,6 +195,32 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+          <from>
+            <image>openjdk:18.0.2.1-slim</image>
+          </from>
+          <to>
+            <image>${DOCKER_REPO}/bankid-saml-idp</image>
+          </to>
+          <container>
+            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+            <jvmFlags>
+              <jvmFlag>-Dtomcat.ajp.enabled=true</jvmFlag>
+              <jvmFlag>-Djava.net.preferIPv4Stack=true</jvmFlag>
+              <jvmFlag>-Dorg.apache.xml.security.ignoreLineBreaks=true</jvmFlag>
+            </jvmFlags>
+            <ports>
+              <port>8009</port>
+              <port>8443</port>
+            </ports>
+          </container>
+        </configuration>
+      </plugin>
+
     </plugins>
 
   </build>
