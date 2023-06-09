@@ -40,6 +40,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import lombok.Setter;
+import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
 import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
@@ -210,7 +211,12 @@ public class BankIdConfiguration {
           .authnRequestProcessor(c -> c.authenticationProvider(
               pc -> pc.signatureMessagePreprocessor(signMessageProcessor)))
           .idpMetadataEndpoint(mdCustomizer -> {
-            mdCustomizer.entityDescriptorCustomizer(this.metadataCustomizer());
+            mdCustomizer.entityDescriptorCustomizer(this.metadataCustomizer());            
+          })
+          .userAuthentication(c -> {
+            c.attributeProducers(producers -> {
+              producers.add(new BankIdAttributeProducer());
+            });
           });
     };
   }
