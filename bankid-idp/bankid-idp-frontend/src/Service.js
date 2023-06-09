@@ -1,6 +1,6 @@
 import {getXSRFCookie} from "@/cookies";
 
-const CONTEXT_PATH = "/bankid/idp"
+const CONTEXT_PATH = import.meta.env.BASE_URL
 export async function poll(showQr) {
 
     const requestOptions = {
