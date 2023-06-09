@@ -2,7 +2,7 @@
 # Configuration for the BankID IdP.
 #
 server:
-  port: 8082
+  port: 8443
   servlet:
     session:
       cookie:
@@ -147,6 +147,8 @@ saml:
     - location: classpath:local/local-metadata.xml
 
 ---
+server:
+  port: 8082
 
 spring:
   config:
