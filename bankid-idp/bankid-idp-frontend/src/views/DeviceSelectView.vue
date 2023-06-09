@@ -30,7 +30,7 @@ export default {
   components: {DeviceSelect},
   methods: {
     cancelSelection: function () {
-      window.location.href = "/idp/view/cancel"
+      window.location.href = "/bankid/idp/view/cancel"
     }
   }
 }

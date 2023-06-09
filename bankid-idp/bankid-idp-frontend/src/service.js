@@ -1,5 +1,6 @@
 import {getXSRFCookie} from "@/cookies";
 
+const CONTEXT_PATH = "/bankid/idp"
 export async function poll(showQr) {
 
     const requestOptions = {
@@ -7,7 +8,7 @@ export async function poll(showQr) {
         headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
         credentials: 'include',
     };
-    const response = await fetch("/idp/api/poll?qr=" + showQr, requestOptions);
+    const response = await fetch(CONTEXT_PATH + "/api/poll?qr=" + showQr, requestOptions);
     return await response.json();
 }
 
@@ -17,10 +18,10 @@ export async function cancel() {
         headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
         credentials: 'include',
     };
-    return await fetch("/idp/api/cancel", requestOptions);
+    return await fetch(CONTEXT_PATH +"/api/cancel", requestOptions);
 }
 
 export async function spInformation() {
-    return (await fetch("/idp/api/sp")).json();
+    return (await fetch(CONTEXT_PATH +"/api/sp")).json();
 }
 
