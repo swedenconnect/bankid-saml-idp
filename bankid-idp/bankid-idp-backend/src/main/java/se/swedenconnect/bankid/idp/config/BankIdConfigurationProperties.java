@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
+import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
@@ -73,7 +74,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
    */
   @NestedConfigurationProperty
   @Getter
-  private final IdpConfiguration authn = new IdpConfiguration(); 
+  private final IdpConfiguration authn = new IdpConfiguration();
 
   /**
    * QR code generation configuration.
@@ -81,6 +82,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
   @NestedConfigurationProperty
   @Getter
   private final QrCode qrCode = new QrCode();
+
+  /**
+   * Default text(s) to display during authentication/signing.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final UserMessage userMessageDefaults = new UserMessage();
 
   /**
    * The relying parties handled by this IdP.
@@ -106,9 +114,22 @@ public class BankIdConfigurationProperties implements InitializingBean {
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
 
+    this.userMessageDefaults.afterPropertiesSet();
+    Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
+        "bankid.user-message-defaults.fallback-sign-text must be assigned");
+
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingParty rp : this.relyingParties) {
       rp.afterPropertiesSet();
+      
+      final RelyingParty.RpUserMessage msg = rp.getUserMessage();
+      
+      if (msg.getFallbackSignText() == null) {
+        msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
+      }
+      if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()) {
+        msg.setLoginText(this.userMessageDefaults.getLoginText());
+      }      
     }
   }
 
@@ -145,6 +166,39 @@ public class BankIdConfigurationProperties implements InitializingBean {
   }
 
   /**
+   * Texts to display during authentication and signature.
+   */
+  public static class UserMessage implements InitializingBean {
+
+    /**
+     * Text to display when authenticating.
+     */
+    @Getter
+    @Setter
+    private DisplayText loginText;
+
+    /**
+     * If no {@code SignMessage} extension was received in the {@code AuthnRequest} message, this text will be
+     * displayed.
+     */
+    @Getter
+    @Setter
+    private DisplayText fallbackSignText;
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (this.loginText != null) {
+        Assert.hasText(this.loginText.getText(), "Missing text field for login-text");
+      }
+      if (this.fallbackSignText != null) {
+        Assert.hasText(this.fallbackSignText.getText(), "Missing text field for fallback-sign-text");
+      }
+    }
+
+  }
+
+  /**
    * Configuration for a relying party. A BankID Relying Party can serve any number of SAML SP:s (usually they are from
    * the same organization).
    */
@@ -158,8 +212,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
     private String id;
 
     /**
-     * The SAML entityID:s (SP:s) served by this Relying Party. If the IdP is in test mode this may be an empty
-     * list (meaning that all SP:s are served).
+     * The SAML entityID:s (SP:s) served by this Relying Party. If the IdP is in test mode this may be an empty list
+     * (meaning that all SP:s are served).
      */
     @Getter
     private final List<String> entityIds = new ArrayList<>();
@@ -172,6 +226,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
     private PkiCredentialConfigurationProperties credential;
 
     /**
+     * Relying Party specific display text for authentication (and signature). Overrides the default text.
+     */
+    @Getter
+    @Setter
+    private RpUserMessage userMessage;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -181,7 +242,27 @@ public class BankIdConfigurationProperties implements InitializingBean {
       if (this.credential.isEmpty()) {
         throw new IllegalArgumentException("bankid.relying-parties[].credential.* must be set");
       }
+      if (this.userMessage == null) {
+        this.userMessage = new RpUserMessage();
+      }
+      this.userMessage.afterPropertiesSet();
     }
+
+    /**
+     * For configuring user messages per RP.
+     */
+    public static class RpUserMessage extends UserMessage {
+
+      /**
+       * If the default user message login text has been assigned, and a specific RP wishes to not use login messages it
+       * should set this flag to {@code false} (and not assign {@code login-text}).
+       */
+      @Getter
+      @Setter
+      private boolean inheritDefaultLoginText = true;
+
+    }
+
   }
 
   /**

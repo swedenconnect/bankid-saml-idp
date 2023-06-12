@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 
 /**
@@ -40,13 +41,22 @@ public class RelyingPartyData {
    */
   private final BankIDClient client;
 
+  /** The text to display when authenticating. May be {@code null}. */
+  private final DisplayText loginText;
+
+  /** The text to display when signing if a {@code SignMessage} is not received. */
+  private final DisplayText fallbackSignText;
+
   // TODO: custom display texts, custom logo ...
 
-  public RelyingPartyData(final BankIDClient client, final List<String> entityIds) {
+  public RelyingPartyData(final BankIDClient client, final List<String> entityIds,
+      final DisplayText loginText, final DisplayText fallbackSignText) {
     this.client = Objects.requireNonNull(client, "client must not be null");
     this.entityIds = Optional.ofNullable(entityIds)
         .map(Collections::unmodifiableList)
         .orElseGet(Collections::emptyList);
+    this.loginText = loginText;
+    this.fallbackSignText = Objects.requireNonNull(fallbackSignText, "fallbackSignText must not be null");
   }
 
   /**
@@ -77,6 +87,24 @@ public class RelyingPartyData {
    */
   public List<String> getEntityIds() {
     return this.entityIds;
+  }
+
+  /**
+   * Gets text to display when authenticating.
+   * 
+   * @return the text or {@code null}
+   */
+  public DisplayText getLoginText() {
+    return this.loginText;
+  }
+
+  /**
+   * Gets the text to display when signing if a {@code SignMessage} is not received.
+   * 
+   * @return the sign text
+   */
+  public DisplayText getFallbackSignText() {
+    return this.fallbackSignText;
   }
 
   /**
