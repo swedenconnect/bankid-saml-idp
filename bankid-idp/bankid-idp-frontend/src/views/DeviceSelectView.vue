@@ -25,12 +25,13 @@
 </template>
 <script>
 import DeviceSelect from "@/components/DeviceSelect.vue";
+import {PATHS} from "@/Redirects";
 
 export default {
   components: {DeviceSelect},
   methods: {
     cancelSelection: function () {
-      window.location.href = "/bankid/idp/view/cancel"
+      window.location.href = PATHS.CANCEL;
     }
   }
 }

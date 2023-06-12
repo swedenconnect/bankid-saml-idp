@@ -7,7 +7,7 @@ server:
     session:
       cookie:
         name: BANKIDSESSION
-    context-path: /idp
+    context-path: /bankid/idp
   ssl:
     enabled: true
     key-store: classpath:ssl.jks

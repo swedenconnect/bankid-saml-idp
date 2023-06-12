@@ -13,7 +13,7 @@ import Localechanger from "@/components/LanguageSelector.vue";
 </template>
 
 <script>
-import {spInformation} from "@/service";
+import {spInformation} from "@/Service";
 
 export default {
     data() {

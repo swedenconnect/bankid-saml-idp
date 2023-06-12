@@ -25,7 +25,8 @@
 <script>
 import QRDisplay from "@/components/QRDisplay.vue";
 import Status from "@/components/Status.vue";
-import {cancel, poll} from "@/service";
+import {cancel, poll} from "@/Service";
+import {PATHS} from "@/Redirects";
 
 export default {
   data() {
@@ -56,14 +57,14 @@ export default {
       }).then(response => {
         if (this.shouldCancel) {
           cancel().then(canel => {
-            window.location.href = "/bankid/idp/view/cancel";
+            window.location.href = PATHS.CANCEL;
           });
         } else {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
               if (response["status"] !== "ERROR") {
-                  window.location.href = "/bankid/idp/view/complete";
+                  window.location.href = PATHS.COMPLETE;
               }
           }
         }
@@ -75,7 +76,7 @@ export default {
     cancelRequest: function () {
       if (!this.pollingActive) {
           cancel().then(r => {
-              window.location.href = "/bankid/idp/view/cancel";
+              window.location.href = PATHS.CANCEL;
           });
       } else {
           this.shouldCancel = true;
