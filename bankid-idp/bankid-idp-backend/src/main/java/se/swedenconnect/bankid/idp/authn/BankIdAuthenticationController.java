@@ -125,6 +125,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     boolean sign = authnInputToken.getAuthnRequirements().getEntityCategories().contains("http://id.elegnamnden.se/st/1.0/sigservice");
     PreviousDeviceSelection previousDeviceSelection = buildInitialContext(authnInputToken, request).getPreviousDeviceSelection();
+    if (previousDeviceSelection == null) {
+      log.warn("Failed to find previous selected device for user");
+      previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
+    }
     return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 

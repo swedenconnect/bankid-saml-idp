@@ -16,8 +16,7 @@ export default {
     props: {
         otherDevice: Boolean,
         autoStartToken: "",
-        message: "",
-        signDevice: String
+        message: ""
     },
     methods: {
         getAutoStartLink: function () {
