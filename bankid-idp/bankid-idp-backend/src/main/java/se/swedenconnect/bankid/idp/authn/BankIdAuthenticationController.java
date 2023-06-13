@@ -117,8 +117,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   @GetMapping("/api/device")
   public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    boolean sign = authnInputToken.getAuthnRequirements().getEntityCategories().contains("http://id.elegnamnden.se/st/1.0/sigservice");
-    PreviousDeviceSelection previousDeviceSelection = buildInitialContext(authnInputToken, request).getPreviousDeviceSelection();
+    BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
+    boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
+    PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
       log.warn("Failed to find previous selected device for user");
       previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
@@ -161,7 +162,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
       // within the Swedish eID Framework".
       //
       message.setUserNonVisibleData(Base64.getEncoder().encodeToString("TODO".getBytes()));
-      
+
       return message;
     }
     else {
