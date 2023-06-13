@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +29,6 @@ import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,9 +51,12 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.service.DataToSign;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
@@ -99,7 +102,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
    */
   private final List<Language> languages;
 
-
   private final BankIdSessionReader sessionReader;
 
   private final BankIdEventPublisher eventPublisher;
@@ -109,7 +111,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * The entry point for the BankID authentication/signature process.
    *
-   * @param request  the HTTP servlet request
+   * @param request the HTTP servlet request
    * @param response the HTTP servlet response
    * @return a {@link ModelAndView}
    */
@@ -118,23 +120,57 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return new ModelAndView("index");
   }
 
-
   @PostMapping("/api/poll")
-  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
+  public Mono<ApiResponse> poll(final HttpServletRequest request,
+      @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
     BankIdSessionState state = sessionReader.loadSessionData(request);
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
-    final RelyingPartyData relyingParty = this. getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
+    final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
-    return service.poll(request, qr, state, authnInputToken, bankIdContext, client, getMessage(bankIdContext, authnInputToken));
+    return service.poll(request, qr, state, authnInputToken, bankIdContext, client,
+        getMessage(bankIdContext, authnInputToken, relyingParty));
   }
 
-  private String getMessage(BankIdContext context, Saml2UserAuthenticationInputToken token) {
-    if (context.getOperation() == BankIdOperation.SIGN){
-      return token.getAuthnRequirements().getSignatureMessageExtension().getMessage();
+  // TODO: Wouldn't it be better if the message was calculated once and assigned to the context?
+  //
+  private UserVisibleData getMessage(final BankIdContext context, final Saml2UserAuthenticationInputToken token,
+      final RelyingPartyData relyingParty) {
+    if (context.getOperation() == BankIdOperation.SIGN) {
+      final DataToSign message = new DataToSign();
+      if (token.getAuthnRequirements().getSignatureMessageExtension() != null) {
+        message.setUserVisibleData(token.getAuthnRequirements().getSignatureMessageExtension().getMessage());
+        if (SignMessageMimeTypeEnum.TEXT_MARKDOWN
+            .equals(token.getAuthnRequirements().getSignatureMessageExtension().getMimeType())) {
+          message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
+        }
+      }
+      else {
+        message.setDisplayText(relyingParty.getFallbackSignText().getText());
+        if (DisplayText.TextFormat.SIMPLE_MARKDOWN_V1.equals(relyingParty.getFallbackSignText().getFormat())) {
+          message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
+        }
+      }
+      // TODO: Build userNonVisibleData according to 4.2.1.2 of "Implementation Profile for BankID Identity Providers
+      // within the Swedish eID Framework".
+      //
+      message.setUserNonVisibleData(Base64.getEncoder().encodeToString("TODO".getBytes()));
+      
+      return message;
     }
-    return "Text";
+    else {
+      if (relyingParty.getLoginText() == null) {
+        return null;
+      }
+      final UserVisibleData message = new UserVisibleData();
+      message.setDisplayText(relyingParty.getLoginText().getText());
+      if (DisplayText.TextFormat.SIMPLE_MARKDOWN_V1.equals(relyingParty.getLoginText().getFormat())) {
+        message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
+      }
+      return message;
+    }
   }
+
   @PostMapping("/api/cancel")
   public Mono<Void> cancelRequest(HttpServletRequest request) {
     BankIdSessionState state = sessionReader.loadSessionData(request);
@@ -162,7 +198,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession().getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
+    Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
+        .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
     Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
         .stream()
         .filter(v -> v.getXMLLang() != null && v.getValue() != null)
@@ -173,19 +210,22 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
         .map(c -> c.stream()
             .filter(x -> x instanceof LogoImpl)
             .map(LogoImpl.class::cast)
-            .toList()).orElseGet(List::of);
-    SpInformation data = new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
+            .toList())
+        .orElseGet(List::of);
+    SpInformation data =
+        new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
     return Mono.just(data);
   }
 
   /**
    * When a SAML {@code AuthnRequest} is received we set up an initial {@link BankIdContext}.
    *
-   * @param token   the input token
+   * @param token the input token
    * @param request the HTTP servlet request
    * @return a {@link BankIdContext}
    */
-  private BankIdContext buildInitialContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
+  private BankIdContext buildInitialContext(final Saml2UserAuthenticationInputToken token,
+      final HttpServletRequest request) {
 
     final BankIdContext context = new BankIdContext();
     context.setState(BankIdState.INIT);
@@ -216,7 +256,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
             .map(d -> {
               try {
                 return PreviousDeviceSelection.forValue(d);
-              } catch (final IllegalArgumentException e) {
+              }
+              catch (final IllegalArgumentException e) {
                 return null;
               }
             })

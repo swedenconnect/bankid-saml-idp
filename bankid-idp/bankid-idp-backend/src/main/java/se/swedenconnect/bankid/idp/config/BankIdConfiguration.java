@@ -165,7 +165,8 @@ public class BankIdConfiguration {
       final BankIDClient client =
           new BankIDClientImpl(rp.getId(), webClientFactory.createInstance(), qrGenerator);
 
-      relyingParties.add(new RelyingPartyData(client, rp.getEntityIds()));
+      relyingParties.add(new RelyingPartyData(client, rp.getEntityIds(),
+          rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText()));
     }
     return new InMemoryRelyingPartyRepository(relyingParties);
   }
@@ -211,7 +212,7 @@ public class BankIdConfiguration {
           .authnRequestProcessor(c -> c.authenticationProvider(
               pc -> pc.signatureMessagePreprocessor(signMessageProcessor)))
           .idpMetadataEndpoint(mdCustomizer -> {
-            mdCustomizer.entityDescriptorCustomizer(this.metadataCustomizer());            
+            mdCustomizer.entityDescriptorCustomizer(this.metadataCustomizer());
           })
           .userAuthentication(c -> {
             c.attributeProducers(producers -> {
