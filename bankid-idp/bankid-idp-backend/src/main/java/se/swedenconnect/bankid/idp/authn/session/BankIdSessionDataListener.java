@@ -20,6 +20,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class BankIdSessionDataListener {
 
+    public static final Map<Boolean, PreviousDeviceSelection> PREVIOUS_DEVICE_SELECTION_MAP = Map.of(true, PreviousDeviceSelection.OTHER, false, PreviousDeviceSelection.THIS_DEVICE);
     private final BankIdSessionWriter writer;
 
     private final BankIdSessionReader reader;
@@ -46,7 +47,7 @@ public class BankIdSessionDataListener {
     public void handleCompletion(OrderCompletionEvent event) {
         BankIdSessionState sessionState = reader.loadSessionData(event.getRequest());
         Boolean otherDevice = sessionState.getBankIdSessionData().getShowQr();
-        PreviousDeviceSelection previousDeviceSelection = Map.of(true, PreviousDeviceSelection.OTHER, false, PreviousDeviceSelection.THIS_DEVICE).get(otherDevice);
+        PreviousDeviceSelection previousDeviceSelection = PREVIOUS_DEVICE_SELECTION_MAP.get(otherDevice);
         writer.save(event.getRequest(), previousDeviceSelection);
         writer.delete(event.getRequest());
     }
