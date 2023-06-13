@@ -81,12 +81,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   public static final String AUTHN_PATH = "/bankid";
 
   /**
-   * The session attribute where we store whether we selected "this device" or "other device".
-   */
-  public static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE =
-      BankIdAuthenticationController.class.getPackageName() + ".DeviceSelection";
-
-  /**
    * Relying parties that we serve.
    */
   private final RelyingPartyRepository rpRepository;
@@ -262,20 +256,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
     // Device selection
     //
-    final PreviousDeviceSelection previousDeviceSelection =
-        Optional.ofNullable(request.getSession().getAttribute(PREVIOUS_DEVICE_SESSION_ATTRIBUTE))
-            .map(String.class::cast)
-            .map(d -> {
-              try {
-                return PreviousDeviceSelection.forValue(d);
-              }
-              catch (final IllegalArgumentException e) {
-                return null;
-              }
-            })
-            .orElse(null);
+    final PreviousDeviceSelection previousDeviceSelection = sessionReader.loadPreviousSelectedDevice(request);
     context.setPreviousDeviceSelection(previousDeviceSelection);
-
     return context;
   }
 
