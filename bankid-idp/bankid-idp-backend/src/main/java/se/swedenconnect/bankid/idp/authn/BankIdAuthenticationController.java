@@ -83,7 +83,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * The session attribute where we store whether we selected "this device" or "other device".
    */
-  private static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE =
+  public static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE =
       BankIdAuthenticationController.class.getPackageName() + ".DeviceSelection";
 
   /**
@@ -124,7 +124,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     boolean sign = authnInputToken.getAuthnRequirements().getEntityCategories().contains("http://id.elegnamnden.se/st/1.0/sigservice");
-    return Mono.just(new SelectedDeviceInformation(sign, SelectedDeviceInformation.SignDevice.SAME));
+    PreviousDeviceSelection previousDeviceSelection = buildInitialContext(authnInputToken, request).getPreviousDeviceSelection();
+    return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 
   @PostMapping("/api/poll")

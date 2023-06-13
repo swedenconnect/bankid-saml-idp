@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
@@ -12,6 +13,7 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -42,6 +44,10 @@ public class BankIdSessionDataListener {
 
     @EventListener
     public void handleCompletion(OrderCompletionEvent event) {
+        BankIdSessionState sessionState = reader.loadSessionData(event.getRequest());
+        Boolean otherDevice = sessionState.getBankIdSessionData().getShowQr();
+        PreviousDeviceSelection previousDeviceSelection = Map.of(true, PreviousDeviceSelection.OTHER, false, PreviousDeviceSelection.THIS_DEVICE).get(otherDevice);
+        writer.save(event.getRequest(), previousDeviceSelection);
         writer.delete(event.getRequest());
     }
 

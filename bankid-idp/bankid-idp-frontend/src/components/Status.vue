@@ -15,7 +15,6 @@ import {createLink} from "@/AutoStartLinkFactory";
 export default {
     props: {
         otherDevice: Boolean,
-        sign: Boolean,
         autoStartToken: "",
         message: "",
         signDevice: String
@@ -31,7 +30,6 @@ export default {
     watch: {
         autoStartToken(oldToken, newToken) {
             if(!this.otherDevice) {
-                console.log("Not sign!")
                 this.navigateToApp();
             }
         }

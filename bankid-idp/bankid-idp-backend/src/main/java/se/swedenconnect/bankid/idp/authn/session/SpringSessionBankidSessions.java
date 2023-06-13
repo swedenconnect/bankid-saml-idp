@@ -1,10 +1,13 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
+import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import static se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController.PREVIOUS_DEVICE_SESSION_ATTRIBUTE;
 
 public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdSessionReader {
     @Override
@@ -32,6 +35,11 @@ public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdS
         HttpSession session = request.getSession();
         session.setAttribute("BANKID-COMPLETION-DATA", null);
         session.setAttribute("BANKID-STATE", null);
+    }
+
+    @Override
+    public void save(HttpServletRequest request, PreviousDeviceSelection previousDeviceSelection) {
+        request.getSession().setAttribute(PREVIOUS_DEVICE_SESSION_ATTRIBUTE, previousDeviceSelection.getValue());
     }
 
     @Override

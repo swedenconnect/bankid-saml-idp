@@ -6,7 +6,6 @@
             :otherDevice=otherDevice
             :autoStartToken=token
             :message=messageCode
-            :sign=sign
         />
         <QRDisplay
             :image=qrImage
@@ -48,7 +47,7 @@ export default {
   },
   methods: {
     poll: function () {
-      poll(this.otherDevice).then(response => {
+      poll(this.otherDevice && !this.sign).then(response => {
         this.qrImage = response["qrCode"];
         this.pollingActive = response["status"] === "IN_PROGRESS";
         this.token = response["autoStartToken"];

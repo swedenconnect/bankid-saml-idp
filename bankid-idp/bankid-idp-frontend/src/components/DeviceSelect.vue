@@ -31,7 +31,7 @@ export default {
   beforeMount() {
     selectedDecvice().then(r => {
         if (r["isSign"]) {
-          if (r["device"] === 'SAME') {
+          if (r["device"] === 'THIS') {
             this.authenticate('sign-same');
           }
           else {
