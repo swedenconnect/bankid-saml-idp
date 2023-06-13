@@ -1,6 +1,5 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
-import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
