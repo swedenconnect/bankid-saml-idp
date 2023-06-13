@@ -2,7 +2,7 @@
     <div>
         <p> {{ $t(message) }}</p>
     </div>
-    <div :hidden=qr>
+    <div :hidden=otherDevice>
         <button @click=navigateToApp>
             {{ $t("bankid.msg.btn-autostart") }}
         </button>
@@ -14,9 +14,11 @@ import {createLink} from "@/AutoStartLinkFactory";
 
 export default {
     props: {
-        qr: Boolean,
+        otherDevice: Boolean,
+        sign: Boolean,
         autoStartToken: "",
-        message: ""
+        message: "",
+        signDevice: String
     },
     methods: {
         getAutoStartLink: function () {
@@ -28,7 +30,8 @@ export default {
     },
     watch: {
         autoStartToken(oldToken, newToken) {
-            if(!this.qr) {
+            if(!this.otherDevice) {
+                console.log("Not sign!")
                 this.navigateToApp();
             }
         }

@@ -3,12 +3,12 @@
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
         <Status
-            :qr=showQR
+            :otherDevice=otherDevice
             :autoStartToken=token
             :message=messageCode
+            :sign=sign
         />
         <QRDisplay
-            :qr=showQR
             :image=qrImage
         />
       </div>
@@ -40,7 +40,7 @@ export default {
   },
   components: {Status, QRDisplay},
   props: {
-    showQR: Boolean
+    otherDevice: Boolean, sign: Boolean
   },
   mounted() {
     this.pollingActive = true;
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     poll: function () {
-      poll(this.showQR).then(response => {
+      poll(this.otherDevice).then(response => {
         this.qrImage = response["qrCode"];
         this.pollingActive = response["status"] === "IN_PROGRESS";
         this.token = response["autoStartToken"];
@@ -63,9 +63,9 @@ export default {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
-              if (response["status"] !== "ERROR") {
-                  window.location.href = PATHS.COMPLETE;
-              }
+            if (response["status"] !== "ERROR") {
+              window.location.href = PATHS.COMPLETE;
+            }
           }
         }
       })
@@ -75,11 +75,11 @@ export default {
     },
     cancelRequest: function () {
       if (!this.pollingActive) {
-          cancel().then(r => {
-              window.location.href = PATHS.CANCEL;
-          });
+        cancel().then(r => {
+          window.location.href = PATHS.CANCEL;
+        });
       } else {
-          this.shouldCancel = true;
+        this.shouldCancel = true;
       }
     }
   }

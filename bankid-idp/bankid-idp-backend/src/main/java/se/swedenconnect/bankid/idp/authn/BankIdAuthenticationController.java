@@ -120,6 +120,13 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return new ModelAndView("index");
   }
 
+  @GetMapping("/api/device")
+  public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
+    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    boolean sign = authnInputToken.getAuthnRequirements().getEntityCategories().contains("http://id.elegnamnden.se/st/1.0/sigservice");
+    return Mono.just(new SelectedDeviceInformation(sign, SelectedDeviceInformation.SignDevice.SAME));
+  }
+
   @PostMapping("/api/poll")
   public Mono<ApiResponse> poll(final HttpServletRequest request,
       @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
