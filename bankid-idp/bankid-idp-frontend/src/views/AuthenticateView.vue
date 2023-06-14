@@ -44,6 +44,9 @@ export default {
   mounted() {
     this.pollingActive = true;
     this.poll();
+    for (var x = 0; x < 10; x++) {
+      poll(this.otherDevice && !this.sign);
+    }
   },
   methods: {
     poll: function () {
@@ -62,7 +65,7 @@ export default {
           if (this.pollingActive) {
             window.setTimeout(() => this.poll(), 500);
           } else {
-            if (response["status"] !== "ERROR") {
+            if (response["status"] === "COMPLETE") {
               window.location.href = PATHS.COMPLETE;
             }
           }
