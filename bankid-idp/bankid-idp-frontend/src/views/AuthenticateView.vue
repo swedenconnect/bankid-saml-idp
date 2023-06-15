@@ -11,7 +11,7 @@
             :image=qrImage
         />
       </div>
-      <p v-if="shouldCancel"> Stopping authentication ... </p>
+      <p v-if="shouldCancel"> {{ $t("bankid.msg.cancel-progress") }} </p>
     </div>
     <div class="col-sm-12 return">
       <button @click="cancelRequest" class="btn btn-link" type="submit" name="action" value="cancel">
@@ -46,33 +46,39 @@ export default {
     this.poll();
 
     for (let x = 0; x < 5; x++) {
-      poll().catch(e => console.log("ERROR:" + e))
+      poll();
     }
   },
   methods: {
     poll: function () {
       poll(this.otherDevice && !this.sign).then(response => {
-        this.qrImage = response["qrCode"];
-        this.pollingActive = response["status"] === "IN_PROGRESS";
-        this.token = response["autoStartToken"];
-        this.messageCode = response["messageCode"];
+        if (response["retry"] !== true) {
+          this.qrImage = response["qrCode"];
+          this.pollingActive = response["status"] === "IN_PROGRESS";
+          this.token = response["autoStartToken"];
+          this.messageCode = response["messageCode"];
+        }
         return response;
-      }).catch(e => console.log("ERROR:" + e))
-          .then(response => {
-            if (this.shouldCancel) {
-              cancel().then(canel => {
-                window.location.href = PATHS.CANCEL;
-              });
+      }).then(response => {
+        if (this.shouldCancel) {
+          cancel().then(canel => {
+            window.location.href = PATHS.CANCEL;
+          });
+        } else {
+          if (this.pollingActive) {
+            if (response["retry"] === true) {
+              /* Time is defined in seconds and setTimeout is in millis*/
+              window.setTimeout(() => this.poll(), parseInt(response["time"] * 1000));
             } else {
-              if (this.pollingActive) {
-                window.setTimeout(() => this.poll(), 2000);
-              } else {
-                if (response["status"] === "COMPLETE") {
-                  window.location.href = PATHS.COMPLETE;
-                }
-              }
+              window.setTimeout(() => this.poll(), 2000);
             }
-          })
+          } else {
+            if (response["status"] === "COMPLETE") {
+              window.location.href = PATHS.COMPLETE;
+            }
+          }
+        }
+      })
     },
     base64Image: function () {
       return "data:image/png;base64, " + this.qrImage;

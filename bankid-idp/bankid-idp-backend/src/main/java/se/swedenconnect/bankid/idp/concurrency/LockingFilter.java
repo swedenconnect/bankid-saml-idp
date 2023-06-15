@@ -26,7 +26,7 @@ public class LockingFilter extends OncePerRequestFilter {
       HttpSession session = request.getSession();
       String key = session.getId();
       Lock lock = locks.get(key);
-      boolean lockAcquired = lock.tryLock();
+      boolean lockAcquired = false;// lock.tryLock();
       if (lockAcquired) {
         try {
           filterChain.doFilter(request, response);
@@ -36,6 +36,7 @@ public class LockingFilter extends OncePerRequestFilter {
       }
       else {
         response.setStatus(429);
+        response.addHeader("Retry-After", "1");
         PrintWriter writer = response.getWriter();
         writer.write("""
             {"Error": "Something went wrong"}
