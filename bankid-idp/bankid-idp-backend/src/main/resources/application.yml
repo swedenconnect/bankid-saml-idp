@@ -179,7 +179,6 @@ bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1
   test-mode: true
-  
   # Only one RP. This serves all SAML SP:s ... 
   relying-parties:
   - id: "test-rp"
@@ -190,7 +189,7 @@ bankid:
       password: "qwerty123"
       type: "PKCS12"
     user-message:
-      inherit-default-login-text: false
+      inherit-default-login-text: true
 
 saml:
   idp:
