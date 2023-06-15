@@ -27,7 +27,9 @@ public enum PreviousDeviceSelection {
   THIS_DEVICE("this"),
 
   /** BankID signature. */
-  OTHER("other");
+  OTHER("other"),
+  /** We have failed to determine the previous device */
+  UNKNOWN("unknown");
 
   /** The string representation of the enum. */
   private String value;

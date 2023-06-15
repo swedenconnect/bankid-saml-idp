@@ -81,12 +81,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   public static final String AUTHN_PATH = "/bankid";
 
   /**
-   * The session attribute where we store whether we selected "this device" or "other device".
-   */
-  private static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE =
-      BankIdAuthenticationController.class.getPackageName() + ".DeviceSelection";
-
-  /**
    * Relying parties that we serve.
    */
   private final RelyingPartyRepository rpRepository;
@@ -118,6 +112,19 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   @GetMapping(AUTHN_PATH)
   public ModelAndView view() {
     return new ModelAndView("index");
+  }
+
+  @GetMapping("/api/device")
+  public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
+    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
+    boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
+    PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
+    if (previousDeviceSelection == null) {
+      log.warn("Failed to find previous selected device for user");
+      previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
+    }
+    return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 
   @PostMapping("/api/poll")
@@ -155,7 +162,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
       // within the Swedish eID Framework".
       //
       message.setUserNonVisibleData(Base64.getEncoder().encodeToString("TODO".getBytes()));
-      
+
       return message;
     }
     else {
@@ -250,20 +257,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
     // Device selection
     //
-    final PreviousDeviceSelection previousDeviceSelection =
-        Optional.ofNullable(request.getSession().getAttribute(PREVIOUS_DEVICE_SESSION_ATTRIBUTE))
-            .map(String.class::cast)
-            .map(d -> {
-              try {
-                return PreviousDeviceSelection.forValue(d);
-              }
-              catch (final IllegalArgumentException e) {
-                return null;
-              }
-            })
-            .orElse(null);
+    final PreviousDeviceSelection previousDeviceSelection = sessionReader.loadPreviousSelectedDevice(request);
     context.setPreviousDeviceSelection(previousDeviceSelection);
-
     return context;
   }
 

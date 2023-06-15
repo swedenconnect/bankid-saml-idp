@@ -14,17 +14,16 @@ img {
 <script>
 
 export default {
-    props: {
-        image: String,
-        qr: Boolean
+  props: {
+    image: String
+  },
+  methods: {
+    base64Image: function () {
+      return this.image;
     },
-    methods: {
-        base64Image: function () {
-            return this.image;
-        },
-        hideQR: function () {
-          return (this.base64Image() === "");
-        }
+    hideQR: function () {
+      return (this.base64Image() === "");
     }
+  }
 }
 </script>
