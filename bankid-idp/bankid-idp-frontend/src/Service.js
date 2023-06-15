@@ -9,7 +9,12 @@ export async function poll(showQr) {
         credentials: 'include',
     };
     const response = await fetch(CONTEXT_PATH + "/api/poll?qr=" + showQr, requestOptions);
-    return await response.json();
+    const data = await response.json();
+    if (!response.ok) {
+        const error = (data && data.message) || response.statusText;
+        return Promise.reject(error)
+    }
+    return data;
 }
 
 export async function cancel() {

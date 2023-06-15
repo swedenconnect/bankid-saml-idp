@@ -44,8 +44,9 @@ export default {
   mounted() {
     this.pollingActive = true;
     this.poll();
-    for (var x = 0; x < 10; x++) {
-      poll(this.otherDevice && !this.sign);
+
+    for (let x = 0; x < 5; x++) {
+      poll().catch(e => console.log("ERROR:" + e))
     }
   },
   methods: {
@@ -56,21 +57,22 @@ export default {
         this.token = response["autoStartToken"];
         this.messageCode = response["messageCode"];
         return response;
-      }).then(response => {
-        if (this.shouldCancel) {
-          cancel().then(canel => {
-            window.location.href = PATHS.CANCEL;
-          });
-        } else {
-          if (this.pollingActive) {
-            window.setTimeout(() => this.poll(), 500);
-          } else {
-            if (response["status"] === "COMPLETE") {
-              window.location.href = PATHS.COMPLETE;
+      }).catch(e => console.log("ERROR:" + e))
+          .then(response => {
+            if (this.shouldCancel) {
+              cancel().then(canel => {
+                window.location.href = PATHS.CANCEL;
+              });
+            } else {
+              if (this.pollingActive) {
+                window.setTimeout(() => this.poll(), 2000);
+              } else {
+                if (response["status"] === "COMPLETE") {
+                  window.location.href = PATHS.COMPLETE;
+                }
+              }
             }
-          }
-        }
-      })
+          })
     },
     base64Image: function () {
       return "data:image/png;base64, " + this.qrImage;

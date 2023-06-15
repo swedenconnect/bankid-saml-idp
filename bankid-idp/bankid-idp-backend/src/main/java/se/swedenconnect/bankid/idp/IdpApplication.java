@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
 import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
@@ -30,6 +31,7 @@ import se.swedenconnect.opensaml.sweid.xmlsec.config.SwedishEidSecurityConfigura
  * @author Felix Hellman
  */
 @SpringBootApplication
+@EnableConfigurationProperties
 public class IdpApplication {
 
   /**

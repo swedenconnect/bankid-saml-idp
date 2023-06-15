@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Component
+
 public class InMemoryLockRepository implements LockRepository {
 
   private final Map<String, Lock> stringLockMap = new ConcurrentHashMap<>();
