@@ -15,9 +15,11 @@
  */
 package se.swedenconnect.bankid.idp;
 
+import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
@@ -30,7 +32,7 @@ import se.swedenconnect.opensaml.sweid.xmlsec.config.SwedishEidSecurityConfigura
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = { RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
 @EnableConfigurationProperties
 public class IdpApplication {
 

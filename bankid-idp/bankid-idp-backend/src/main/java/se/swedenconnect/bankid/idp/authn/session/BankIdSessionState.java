@@ -1,9 +1,12 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
+import org.springframework.data.redis.core.RedisHash;
+
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+@RedisHash(timeToLive = 3600L)
 public class BankIdSessionState {
     private final Deque<BankIdSessionData> bankIdSessionDataStack;
 

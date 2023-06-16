@@ -44,10 +44,6 @@ export default {
   mounted() {
     this.pollingActive = true;
     this.poll();
-
-    for (let x = 0; x < 5; x++) {
-      poll();
-    }
   },
   methods: {
     poll: function () {

@@ -26,7 +26,7 @@ public class LockingFilter extends OncePerRequestFilter {
       HttpSession session = request.getSession();
       String key = session.getId();
       Lock lock = locks.get(key);
-      boolean lockAcquired = false;// lock.tryLock();
+      boolean lockAcquired = lock.tryLock();
       if (lockAcquired) {
         try {
           filterChain.doFilter(request, response);

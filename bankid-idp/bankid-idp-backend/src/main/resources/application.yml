@@ -141,7 +141,10 @@ spring:
   config:
     activate:
       on-profile: local
-  
+
+session:
+  module: redis
+
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1

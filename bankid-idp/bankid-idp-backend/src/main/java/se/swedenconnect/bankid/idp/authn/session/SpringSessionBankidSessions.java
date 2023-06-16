@@ -7,19 +7,9 @@ import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import static se.swedenconnect.bankid.idp.authn.session.SessionAttributeKeys.*;
+
 public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdSessionReader {
-  /**
-   * The session attribute where we store whether we selected "this device" or "other device".
-   */
-  private static final String PREVIOUS_DEVICE_SESSION_ATTRIBUTE = "DEVICE-SELECTION";
-  /**
-   * The session attribute where we store completion data for a bankid session
-   */
-  private static final String BANKID_COMPLETION_DATA_ATTRIBUTE = "BANKID-COMPLETION-DATA";
-  /**
-   * The session attribute where we store the current state of a bankid session
-   */
-  public static final String BANKID_STATE_ATTRIBUTE = "BANKID-STATE";
 
   @Override
   public void save(HttpServletRequest request, BankIdSessionData data) {
@@ -58,8 +48,8 @@ public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdS
   }
 
   @Override
-  public CompletionData laodCompletionData(HttpServletRequest request) {
-    return (CompletionData) request.getSession().getAttribute(BANKID_COMPLETION_DATA_ATTRIBUTE);
+  public CollectResponse laodCompletionData(HttpServletRequest request) {
+    return (CollectResponse) request.getSession().getAttribute(BANKID_COMPLETION_DATA_ATTRIBUTE);
   }
 
   @Override

@@ -17,13 +17,15 @@ package se.swedenconnect.bankid.rpapi.types;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.Serializable;
+
 /**
  * Representation of the response received from a collect call.
  *
  * @author Martin Lindström
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CollectResponse {
+public class CollectResponse implements Serializable {
 
   /** The order reference string. */
   @JsonProperty(value = "orderRef", required = true)

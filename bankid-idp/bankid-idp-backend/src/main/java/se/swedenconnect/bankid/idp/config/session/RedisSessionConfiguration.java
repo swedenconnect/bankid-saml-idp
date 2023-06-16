@@ -1,18 +1,29 @@
-package se.swedenconnect.bankid.idp.config;
+package se.swedenconnect.bankid.idp.config.session;
 
+import org.redisson.api.RedissonClient;
 import org.redisson.config.SingleServerConfig;
+import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import se.swedenconnect.bankid.idp.authn.session.RedisBankidSessions;
+import se.swedenconnect.bankid.idp.concurrency.LockRepository;
+import se.swedenconnect.bankid.idp.concurrency.RedisLockRepository;
+import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
 
 import java.io.IOException;
 
 @Configuration
-public class RedisConfiguration {
+@ConditionalOnProperty(value = "session.module", havingValue = "redis")
+@Import({RedissonAutoConfiguration.class, RedisAutoConfiguration.class})
+public class RedisSessionConfiguration {
   private final ResourceLoader loader = new DefaultResourceLoader();
 
   @Bean
@@ -40,5 +51,15 @@ public class RedisConfiguration {
         throw new RuntimeException(e);
       }
     };
+  }
+
+  @Bean
+  public LockRepository repository(RedissonClient client) {
+    return new RedisLockRepository(client);
+  }
+
+  @Bean
+  public RedisBankidSessions redisBankidSessions(RedissonClient client) {
+    return new RedisBankidSessions(client);
   }
 }

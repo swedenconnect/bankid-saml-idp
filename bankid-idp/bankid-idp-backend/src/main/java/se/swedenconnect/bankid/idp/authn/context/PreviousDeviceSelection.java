@@ -17,10 +17,12 @@ package se.swedenconnect.bankid.idp.authn.context;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * An enum representing a previous selection of device.
  */
+@RedisHash(timeToLive = 3600L)
 public enum PreviousDeviceSelection {
 
   /** This device. */

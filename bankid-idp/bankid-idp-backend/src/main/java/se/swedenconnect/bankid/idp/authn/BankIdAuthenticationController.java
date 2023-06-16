@@ -38,6 +38,7 @@ import org.springframework.web.servlet.ModelAndView;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.idp.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
@@ -54,6 +55,7 @@ import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
@@ -135,6 +137,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
+    if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
+      return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
+    }
     return service.poll(request, qr, state, authnInputToken, bankIdContext, client,
         getMessage(bankIdContext, authnInputToken, relyingParty));
   }
@@ -193,7 +198,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    CollectResponse data = (CollectResponse) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
+    // TODO: 2023-06-16 Save and load final collect response
+    CollectResponse data = sessionReader.laodCompletionData(request);
     eventPublisher.orderCompletion(request).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
