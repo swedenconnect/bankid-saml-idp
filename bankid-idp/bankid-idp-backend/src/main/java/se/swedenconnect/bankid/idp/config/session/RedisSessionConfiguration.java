@@ -6,6 +6,7 @@ import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import se.swedenconnect.bankid.idp.authn.session.RedisBankidSessions;
 import se.swedenconnect.bankid.idp.concurrency.LockRepository;
 import se.swedenconnect.bankid.idp.concurrency.RedisLockRepository;
@@ -23,6 +25,7 @@ import java.io.IOException;
 @Configuration
 @ConditionalOnProperty(value = "session.module", havingValue = "redis")
 @Import({RedissonAutoConfiguration.class, RedisAutoConfiguration.class})
+@EnableRedisHttpSession
 public class RedisSessionConfiguration {
   private final ResourceLoader loader = new DefaultResourceLoader();
 
@@ -31,7 +34,6 @@ public class RedisSessionConfiguration {
   public RedisSecurityProperties redisSecurityProperties() {
     return new RedisSecurityProperties();
   }
-
   @Bean
   public RedissonAutoConfigurationCustomizer sslCustomizer(RedisSecurityProperties properties) {
     Resource keystore = loader.getResource(properties.getP12KeyStorePath());

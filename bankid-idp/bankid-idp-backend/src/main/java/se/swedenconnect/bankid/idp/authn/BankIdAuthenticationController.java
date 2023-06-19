@@ -140,8 +140,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
       return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
     }
-    return service.poll(request, qr, state, authnInputToken, bankIdContext, client,
-        getMessage(bankIdContext, authnInputToken, relyingParty));
+    UserVisibleData message = getMessage(bankIdContext, authnInputToken, relyingParty);
+    return service.poll(request, qr, state, bankIdContext, client, message);
   }
 
   // TODO: Wouldn't it be better if the message was calculated once and assigned to the context?

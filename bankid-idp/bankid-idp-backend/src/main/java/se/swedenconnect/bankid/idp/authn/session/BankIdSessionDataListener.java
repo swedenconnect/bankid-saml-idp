@@ -24,6 +24,11 @@ public class BankIdSessionDataListener {
 
   private final BankIdSessionReader reader;
 
+  /**
+   * Writes published OrderResponseEvent(s) to the users session
+   * @see OrderResponseEvent
+   * @param event to be processes
+   */
   @EventListener
   public void handleOrderResponse(OrderResponseEvent event) {
     log.info("Order response event was published {} for session {}", event.getOrderResponse(), event.getRequest().getSession().getId());
@@ -31,6 +36,11 @@ public class BankIdSessionDataListener {
     writer.save(event.getRequest(), bankIdSessionData);
   }
 
+  /**
+   * Writes published CollectResponseEvent(s) to the users session
+   * @see CollectResponseEvent
+   * @param event to be processed
+   */
   @EventListener
   public void handleCollectResponse(CollectResponseEvent event) {
     HttpSession session = event.getRequest().getSession();
@@ -40,8 +50,17 @@ public class BankIdSessionDataListener {
     if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
       writer.save(event.getRequest(), event.getCollectResponse());
     }
+    if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.FAILED)) {
+      // We do not need to keep the session of a failure
+      writer.delete(event.getRequest());
+    }
   }
 
+  /**
+   * Writes published OrderCompletionEvent(s) to the users session
+   * @see OrderCompletionEvent
+   * @param event to be processed
+   */
   @EventListener
   public void handleCompletion(OrderCompletionEvent event) {
     BankIdSessionState sessionState = reader.loadSessionData(event.getRequest());
@@ -51,8 +70,15 @@ public class BankIdSessionDataListener {
     writer.delete(event.getRequest());
   }
 
+  /**
+   * Handles published OrderCancellationEvent(s) to delete relevant user session data
+   * @see OrderCancellationEvent
+   * @param event to be processed
+   */
   @EventListener
   public void handleOrderCancellationEvent(OrderCancellationEvent event) {
     writer.delete(event.getRequest());
   }
+
+  // TODO: 2023-06-19 Handle and publish events for errors 
 }

@@ -66,11 +66,14 @@ export default {
               /* Time is defined in seconds and setTimeout is in millis*/
               window.setTimeout(() => this.poll(), parseInt(response["time"] * 1000));
             } else {
-              window.setTimeout(() => this.poll(), 2000);
+              window.setTimeout(() => this.poll(), 500);
             }
           } else {
             if (response["status"] === "COMPLETE") {
               window.location.href = PATHS.COMPLETE;
+            }
+            if (response["status"] === "CANCEL") {
+              window.location.href = PATHS.CANCEL;
             }
           }
         }

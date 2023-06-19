@@ -28,4 +28,8 @@ public class ApiResponseFactory {
         yield ApiResponse.Status.IN_PROGRESS;
     };
   }
+
+  public static ApiResponse createUserCancelResponse() {
+    return new ApiResponse(ApiResponse.Status.CANCEL, "", "", "bankid.msg.error.userCancel");
+  }
 }

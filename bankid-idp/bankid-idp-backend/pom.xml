@@ -177,6 +177,11 @@
       <artifactId>redisson-spring-data-27</artifactId>
       <version>3.20.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-data-redis</artifactId>
+    </dependency>
     
   </dependencies>
 

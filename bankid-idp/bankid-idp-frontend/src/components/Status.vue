@@ -28,7 +28,7 @@ export default {
     },
     watch: {
         autoStartToken(oldToken, newToken) {
-            if(!this.otherDevice) {
+            if(!this.otherDevice && newToken !== "") {
                 this.navigateToApp();
             }
         }

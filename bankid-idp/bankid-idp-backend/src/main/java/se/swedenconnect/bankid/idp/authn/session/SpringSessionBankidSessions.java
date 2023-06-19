@@ -2,13 +2,16 @@ package se.swedenconnect.bankid.idp.authn.session;
 
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
-import se.swedenconnect.bankid.rpapi.types.CompletionData;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import static se.swedenconnect.bankid.idp.authn.session.SessionAttributeKeys.*;
 
+/**
+ * Spring Session Implementation of Session Storage
+ * This implementation is not meant for production use
+ */
 public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdSessionReader {
 
   @Override
