@@ -10,7 +10,6 @@ import static se.swedenconnect.bankid.idp.authn.session.SessionAttributeKeys.*;
 
 /**
  * Spring Session Implementation of Session Storage
- * This implementation is not meant for production use
  */
 public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdSessionReader {
 

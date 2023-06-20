@@ -9,12 +9,20 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
+/**
+ * This class is not meant for production use
+ */
 public class InMemoryLockRepository implements LockRepository {
 
   private final Map<String, Lock> stringLockMap = new ConcurrentHashMap<>();
 
   @Override
   public Lock get(String key) {
-    return stringLockMap.computeIfAbsent(key, s -> new ReentrantLock());
+    Lock lock = stringLockMap.computeIfAbsent(key, s -> new ReentrantLock());
+    boolean locked = lock.tryLock();
+    if (locked) {
+      return lock;
+    }
+    throw new LockAlreadyAcquiredException();
   }
 }
