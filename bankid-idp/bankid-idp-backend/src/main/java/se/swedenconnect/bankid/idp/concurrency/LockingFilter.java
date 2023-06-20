@@ -2,6 +2,7 @@ package se.swedenconnect.bankid.idp.concurrency;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -12,24 +13,26 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Optional;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Handles per user locking for the polling critical section
  */
 @Component
 @AllArgsConstructor
+@Slf4j
 public class LockingFilter extends OncePerRequestFilter {
 
-  private final LockRepository locks;
+  public static final String ERROR_RESOURCE_BUSY = """
+      {"Error": "The resource is busy for current user, try again soon"}
+      """;
+  private final TryLockRepository locks;
 
   /**
    * Checks if the request is "/api/poll", and locks the same user from accessing the resource
    * If the resources is already being accessed, the api will return a HTTP-Status 429
    *
-   * @param request Request to be handled
-   * @param response Response to be sent to user
+   * @param request     Request to be handled
+   * @param response    Response to be sent to user
    * @param filterChain filterChain of remaining filters
    * @throws ServletException
    * @throws IOException
@@ -39,23 +42,21 @@ public class LockingFilter extends OncePerRequestFilter {
 
     if (request.getServletPath().contains("/api/poll")) {
       HttpSession session = request.getSession();
-      String key = session.getId();
-      Optional<Lock> lock = getAcquiredLock(key);
-      if (lock.isPresent()) {
-        Lock preAcquiredLock = lock.get();
+      //Keyformat is lock:/path/:sessionID
+      String key = "lock:/api/poll:%s".formatted(session.getId());
+      TryLock lock = locks.get(key);
+      if (lock.tryLock()) {
         try {
           filterChain.doFilter(request, response);
         } finally {
-          preAcquiredLock.unlock();
+          lock.unlock();
         }
-      }
-      else {
+      } else {
         // The resource is busy, send an error to the user
         // Do not continue the filter chain
         handleError(response);
       }
-    }
-    else {
+    } else {
       filterChain.doFilter(request, response);
     }
   }
@@ -67,23 +68,10 @@ public class LockingFilter extends OncePerRequestFilter {
    * @throws IOException
    */
   private static void handleError(HttpServletResponse response) throws IOException {
+    log.info("Failed to acquire lock, resource busy");
     response.setStatus(429);
     response.addHeader("Retry-After", "1");
     PrintWriter writer = response.getWriter();
-    writer.write("""
-        {"Error": "The resource is busy for current user, try again soon"}
-        """);
-  }
-
-  /**
-   * @param key Unique identifier for this session
-   * @return A pre acquired lock if the resource is not busy, empty if the resource is busy
-   */
-  private Optional<Lock> getAcquiredLock(String key) {
-    try {
-      return Optional.of(locks.get(key));
-    } catch (LockAlreadyAcquiredException e) {
-      return Optional.empty();
-    }
+    writer.write(ERROR_RESOURCE_BUSY);
   }
 }

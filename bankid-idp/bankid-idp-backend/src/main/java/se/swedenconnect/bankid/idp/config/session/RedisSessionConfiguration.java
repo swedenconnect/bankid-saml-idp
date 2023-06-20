@@ -6,7 +6,6 @@ import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.session.RedisSessionProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +15,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import se.swedenconnect.bankid.idp.authn.session.RedisBankidSessions;
-import se.swedenconnect.bankid.idp.concurrency.LockRepository;
-import se.swedenconnect.bankid.idp.concurrency.RedisLockRepository;
+import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
+import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
 import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
 
 import java.io.IOException;
@@ -56,8 +55,8 @@ public class RedisSessionConfiguration {
   }
 
   @Bean
-  public LockRepository repository(RedissonClient client) {
-    return new RedisLockRepository(client);
+  public TryLockRepository repository(RedissonClient client) {
+    return new RedisTryLockRepository(client);
   }
 
   @Bean
