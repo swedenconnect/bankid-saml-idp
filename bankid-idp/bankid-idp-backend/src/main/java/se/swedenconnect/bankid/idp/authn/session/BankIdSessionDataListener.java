@@ -50,10 +50,6 @@ public class BankIdSessionDataListener {
     if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
       writer.save(event.getRequest(), event.getCollectResponse());
     }
-    if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.FAILED)) {
-      // We do not need to keep the session of a failure
-      writer.delete(event.getRequest());
-    }
   }
 
   /**
