@@ -3,16 +3,18 @@ package se.swedenconnect.bankid.idp.authn.session;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.redis.core.RedisHash;
 import se.swedenconnect.bankid.idp.authn.StatusCodeFactory;
-import se.swedenconnect.bankid.rpapi.types.*;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
+import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
 import java.time.Instant;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@RedisHash(timeToLive = 3600L)
+
 public class BankIdSessionData {
   private String autoStartToken;
   private String qrStartToken;
