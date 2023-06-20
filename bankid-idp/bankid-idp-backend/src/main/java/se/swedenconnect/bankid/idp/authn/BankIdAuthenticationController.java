@@ -15,15 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.opensaml.core.xml.LangBearing;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
@@ -34,10 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.idp.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
@@ -54,6 +45,7 @@ import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
@@ -62,6 +54,10 @@ import se.swedenconnect.spring.saml.idp.authentication.provider.external.Abstrac
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
@@ -105,7 +101,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * The entry point for the BankID authentication/signature process.
    *
-   * @param request the HTTP servlet request
+   * @param request  the HTTP servlet request
    * @param response the HTTP servlet response
    * @return a {@link ModelAndView}
    */
@@ -128,21 +124,23 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @PostMapping("/api/poll")
-  public Mono<ApiResponse> poll(final HttpServletRequest request,
-      @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
+  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
     BankIdSessionState state = sessionReader.loadSessionData(request);
     Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
     BankIDClient client = relyingParty.getClient();
-    return service.poll(request, qr, state, authnInputToken, bankIdContext, client,
-        getMessage(bankIdContext, authnInputToken, relyingParty));
+    if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
+      return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
+    }
+    UserVisibleData message = getMessage(bankIdContext, authnInputToken, relyingParty);
+    return service.poll(request, qr, state, bankIdContext, client, message);
   }
 
   // TODO: Wouldn't it be better if the message was calculated once and assigned to the context?
   //
   private UserVisibleData getMessage(final BankIdContext context, final Saml2UserAuthenticationInputToken token,
-      final RelyingPartyData relyingParty) {
+                                     final RelyingPartyData relyingParty) {
     if (context.getOperation() == BankIdOperation.SIGN) {
       final DataToSign message = new DataToSign();
       if (token.getAuthnRequirements().getSignatureMessageExtension() != null) {
@@ -151,8 +149,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
             .equals(token.getAuthnRequirements().getSignatureMessageExtension().getMimeType())) {
           message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
         }
-      }
-      else {
+      } else {
         message.setDisplayText(relyingParty.getFallbackSignText().getText());
         if (DisplayText.TextFormat.SIMPLE_MARKDOWN_V1.equals(relyingParty.getFallbackSignText().getFormat())) {
           message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
@@ -164,8 +161,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
       message.setUserNonVisibleData(Base64.getEncoder().encodeToString("TODO".getBytes()));
 
       return message;
-    }
-    else {
+    } else {
       if (relyingParty.getLoginText() == null) {
         return null;
       }
@@ -193,7 +189,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    CollectResponse data = (CollectResponse) request.getSession().getAttribute("BANKID-COMPLETION-DATA");
+    CollectResponse data = sessionReader.laodCompletionData(request);
     eventPublisher.orderCompletion(request).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
@@ -227,12 +223,12 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * When a SAML {@code AuthnRequest} is received we set up an initial {@link BankIdContext}.
    *
-   * @param token the input token
+   * @param token   the input token
    * @param request the HTTP servlet request
    * @return a {@link BankIdContext}
    */
   private BankIdContext buildInitialContext(final Saml2UserAuthenticationInputToken token,
-      final HttpServletRequest request) {
+                                            final HttpServletRequest request) {
 
     final BankIdContext context = new BankIdContext();
     context.setState(BankIdState.INIT);

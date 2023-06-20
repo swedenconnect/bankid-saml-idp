@@ -1,29 +1,52 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
+import org.springframework.data.redis.core.TimeToLive;
+
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+/**
+ * Container for multiple BankId session states
+ * This is construct serves the purpose of holding all sessions that gets started when a user starts authentication
+ * for the strict purpose of being able to refer to the first initial session as well as the most current one.
+ *
+ */
 public class BankIdSessionState {
-    private final Deque<BankIdSessionData> bankIdSessionDataStack;
 
-    public BankIdSessionState() {
-        this.bankIdSessionDataStack = new ArrayDeque<>();
-    }
+  private final Deque<BankIdSessionData> bankIdSessionDataStack;
 
-    public void push(BankIdSessionData data) {
-        bankIdSessionDataStack.push(data);
-    }
+  public BankIdSessionState() {
+    this.bankIdSessionDataStack = new ArrayDeque<>();
+  }
 
-    public BankIdSessionData pop() {
-        return bankIdSessionDataStack.removeFirst();
-    }
+  /**
+   * Operation to insert a new session data
+   * @param data New session data
+   */
+  public void push(BankIdSessionData data) {
+    bankIdSessionDataStack.push(data);
+  }
 
-    public BankIdSessionData getBankIdSessionData() {
-        return bankIdSessionDataStack.getFirst();
-    }
+  /**
+   * Operation to remove the most current session data
+   * @return Old session data
+   */
+  public BankIdSessionData pop() {
+    return bankIdSessionDataStack.removeFirst();
+  }
 
-    public Instant getInitialOrderTime() {
-        return bankIdSessionDataStack.getLast().getStartTime();
-    }
+  /**
+   * @return Most current bankid session data
+   */
+  public BankIdSessionData getBankIdSessionData() {
+    return bankIdSessionDataStack.getFirst();
+  }
+
+  /**
+   * @return Point in time of the first response
+   */
+  public Instant getInitialOrderTime() {
+    return bankIdSessionDataStack.getLast().getStartTime();
+  }
 }

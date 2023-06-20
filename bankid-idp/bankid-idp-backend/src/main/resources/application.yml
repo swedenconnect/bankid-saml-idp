@@ -7,6 +7,7 @@ server:
     session:
       cookie:
         name: BANKIDSESSION
+      timeout: 15m
     context-path: /bankid/idp
   ssl:
     enabled: true
@@ -127,10 +128,31 @@ logging:
 ---
 
 spring:
+  redis:
+    host: ${REDIS_HOST:local.dev.swedenconnect.se}
+    port: ${REDIS_PORT:6379}
+    password: supersecret
+    ssl: true
+    tls:
+      p12KeyStorePath: classpath:local/redis/redis.p12
+      p12KeyStorePassword: changeit
+      p12TrustStorePath: classpath:local/redis/trust.p12
+      p12TrustStorePassword: changeit
+      enableHostnameVerification: true
   config:
     activate:
       on-profile: local
-  
+  session:
+    timeout: 15m
+server:
+  reactive:
+    session:
+      timeout: 15m
+
+
+session:
+  module: redis
+
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1

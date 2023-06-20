@@ -11,7 +11,7 @@
             :image=qrImage
         />
       </div>
-      <p v-if="shouldCancel"> Stopping authentication ... </p>
+      <p v-if="shouldCancel"> {{ $t("bankid.msg.cancel-progress") }} </p>
     </div>
     <div class="col-sm-12 return">
       <button @click="cancelRequest" class="btn btn-link" type="submit" name="action" value="cancel">
@@ -48,10 +48,12 @@ export default {
   methods: {
     poll: function () {
       poll(this.otherDevice && !this.sign).then(response => {
-        this.qrImage = response["qrCode"];
-        this.pollingActive = response["status"] === "IN_PROGRESS";
-        this.token = response["autoStartToken"];
-        this.messageCode = response["messageCode"];
+        if (response["retry"] !== true) {
+          this.qrImage = response["qrCode"];
+          this.pollingActive = response["status"] === "IN_PROGRESS";
+          this.token = response["autoStartToken"];
+          this.messageCode = response["messageCode"];
+        }
         return response;
       }).then(response => {
         if (this.shouldCancel) {
@@ -60,10 +62,18 @@ export default {
           });
         } else {
           if (this.pollingActive) {
-            window.setTimeout(() => this.poll(), 500);
+            if (response["retry"] === true) {
+              /* Time is defined in seconds and setTimeout is in millis*/
+              window.setTimeout(() => this.poll(), parseInt(response["time"] * 1000));
+            } else {
+              window.setTimeout(() => this.poll(), 500);
+            }
           } else {
-            if (response["status"] !== "ERROR") {
+            if (response["status"] === "COMPLETE") {
               window.location.href = PATHS.COMPLETE;
+            }
+            if (response["status"] === "CANCEL") {
+              window.location.href = PATHS.CANCEL;
             }
           }
         }

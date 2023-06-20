@@ -36,7 +36,7 @@ public enum PreviousDeviceSelection {
 
   /**
    * Constructor.
-   * 
+   *
    * @param value the string representation of the enum
    */
   private PreviousDeviceSelection(final String value) {
@@ -45,7 +45,7 @@ public enum PreviousDeviceSelection {
 
   /**
    * Given a string representation its enum object is returned.
-   * 
+   *
    * @param value the string representation
    * @return a {@link PreviousDeviceSelection}
    */
@@ -61,12 +61,12 @@ public enum PreviousDeviceSelection {
 
   /**
    * Returns the string representation of the enum.
-   * 
+   *
    * @return the string representation
    */
   @JsonValue
   public String getValue() {
     return this.value;
   }
-  
+
 }

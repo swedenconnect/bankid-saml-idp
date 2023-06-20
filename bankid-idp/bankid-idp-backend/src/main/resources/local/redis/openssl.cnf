@@ -1,0 +1,8 @@
+[ server_cert ]
+keyUsage = digitalSignature, keyEncipherment
+nsCertType = server
+subjectAltName         = DNS:local.dev.swedenconnect.se, DNS:*.local.dev.swedenconnect.se
+[ client_cert ]
+keyUsage = digitalSignature, keyEncipherment
+nsCertType = client
+subjectAltName         = DNS:local.dev.swedenconnect.se, DNS:*.local.dev.swedenconnect.se

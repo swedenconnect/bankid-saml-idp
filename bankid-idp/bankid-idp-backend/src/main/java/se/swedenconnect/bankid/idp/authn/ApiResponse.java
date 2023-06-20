@@ -11,7 +11,9 @@ public class ApiResponse {
     public enum Status {
         IN_PROGRESS,
         ERROR,
-        COMPLETE
+        COMPLETE,
+
+        CANCEL
     }
 
     private Status status;
