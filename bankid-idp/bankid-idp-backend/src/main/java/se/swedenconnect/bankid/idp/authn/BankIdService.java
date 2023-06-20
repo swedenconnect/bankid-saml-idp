@@ -51,7 +51,7 @@ public class BankIdService {
             .map(c -> BankIdSessionData.of(sessionData, c))
             .flatMap(b -> this.reAuthIfExpired(request, state, bankIdContext, client, message))
             .map(b -> ApiResponseFactory.create(b, client.getQRGenerator(), qr))
-            .onErrorResume(this::handleError))
+            .onErrorResume(e -> handleError(e, request)))
         .orElseGet(() -> this.onNoSession(request, qr, bankIdContext, client, message));
   }
 
@@ -93,11 +93,12 @@ public class BankIdService {
             .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), client.getQRGenerator(), qr)));
   }
 
-  private Mono<ApiResponse> handleError(final Throwable e) {
+  private Mono<ApiResponse> handleError(final Throwable e, HttpServletRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
       return this.sessionExpired(bankIdSessionExpiredException.getExpiredSessionHolder());
     }
     if (e.getCause() instanceof final BankIDException bankIDException && ErrorCode.USER_CANCEL.equals(bankIDException.getErrorCode())) {
+      eventPublisher.orderCancellation(request).publish();
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
     return Mono.error(e);

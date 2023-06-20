@@ -198,7 +198,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    // TODO: 2023-06-16 Save and load final collect response
     CollectResponse data = sessionReader.laodCompletionData(request);
     eventPublisher.orderCompletion(request).publish();
     return complete(request, new BankIdAuthenticationToken(data));

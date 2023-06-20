@@ -80,5 +80,4 @@ public class BankIdSessionDataListener {
     writer.delete(event.getRequest());
   }
 
-  // TODO: 2023-06-19 Handle and publish events for errors 
 }
