@@ -133,45 +133,29 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
       return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
     }
-    UserVisibleData message = getMessage(bankIdContext, authnInputToken, relyingParty);
+    UserVisibleData message = getMessage(request, bankIdContext, authnInputToken, relyingParty);
     return service.poll(request, qr, state, bankIdContext, client, message);
   }
 
-  // TODO: Wouldn't it be better if the message was calculated once and assigned to the context?
-  //
-  private UserVisibleData getMessage(final BankIdContext context, final Saml2UserAuthenticationInputToken token,
-                                     final RelyingPartyData relyingParty) {
-    if (context.getOperation() == BankIdOperation.SIGN) {
-      final DataToSign message = new DataToSign();
-      if (token.getAuthnRequirements().getSignatureMessageExtension() != null) {
-        message.setUserVisibleData(token.getAuthnRequirements().getSignatureMessageExtension().getMessage());
-        if (SignMessageMimeTypeEnum.TEXT_MARKDOWN
-            .equals(token.getAuthnRequirements().getSignatureMessageExtension().getMimeType())) {
-          message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
-        }
-      } else {
-        message.setDisplayText(relyingParty.getFallbackSignText().getText());
-        if (DisplayText.TextFormat.SIMPLE_MARKDOWN_V1.equals(relyingParty.getFallbackSignText().getFormat())) {
-          message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
-        }
-      }
-      // TODO: Build userNonVisibleData according to 4.2.1.2 of "Implementation Profile for BankID Identity Providers
-      // within the Swedish eID Framework".
-      //
-      message.setUserNonVisibleData(Base64.getEncoder().encodeToString("TODO".getBytes()));
 
-      return message;
-    } else {
-      if (relyingParty.getLoginText() == null) {
-        return null;
-      }
-      final UserVisibleData message = new UserVisibleData();
-      message.setDisplayText(relyingParty.getLoginText().getText());
-      if (DisplayText.TextFormat.SIMPLE_MARKDOWN_V1.equals(relyingParty.getLoginText().getFormat())) {
-        message.setUserVisibleDataFormat(UserVisibleData.VISIBLE_DATA_FORMAT_SIMPLE_MARKDOWN_V1);
-      }
-      return message;
-    }
+  /**
+   *
+   * Lazy load of message, if no message is set, it is calculated and published to be persisted
+   *
+   * @param request Current http servlet
+   * @param context Current bankid context
+   * @param token Current SAML token
+   * @param relyingParty Relaying party who wants the authentication
+   * @return Message to be displayed in app
+   */
+  private UserVisibleData getMessage(final HttpServletRequest request, final BankIdContext context, final Saml2UserAuthenticationInputToken token,
+                                     final RelyingPartyData relyingParty) {
+    return Optional.ofNullable(sessionReader.loadUserVisibleData(request))
+        .orElseGet(() -> {
+          UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
+          eventPublisher.userVisibleData(userVisibleData, request).publish();
+          return userVisibleData;
+        });
   }
 
   @PostMapping("/api/cancel")

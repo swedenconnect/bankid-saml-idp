@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +51,16 @@ public class RedisBankidSessions implements BankIdSessionWriter, BankIdSessionRe
       return null;
     }
     return (PreviousDeviceSelection) attribute;
+  }
+
+  @Override
+  public UserVisibleData loadUserVisibleData(HttpServletRequest request) {
+    RMap<Object, Object> map = getRedisHashForUser(request);
+    Object attribute = map.get(BANKID_USER_VISIBLE_DATA_ATTRIBUTE);
+    if (attribute == null) {
+      return null;
+    }
+    return (UserVisibleData) attribute;
   }
 
   private RMap<Object, Object> getRedisHashForUser(HttpServletRequest request) {
@@ -99,7 +110,16 @@ public class RedisBankidSessions implements BankIdSessionWriter, BankIdSessionRe
   @Override
   public void delete(HttpServletRequest request) {
     RMap<Object, Object> map = getRedisHashForUser(request);
-    map.fastRemove(BANKID_COMPLETION_DATA_ATTRIBUTE);
-    map.fastRemove(BANKID_STATE_ATTRIBUTE);
+    BANKID_VOLATILE_ATTRIBUTES.forEach(map::fastRemove);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void save(HttpServletRequest request, UserVisibleData userVisibleData) {
+    RMap<Object, Object> map = getRedisHashForUser(request);
+    map.fastPut(BANKID_USER_VISIBLE_DATA_ATTRIBUTE, userVisibleData);
+    map.expire(Instant.now().plusSeconds(request.getSession().getMaxInactiveInterval()));
   }
 }

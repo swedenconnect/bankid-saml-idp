@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
+import se.swedenconnect.bankid.idp.authn.events.*;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 
 import javax.servlet.http.HttpSession;
@@ -76,4 +73,12 @@ public class BankIdSessionDataListener {
     writer.delete(event.getRequest());
   }
 
+  /**
+   * Handles published UserVisibleDataEvent(s) to persist message for a user
+   * @param event to be processed
+   */
+  @EventListener
+  public void handleUserVisibleDataEvent(UserVisibleDataEvent event) {
+    writer.save(event.getRequest(), event.getUserVisibleData());
+  }
 }
