@@ -3,6 +3,7 @@ package se.swedenconnect.bankid.idp.authn.events;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
@@ -30,6 +31,10 @@ public class BankIdEventPublisher {
 
   public EventBuilder orderCompletion(HttpServletRequest request) {
     return new EventBuilder(new OrderCompletionEvent(request), publisher);
+  }
+
+  public EventBuilder userVisibleData(UserVisibleData data, HttpServletRequest request) {
+    return new EventBuilder(new UserVisibleDataEvent(data, request), publisher);
   }
 
   @AllArgsConstructor

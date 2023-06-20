@@ -1,6 +1,7 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +36,7 @@ public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdS
   @Override
   public void delete(HttpServletRequest request) {
     HttpSession session = request.getSession();
-    session.setAttribute(BANKID_COMPLETION_DATA_ATTRIBUTE, null);
-    session.setAttribute(BANKID_STATE_ATTRIBUTE, null);
+    BANKID_VOLATILE_ATTRIBUTES.forEach(key -> session.setAttribute(key, null));
   }
 
   @Override
@@ -61,5 +61,15 @@ public class SpringSessionBankidSessions implements BankIdSessionWriter, BankIdS
       return null;
     }
     return PreviousDeviceSelection.forValue(attribute);
+  }
+
+  @Override
+  public UserVisibleData loadUserVisibleData(HttpServletRequest request) {
+    return (UserVisibleData) request.getSession().getAttribute(BANKID_USER_VISIBLE_DATA_ATTRIBUTE);
+  }
+
+  @Override
+  public void save(HttpServletRequest request, UserVisibleData userVisibleData) {
+    request.getSession().setAttribute(BANKID_USER_VISIBLE_DATA_ATTRIBUTE, userVisibleData);
   }
 }
