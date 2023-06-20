@@ -153,7 +153,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return Optional.ofNullable(sessionReader.loadUserVisibleData(request))
         .orElseGet(() -> {
           UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
-          eventPublisher.userVisibleData(userVisibleData, request);
+          eventPublisher.userVisibleData(userVisibleData, request).publish();
           return userVisibleData;
         });
   }
