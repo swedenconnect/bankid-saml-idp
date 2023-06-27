@@ -149,7 +149,9 @@ server:
     session:
       timeout: 15m
 
-
+logging:
+  eventlogger:
+    module: deualt
 session:
   module: redis
 

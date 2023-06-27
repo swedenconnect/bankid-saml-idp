@@ -35,6 +35,8 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
+import se.swedenconnect.bankid.idp.authn.service.BankIdService;
+import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
@@ -42,13 +44,11 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
-import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
@@ -56,7 +56,10 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -101,8 +104,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * The entry point for the BankID authentication/signature process.
    *
-   * @param request  the HTTP servlet request
-   * @param response the HTTP servlet response
    * @return a {@link ModelAndView}
    */
   @GetMapping(AUTHN_PATH)
@@ -133,18 +134,24 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
       return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
     }
-    UserVisibleData message = getMessage(request, bankIdContext, authnInputToken, relyingParty);
-    return service.poll(request, qr, state, bankIdContext, client, message);
+    PollRequest pollRequest = PollRequest.builder()
+        .request(request)
+        .relyingPartyData(relyingParty)
+        .qr(qr)
+        .context(bankIdContext)
+        .data(getMessage(request, bankIdContext, authnInputToken, relyingParty))
+        .state(state)
+        .build();
+    return service.poll(pollRequest);
   }
 
 
   /**
-   *
    * Lazy load of message, if no message is set, it is calculated and published to be persisted
    *
-   * @param request Current http servlet
-   * @param context Current bankid context
-   * @param token Current SAML token
+   * @param request      Current http servlet
+   * @param context      Current bankid context
+   * @param token        Current SAML token
    * @param relyingParty Relaying party who wants the authentication
    * @return Message to be displayed in app
    */

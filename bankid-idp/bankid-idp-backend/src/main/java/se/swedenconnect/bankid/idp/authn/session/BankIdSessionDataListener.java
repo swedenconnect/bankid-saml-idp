@@ -28,9 +28,9 @@ public class BankIdSessionDataListener {
    */
   @EventListener
   public void handleOrderResponse(OrderResponseEvent event) {
-    log.info("Order response event was published {} for session {}", event.getOrderResponse(), event.getRequest().getSession().getId());
-    BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getOrderResponse(), event.getShowQr());
-    writer.save(event.getRequest(), bankIdSessionData);
+    log.info("Order response event was published {} for session {}", event.getResponse(), event.getRequest().getRequest().getSession().getId());
+    BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getRequest(), event.getResponse());
+    writer.save(event.getRequest().getRequest(), bankIdSessionData);
   }
 
   /**
@@ -40,12 +40,12 @@ public class BankIdSessionDataListener {
    */
   @EventListener
   public void handleCollectResponse(CollectResponseEvent event) {
-    HttpSession session = event.getRequest().getSession();
+    HttpSession session = event.getRequest().getRequest().getSession();
     log.info("Collect response event was published {} for session {}", event.getCollectResponse(), session.getId());
-    BankIdSessionData previous = reader.loadSessionData(event.getRequest()).getBankIdSessionData();
-    writer.save(event.getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
+    BankIdSessionData previous = reader.loadSessionData(event.getRequest().getRequest()).getBankIdSessionData();
+    writer.save(event.getRequest().getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
     if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
-      writer.save(event.getRequest(), event.getCollectResponse());
+      writer.save(event.getRequest().getRequest(), event.getCollectResponse());
     }
   }
 

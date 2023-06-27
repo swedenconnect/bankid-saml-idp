@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.swedenconnect.bankid.idp.authn.StatusCodeFactory;
+import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -27,7 +28,7 @@ public class BankIdSessionData {
   private String messageCode;
   private Boolean showQr;
 
-  public static BankIdSessionData of(OrderResponse response, Boolean showQr) {
+  public static BankIdSessionData of(PollRequest request, OrderResponse response) {
     return new BankIdSessionData(
         response.getAutoStartToken(),
         response.getQrStartToken(),
@@ -38,7 +39,7 @@ public class BankIdSessionData {
         false,
         "",
         "bankid.msg.rfa21",
-        showQr
+        request.getQr()
     );
   }
 

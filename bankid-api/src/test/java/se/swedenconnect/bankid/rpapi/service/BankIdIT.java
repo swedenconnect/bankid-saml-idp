@@ -23,7 +23,7 @@ public class BankIdIT {
     WebClient webClient = WebClient.builder().baseUrl("http://localhost:9000").build();
     BankIDClient client = new BankIDClientImpl("id", webClient, null);
 
-    Mono<OrderResponse> authenticateStep = client.authenticate("1231231232", "1.1.1.1", new UserVisibleData(), new Requirement());
+    Mono<OrderResponse> authenticateStep = client.authenticate(new AuthenticateRequest("1231231232", "1.1.1.1", new UserVisibleData(), new Requirement()));
     StepVerifier.create(authenticateStep)
         .expectNextMatches(o -> o.getOrderReference() != null)
         .verifyComplete();

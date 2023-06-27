@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.service;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -26,16 +26,18 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.ApiResponseFactory;
+import se.swedenconnect.bankid.idp.authn.ApiResponse;
+import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
+import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.*;
-import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 
 @Service
 @AllArgsConstructor
@@ -43,16 +45,15 @@ public class BankIdService {
 
   private final BankIdEventPublisher eventPublisher;
 
-  public Mono<ApiResponse> poll(final HttpServletRequest request, final Boolean qr, final BankIdSessionState state, final BankIdContext bankIdContext,
-      final BankIDClient client, final UserVisibleData message) {
-    return Optional.ofNullable(state)
+  public Mono<ApiResponse> poll(PollRequest request) {
+    return Optional.ofNullable(request.getState())
         .map(BankIdSessionState::getBankIdSessionData)
-        .map(sessionData -> this.collect(request, client, sessionData)
+        .map(sessionData -> this.collect(request)
             .map(c -> BankIdSessionData.of(sessionData, c))
-            .flatMap(b -> this.reAuthIfExpired(request, state, bankIdContext, client, message))
-            .map(b -> ApiResponseFactory.create(b, client.getQRGenerator(), qr))
+            .flatMap(b -> this.reAuthIfExpired(request))
+            .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
             .onErrorResume(e -> handleError(e, request)))
-        .orElseGet(() -> this.onNoSession(request, qr, bankIdContext, client, message));
+        .orElseGet(() -> this.onNoSession(request));
   }
 
   public Mono<Void> cancel(final HttpServletRequest request, final BankIdSessionState state,
@@ -61,65 +62,59 @@ public class BankIdService {
     return client.cancel(state.getBankIdSessionData().getOrderReference());
   }
 
-  private Mono<OrderResponse> auth(final HttpServletRequest request, final String personalNumber,
-      final BankIDClient client, final Boolean showQr, final UserVisibleData message) {
-    final Requirement requirement = new Requirement();
-    // TODO: 2023-05-17 Requirement factory per entityId
-    return client.authenticate(personalNumber, request.getRemoteAddr(), message, requirement)
+  private Mono<OrderResponse> auth(PollRequest request) {
+    return request.getRelyingPartyData().getClient().authenticate(BankIdRequestFactory.createAuthenticateRequest(request))
         .map(o -> {
-          this.eventPublisher.orderResponse(request, o, showQr).publish();
+          this.eventPublisher.orderResponse(request, o).publish();
           return o;
         });
   }
 
-  private Mono<OrderResponse> init(final BankIdContext bankIdContext, final HttpServletRequest request,
-      final BankIDClient client, final boolean qr, final UserVisibleData message) {
-    if (bankIdContext.getOperation().equals(BankIdOperation.SIGN)) {
-      return client
-          .sign(bankIdContext.getPersonalNumber(), request.getRemoteAddr(), (DataToSign) message, new Requirement())
+  private Mono<OrderResponse> init(PollRequest request) {
+    if (request.getContext().getOperation().equals(BankIdOperation.SIGN)) {
+      return request.getRelyingPartyData().getClient()
+          .sign(BankIdRequestFactory.createSignRequest(request))
           .map(o -> {
-            this.eventPublisher.orderResponse(request, o, qr).publish();
+            this.eventPublisher.orderResponse(request, o).publish();
             return o;
           });
     }
-    return this.auth(request, bankIdContext.getPersonalNumber(), client, qr, message);
+    return this.auth(request);
   }
 
-  private Mono<ApiResponse> onNoSession(final HttpServletRequest request, final Boolean qr,
-      final BankIdContext bankIdContext, final BankIDClient client, final UserVisibleData message) {
-    return this.init(bankIdContext, request, client, qr, message)
-        .map(b -> BankIdSessionData.of(b, qr))
-        .flatMap(b -> collect(request, client, b)
-            .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), client.getQRGenerator(), qr)));
+  private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
+    return this.init(pollRequest)
+        .map(b -> BankIdSessionData.of(pollRequest, b))
+        .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
+            .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr())));
   }
 
-  private Mono<ApiResponse> handleError(final Throwable e, HttpServletRequest request) {
+  private Mono<ApiResponse> handleError(final Throwable e, PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
-      return this.sessionExpired(bankIdSessionExpiredException.getExpiredSessionHolder());
+      return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest());
     }
     if (e.getCause() instanceof final BankIDException bankIDException && ErrorCode.USER_CANCEL.equals(bankIDException.getErrorCode())) {
-      eventPublisher.orderCancellation(request).publish();
+      eventPublisher.orderCancellation(request.getRequest()).publish();
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
     return Mono.error(e);
   }
 
-  private Mono<BankIdSessionData> reAuthIfExpired(final HttpServletRequest request, final BankIdSessionState state,
-      final BankIdContext bankIdContext, final BankIDClient client, final UserVisibleData message) {
+  private Mono<BankIdSessionData> reAuthIfExpired(final PollRequest request) {
+    final BankIdSessionState state = request.getState();
     final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
     if (bankIdSessionData.getExpired()) {
       if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
-      return this.auth(request, bankIdContext.getPersonalNumber(), client, bankIdSessionData.getShowQr(), message)
-          .map(orderResponse -> BankIdSessionData.of(orderResponse, bankIdSessionData.getShowQr()));
+      return this.auth(request)
+          .map(orderResponse -> BankIdSessionData.of(request, orderResponse));
     }
     return Mono.just(bankIdSessionData);
   }
 
-  private Mono<CollectResponse> collect(final HttpServletRequest request, final BankIDClient client,
-      final BankIdSessionData data) {
-    return client.collect(data.getOrderReference())
+  private Mono<CollectResponse> collect(final PollRequest request) {
+    return request.getRelyingPartyData().getClient().collect(request.getState().getBankIdSessionData().getOrderReference())
         .map(c -> {
           this.eventPublisher.collectResponse(request, c).publish();
           return c;

@@ -33,37 +33,11 @@ public interface BankIDClient {
    */
   String getIdentifier();
 
-  /**
-   * Request an authentication order. The {@link #collect(String)} method is used to query the status of the order.
-   * 
-   * @param personalIdentityNumber the ID number of the user trying to be authenticated (optional). If the ID number is
-   *          omitted the user must use the same device and the client must be started with the autoStartToken returned
-   *          in orderResponse
-   * @param endUserIp the user IP address as seen by the relying party
-   * @param userVisibleData data to display to the user during authentication (optional)
-   * @param requirement used by the relying party to set requirements how the authentication or sign operation must be
-   *          performed. Default rules are applied if omitted
-   * @return an order response
-   * @throws BankIDException for errors
-   */
-  Mono<OrderResponse> authenticate(final String personalIdentityNumber, final String endUserIp,
-                                   final UserVisibleData userVisibleData, final Requirement requirement);
 
-  /**
-   * Request a signing order. The {@link #collect(String)} method is used to query the status of the order.
-   * 
-   * @param personalIdentityNumber the ID number of the user trying to be authenticated (optional). If the ID number is
-   *          omitted the user must use the same device and the client must be started with the autoStartToken returned
-   *          in orderResponse
-   * @param endUserIp the user IP address as seen by the relying party
-   * @param dataToSign the data to sign
-   * @param requirement used by the relying party to set requirements how the authentication or sign operation must be
-   *          performed. Default rules are applied if omitted
-   * @return an order response
-   * @throws BankIDException for errors
-   */
-  Mono<OrderResponse> sign(final String personalIdentityNumber, final String endUserIp,
-      final DataToSign dataToSign, final Requirement requirement);
+  Mono<OrderResponse> authenticate(AuthenticateRequest request);
+
+
+  Mono<OrderResponse> sign(SignatureRequest request);
 
   /**
    * Cancels an ongoing order.

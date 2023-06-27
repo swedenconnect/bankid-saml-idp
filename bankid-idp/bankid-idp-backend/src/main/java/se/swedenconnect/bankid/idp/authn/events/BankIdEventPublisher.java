@@ -3,6 +3,7 @@ package se.swedenconnect.bankid.idp.authn.events;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -15,13 +16,11 @@ public class BankIdEventPublisher {
   private final ApplicationEventPublisher publisher;
 
 
-
-
-  public EventBuilder orderResponse(HttpServletRequest request, OrderResponse response, Boolean showQr) {
-    return new EventBuilder(new OrderResponseEvent(request, response, showQr), publisher);
+  public EventBuilder orderResponse(PollRequest request, OrderResponse response) {
+    return new EventBuilder(new OrderResponseEvent(request, response), publisher);
   }
 
-  public EventBuilder collectResponse(HttpServletRequest request, CollectResponse collectResponse) {
+  public EventBuilder collectResponse(PollRequest request, CollectResponse collectResponse) {
     return new EventBuilder(new CollectResponseEvent(request, collectResponse), publisher);
   }
 
