@@ -139,12 +139,18 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
         .relyingPartyData(relyingParty)
         .qr(qr)
         .context(bankIdContext)
-        .data(getMessage(request, bankIdContext, authnInputToken, relyingParty))
+        .data(this.getMessage(request, bankIdContext, authnInputToken, relyingParty))
         .state(state)
         .build();
     return service.poll(pollRequest);
   }
 
+
+  private BankIdContext getBankIdContext(Saml2UserAuthenticationInputToken token, HttpServletRequest request) {
+    BankIdContext bankIdContext = this.buildInitialContext(token, request);
+    BankIdContext context = sessionReader.loadContext(request);
+    return bankIdContext;
+  }
 
   /**
    * Lazy load of message, if no message is set, it is calculated and published to be persisted

@@ -14,7 +14,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import se.swedenconnect.bankid.idp.authn.session.RedisBankidSessions;
+import se.swedenconnect.bankid.idp.authn.session.RedisSessionDao;
+import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
 import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
@@ -60,7 +61,7 @@ public class RedisSessionConfiguration {
   }
 
   @Bean
-  public RedisBankidSessions redisBankidSessions(RedissonClient client) {
-    return new RedisBankidSessions(client);
+  public SessionDao redisSessionDao(RedissonClient client) {
+    return new RedisSessionDao(client);
   }
 }

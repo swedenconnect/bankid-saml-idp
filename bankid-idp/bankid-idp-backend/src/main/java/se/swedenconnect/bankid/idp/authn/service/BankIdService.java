@@ -45,6 +45,8 @@ public class BankIdService {
 
   private final BankIdEventPublisher eventPublisher;
 
+  private final BankIdRequestFactory requestFactory;
+
   public Mono<ApiResponse> poll(PollRequest request) {
     return Optional.ofNullable(request.getState())
         .map(BankIdSessionState::getBankIdSessionData)
@@ -63,7 +65,7 @@ public class BankIdService {
   }
 
   private Mono<OrderResponse> auth(PollRequest request) {
-    return request.getRelyingPartyData().getClient().authenticate(BankIdRequestFactory.createAuthenticateRequest(request))
+    return request.getRelyingPartyData().getClient().authenticate(requestFactory.createAuthenticateRequest(request))
         .map(o -> {
           this.eventPublisher.orderResponse(request, o).publish();
           return o;
@@ -73,7 +75,7 @@ public class BankIdService {
   private Mono<OrderResponse> init(PollRequest request) {
     if (request.getContext().getOperation().equals(BankIdOperation.SIGN)) {
       return request.getRelyingPartyData().getClient()
-          .sign(BankIdRequestFactory.createSignRequest(request))
+          .sign(requestFactory.createSignRequest(request))
           .map(o -> {
             this.eventPublisher.orderResponse(request, o).publish();
             return o;
