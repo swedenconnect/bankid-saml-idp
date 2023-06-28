@@ -178,8 +178,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     if (Objects.nonNull(bankIdSessionData)) {
       Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
       String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-      BankIDClient client = this.getRelyingParty(entityId).getClient();
-      return service.cancel(request, state, client);
+      RelyingPartyData relyingParty = this.getRelyingParty(entityId);
+      return service.cancel(request, state, relyingParty);
     }
     return Mono.empty();
   }
@@ -187,7 +187,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
     CollectResponse data = sessionReader.laodCompletionData(request);
-    eventPublisher.orderCompletion(request).publish();
+    Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+    String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+    RelyingPartyData relyingParty = getRelyingParty(entityId);
+    eventPublisher.orderCompletion(request, relyingParty).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
 

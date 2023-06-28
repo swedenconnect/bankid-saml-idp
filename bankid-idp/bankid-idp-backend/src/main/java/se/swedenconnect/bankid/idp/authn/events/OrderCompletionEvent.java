@@ -11,4 +11,5 @@ import javax.servlet.http.HttpServletRequest;
 @Data
 public class OrderCompletionEvent {
   private final HttpServletRequest request;
+  private final RelyingPartyData data;
 }

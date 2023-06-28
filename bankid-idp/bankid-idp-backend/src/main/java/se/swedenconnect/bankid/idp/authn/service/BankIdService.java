@@ -15,29 +15,26 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Service;
-
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
-import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.DataToSign;
-import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
-import se.swedenconnect.bankid.rpapi.types.*;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
+import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -58,10 +55,9 @@ public class BankIdService {
         .orElseGet(() -> this.onNoSession(request));
   }
 
-  public Mono<Void> cancel(final HttpServletRequest request, final BankIdSessionState state,
-      final BankIDClient client) {
-    this.eventPublisher.orderCancellation(request).publish();
-    return client.cancel(state.getBankIdSessionData().getOrderReference());
+  public Mono<Void> cancel(final HttpServletRequest request, final BankIdSessionState state, final RelyingPartyData data) {
+    this.eventPublisher.orderCancellation(request, data).publish();
+    return data.getClient().cancel(state.getBankIdSessionData().getOrderReference());
   }
 
   private Mono<OrderResponse> auth(PollRequest request) {
@@ -93,10 +89,10 @@ public class BankIdService {
 
   private Mono<ApiResponse> handleError(final Throwable e, PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
-      return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest());
+      return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
     if (e.getCause() instanceof final BankIDException bankIDException && ErrorCode.USER_CANCEL.equals(bankIDException.getErrorCode())) {
-      eventPublisher.orderCancellation(request.getRequest()).publish();
+      eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
     return Mono.error(e);
@@ -123,8 +119,8 @@ public class BankIdService {
         });
   }
 
-  private Mono<ApiResponse> sessionExpired(final HttpServletRequest request) {
-    this.eventPublisher.orderCancellation(request).publish();
+  private Mono<ApiResponse> sessionExpired(final HttpServletRequest request, PollRequest pollRequest) {
+    this.eventPublisher.orderCancellation(request, pollRequest.getRelyingPartyData()).publish();
     return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
   }
 }
