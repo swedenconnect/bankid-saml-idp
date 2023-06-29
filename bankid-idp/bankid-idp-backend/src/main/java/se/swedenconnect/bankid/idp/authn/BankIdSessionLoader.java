@@ -18,13 +18,13 @@ public class BankIdSessionLoader {
 
   private final RelyingPartyRepository repository;
 
-  public BankIdUserData load(HttpServletRequest request, Saml2UserAuthenticationInputToken token) {
+  public BankIdUserData load(final HttpServletRequest request, final Saml2UserAuthenticationInputToken token) {
     final RelyingPartyData relyingParty = this.getRelyingParty(token.getAuthnRequestToken().getEntityId());
     final BankIdSessionData sessionData = (BankIdSessionData) request.getSession().getAttribute("BANKID-STATE");
     return new BankIdUserData(sessionData, relyingParty);
   }
 
-  public void save(HttpServletRequest request, BankIdSessionData data) {
+  public void save(final HttpServletRequest request, final BankIdSessionData data) {
     request.getSession().setAttribute("BANKID-STATE", data);
   }
 
@@ -37,7 +37,7 @@ public class BankIdSessionLoader {
     return rp;
   }
 
-  public void delete(HttpServletRequest request) {
+  public void delete(final HttpServletRequest request) {
     request.getSession().setAttribute("BANKID-STATE", null);
     request.getSession().setAttribute("BANKID-COMPLETION-DATA", null);
   }

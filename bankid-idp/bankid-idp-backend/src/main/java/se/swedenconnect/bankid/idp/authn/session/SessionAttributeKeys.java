@@ -3,6 +3,10 @@ package se.swedenconnect.bankid.idp.authn.session;
 import java.util.List;
 
 public class SessionAttributeKeys {
+
+  public static final String BANKID_CONTEXT = "BANKID-CONTEXT";
+
+
   /**
    * The session attribute where we store whether we selected "this device" or "other device".
    */

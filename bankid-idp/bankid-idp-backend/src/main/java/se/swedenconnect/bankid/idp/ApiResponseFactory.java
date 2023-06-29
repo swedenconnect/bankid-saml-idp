@@ -7,10 +7,10 @@ import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import java.util.Optional;
 
 public class ApiResponseFactory {
-  public static ApiResponse create(BankIdSessionData data, QRGenerator generator, boolean showQr) {
+  public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
     String qrCode = "";
     // Only generate qr code when it has not been scanned and should be displayed
-    if (showQr && Optional.ofNullable(data.getHintCode()).map("outstandingTransaction"::equals).orElse(false) ) {
+    if (showQr && Optional.ofNullable(data.getHintCode()).map("outstandingTransaction"::equals).orElse(false)) {
       qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(), data.getStartTime());
     }
     return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
@@ -20,7 +20,7 @@ public class ApiResponseFactory {
     return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.timeout");
   }
 
-  private static ApiResponse.Status statusOf(BankIdSessionData sessionData) {
+  private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
     return switch (sessionData.getStatus()) {
       case COMPLETE:
         yield ApiResponse.Status.COMPLETE;

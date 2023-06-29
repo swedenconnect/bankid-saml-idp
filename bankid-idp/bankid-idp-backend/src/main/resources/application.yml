@@ -149,6 +149,9 @@ server:
     session:
       timeout: 15m
 
+audit:
+  logging:
+    module: default
 
 session:
   module: redis

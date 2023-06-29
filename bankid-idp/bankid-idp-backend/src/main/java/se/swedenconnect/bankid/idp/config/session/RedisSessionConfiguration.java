@@ -14,7 +14,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import se.swedenconnect.bankid.idp.authn.session.RedisBankidSessions;
+import se.swedenconnect.bankid.idp.authn.session.RedisSessionDao;
+import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
 import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
@@ -34,33 +35,33 @@ public class RedisSessionConfiguration {
     return new RedisSecurityProperties();
   }
   @Bean
-  public RedissonAutoConfigurationCustomizer sslCustomizer(RedisSecurityProperties properties) {
-    Resource keystore = loader.getResource(properties.getP12KeyStorePath());
+  public RedissonAutoConfigurationCustomizer sslCustomizer(final RedisSecurityProperties properties) {
+    final Resource keystore = loader.getResource(properties.getP12KeyStorePath());
     return c -> {
       try {
-        SingleServerConfig singleServerConfig = c.useSingleServer()
+        final SingleServerConfig singleServerConfig = c.useSingleServer()
             .setSslKeystore(keystore.getURL())
             .setSslKeystorePassword(properties.getP12KeyStorePassword());
         singleServerConfig.setSslEnableEndpointIdentification(properties.getEnableHostnameVerification());
         if (properties.getEnableHostnameVerification()) {
-          Resource truststore = loader.getResource(properties.getP12TrustStorePath());
+          final Resource truststore = loader.getResource(properties.getP12TrustStorePath());
           singleServerConfig
               .setSslTruststore(truststore.getURL())
               .setSslTruststorePassword(properties.getP12TrustStorePassword());
         }
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new RuntimeException(e);
       }
     };
   }
 
   @Bean
-  public TryLockRepository repository(RedissonClient client) {
+  public TryLockRepository repository(final RedissonClient client) {
     return new RedisTryLockRepository(client);
   }
 
   @Bean
-  public RedisBankidSessions redisBankidSessions(RedissonClient client) {
-    return new RedisBankidSessions(client);
+  public SessionDao redisSessionDao(final RedissonClient client) {
+    return new RedisSessionDao(client);
   }
 }

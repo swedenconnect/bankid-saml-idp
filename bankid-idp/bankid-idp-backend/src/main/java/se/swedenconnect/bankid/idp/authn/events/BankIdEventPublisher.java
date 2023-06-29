@@ -3,6 +3,8 @@ package se.swedenconnect.bankid.idp.authn.events;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import se.swedenconnect.bankid.idp.authn.service.PollRequest;
+import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -15,25 +17,23 @@ public class BankIdEventPublisher {
   private final ApplicationEventPublisher publisher;
 
 
-
-
-  public EventBuilder orderResponse(HttpServletRequest request, OrderResponse response, Boolean showQr) {
-    return new EventBuilder(new OrderResponseEvent(request, response, showQr), publisher);
+  public EventBuilder orderResponse(final PollRequest request, final OrderResponse response) {
+    return new EventBuilder(new OrderResponseEvent(request, response), publisher);
   }
 
-  public EventBuilder collectResponse(HttpServletRequest request, CollectResponse collectResponse) {
+  public EventBuilder collectResponse(final PollRequest request, final CollectResponse collectResponse) {
     return new EventBuilder(new CollectResponseEvent(request, collectResponse), publisher);
   }
 
-  public EventBuilder orderCancellation(HttpServletRequest request) {
-    return new EventBuilder(new OrderCancellationEvent(request), publisher);
+  public EventBuilder orderCancellation(final HttpServletRequest request, final RelyingPartyData data) {
+    return new EventBuilder(new OrderCancellationEvent(request, data), publisher);
   }
 
-  public EventBuilder orderCompletion(HttpServletRequest request) {
-    return new EventBuilder(new OrderCompletionEvent(request), publisher);
+  public EventBuilder orderCompletion(final HttpServletRequest request, final RelyingPartyData data) {
+    return new EventBuilder(new OrderCompletionEvent(request, data), publisher);
   }
 
-  public EventBuilder userVisibleData(UserVisibleData data, HttpServletRequest request) {
+  public EventBuilder userVisibleData(final UserVisibleData data, final HttpServletRequest request) {
     return new EventBuilder(new UserVisibleDataEvent(data, request), publisher);
   }
 

@@ -24,7 +24,7 @@ public class BankIdSessionState {
    * Operation to insert a new session data
    * @param data New session data
    */
-  public void push(BankIdSessionData data) {
+  public void push(final BankIdSessionData data) {
     bankIdSessionDataStack.push(data);
   }
 

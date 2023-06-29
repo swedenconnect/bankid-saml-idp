@@ -35,6 +35,8 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdState;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
+import se.swedenconnect.bankid.idp.authn.service.BankIdService;
+import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
@@ -42,13 +44,11 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
-import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
@@ -56,7 +56,10 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -101,8 +104,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * The entry point for the BankID authentication/signature process.
    *
-   * @param request  the HTTP servlet request
-   * @param response the HTTP servlet response
    * @return a {@link ModelAndView}
    */
   @GetMapping(AUTHN_PATH)
@@ -111,10 +112,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @GetMapping("/api/device")
-  public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
-    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
-    boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
+  public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    final BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
+    final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
     PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
       log.warn("Failed to find previous selected device for user");
@@ -124,27 +125,39 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @PostMapping("/api/poll")
-  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
-    BankIdSessionState state = sessionReader.loadSessionData(request);
-    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
+  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") final Boolean qr) {
+    final BankIdSessionState state = sessionReader.loadSessionData(request);
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    final BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-    BankIDClient client = relyingParty.getClient();
+    final BankIDClient client = relyingParty.getClient();
     if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
       return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
     }
-    UserVisibleData message = getMessage(request, bankIdContext, authnInputToken, relyingParty);
-    return service.poll(request, qr, state, bankIdContext, client, message);
+    final PollRequest pollRequest = PollRequest.builder()
+        .request(request)
+        .relyingPartyData(relyingParty)
+        .qr(qr)
+        .context(bankIdContext)
+        .data(this.getMessage(request, bankIdContext, authnInputToken, relyingParty))
+        .state(state)
+        .build();
+    return service.poll(pollRequest);
   }
 
 
+  private BankIdContext getBankIdContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
+    final BankIdContext bankIdContext = this.buildInitialContext(token, request);
+    final BankIdContext context = sessionReader.loadContext(request);
+    return bankIdContext;
+  }
+
   /**
-   *
    * Lazy load of message, if no message is set, it is calculated and published to be persisted
    *
-   * @param request Current http servlet
-   * @param context Current bankid context
-   * @param token Current SAML token
+   * @param request      Current http servlet
+   * @param context      Current bankid context
+   * @param token        Current SAML token
    * @param relyingParty Relaying party who wants the authentication
    * @return Message to be displayed in app
    */
@@ -152,29 +165,32 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
                                      final RelyingPartyData relyingParty) {
     return Optional.ofNullable(sessionReader.loadUserVisibleData(request))
         .orElseGet(() -> {
-          UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
+          final UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
           eventPublisher.userVisibleData(userVisibleData, request).publish();
           return userVisibleData;
         });
   }
 
   @PostMapping("/api/cancel")
-  public Mono<Void> cancelRequest(HttpServletRequest request) {
-    BankIdSessionState state = sessionReader.loadSessionData(request);
-    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+  public Mono<Void> cancelRequest(final HttpServletRequest request) {
+    final BankIdSessionState state = sessionReader.loadSessionData(request);
+    final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
     if (Objects.nonNull(bankIdSessionData)) {
-      Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
-      String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-      BankIDClient client = this.getRelyingParty(entityId).getClient();
-      return service.cancel(request, state, client);
+      final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+      final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+      final RelyingPartyData relyingParty = this.getRelyingParty(entityId);
+      return service.cancel(request, state, relyingParty);
     }
     return Mono.empty();
   }
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    CollectResponse data = sessionReader.laodCompletionData(request);
-    eventPublisher.orderCompletion(request).publish();
+    final CollectResponse data = sessionReader.laodCompletionData(request);
+    final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+    final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+    final RelyingPartyData relyingParty = getRelyingParty(entityId);
+    eventPublisher.orderCompletion(request, relyingParty).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
 
@@ -185,13 +201,13 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
+    final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
         .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
-    Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
+    final Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
         .stream()
         .filter(v -> v.getXMLLang() != null && v.getValue() != null)
         .collect(Collectors.toMap(LangBearing::getXMLLang, XSString::getValue));
-    List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
+    final List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
         .flatMap(d -> Optional.ofNullable(d.getExtensions().getUnknownXMLObjects().get(0)))
         .flatMap(e -> Optional.ofNullable(e.getOrderedChildren()))
         .map(c -> c.stream()
@@ -199,7 +215,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
             .map(LogoImpl.class::cast)
             .toList())
         .orElseGet(List::of);
-    SpInformation data =
+    final SpInformation data =
         new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
     return Mono.just(data);
   }
