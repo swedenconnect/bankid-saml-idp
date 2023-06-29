@@ -112,10 +112,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @GetMapping("/api/device")
-  public Mono<SelectedDeviceInformation> getSelectedDevice(HttpServletRequest request) {
-    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
-    boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
+  public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    final BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
+    final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
     PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
       log.warn("Failed to find previous selected device for user");
@@ -125,16 +125,16 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   @PostMapping("/api/poll")
-  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") Boolean qr) {
-    BankIdSessionState state = sessionReader.loadSessionData(request);
-    Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
+  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") final Boolean qr) {
+    final BankIdSessionState state = sessionReader.loadSessionData(request);
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
+    final BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-    BankIDClient client = relyingParty.getClient();
+    final BankIDClient client = relyingParty.getClient();
     if (state != null && state.getBankIdSessionData().getStatus().equals(ProgressStatus.COMPLETE)) {
       return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
     }
-    PollRequest pollRequest = PollRequest.builder()
+    final PollRequest pollRequest = PollRequest.builder()
         .request(request)
         .relyingPartyData(relyingParty)
         .qr(qr)
@@ -146,9 +146,9 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
 
-  private BankIdContext getBankIdContext(Saml2UserAuthenticationInputToken token, HttpServletRequest request) {
-    BankIdContext bankIdContext = this.buildInitialContext(token, request);
-    BankIdContext context = sessionReader.loadContext(request);
+  private BankIdContext getBankIdContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
+    final BankIdContext bankIdContext = this.buildInitialContext(token, request);
+    final BankIdContext context = sessionReader.loadContext(request);
     return bankIdContext;
   }
 
@@ -165,20 +165,20 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
                                      final RelyingPartyData relyingParty) {
     return Optional.ofNullable(sessionReader.loadUserVisibleData(request))
         .orElseGet(() -> {
-          UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
+          final UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
           eventPublisher.userVisibleData(userVisibleData, request).publish();
           return userVisibleData;
         });
   }
 
   @PostMapping("/api/cancel")
-  public Mono<Void> cancelRequest(HttpServletRequest request) {
-    BankIdSessionState state = sessionReader.loadSessionData(request);
-    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+  public Mono<Void> cancelRequest(final HttpServletRequest request) {
+    final BankIdSessionState state = sessionReader.loadSessionData(request);
+    final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
     if (Objects.nonNull(bankIdSessionData)) {
-      Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
-      String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-      RelyingPartyData relyingParty = this.getRelyingParty(entityId);
+      final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+      final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+      final RelyingPartyData relyingParty = this.getRelyingParty(entityId);
       return service.cancel(request, state, relyingParty);
     }
     return Mono.empty();
@@ -186,10 +186,10 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    CollectResponse data = sessionReader.laodCompletionData(request);
-    Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
-    String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-    RelyingPartyData relyingParty = getRelyingParty(entityId);
+    final CollectResponse data = sessionReader.laodCompletionData(request);
+    final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+    final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
+    final RelyingPartyData relyingParty = getRelyingParty(entityId);
     eventPublisher.orderCompletion(request, relyingParty).publish();
     return complete(request, new BankIdAuthenticationToken(data));
   }
@@ -201,13 +201,13 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
+    final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
         .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
-    Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
+    final Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
         .stream()
         .filter(v -> v.getXMLLang() != null && v.getValue() != null)
         .collect(Collectors.toMap(LangBearing::getXMLLang, XSString::getValue));
-    List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
+    final List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
         .flatMap(d -> Optional.ofNullable(d.getExtensions().getUnknownXMLObjects().get(0)))
         .flatMap(e -> Optional.ofNullable(e.getOrderedChildren()))
         .map(c -> c.stream()
@@ -215,7 +215,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
             .map(LogoImpl.class::cast)
             .toList())
         .orElseGet(List::of);
-    SpInformation data =
+    final SpInformation data =
         new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
     return Mono.just(data);
   }

@@ -22,7 +22,7 @@ public class BankIdSessions implements BankIdSessionWriter, BankIdSessionReader 
   private final SessionDao dao;
 
   @Override
-  public void save(HttpServletRequest request, BankIdSessionData data) {
+  public void save(final HttpServletRequest request, final BankIdSessionData data) {
     BankIdSessionState state = dao.read(BANKID_STATE_ATTRIBUTE, BankIdSessionState.class, request);
     if (state == null) {
       state = new BankIdSessionState();
@@ -34,33 +34,33 @@ public class BankIdSessions implements BankIdSessionWriter, BankIdSessionReader 
   }
 
   @Override
-  public void save(HttpServletRequest request, CollectResponse data) {
+  public void save(final HttpServletRequest request, final CollectResponse data) {
     dao.write(BANKID_COMPLETION_DATA_ATTRIBUTE, data, request);
   }
 
   @Override
-  public void delete(HttpServletRequest request) {
+  public void delete(final HttpServletRequest request) {
     BANKID_VOLATILE_ATTRIBUTES.forEach(key -> dao.remove(key, request));
   }
 
   @Override
-  public void save(HttpServletRequest request, PreviousDeviceSelection previousDeviceSelection) {
+  public void save(final HttpServletRequest request, final PreviousDeviceSelection previousDeviceSelection) {
     dao.write(PREVIOUS_DEVICE_SESSION_ATTRIBUTE, previousDeviceSelection.getValue(), request);
   }
 
   @Override
-  public BankIdSessionState loadSessionData(HttpServletRequest request) {
+  public BankIdSessionState loadSessionData(final HttpServletRequest request) {
     return dao.read(BANKID_STATE_ATTRIBUTE, BankIdSessionState.class, request);
   }
 
   @Override
-  public CollectResponse laodCompletionData(HttpServletRequest request) {
+  public CollectResponse laodCompletionData(final HttpServletRequest request) {
     return dao.read(BANKID_COMPLETION_DATA_ATTRIBUTE, CollectResponse.class, request);
   }
 
   @Override
-  public PreviousDeviceSelection loadPreviousSelectedDevice(HttpServletRequest request) {
-    String attribute = dao.read(PREVIOUS_DEVICE_SESSION_ATTRIBUTE, String.class, request);
+  public PreviousDeviceSelection loadPreviousSelectedDevice(final HttpServletRequest request) {
+    final String attribute = dao.read(PREVIOUS_DEVICE_SESSION_ATTRIBUTE, String.class, request);
     if (attribute == null) {
       return null;
     }
@@ -68,17 +68,17 @@ public class BankIdSessions implements BankIdSessionWriter, BankIdSessionReader 
   }
 
   @Override
-  public UserVisibleData loadUserVisibleData(HttpServletRequest request) {
+  public UserVisibleData loadUserVisibleData(final HttpServletRequest request) {
     return dao.read(BANKID_USER_VISIBLE_DATA_ATTRIBUTE, UserVisibleData.class, request);
   }
 
   @Override
-  public void save(HttpServletRequest request, UserVisibleData userVisibleData) {
+  public void save(final HttpServletRequest request, final UserVisibleData userVisibleData) {
     dao.write(BANKID_USER_VISIBLE_DATA_ATTRIBUTE, userVisibleData, request);
   }
 
   @Override
-  public BankIdContext loadContext(HttpServletRequest request) {
+  public BankIdContext loadContext(final HttpServletRequest request) {
     return dao.read(BANKID_CONTEXT, BankIdContext.class, request);
   }
 }

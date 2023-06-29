@@ -7,7 +7,7 @@ import se.swedenconnect.bankid.rpapi.types.Requirement;
 public class BankIdRequirementFactory {
 
     // TODO: 2023-06-27 Wire per RP configurations here and use the configuration to create requriments
-    public Requirement create(PollRequest request) {
+    public Requirement create(final PollRequest request) {
         return new Requirement();
     }
 }

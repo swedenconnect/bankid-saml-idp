@@ -51,7 +51,7 @@ public enum BankIdState {
    * @return a {@link BankIdState}
    */
   @JsonCreator
-  public static BankIdState forValue(String value) {
+  public static BankIdState forValue(final String value) {
     for (final BankIdState s : BankIdState.values()) {
       if (s.getValue().equalsIgnoreCase(value)) {
         return s;

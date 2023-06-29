@@ -44,7 +44,7 @@ public class BankIdService {
 
   private final BankIdRequestFactory requestFactory;
 
-  public Mono<ApiResponse> poll(PollRequest request) {
+  public Mono<ApiResponse> poll(final PollRequest request) {
     return Optional.ofNullable(request.getState())
         .map(BankIdSessionState::getBankIdSessionData)
         .map(sessionData -> this.collect(request)
@@ -60,7 +60,7 @@ public class BankIdService {
     return data.getClient().cancel(state.getBankIdSessionData().getOrderReference());
   }
 
-  private Mono<OrderResponse> auth(PollRequest request) {
+  private Mono<OrderResponse> auth(final PollRequest request) {
     return request.getRelyingPartyData().getClient().authenticate(requestFactory.createAuthenticateRequest(request))
         .map(o -> {
           this.eventPublisher.orderResponse(request, o).publish();
@@ -68,7 +68,7 @@ public class BankIdService {
         });
   }
 
-  private Mono<OrderResponse> init(PollRequest request) {
+  private Mono<OrderResponse> init(final PollRequest request) {
     if (request.getContext().getOperation().equals(BankIdOperation.SIGN)) {
       return request.getRelyingPartyData().getClient()
           .sign(requestFactory.createSignRequest(request))
@@ -87,7 +87,7 @@ public class BankIdService {
             .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c), pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr())));
   }
 
-  private Mono<ApiResponse> handleError(final Throwable e, PollRequest request) {
+  private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
@@ -119,7 +119,7 @@ public class BankIdService {
         });
   }
 
-  private Mono<ApiResponse> sessionExpired(final HttpServletRequest request, PollRequest pollRequest) {
+  private Mono<ApiResponse> sessionExpired(final HttpServletRequest request, final PollRequest pollRequest) {
     this.eventPublisher.orderCancellation(request, pollRequest.getRelyingPartyData()).publish();
     return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
   }

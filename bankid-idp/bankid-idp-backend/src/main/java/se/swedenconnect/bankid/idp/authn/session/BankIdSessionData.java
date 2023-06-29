@@ -28,7 +28,7 @@ public class BankIdSessionData {
   private String messageCode;
   private Boolean showQr;
 
-  public static BankIdSessionData of(PollRequest request, OrderResponse response) {
+  public static BankIdSessionData of(final PollRequest request, final OrderResponse response) {
     return new BankIdSessionData(
         response.getAutoStartToken(),
         response.getQrStartToken(),
@@ -43,7 +43,7 @@ public class BankIdSessionData {
     );
   }
 
-  public static BankIdSessionData of(BankIdSessionData previous, CollectResponse json) {
+  public static BankIdSessionData of(final BankIdSessionData previous, final CollectResponse json) {
     return new BankIdSessionData(
         previous.autoStartToken,
         previous.qrStartToken,

@@ -35,33 +35,33 @@ public class RedisSessionConfiguration {
     return new RedisSecurityProperties();
   }
   @Bean
-  public RedissonAutoConfigurationCustomizer sslCustomizer(RedisSecurityProperties properties) {
-    Resource keystore = loader.getResource(properties.getP12KeyStorePath());
+  public RedissonAutoConfigurationCustomizer sslCustomizer(final RedisSecurityProperties properties) {
+    final Resource keystore = loader.getResource(properties.getP12KeyStorePath());
     return c -> {
       try {
-        SingleServerConfig singleServerConfig = c.useSingleServer()
+        final SingleServerConfig singleServerConfig = c.useSingleServer()
             .setSslKeystore(keystore.getURL())
             .setSslKeystorePassword(properties.getP12KeyStorePassword());
         singleServerConfig.setSslEnableEndpointIdentification(properties.getEnableHostnameVerification());
         if (properties.getEnableHostnameVerification()) {
-          Resource truststore = loader.getResource(properties.getP12TrustStorePath());
+          final Resource truststore = loader.getResource(properties.getP12TrustStorePath());
           singleServerConfig
               .setSslTruststore(truststore.getURL())
               .setSslTruststorePassword(properties.getP12TrustStorePassword());
         }
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new RuntimeException(e);
       }
     };
   }
 
   @Bean
-  public TryLockRepository repository(RedissonClient client) {
+  public TryLockRepository repository(final RedissonClient client) {
     return new RedisTryLockRepository(client);
   }
 
   @Bean
-  public SessionDao redisSessionDao(RedissonClient client) {
+  public SessionDao redisSessionDao(final RedissonClient client) {
     return new RedisSessionDao(client);
   }
 }

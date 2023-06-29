@@ -17,23 +17,23 @@ public class BankIdEventPublisher {
   private final ApplicationEventPublisher publisher;
 
 
-  public EventBuilder orderResponse(PollRequest request, OrderResponse response) {
+  public EventBuilder orderResponse(final PollRequest request, final OrderResponse response) {
     return new EventBuilder(new OrderResponseEvent(request, response), publisher);
   }
 
-  public EventBuilder collectResponse(PollRequest request, CollectResponse collectResponse) {
+  public EventBuilder collectResponse(final PollRequest request, final CollectResponse collectResponse) {
     return new EventBuilder(new CollectResponseEvent(request, collectResponse), publisher);
   }
 
-  public EventBuilder orderCancellation(HttpServletRequest request, RelyingPartyData data) {
+  public EventBuilder orderCancellation(final HttpServletRequest request, final RelyingPartyData data) {
     return new EventBuilder(new OrderCancellationEvent(request, data), publisher);
   }
 
-  public EventBuilder orderCompletion(HttpServletRequest request, RelyingPartyData data) {
+  public EventBuilder orderCompletion(final HttpServletRequest request, final RelyingPartyData data) {
     return new EventBuilder(new OrderCompletionEvent(request, data), publisher);
   }
 
-  public EventBuilder userVisibleData(UserVisibleData data, HttpServletRequest request) {
+  public EventBuilder userVisibleData(final UserVisibleData data, final HttpServletRequest request) {
     return new EventBuilder(new UserVisibleDataEvent(data, request), publisher);
   }
 

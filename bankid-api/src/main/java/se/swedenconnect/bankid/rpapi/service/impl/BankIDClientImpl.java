@@ -113,7 +113,7 @@ public class BankIDClientImpl implements BankIDClient {
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
     try {
       log.info("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
-    } catch (JsonProcessingException e) {
+    } catch (final JsonProcessingException e) {
       throw new RuntimeException(e);
     }
     try {
@@ -171,7 +171,7 @@ public class BankIDClientImpl implements BankIDClient {
           .bodyToMono(OrderResponse.class)
           .onErrorComplete()
           .doOnError(e -> {
-            if (e instanceof WebClientResponseException webClientResponseException) {
+            if (e instanceof final WebClientResponseException webClientResponseException) {
               log.info("{}: collect. Error during collect-call - {} - {} - {}",
                   this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
               throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
@@ -199,7 +199,7 @@ public class BankIDClientImpl implements BankIDClient {
         .bodyToMono(Void.class)
         .doOnSuccess(n -> log.info("{}: cancel. Order {} successfully cancelled", this.identifier, orderReference))
         .doOnError(e -> {
-          if (e instanceof WebClientResponseException webClientResponseException) {
+          if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
                 this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
             throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
@@ -212,7 +212,7 @@ public class BankIDClientImpl implements BankIDClient {
   }
 
 
-  private Mono<? extends Throwable> defaultErrorHandler(ClientResponse clientResponse) {
+  private Mono<? extends Throwable> defaultErrorHandler(final ClientResponse clientResponse) {
     return clientResponse.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
       return new BankIDException("Error to communicate with BankID API response:" + m.toString());
     });
@@ -228,7 +228,7 @@ public class BankIDClientImpl implements BankIDClient {
     log.info("{}: collect: Request for collecting order {}", this.identifier, orderReference);
 
     final OrderRefRequest request = new OrderRefRequest(orderReference);
-    WebClient.ResponseSpec retrieve = this.webClient.post()
+    final WebClient.ResponseSpec retrieve = this.webClient.post()
         .uri(COLLECT_PATH)
         .bodyValue(request)
         .retrieve();
@@ -238,7 +238,7 @@ public class BankIDClientImpl implements BankIDClient {
         .map(BankIDClientImpl::checkForError)
         .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
-          if (e instanceof WebClientResponseException webClientResponseException) {
+          if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
                 this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
             throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
@@ -249,7 +249,7 @@ public class BankIDClientImpl implements BankIDClient {
         });
   }
 
-  private static CollectResponse checkForError(CollectResponse c) {
+  private static CollectResponse checkForError(final CollectResponse c) {
     if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
       throw new BankIDException(c.getErrorCode(), String.format("Order '%s' failed with code '%s'", c.getOrderReference(), c.getErrorCode().getValue()));
     }
@@ -320,23 +320,23 @@ public class BankIDClientImpl implements BankIDClient {
           Optional.ofNullable(this.userVisibleDataFormat).orElseGet(() -> "not-set"));
     }
 
-    public void setPersonalNumber(String personalNumber) {
+    public void setPersonalNumber(final String personalNumber) {
       this.personalNumber = personalNumber;
     }
 
-    public void setEndUserIp(String endUserIp) {
+    public void setEndUserIp(final String endUserIp) {
       this.endUserIp = endUserIp;
     }
 
-    public void setRequirement(Requirement requirement) {
+    public void setRequirement(final Requirement requirement) {
       this.requirement = requirement;
     }
 
-    public void setUserVisibleData(String userVisibleData) {
+    public void setUserVisibleData(final String userVisibleData) {
       this.userVisibleData = userVisibleData;
     }
 
-    public void setUserVisibleDataFormat(String userVisibleDataFormat) {
+    public void setUserVisibleDataFormat(final String userVisibleDataFormat) {
       this.userVisibleDataFormat = userVisibleDataFormat;
     }
   }

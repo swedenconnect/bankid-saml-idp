@@ -21,7 +21,7 @@ public class SignatureRequest {
    *          performed. Default rules are applied if omitted
    * @throws BankIDException for errors
    */
-  public SignatureRequest(String personalIdentityNumber, String endUserIp, DataToSign dataToSign, Requirement requirement) {
+  public SignatureRequest(final String personalIdentityNumber, final String endUserIp, final DataToSign dataToSign, final Requirement requirement) {
     this.personalIdentityNumber = personalIdentityNumber;
     this.endUserIp = endUserIp;
     this.dataToSign = dataToSign;

@@ -24,7 +24,7 @@ public class AuthenticateRequest {
    * @throws BankIDException for errors
    */
 
-  public AuthenticateRequest(String personalIdentityNumber, String endUserIp, UserVisibleData userVisibleData, Requirement requirement) {
+  public AuthenticateRequest(final String personalIdentityNumber, final String endUserIp, final UserVisibleData userVisibleData, final Requirement requirement) {
     this.personalIdentityNumber = personalIdentityNumber;
     this.endUserIp = endUserIp;
     this.userVisibleData = userVisibleData;
