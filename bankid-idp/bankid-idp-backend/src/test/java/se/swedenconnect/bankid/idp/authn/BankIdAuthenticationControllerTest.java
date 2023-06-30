@@ -22,9 +22,6 @@ class BankIdAuthenticationControllerTest {
   @Autowired
   BankIdAuthenticationController controller;
 
-  @MockBean
-  BankIdAuthenticationProvider provider;
-
   public static final GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
       .withEnv("REDIS_ARGS", "--requirepass supersecret")
       .withExposedPorts(6379);
