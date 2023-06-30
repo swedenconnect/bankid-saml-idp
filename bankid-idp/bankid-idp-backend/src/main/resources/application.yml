@@ -24,7 +24,7 @@ server:
 spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
-    
+
 bankid:
   server-root-certificate: classpath:bankid-trust-prod.crt
   service-url: https://appapi2.bankid.com/rp/v5.1
@@ -33,37 +33,37 @@ bankid:
     image-format: PNG
   user-message-defaults:
     fallback-sign-text:
-      text: "Jag skriver härmed under den information som visades på föregående sida." 
+      text: "Jag skriver härmed under den information som visades på föregående sida."
       format: plain-text
     login-text:
       text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
       format: simple-markdown-v1
   authn:
-    resume-path: /resume 
+    resume-path: /resume
     provider-name: "BankID"
     supported-loas:
-    - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
+      - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
     entity-categories:
-    - http://id.elegnamnden.se/ec/1.0/loa3-pnr
-    - http://id.swedenconnect.se/ec/1.0/loa3-name
-    - http://id.elegnamnden.se/sprop/1.0/mobile-auth
-    - http://id.elegnamnden.se/sprop/1.0/scal2
-    - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
-    
+      - http://id.elegnamnden.se/ec/1.0/loa3-pnr
+      - http://id.swedenconnect.se/ec/1.0/loa3-name
+      - http://id.elegnamnden.se/sprop/1.0/mobile-auth
+      - http://id.elegnamnden.se/sprop/1.0/scal2
+      - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding
+
 ui:
   languages:
-  - tag: sv
-    text: Svenska
-  - tag: en
-    text: English    
-    
+    - tag: sv
+      text: Svenska
+    - tag: en
+      text: English
+
 #
 # The SAML IdP configuration
 #    
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp
-    base-url: https://local.dev.swedenconnect.se:${server.port}/idp    
+    base-url: https://local.dev.swedenconnect.se:${server.port}/idp
     credentials:
       sign:
         resource: classpath:idp-credentials.jks
@@ -81,11 +81,11 @@ saml:
         password: secret
         type: JKS
     endpoints:
-      metadata: /saml2/metadata    
+      metadata: /saml2/metadata
     metadata-providers:
-    - location: https://eid.svelegtest.se/metadata/mdx/role/sp.xml
-      backup-location: target/metadata-backup.xml
-      validation-certificate: classpath:sandbox-metadata.crt
+      - location: https://eid.svelegtest.se/metadata/mdx/role/sp.xml
+        backup-location: target/metadata-backup.xml
+        validation-certificate: classpath:sandbox-metadata.crt
     metadata:
       ui-info:
         display-names:
@@ -95,9 +95,9 @@ saml:
           en: BankID Identity Provider
           sv: BankID legitimeringstjänst
         logotypes:
-        - path: /images/BankID_logo.svg
-          height: 171
-          width: 206   
+          - path: /images/BankID_logo.svg
+            height: 171
+            width: 206
       organization:
         names:
           en: Sweden Connect
@@ -112,12 +112,12 @@ saml:
         technical:
           company: Sweden Connect
           email-addresses:
-          - operations@swedenconnect.se
+            - operations@swedenconnect.se
         support:
           company: Sweden Connect
           email-addresses:
-          - operations@swedenconnect.se 
-              
+            - operations@swedenconnect.se
+
 logging:
   level:
     se:
@@ -160,29 +160,29 @@ bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1
   relying-parties:
-  - id: test-my-eid
-    entity-ids:
-    - http://sandbox.swedenconnect.se/testmyeid
-    - http://sandbox.swedenconnect.se/testmyeid-sign
-    credential:
-      name: "test-cred"
-      resource: classpath:FPTestcert4_20220818.p12
-      alias: "1"
-      password: "qwerty123"
-      type: "PKCS12"
-    user-message:
-      inherit-default-login-text: false
-      login-text:
-        text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
-        format: simple-markdown-v1
-      
+    - id: test-my-eid
+      entity-ids:
+        - http://sandbox.swedenconnect.se/testmyeid
+        - http://sandbox.swedenconnect.se/testmyeid-sign
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: false
+        login-text:
+          text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+          format: simple-markdown-v1
+
 
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp/local
     base-url: https://local.dev.swedenconnect.se:${server.port}/idp
     metadata-providers:
-    - location: classpath:local/local-metadata.xml
+      - location: classpath:local/local-metadata.xml
 
 ---
 server:
@@ -192,7 +192,7 @@ spring:
   config:
     activate:
       on-profile: sandbox
-      
+
 tomcat:
   ajp:
     enabled: true
@@ -206,27 +206,38 @@ bankid:
   test-mode: true
   # Only one RP. This serves all SAML SP:s ... 
   relying-parties:
-  - id: "test-rp"
-    credential:
-      name: "test-cred"
-      resource: classpath:FPTestcert4_20220818.p12
-      alias: "1"
-      password: "qwerty123"
-      type: "PKCS12"
-    user-message:
-      inherit-default-login-text: true
+    - id: "test-rp"
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: true
 
 saml:
   idp:
     entity-id: https://sandbox.swedenconnect.se/bankid/idp
     base-url: https://sandbox.swedenconnect.se/bankid/idp
 
-    
+
 logging:
   level:
     se:
       swedenconnect:
         spring:
           saml: DEBUG
-    
+
+---
+spring:
+  redis:
+    host: ${REDIS_HOST:local.dev.swedenconnect.se}
+    port: ${REDIS_PORT:6379}
+    ssl: false
+  config:
+    activate:
+      on-profile: unittest
+session:
+  module: redis
 

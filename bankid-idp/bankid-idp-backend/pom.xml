@@ -5,13 +5,13 @@
 
   <artifactId>bankid-idp-backend</artifactId>
   <packaging>jar</packaging>
-  
+
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath/>
-  </parent>  
+  </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider :: Backend</name>
   <description>BankID SAML Identity Provider Backend</description>
@@ -43,35 +43,40 @@
       <organization>IDsec Solutions AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
     </developer>
-    
+
     <developer>
       <name>Felix Hellman</name>
       <email>felix@idsec.se</email>
       <organization>Helagon AB</organization>
       <organizationUrl>https://www.idsec.se</organizationUrl>
-    </developer>    
+    </developer>
   </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
   </properties>
-    
-  <dependencyManagement>
 
+  <dependencyManagement>
     <dependencies>
-      
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-bom</artifactId>
+            <version>1.18.3</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
     </dependencies>
-  </dependencyManagement>  
-  
+  </dependencyManagement>
+
   <dependencies>
-    
+
     <dependency>
       <groupId>se.swedenconnect.bankid</groupId>
       <artifactId>bankid-rp-api</artifactId>
-      <version>${project.version}</version>    
+      <version>${project.version}</version>
     </dependency>
-    
+
     <!-- QR support -->
     <dependency>
       <groupId>com.google.zxing</groupId>
@@ -79,29 +84,29 @@
       <version>${zxing.version}</version>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>${zxing.version}</version>
       <optional>true</optional>
-    </dependency>    
-        
+    </dependency>
+
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
       <artifactId>saml-idp-spring-boot-starter</artifactId>
       <version>1.0.0</version>
-    </dependency>    
-    
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>      
-    </dependency>    
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -131,7 +136,7 @@
       <artifactId>spring-boot-devtools</artifactId>
     </dependency>
     -->
-    
+
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
@@ -182,12 +187,27 @@
       <groupId>org.springframework.session</groupId>
       <artifactId>spring-session-data-redis</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.18.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.redis.testcontainers</groupId>
+      <artifactId>testcontainers-redis</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+
+
+
   </dependencies>
 
   <build>
-    
-    <plugins>      
+
+    <plugins>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

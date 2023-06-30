@@ -35,6 +35,7 @@ public class RedisSessionConfiguration {
     return new RedisSecurityProperties();
   }
   @Bean
+  @ConditionalOnProperty(value = "spring.redis.ssl", havingValue = "true")
   public RedissonAutoConfigurationCustomizer sslCustomizer(final RedisSecurityProperties properties) {
     final Resource keystore = loader.getResource(properties.getP12KeyStorePath());
     return c -> {
