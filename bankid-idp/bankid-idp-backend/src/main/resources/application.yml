@@ -241,3 +241,31 @@ spring:
 session:
   module: redis
 
+bankid:
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v5.1
+  test-mode: true
+  # Only one RP. This serves all SAML SP:s ...
+  relying-parties:
+    - id: "test-rp"
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: true
+  authn:
+    resume-path: /resume
+    provider-name: "BankID"
+    supported-loas:
+      - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
+    entity-categories:
+      - http://id.elegnamnden.se/ec/1.0/loa3-pnr
+      - http://id.swedenconnect.se/ec/1.0/loa3-name
+      - http://id.elegnamnden.se/sprop/1.0/mobile-auth
+      - http://id.elegnamnden.se/sprop/1.0/scal2
+      - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding
+
+
