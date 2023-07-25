@@ -149,6 +149,8 @@ server:
     session:
       timeout: 15m
 
+
+
 audit:
   logging:
     module: default
@@ -186,7 +188,16 @@ saml:
     base-url: https://local.dev.swedenconnect.se:${server.port}/idp
     metadata-providers:
     - location: classpath:local/local-metadata.xml
-
+management:
+  endpoint:
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers
+  server:
+    port: 8444
 ---
 server:
   port: 8082
