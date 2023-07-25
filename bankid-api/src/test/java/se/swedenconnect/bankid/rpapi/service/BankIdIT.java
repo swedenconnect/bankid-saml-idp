@@ -35,7 +35,7 @@ public class BankIdIT {
 
     DataToSign dataToSign = new DataToSign();
     dataToSign.setUserVisibleData("Data visible to user!");
-    Mono<OrderResponse> signStep = client.sign("1231231232", "1.1.1.1", dataToSign, new Requirement());
+    Mono<OrderResponse> signStep = client.sign(new SignatureRequest("1231231232", "1.1.1.1", dataToSign, new Requirement()));
     StepVerifier.create(signStep)
         .expectNextMatches(sign -> sign.getOrderReference() != null)
         .verifyComplete();

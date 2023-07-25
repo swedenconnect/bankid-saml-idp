@@ -49,7 +49,9 @@ export default {
     poll: function () {
       poll(this.otherDevice && !this.sign).then(response => {
         if (response["retry"] !== true) {
-          this.qrImage = response["qrCode"];
+          if (response["qrCode"] !== "") {
+              this.qrImage = response["qrCode"];
+          }
           this.pollingActive = response["status"] === "IN_PROGRESS";
           this.token = response["autoStartToken"];
           this.messageCode = response["messageCode"];
