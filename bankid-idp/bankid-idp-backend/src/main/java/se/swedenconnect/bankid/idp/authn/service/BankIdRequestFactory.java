@@ -10,14 +10,12 @@ import se.swedenconnect.bankid.rpapi.service.SignatureRequest;
 @AllArgsConstructor
 public class BankIdRequestFactory {
 
-    private final BankIdRequirementFactory requirementFactory;
-
     public AuthenticateRequest createAuthenticateRequest(final PollRequest request) {
-        return new AuthenticateRequest(request.getContext().getPersonalNumber(), request.getRequest().getRemoteAddr(), request.getData(), requirementFactory.create(request));
+        return new AuthenticateRequest(request.getContext().getPersonalNumber(), request.getRequest().getRemoteAddr(), request.getData(), BankIdRequirementFactory.create(request));
     }
     public SignatureRequest createSignRequest(final PollRequest request) {
         if (request.getData() instanceof final DataToSign dataToSign) {
-            return new SignatureRequest(request.getContext().getPersonalNumber(), request.getRequest().getRemoteAddr(), dataToSign, requirementFactory.create(request));
+            return new SignatureRequest(request.getContext().getPersonalNumber(), request.getRequest().getRemoteAddr(), dataToSign, BankIdRequirementFactory.create(request));
         } else {
             throw new IllegalArgumentException("Message was not of type DataToSign but was " + request.getData().getClass().getCanonicalName());
         }

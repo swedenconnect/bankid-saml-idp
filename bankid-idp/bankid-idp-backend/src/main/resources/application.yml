@@ -175,6 +175,9 @@ bankid:
       login-text:
         text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
+    requirement:
+      use-finger-print: true
+      token-start-required: true
       
 
 saml:

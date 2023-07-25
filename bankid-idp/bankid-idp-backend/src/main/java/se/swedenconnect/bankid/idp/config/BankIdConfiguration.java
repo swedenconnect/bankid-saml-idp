@@ -166,7 +166,7 @@ public class BankIdConfiguration {
           new BankIDClientImpl(rp.getId(), webClientFactory.createInstance(), qrGenerator);
 
       relyingParties.add(new RelyingPartyData(client, rp.getEntityIds(),
-          rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText()));
+          rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText(), rp.getRequirement()));
     }
     return new InMemoryRelyingPartyRepository(relyingParties);
   }
