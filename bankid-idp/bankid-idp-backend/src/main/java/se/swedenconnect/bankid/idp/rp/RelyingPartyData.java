@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import se.swedenconnect.bankid.idp.authn.DisplayText;
+import se.swedenconnect.bankid.idp.config.EntityRequirement;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 
 /**
@@ -49,14 +50,17 @@ public class RelyingPartyData {
 
   // TODO: custom display texts, custom logo ...
 
+  private final EntityRequirement requirement;
+
   public RelyingPartyData(final BankIDClient client, final List<String> entityIds,
-      final DisplayText loginText, final DisplayText fallbackSignText) {
+      final DisplayText loginText, final DisplayText fallbackSignText, EntityRequirement requirement) {
     this.client = Objects.requireNonNull(client, "client must not be null");
     this.entityIds = Optional.ofNullable(entityIds)
         .map(Collections::unmodifiableList)
         .orElseGet(Collections::emptyList);
     this.loginText = loginText;
     this.fallbackSignText = Objects.requireNonNull(fallbackSignText, "fallbackSignText must not be null");
+    this.requirement = requirement;
   }
 
   /**
@@ -105,6 +109,15 @@ public class RelyingPartyData {
    */
   public DisplayText getFallbackSignText() {
     return this.fallbackSignText;
+  }
+
+  /**
+   * Gets the BankId requirement for relaying party
+   *
+   * @return the requirements
+   */
+  public EntityRequirement getRequirement() {
+    return requirement;
   }
 
   /**

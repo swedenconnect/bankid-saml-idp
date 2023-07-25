@@ -232,6 +232,10 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private RpUserMessage userMessage;
 
+    @Getter
+    @Setter
+    private EntityRequirement requirement;
+
     /**
      * {@inheritDoc}
      */

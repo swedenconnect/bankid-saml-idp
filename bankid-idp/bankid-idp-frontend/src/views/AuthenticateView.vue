@@ -32,7 +32,6 @@ export default {
     return {
       qrImage: "",
       token: "",
-      pollingActive: false,
       shouldCancel: false,
       messageCode: "bankid.msg.rfa13"
     }
@@ -42,54 +41,43 @@ export default {
     otherDevice: Boolean, sign: Boolean
   },
   mounted() {
-    this.pollingActive = true;
     this.poll();
   },
   methods: {
     poll: function () {
       poll(this.otherDevice && !this.sign).then(response => {
         if (response["retry"] !== true) {
-          this.qrImage = response["qrCode"];
-          this.pollingActive = response["status"] === "IN_PROGRESS";
+          if (response["qrCode"] !== "") {
+              this.qrImage = response["qrCode"];
+          }
           this.token = response["autoStartToken"];
           this.messageCode = response["messageCode"];
         }
         return response;
       }).then(response => {
-        if (this.shouldCancel) {
-          cancel().then(canel => {
-            window.location.href = PATHS.CANCEL;
-          });
-        } else {
-          if (this.pollingActive) {
-            if (response["retry"] === true) {
+
+            if (response["status"] === "COMPLETE") {
+                window.location.href = PATHS.COMPLETE;
+            }
+            else if (response["status"] === "CANCEL") {
+                window.location.href = PATHS.CANCEL;
+            }
+            else if (response["retry"] === true) {
               /* Time is defined in seconds and setTimeout is in millis*/
               window.setTimeout(() => this.poll(), parseInt(response["time"] * 1000));
             } else {
               window.setTimeout(() => this.poll(), 500);
             }
-          } else {
-            if (response["status"] === "COMPLETE") {
-              window.location.href = PATHS.COMPLETE;
-            }
-            if (response["status"] === "CANCEL") {
-              window.location.href = PATHS.CANCEL;
-            }
-          }
-        }
+
       })
     },
     base64Image: function () {
       return "data:image/png;base64, " + this.qrImage;
     },
     cancelRequest: function () {
-      if (!this.pollingActive) {
         cancel().then(r => {
           window.location.href = PATHS.CANCEL;
         });
-      } else {
-        this.shouldCancel = true;
-      }
     }
   }
 }
