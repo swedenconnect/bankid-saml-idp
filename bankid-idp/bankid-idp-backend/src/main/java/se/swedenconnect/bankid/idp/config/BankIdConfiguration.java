@@ -114,18 +114,13 @@ public class BankIdConfiguration {
             .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
                 "/**/resume")
             .permitAll()
+            .antMatchers("/actuator/**")
+            .permitAll()
             .anyRequest().denyAll());
 
     return http.build();
   }
 
-  @Bean
-  @Order(1)
-  SecurityFilterChain managementFilterChain(final HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests()
-            .antMatchers("/actuator/**").permitAll();
-    return http.build();
-  }
 
   /**
    * Creates the {@link QRGenerator} to use when generating QR code images.
