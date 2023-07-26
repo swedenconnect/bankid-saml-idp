@@ -31,7 +31,13 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
                 .peek(ch -> {
                     builder.withDetail("id", ch.id);
                     builder.withDetail("expired", ch.expired);
+                    if (ch.expired()) {
+                        log.error("Certificate for {} has expired since {}", ch.id, ch.expirationDate);
+                    }
                     builder.withDetail("expiresSoon", ch.expiresSoon);
+                    if (ch.expiresSoon() && !ch.expired) {
+                        log.warn("Certificate for {} is about to expire at {}", ch.id, ch.expirationDate);
+                    }
                     builder.withDetail("expirationDate", ch.expirationDate);
                 })
                 .anyMatch(ch -> ch.expired);
