@@ -190,6 +190,8 @@ saml:
     - location: classpath:local/local-metadata.xml
 management:
   endpoint:
+    health:
+      show-details: always
     info:
       enabled: true
   endpoints:
