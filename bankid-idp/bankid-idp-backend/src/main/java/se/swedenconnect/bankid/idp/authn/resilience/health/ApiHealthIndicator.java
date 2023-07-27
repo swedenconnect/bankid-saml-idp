@@ -1,4 +1,4 @@
-package se.swedenconnect.bankid.idp.authn.resilience;
+package se.swedenconnect.bankid.idp.authn.resilience.health;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.AllArgsConstructor;
