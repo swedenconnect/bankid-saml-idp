@@ -1,6 +1,6 @@
 <template>
     <div v-if="display" class="container-fluid status">
-        <p> Just nu har vi en driftstörning med inloggningstjänsten, försök igen senare </p>
+        <p>{{ $t("bankid.msg.error.service") }}</p>
     </div>
 </template>
 <script>

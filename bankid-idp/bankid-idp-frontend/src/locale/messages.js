@@ -41,7 +41,8 @@ export const messages = {
                 "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds.",
                 "cancel-progress": "Stopping authentication ...",
                 error: {
-                    "timeout": "The time for starting a new authentication has expired. Please try again."
+                    "timeout": "The time for starting a new authentication has expired. Please try again.",
+                    "service": "This service is currently experiencing some issues, please try again later"
                 }
             }
         }
@@ -82,7 +83,8 @@ export const messages = {
                 "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder.",
                 "cancel-progress": "Avbryter ...",
                 error: {
-                    "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen."
+                    "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen.",
+                    "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare"
                 }
             }
         }
