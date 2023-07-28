@@ -3,7 +3,9 @@
     <div class="row" id="mainRow">
 
       <div class="col-sm-12 content-container">
-        <h2>BankID</h2>
+          <StatusMessage/>
+
+          <h2>BankID</h2>
         <p> {{ $t("bankid.msg.rfa20") }}</p>
 
         <hr class="full-width">
@@ -26,9 +28,10 @@
 <script>
 import DeviceSelect from "@/components/DeviceSelect.vue";
 import {PATHS} from "@/Redirects";
+import StatusMessage from "@/components/StatusMessage.vue";
 
 export default {
-  components: {DeviceSelect},
+  components: {StatusMessage, DeviceSelect},
   methods: {
     cancelSelection: function () {
       window.location.href = PATHS.CANCEL;

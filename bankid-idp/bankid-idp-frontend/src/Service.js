@@ -21,6 +21,11 @@ export async function poll(showQr) {
   return data;
 }
 
+export async function status() {
+  return (await fetch(CONTEXT_PATH + "/api/status")).json();
+
+}
+
 export async function cancel() {
   const requestOptions = {
     method: 'POST',

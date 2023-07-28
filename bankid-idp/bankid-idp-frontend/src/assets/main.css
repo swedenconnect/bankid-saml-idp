@@ -515,3 +515,9 @@ a {
 .hide {
   display: none;
 }
+
+.container-fluid.status {
+  border: black;
+  border-style: double;
+  background: beige;
+}

@@ -199,6 +199,11 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 
+  @GetMapping(value = "/api/status")
+  public Mono<ServiceInformation> serviceInformation() {
+    return service.getServiceInformation();
+  }
+
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
     final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
