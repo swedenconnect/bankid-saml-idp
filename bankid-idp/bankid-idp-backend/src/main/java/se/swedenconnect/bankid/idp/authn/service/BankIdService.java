@@ -15,7 +15,6 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import lombok.AllArgsConstructor;
@@ -24,9 +23,9 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
+import se.swedenconnect.bankid.idp.authn.ServiceInformation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
-import se.swedenconnect.bankid.idp.authn.resilience.BackoffException;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -105,9 +104,6 @@ public class BankIdService {
             eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
             return Mono.just(ApiResponseFactory.createUserCancelResponse());
         }
-        if (e.getCause() instanceof final CallNotPermittedException callNotPermitted) {
-            return Mono.error(new BackoffException()); // TODO: 2023-07-26 Better name for exception
-        }
         return Mono.error(e);
     }
 
@@ -136,5 +132,12 @@ public class BankIdService {
     private Mono<ApiResponse> sessionExpired(final HttpServletRequest request, final PollRequest pollRequest) {
         this.eventPublisher.orderCancellation(request, pollRequest.getRelyingPartyData()).publish();
         return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
+    }
+
+    public Mono<ServiceInformation> getServiceInformation() {
+        if (circuitBreaker.getState().equals(CircuitBreaker.State.CLOSED)) {
+            return Mono.just(new ServiceInformation(ServiceInformation.Status.OK));
+        }
+        return Mono.just(new ServiceInformation(ServiceInformation.Status.ISSUES));
     }
 }

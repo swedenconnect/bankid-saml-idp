@@ -2,7 +2,8 @@
   <div class="container main" id="main">
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
-        <Status
+          <StatusMessage/>
+          <Status
             :otherDevice=otherDevice
             :autoStartToken=token
             :message=messageCode
@@ -26,6 +27,7 @@ import QRDisplay from "@/components/QRDisplay.vue";
 import Status from "@/components/Status.vue";
 import {cancel, poll} from "@/Service";
 import {PATHS} from "@/Redirects";
+import StatusMessage from "@/components/StatusMessage.vue";
 
 export default {
   data() {
@@ -36,7 +38,7 @@ export default {
       messageCode: "bankid.msg.rfa13"
     }
   },
-  components: {Status, QRDisplay},
+  components: {StatusMessage, Status, QRDisplay},
   props: {
     otherDevice: Boolean, sign: Boolean
   },

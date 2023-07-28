@@ -18,6 +18,8 @@ public class ResilienceConfiguration {
     }
     @Bean
     public CircuitBreaker circuitBreaker(CircuitBreakerRegistry registry) {
-        return registry.circuitBreaker("bankid");
+        CircuitBreaker bankid = registry.circuitBreaker("bankid");
+        bankid.transitionToForcedOpenState();
+        return bankid;
     }
 }
