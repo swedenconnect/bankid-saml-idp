@@ -159,6 +159,7 @@ session:
   module: redis
 
 bankid:
+  standalone: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v5.1
   relying-parties:
