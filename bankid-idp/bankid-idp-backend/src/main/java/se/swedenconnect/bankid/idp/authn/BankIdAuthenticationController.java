@@ -21,6 +21,7 @@ import org.opensaml.core.xml.LangBearing;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,16 +101,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   private final BankIdEventPublisher eventPublisher;
 
   private final BankIdService service;
-
-  /**
-   * The entry point for the BankID authentication/signature process.
-   *
-   * @return a {@link ModelAndView}
-   */
-  @GetMapping(AUTHN_PATH)
-  public ModelAndView view() {
-    return new ModelAndView("index");
-  }
 
   @GetMapping("/api/device")
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
