@@ -22,7 +22,7 @@ public interface BankIdSessionReader {
      * @param request The current request for the user to determine session key
      * @return Final CollectResponse from BankidApi containing CompletionData
      */
-    CollectResponse laodCompletionData(HttpServletRequest request);
+    CollectResponse loadCompletionData(HttpServletRequest request);
 
     /**
      * Loads device selection

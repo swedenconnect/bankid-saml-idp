@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -93,9 +94,12 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
 
     final BankIdAuthenticationToken bankIdToken = BankIdAuthenticationToken.class.cast(token.getAuthnToken());
     final CollectResponse authnData = (CollectResponse) bankIdToken.getDetails();
-    Objects.requireNonNull(authnData.getCompletionData());
+    if (authnData.getCompletionData() == null) {
+      throw BankIdAuthenticationExceptionFactory.validationError(authnData.getOrderReference());
+    }
     // TODO: Compare pnr from principal selection with pnr from authnData
     // TODO: We should not hardwire loa3-uncertified
+
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
@@ -105,6 +109,13 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
     Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
     if (SecurityContextHolder.getContext().getAuthentication() instanceof Saml2UserAuthenticationInputToken saml && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
       saml2UserAuthentication.getSaml2UserDetails().setSignMessageDisplayed(true);
+      String signature = authnData.getCompletionData().getSignature();
+      if (signature == null) {
+        throw BankIdAuthenticationExceptionFactory.validationError(authnData.getOrderReference());
+      }
+      if (Strings.isBlank(signature)) {
+        throw BankIdAuthenticationExceptionFactory.invalidSignature(authnData.getOrderReference());
+      }
     }
     return saml2UserAuthentication;
   }

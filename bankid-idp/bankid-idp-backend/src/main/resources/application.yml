@@ -126,7 +126,6 @@ logging:
           saml: TRACE
 
 ---
-
 spring:
   redis:
     host: ${REDIS_HOST:local.dev.swedenconnect.se}
@@ -145,6 +144,10 @@ spring:
   session:
     timeout: 15m
 server:
+  error:
+    whitelabel:
+      enabled: true
+    path: /#error
   reactive:
     session:
       timeout: 15m
@@ -201,6 +204,11 @@ management:
         include: health, metrics, prometheus, loggers
   server:
     port: 8444
+user:
+  error:
+    contact-email: contact@email.com
+    show-contact-information: true
+    show-trace-id: true
 ---
 server:
   port: 8082

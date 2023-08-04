@@ -29,6 +29,7 @@ import org.opensaml.saml.saml2.metadata.KeyDescriptor;
 import org.opensaml.security.credential.UsageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -37,11 +38,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
+import se.swedenconnect.bankid.idp.authn.ErrorhandlerFilter;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
 import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -279,6 +282,14 @@ public class BankIdConfiguration {
   @Bean
   ThymeleafResponsePage responsePage(final SpringTemplateEngine templateEngine) {
     return new ThymeleafResponsePage(templateEngine, "post-response.html");
+  }
+
+  @Bean
+  public FilterRegistrationBean<OncePerRequestFilter> errorHandlerFilterRegistration(ErrorhandlerFilter filter) {
+    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
+    registration.setOrder(Integer.MIN_VALUE + 1);
+    registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
+    return registration;
   }
 
 }

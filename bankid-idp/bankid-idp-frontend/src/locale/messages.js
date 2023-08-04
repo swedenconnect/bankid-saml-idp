@@ -40,9 +40,13 @@ export const messages = {
                 "btn-cancel": "Cancel",
                 "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds.",
                 "cancel-progress": "Stopping authentication ...",
+                "contact": "If this is a recurring error please contact support",
+                "error-page-close": "Please close this web browser window when you are done",
                 error: {
                     "timeout": "The time for starting a new authentication has expired. Please try again.",
-                    "service": "This service is currently experiencing some issues, please try again later"
+                    "service": "This service is currently experiencing some issues, please try again later",
+                    "unknown": "Something went wrong. Please try again later.",
+                    "sign": "Signature is invalid. Please try again later."
                 }
             }
         }
@@ -82,9 +86,13 @@ export const messages = {
                 "btn-cancel": "Avbryt",
                 "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder.",
                 "cancel-progress": "Avbryter ...",
+                "contact": "Om detta är ett återkommande problem så vänligen kontakta support",
+                "error-page-close": "Vänligen stäng sidan när du är klar",
                 error: {
                     "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen.",
-                    "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare"
+                    "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare",
+                    "unknown": "Någonting har gått fel, försök igen senare",
+                    "sign": "Signaturen är inte korrekt, försök igen senare"
                 }
             }
         }
