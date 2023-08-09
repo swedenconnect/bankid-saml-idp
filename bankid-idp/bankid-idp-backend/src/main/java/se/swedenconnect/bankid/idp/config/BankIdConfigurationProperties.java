@@ -35,7 +35,9 @@ import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
+import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
+import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
 
 /**
  * BankID configuration properties.
@@ -121,15 +123,15 @@ public class BankIdConfigurationProperties implements InitializingBean {
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingParty rp : this.relyingParties) {
       rp.afterPropertiesSet();
-      
+
       final RelyingParty.RpUserMessage msg = rp.getUserMessage();
-      
+
       if (msg.getFallbackSignText() == null) {
         msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
       }
       if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()) {
         msg.setLoginText(this.userMessageDefaults.getLoginText());
-      }      
+      }
     }
   }
 
@@ -225,6 +227,9 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private PkiCredentialConfigurationProperties credential;
 
+    // Internal use only ...
+    private PkiCredential _credential;
+
     /**
      * Relying Party specific display text for authentication (and signature). Overrides the default text.
      */
@@ -250,6 +255,21 @@ public class BankIdConfigurationProperties implements InitializingBean {
         this.userMessage = new RpUserMessage();
       }
       this.userMessage.afterPropertiesSet();
+    }
+
+    /**
+     * Creates a {@link PkiCredential} given the {@link PkiCredentialConfigurationProperties}.
+     * 
+     * @return a {@link PkiCredential}
+     * @throws Exception for errors creating the object
+     */
+    public PkiCredential createCredential() throws Exception {
+      if (this._credential == null) {
+        final PkiCredentialFactoryBean factory = new PkiCredentialFactoryBean(this.credential);
+        factory.afterPropertiesSet();
+        this._credential = factory.getObject();
+      }
+      return this._credential;
     }
 
     /**
