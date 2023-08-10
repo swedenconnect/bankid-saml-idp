@@ -21,6 +21,29 @@ server:
     include-exception: true
     include-stacktrace: always
     path: "/icandothis"
+    
+management:
+  server:
+    port: 8444
+  endpoint:
+    health:
+      status:
+        order:
+        - DOWN
+        - OUT_OF_SERVICE
+        - UP
+        - WARNING
+        - UNKNOWN
+        http-mapping:
+          WARNING: 503
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers  
+        
 spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
@@ -128,6 +151,9 @@ logging:
 ---
 
 spring:
+  config:
+    activate:
+      on-profile: local
   redis:
     host: ${REDIS_HOST:local.dev.swedenconnect.se}
     port: ${REDIS_PORT:6379}
@@ -139,17 +165,12 @@ spring:
       p12TrustStorePath: classpath:local/redis/trust.p12
       p12TrustStorePassword: changeit
       enableHostnameVerification: true
-  config:
-    activate:
-      on-profile: local
   session:
     timeout: 15m
 server:
   reactive:
     session:
       timeout: 15m
-
-
 
 audit:
   logging:
@@ -182,7 +203,6 @@ bankid:
       use-finger-print: true
       token-start-required: true
       
-
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp/local
@@ -190,27 +210,6 @@ saml:
     metadata-providers:
     - location: classpath:local/local-metadata.xml
     
-management:
-  endpoint:
-    health:
-      status:
-        order:
-        - DOWN
-        - OUT_OF_SERVICE
-        - UP
-        - WARNING
-        - UNKNOWN
-        http-mapping:
-          WARNING: 503
-      show-details: always
-    info:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, prometheus, loggers
-  server:
-    port: 8444
 ---
 server:
   port: 8082
