@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +87,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final QrCode qrCode = new QrCode();
 
   /**
+   * Configuration for health endpoints.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final HealthConfiguration health = new HealthConfiguration();
+
+  /**
    * Default text(s) to display during authentication/signing.
    */
   @NestedConfigurationProperty
@@ -115,6 +123,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     }
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
+    this.health.afterPropertiesSet();
 
     this.userMessageDefaults.afterPropertiesSet();
     Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
@@ -259,7 +268,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
     /**
      * Creates a {@link PkiCredential} given the {@link PkiCredentialConfigurationProperties}.
-     * 
+     *
      * @return a {@link PkiCredential}
      * @throws Exception for errors creating the object
      */
@@ -328,9 +337,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Getter
     private final List<String> entityCategories = new ArrayList<>();
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void afterPropertiesSet() throws Exception {
       if (!StringUtils.hasText(this.providerName)) {
@@ -342,6 +349,35 @@ public class BankIdConfigurationProperties implements InitializingBean {
       }
       Assert.hasText(this.resumePath, "bankid.authn.resume-path must be set");
       Assert.notEmpty(this.supportedLoas, "At least one URI must be assigned to bankid.authn.supported-loas");
+    }
+
+  }
+
+  /**
+   * Configuration for health endpoints.
+   */
+  public static class HealthConfiguration implements InitializingBean {
+
+    /**
+     * Default value for the setting that tells when the health endpoint should warn about Relying Party certificates
+     * that are about to expire.
+     */
+    public static final Duration RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT = Duration.ofDays(14);
+
+    /**
+     * Setting that tells when the health endpoint should warn about Relying Party certificates that are about to
+     * expire. The default is 14 days.
+     */
+    @Getter
+    @Setter
+    private Duration rpCertificateWarnThreshold;
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (this.rpCertificateWarnThreshold == null) {
+        this.rpCertificateWarnThreshold = RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT;
+      }
     }
 
   }

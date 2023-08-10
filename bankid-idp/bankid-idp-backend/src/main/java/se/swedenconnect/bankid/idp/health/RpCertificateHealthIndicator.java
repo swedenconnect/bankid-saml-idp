@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn.resilience.health;
+package se.swedenconnect.bankid.idp.health;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.HealthConfiguration;
 import se.swedenconnect.security.credential.PkiCredential;
 
 /**
@@ -40,21 +42,28 @@ import se.swedenconnect.security.credential.PkiCredential;
 @Slf4j
 public class RpCertificateHealthIndicator implements HealthIndicator {
 
+  /** Information about all RP certificates installed. */
   private final List<CertificateInformation> certificateInformation;
+
+  /** Tells when the health endpoint should warn about Relying Party certificates that are about to expire. */
+  private final Duration warnThreshold;
 
   /**
    * Constructor.
-   * 
-   * @param properties the BankID configuration properties
+   *
+   * @param properties the BankID IdP configuration properties
    */
   public RpCertificateHealthIndicator(final BankIdConfigurationProperties properties) {
+    this.warnThreshold = Optional.ofNullable(properties.getHealth())
+        .map(HealthConfiguration::getRpCertificateWarnThreshold)
+        .orElseGet(() -> HealthConfiguration.RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT);
+
     this.certificateInformation = properties.getRelyingParties().stream()
-        .map(rp -> {          
+        .map(rp -> {
           try {
-            final PkiCredential credential = rp.createCredential(); 
+            final PkiCredential credential = rp.createCredential();
             Objects.requireNonNull(credential);
-            final Date notAfter = credential.getCertificate().getNotAfter();
-            return new CertificateInformation(rp.getId(), notAfter);
+            return new CertificateInformation(rp.getId(), credential.getCertificate().getNotAfter());
           }
           catch (final Exception e) {
             throw new IllegalArgumentException("Illegal arguments for reading certificate health of id:" + rp.getId());
@@ -71,30 +80,37 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
     final Health.Builder builder = new Health.Builder();
     final List<CertificateHealth> list = this.certificateInformation
         .stream()
-        .map(CertificateHealth::of)
+        .map(ci -> CertificateHealth.of(ci, this.warnThreshold))
         .peek(ch -> {
           if (ch.expired()) {
-            log.error("Certificate for {} has expired since {}", ch.id, ch.expirationDate);
+            log.error("Certificate for {} has expired since {}", ch.id(), ch.expirationDate());
           }
-          if (ch.expiresSoon() && !ch.expired) {
-            log.warn("Certificate for {} is about to expire at {}", ch.id, ch.expirationDate);
+          else if (ch.expiresSoon()) {
+            log.warn("Certificate for {} is about to expire at {}", ch.id(), ch.expirationDate());
           }
-          builder.withDetail(ch.id,
-              Map.of("expired", ch.expired, "expiresSoon", ch.expiresSoon, "expirationDate", ch.expirationDate));
+          builder.withDetail(ch.id(),
+              Map.of("expired", ch.expired(), "expiresSoon", ch.expiresSoon(), "expirationDate", ch.expirationDate()));
         })
         .toList();
-    final boolean anyExpired = list.stream().anyMatch(ch -> ch.expired);
-    if (anyExpired) {
+
+    if (list.stream().anyMatch(ch -> ch.expired())) {
       return builder.down().build();
     }
-    return builder.up().build();
+    else if (list.stream().anyMatch(ch -> ch.expiresSoon())) {
+      return builder.status(CustomStatus.WARNING).build();
+    }
+    else {
+      return builder.up().build();
+    }
   }
 
   private record CertificateHealth(String id, boolean expired, boolean expiresSoon, Date expirationDate) {
-    private static CertificateHealth of(final CertificateInformation certificateInformation) {
+    private static CertificateHealth of(final CertificateInformation certificateInformation, final Duration warnThreshold) {
       final Date notAfter = certificateInformation.notAfter();
-      final boolean expired = notAfter.before(Date.from(Instant.now()));
-      final boolean expiresSoon = notAfter.before(Date.from(Instant.now().minus(14, ChronoUnit.DAYS)));
+      final boolean expired = notAfter.before(new Date());
+      final boolean expiresSoon = !expired
+          ? notAfter.before(Date.from(Instant.now().plus(warnThreshold)))
+          : false;
       return new CertificateHealth(certificateInformation.id(), expired, expiresSoon, notAfter);
     }
   }
@@ -102,5 +118,5 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
   private record CertificateInformation(String id, Date notAfter) {
 
   }
-  
+
 }

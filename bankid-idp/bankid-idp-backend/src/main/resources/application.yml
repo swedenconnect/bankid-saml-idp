@@ -189,9 +189,19 @@ saml:
     base-url: https://local.dev.swedenconnect.se:${server.port}/idp
     metadata-providers:
     - location: classpath:local/local-metadata.xml
+    
 management:
   endpoint:
     health:
+      status:
+        order:
+        - DOWN
+        - OUT_OF_SERVICE
+        - UP
+        - WARNING
+        - UNKNOWN
+        http-mapping:
+          WARNING: 503
       show-details: always
     info:
       enabled: true
