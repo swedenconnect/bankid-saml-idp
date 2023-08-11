@@ -33,13 +33,13 @@ public class UserErrorRouteFactory {
     }
   }
 
-  public String getRedirectView(Exception e, HttpServletRequest request) {
+  public String getRedirectView(Exception e) {
     ErrorMessage errorMessage = getErrorMessage(e);
     String traceId = getTraceId(e);
     return "redirect:/bankid#/error/%s".formatted(build(errorMessage, traceId));
   }
 
-  public String getRedirect(Exception e, HttpServletRequest request) {
+  public String getRedirect(Exception e) {
     ErrorMessage errorMessage = getErrorMessage(e);
     String traceId = getTraceId(e);
     return "bankid#/error/%s".formatted(build(errorMessage, traceId));

@@ -31,7 +31,7 @@ public class ErrorhandlerFilter extends OncePerRequestFilter {
     try {
       filterChain.doFilter(request, response);
     } catch (RuntimeException e) {
-      response.sendRedirect(userErrorRouteFactory.getRedirect(e, request));
+      response.sendRedirect(userErrorRouteFactory.getRedirect(e));
     }
   }
 }

@@ -42,13 +42,13 @@ public class BankidControllerAdvice {
   }
 
   @ExceptionHandler(value = {NoHandlerFoundException.class})
-  public ModelAndView handleException(NoHandlerFoundException e, HttpServletRequest request) {
-    return new ModelAndView(userErrorRouteFactory.getRedirectView(e, request));
+  public ModelAndView handleException(NoHandlerFoundException e) {
+    return new ModelAndView(userErrorRouteFactory.getRedirectView(e));
   }
 
   @ExceptionHandler(value = {Exception.class})
-  public ModelAndView defaultHandler(Exception e, HttpServletRequest request) {
+  public ModelAndView defaultHandler(Exception e) {
     log.error("Generic exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
-    return new ModelAndView(userErrorRouteFactory.getRedirectView(e, request));
+    return new ModelAndView(userErrorRouteFactory.getRedirectView(e));
   }
 }
