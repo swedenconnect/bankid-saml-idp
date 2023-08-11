@@ -27,6 +27,7 @@ import org.opensaml.core.xml.LangBearing;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,7 +61,11 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationIn
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
-import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
@@ -91,6 +96,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   /** The BankID service that communicates with the BankID server. */
   private final BankIdService service;
+
+  private final CustomerContactInformationFactory customerContactInformationFactory;
 
   /**
    * Gets information about the selected device.
@@ -223,23 +230,12 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
    */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
-        .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
-    final Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
-        .stream()
-        .filter(v -> v.getXMLLang() != null && v.getValue() != null)
-        .collect(Collectors.toMap(LangBearing::getXMLLang, XSString::getValue));
-    final List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
-        .flatMap(d -> Optional.ofNullable(d.getExtensions().getUnknownXMLObjects().get(0)))
-        .flatMap(e -> Optional.ofNullable(e.getOrderedChildren()))
-        .map(c -> c.stream()
-            .filter(x -> x instanceof LogoImpl)
-            .map(LogoImpl.class::cast)
-            .toList())
-        .orElseGet(List::of);
-    final SpInformation data =
-        new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
-    return Mono.just(data);
+    return Mono.just(SpInformationFactory.getSpInformation(request));
+  }
+
+  @GetMapping(value = "/api/contact", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<CustomerContactInformation> customerContactInormationMono() {
+    return Mono.just(customerContactInformationFactory.getContactInformation());
   }
 
   /**

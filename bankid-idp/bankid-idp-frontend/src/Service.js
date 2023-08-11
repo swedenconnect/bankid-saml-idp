@@ -23,7 +23,10 @@ export async function poll(showQr) {
 
 export async function status() {
   return (await fetch(CONTEXT_PATH + "/api/status")).json();
+}
 
+export async function contactInformation() {
+  return (await fetch(CONTEXT_PATH + "/api/contact")).json();
 }
 
 export async function cancel() {
