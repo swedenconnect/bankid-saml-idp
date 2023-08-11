@@ -15,25 +15,32 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.opensaml.core.xml.LangBearing;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSURIImpl;
 import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.idp.ApiResponseFactory;
-import se.swedenconnect.bankid.idp.NoSuchRelyingPartyException;
+import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
+import se.swedenconnect.bankid.idp.authn.api.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
-import se.swedenconnect.bankid.idp.authn.context.BankIdState;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
@@ -41,7 +48,6 @@ import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
-import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
@@ -56,16 +62,9 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
- * authentication/signature.
+ * authentication/signature. This controller also acts as an API backend to the applications frontend.
  *
  * @author Martin Lindström
  * @author Felix Hellman
@@ -75,37 +74,34 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class BankIdAuthenticationController extends AbstractAuthenticationController<BankIdAuthenticationProvider> {
 
-  /**
-   * The path to where the Spring Security SAML IdP flow directs the user agent to.
-   */
+  /** The path to where the Spring Security SAML IdP flow directs the user agent to. */
   public static final String AUTHN_PATH = "/bankid";
 
-  /**
-   * Relying parties that we serve.
-   */
+  /** Relying parties that we serve. */
   private final RelyingPartyRepository rpRepository;
 
-  /**
-   * The authentication provider that is the "manager" for this authentication.
-   */
-
+  /** The authentication provider that is the "manager" for this authentication. */
   private final BankIdAuthenticationProvider provider;
 
-  /**
-   * Possible languages for the UI.
-   */
-  private final List<Language> languages;
-
+  /** For loading session data. */
   private final BankIdSessionReader sessionReader;
 
+  /** For publishing events. */
   private final BankIdEventPublisher eventPublisher;
 
+  /** The BankID service that communicates with the BankID server. */
   private final BankIdService service;
 
+  /**
+   * Gets information about the selected device.
+   *
+   * @param request the HTTP servlet request
+   * @return selected device information
+   */
   @GetMapping("/api/device")
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
-    final BankIdContext bankIdContext = buildInitialContext(authnInputToken, request);
+    final BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
     PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
@@ -115,9 +111,17 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 
+  /**
+   * API method for making a BankID polling request.
+   *
+   * @param request the HTTP servlet request
+   * @param qr whether to display the QR code
+   * @return an {@link ApiResponse}
+   */
   @PostMapping("/api/poll")
-  public Mono<ApiResponse> poll(final HttpServletRequest request, @RequestParam(value = "qr", defaultValue = "false") final Boolean qr) {
-    final BankIdSessionState state = sessionReader.loadSessionData(request);
+  public Mono<ApiResponse> poll(final HttpServletRequest request,
+      @RequestParam(value = "qr", defaultValue = "false") final Boolean qr) {
+    final BankIdSessionState state = this.sessionReader.loadSessionData(request);
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     final BankIdContext bankIdContext = this.buildInitialContext(authnInputToken, request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
@@ -133,68 +137,90 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
         .data(this.getMessage(request, bankIdContext, authnInputToken, relyingParty))
         .state(state)
         .build();
-    return service.poll(pollRequest);
-  }
-
-
-  private BankIdContext getBankIdContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
-    final BankIdContext bankIdContext = this.buildInitialContext(token, request);
-    final BankIdContext context = sessionReader.loadContext(request);
-    return bankIdContext;
+    return this.service.poll(pollRequest);
   }
 
   /**
-   * Lazy load of message, if no message is set, it is calculated and published to be persisted
+   * Lazy load of message, if no message is set, it is calculated and published to be persisted.
    *
-   * @param request      Current http servlet
-   * @param context      Current bankid context
-   * @param token        Current SAML token
-   * @param relyingParty Relaying party who wants the authentication
-   * @return Message to be displayed in app
+   * @param request current http servlet
+   * @param context current bankid context
+   * @param token current SAML token
+   * @param relyingParty relaying party who wants the authentication
+   * @return message to be displayed in app
    */
-  private UserVisibleData getMessage(final HttpServletRequest request, final BankIdContext context, final Saml2UserAuthenticationInputToken token,
-                                     final RelyingPartyData relyingParty) {
-    return Optional.ofNullable(sessionReader.loadUserVisibleData(request))
+  private UserVisibleData getMessage(final HttpServletRequest request, final BankIdContext context,
+      final Saml2UserAuthenticationInputToken token,
+      final RelyingPartyData relyingParty) {
+    return Optional.ofNullable(this.sessionReader.loadUserVisibleData(request))
         .orElseGet(() -> {
           final UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, token, relyingParty);
-          eventPublisher.userVisibleData(userVisibleData, request).publish();
+          this.eventPublisher.userVisibleData(userVisibleData, request).publish();
           return userVisibleData;
         });
   }
 
+  /**
+   * API method for cancelling a request
+   *
+   * @param request the HTTP servlet request
+   * @return nothing
+   */
   @PostMapping("/api/cancel")
   public Mono<Void> cancelRequest(final HttpServletRequest request) {
-    final BankIdSessionState state = sessionReader.loadSessionData(request);
+    final BankIdSessionState state = this.sessionReader.loadSessionData(request);
     final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
     if (Objects.nonNull(bankIdSessionData)) {
-      final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+      final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
       final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
       final RelyingPartyData relyingParty = this.getRelyingParty(entityId);
-      return service.cancel(request, state, relyingParty);
+      return this.service.cancel(request, state, relyingParty);
     }
     return Mono.empty();
   }
 
+  /**
+   * Method for completing the operation and returning to the SAML engine.
+   *
+   * @param request the HTTP servlet request
+   * @return a {@link ModelAndView}
+   */
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    final CollectResponse data = sessionReader.laodCompletionData(request);
-    final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
+    final CollectResponse data = this.sessionReader.laodCompletionData(request);
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
     final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
-    final RelyingPartyData relyingParty = getRelyingParty(entityId);
-    eventPublisher.orderCompletion(request, relyingParty).publish();
-    return complete(request, new BankIdAuthenticationToken(data));
+    final RelyingPartyData relyingParty = this.getRelyingParty(entityId);
+    this.eventPublisher.orderCompletion(request, relyingParty).publish();
+    return this.complete(request, new BankIdAuthenticationToken(data));
   }
 
+  /**
+   * Method for completing the operation and returning to the SAML engine in cases of cancelled operation.
+   *
+   * @param request the HTTP servlet request
+   * @return a {@link ModelAndView}
+   */
   @GetMapping("/view/cancel")
   public ModelAndView cancelView(final HttpServletRequest request) {
-    return complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
+    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 
+  /**
+   * API method for delivering status information.
+   *
+   * @return the service information
+   */
   @GetMapping(value = "/api/status")
   public Mono<ServiceInformation> serviceInformation() {
-    return service.getServiceInformation();
+    return this.service.getServiceInformation();
   }
 
+  /**
+   * API method for delivering SP display information.
+   * @param request the HTTP servlet request
+   * @return SP information
+   */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
     final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
@@ -219,15 +245,14 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   /**
    * When a SAML {@code AuthnRequest} is received we set up an initial {@link BankIdContext}.
    *
-   * @param token   the input token
+   * @param token the input token
    * @param request the HTTP servlet request
    * @return a {@link BankIdContext}
    */
   private BankIdContext buildInitialContext(final Saml2UserAuthenticationInputToken token,
-                                            final HttpServletRequest request) {
+      final HttpServletRequest request) {
 
     final BankIdContext context = new BankIdContext();
-    context.setState(BankIdState.INIT);
     context.setClientId(token.getAuthnRequestToken().getEntityId());
 
     // Authentication or signature?
@@ -249,7 +274,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
     // Device selection
     //
-    final PreviousDeviceSelection previousDeviceSelection = sessionReader.loadPreviousSelectedDevice(request);
+    final PreviousDeviceSelection previousDeviceSelection = this.sessionReader.loadPreviousSelectedDevice(request);
     context.setPreviousDeviceSelection(previousDeviceSelection);
     return context;
   }
@@ -258,14 +283,12 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     final RelyingPartyData rp = this.rpRepository.getRelyingParty(entityId);
     if (rp == null) {
       log.info("SAML SP '{}' is not a registered BankID Relying Party", entityId);
-      throw new NoSuchRelyingPartyException();
+      throw new NoSuchRelyingPartyException(entityId);
     }
     return rp;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected BankIdAuthenticationProvider getProvider() {
     return this.provider;
