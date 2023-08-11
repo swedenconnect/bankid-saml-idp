@@ -86,7 +86,7 @@ export const messages = {
                 "btn-cancel": "Avbryt",
                 "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder.",
                 "cancel-progress": "Avbryter ...",
-                "contact": "Om detta är ett återkommande problem så vänligen kontakta support",
+                "contact": "Om detta är ett återkommande problem så kontakta vänligen support via email",
                 "error-page-close": "Vänligen stäng sidan när du är klar",
                 error: {
                     "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen.",
