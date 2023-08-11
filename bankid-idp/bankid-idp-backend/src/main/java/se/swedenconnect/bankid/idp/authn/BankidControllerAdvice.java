@@ -13,6 +13,12 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
+
 @RestControllerAdvice
 @AllArgsConstructor
 @Slf4j

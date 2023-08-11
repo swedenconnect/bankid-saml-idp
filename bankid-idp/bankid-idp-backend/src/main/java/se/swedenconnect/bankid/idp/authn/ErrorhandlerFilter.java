@@ -11,6 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * ErrorhandlerFilter handles error that do not originate from a controller e.g. another filter
+ * Handles exceptions thrown by BankIdAuthenticationProvider @see {@link BankIdAuthenticationProvider}
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 
 @AllArgsConstructor
 @Component(ErrorhandlerFilter.NAME)

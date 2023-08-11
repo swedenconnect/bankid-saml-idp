@@ -3,11 +3,15 @@ package se.swedenconnect.bankid.idp.authn;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
-
+/**
+ * Creates redirect views and links to be used by error handlers
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @Component
 @Slf4j

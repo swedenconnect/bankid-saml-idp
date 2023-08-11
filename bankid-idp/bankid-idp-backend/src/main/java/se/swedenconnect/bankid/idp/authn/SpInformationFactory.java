@@ -12,6 +12,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 public class SpInformationFactory {
   public static SpInformation getSpInformation(HttpServletRequest request) {
     final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
