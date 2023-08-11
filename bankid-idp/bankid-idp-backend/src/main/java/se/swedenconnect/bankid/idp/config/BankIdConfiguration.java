@@ -58,9 +58,6 @@ import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.authn.psc.RequestedPrincipalSelection;
 import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.MatchValueBuilder;
 import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.RequestedPrincipalSelectionBuilder;
-import se.swedenconnect.security.credential.PkiCredential;
-import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
-import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
@@ -124,7 +121,6 @@ public class BankIdConfiguration {
     return http.build();
   }
 
-
   /**
    * Creates the {@link QRGenerator} to use when generating QR code images.
    *
@@ -162,10 +158,8 @@ public class BankIdConfiguration {
         }
       }
 
-      final PkiCredential credential = this.createPkiCredential(rp.getCredential());
-
       final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
-          this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), credential);
+          this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
       webClientFactory.afterPropertiesSet();
 
       final BankIDClient client =
@@ -175,19 +169,6 @@ public class BankIdConfiguration {
           rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText(), rp.getRequirement()));
     }
     return new InMemoryRelyingPartyRepository(relyingParties);
-  }
-
-  /**
-   * Given a {@link PkiCredentialConfigurationProperties} a {@link PkiCredential} is created.
-   *
-   * @param cred the properties
-   * @return a {@link PkiCredential}
-   * @throws Exception for creation errors
-   */
-  private PkiCredential createPkiCredential(final PkiCredentialConfigurationProperties cred) throws Exception {
-    final PkiCredentialFactoryBean factory = new PkiCredentialFactoryBean(cred);
-    factory.afterPropertiesSet();
-    return factory.getObject();
   }
 
   /**
