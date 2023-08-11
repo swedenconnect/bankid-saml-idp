@@ -39,7 +39,6 @@ export default {
         }
     },
     beforeMount() {
-        this.displayServiceMessage = true;
         status().then(s => {
             this.displayServiceMessage = true;
             if (s["status"] !== "OK") {

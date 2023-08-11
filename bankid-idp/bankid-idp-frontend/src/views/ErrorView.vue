@@ -26,7 +26,7 @@ export default {
     data() {
         return {
             contactEmail: "",
-            displayEmail: true
+            displayEmail: false
         }
     },
     beforeMount() {
