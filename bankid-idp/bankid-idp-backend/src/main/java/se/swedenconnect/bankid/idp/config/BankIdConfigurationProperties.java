@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,9 @@ import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
+import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
+import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
 
 /**
  * BankID configuration properties.
@@ -84,6 +87,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final QrCode qrCode = new QrCode();
 
   /**
+   * Configuration for health endpoints.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final HealthConfiguration health = new HealthConfiguration();
+
+  /**
    * Default text(s) to display during authentication/signing.
    */
   @NestedConfigurationProperty
@@ -113,6 +123,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     }
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
+    this.health.afterPropertiesSet();
 
     this.userMessageDefaults.afterPropertiesSet();
     Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
@@ -121,15 +132,15 @@ public class BankIdConfigurationProperties implements InitializingBean {
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingParty rp : this.relyingParties) {
       rp.afterPropertiesSet();
-      
+
       final RelyingParty.RpUserMessage msg = rp.getUserMessage();
-      
+
       if (msg.getFallbackSignText() == null) {
         msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
       }
       if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()) {
         msg.setLoginText(this.userMessageDefaults.getLoginText());
-      }      
+      }
     }
   }
 
@@ -225,6 +236,9 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private PkiCredentialConfigurationProperties credential;
 
+    // Internal use only ...
+    private PkiCredential _credential;
+
     /**
      * Relying Party specific display text for authentication (and signature). Overrides the default text.
      */
@@ -250,6 +264,21 @@ public class BankIdConfigurationProperties implements InitializingBean {
         this.userMessage = new RpUserMessage();
       }
       this.userMessage.afterPropertiesSet();
+    }
+
+    /**
+     * Creates a {@link PkiCredential} given the {@link PkiCredentialConfigurationProperties}.
+     *
+     * @return a {@link PkiCredential}
+     * @throws Exception for errors creating the object
+     */
+    public PkiCredential createCredential() throws Exception {
+      if (this._credential == null) {
+        final PkiCredentialFactoryBean factory = new PkiCredentialFactoryBean(this.credential);
+        factory.afterPropertiesSet();
+        this._credential = factory.getObject();
+      }
+      return this._credential;
     }
 
     /**
@@ -308,9 +337,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Getter
     private final List<String> entityCategories = new ArrayList<>();
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void afterPropertiesSet() throws Exception {
       if (!StringUtils.hasText(this.providerName)) {
@@ -322,6 +349,35 @@ public class BankIdConfigurationProperties implements InitializingBean {
       }
       Assert.hasText(this.resumePath, "bankid.authn.resume-path must be set");
       Assert.notEmpty(this.supportedLoas, "At least one URI must be assigned to bankid.authn.supported-loas");
+    }
+
+  }
+
+  /**
+   * Configuration for health endpoints.
+   */
+  public static class HealthConfiguration implements InitializingBean {
+
+    /**
+     * Default value for the setting that tells when the health endpoint should warn about Relying Party certificates
+     * that are about to expire.
+     */
+    public static final Duration RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT = Duration.ofDays(14);
+
+    /**
+     * Setting that tells when the health endpoint should warn about Relying Party certificates that are about to
+     * expire. The default is 14 days.
+     */
+    @Getter
+    @Setter
+    private Duration rpCertificateWarnThreshold;
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (this.rpCertificateWarnThreshold == null) {
+        this.rpCertificateWarnThreshold = RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT;
+      }
     }
 
   }
