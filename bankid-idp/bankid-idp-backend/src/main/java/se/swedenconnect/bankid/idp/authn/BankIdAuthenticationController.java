@@ -17,11 +17,6 @@ package se.swedenconnect.bankid.idp.authn;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.opensaml.core.xml.LangBearing;
-import org.opensaml.core.xml.schema.XSString;
-import org.opensaml.core.xml.schema.impl.XSURIImpl;
-import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,14 +49,11 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationIn
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractAuthenticationController;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatus;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
-import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * The controller to which the Spring Security SAML IdP flow directs the user to initiate BankID
@@ -102,6 +94,8 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   private final BankIdService service;
 
+  private final CustomerContactInformationFactory customerContactInformationFactory;
+
   @GetMapping("/api/device")
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request).getAuthnInputToken();
@@ -134,13 +128,6 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
         .state(state)
         .build();
     return service.poll(pollRequest);
-  }
-
-
-  private BankIdContext getBankIdContext(final Saml2UserAuthenticationInputToken token, final HttpServletRequest request) {
-    final BankIdContext bankIdContext = this.buildInitialContext(token, request);
-    final BankIdContext context = sessionReader.loadContext(request);
-    return bankIdContext;
   }
 
   /**
@@ -177,7 +164,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping("/view/complete")
   public ModelAndView complete(final HttpServletRequest request) {
-    final CollectResponse data = sessionReader.laodCompletionData(request);
+    final CollectResponse data = sessionReader.loadCompletionData(request);
     final Saml2UserAuthenticationInputToken authnInputToken = getInputToken(request).getAuthnInputToken();
     final String entityId = authnInputToken.getAuthnRequestToken().getEntityId();
     final RelyingPartyData relyingParty = getRelyingParty(entityId);
@@ -197,23 +184,12 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
 
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
-        .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
-    final Map<String, String> displayNames = attribute.getPeerMetadata().getOrganization().getDisplayNames()
-        .stream()
-        .filter(v -> v.getXMLLang() != null && v.getValue() != null)
-        .collect(Collectors.toMap(LangBearing::getXMLLang, XSString::getValue));
-    final List<LogoImpl> images = Optional.ofNullable(attribute.getPeerMetadata().getRoleDescriptors().get(0))
-        .flatMap(d -> Optional.ofNullable(d.getExtensions().getUnknownXMLObjects().get(0)))
-        .flatMap(e -> Optional.ofNullable(e.getOrderedChildren()))
-        .map(c -> c.stream()
-            .filter(x -> x instanceof LogoImpl)
-            .map(LogoImpl.class::cast)
-            .toList())
-        .orElseGet(List::of);
-    final SpInformation data =
-        new SpInformation(displayNames, Optional.ofNullable(images.get(0)).map(XSURIImpl::getURI).orElse(""));
-    return Mono.just(data);
+    return Mono.just(SpInformationFactory.getSpInformation(request));
+  }
+
+  @GetMapping(value = "/api/contact", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<CustomerContactInformation> customerContactInormationMono() {
+    return Mono.just(customerContactInformationFactory.getContactInformation());
   }
 
   /**

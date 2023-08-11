@@ -21,7 +21,7 @@ server:
     include-exception: true
     include-stacktrace: always
     path: "/icandothis"
-    
+
 management:
   server:
     port: 8444
@@ -42,8 +42,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, metrics, prometheus, loggers  
-        
+        include: health, metrics, prometheus, loggers
+
 spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
@@ -149,7 +149,6 @@ logging:
           saml: TRACE
 
 ---
-
 spring:
   config:
     activate:
@@ -168,6 +167,10 @@ spring:
   session:
     timeout: 15m
 server:
+  error:
+    whitelabel:
+      enabled: true
+    path: /#error
   reactive:
     session:
       timeout: 15m
@@ -202,14 +205,31 @@ bankid:
     requirement:
       use-finger-print: true
       token-start-required: true
-      
+
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp/local
     base-url: https://local.dev.swedenconnect.se:${server.port}/idp
     metadata-providers:
     - location: classpath:local/local-metadata.xml
-    
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers
+  server:
+    port: 8444
+user:
+  error:
+    contact-email: contact@email.com
+    show-contact-information: true
+    show-trace-id: true
 ---
 server:
   port: 8082

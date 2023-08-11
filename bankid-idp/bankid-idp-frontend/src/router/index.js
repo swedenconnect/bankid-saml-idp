@@ -1,6 +1,7 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 import AuthenticateView from "@/views/AuthenticateView.vue";
 import DeviceSelectView from "@/views/DeviceSelectView.vue";
+import ErrorView from "@/views/ErrorView.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
       name: 'sign-other',
       component: AuthenticateView,
       props: {otherDevice: true, sign: true}
+    },
+    {
+      path: '/error/:msg/:trace?',
+      name: 'error',
+      component: ErrorView,
     }
   ]
 })

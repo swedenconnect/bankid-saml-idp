@@ -54,7 +54,7 @@ public class BankIdSessions implements BankIdSessionWriter, BankIdSessionReader 
   }
 
   @Override
-  public CollectResponse laodCompletionData(final HttpServletRequest request) {
+  public CollectResponse loadCompletionData(final HttpServletRequest request) {
     return dao.read(BANKID_COMPLETION_DATA_ATTRIBUTE, CollectResponse.class, request);
   }
 

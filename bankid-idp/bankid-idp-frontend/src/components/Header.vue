@@ -27,7 +27,7 @@ export default {
             return this.spInfo["imageUrl"];
         },
         hideImage: function () {
-            return !this.spInfo.hasOwnProperty("imageUrl");
+            return !this.spInfo.hasOwnProperty("imageUrl") || this.spInfo["imageUrl"] === "" || this.spInfo["imageUrl"] === null;
         }
     }
 }
