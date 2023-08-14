@@ -13,26 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.error;
 
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
- * Runtime exception for cases where the flow is invoked for a non-registered RP.
- *
+ * Exception class for validation errors in BankID data received from the BankID server.
+ * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class NoSuchRelyingPartyException extends RuntimeException {
+public class BankIdValidationException extends BankIdTraceableException {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor.
-   *
-   * @param entityId the entityID for the SP that does not exist
-   */
-  public NoSuchRelyingPartyException(final String entityId) {
-    super("Not registered SP - " + entityId);
+   * 
+   * @param orderRef the order reference
+   * @param msg the error message
+   */  
+  public BankIdValidationException(final String orderRef, final String msg) {
+    super(orderRef, msg);
   }
+
+  /**
+   * Constructor.
+   * 
+   * @param orderRef the order reference
+   * @param msg the error message
+   * @param cause the cause of the error
+   */  
+  public BankIdValidationException(final String orderRef, final String msg, final Throwable cause) {
+    super(orderRef, msg, cause);
+  }
+
 }

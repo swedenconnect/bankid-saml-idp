@@ -13,27 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn.events;
+package se.swedenconnect.bankid.idp.authn.error;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import se.swedenconnect.bankid.idp.ApplicationVersion;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
-import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
 /**
- * An event for an order (sign or auth) response.
+ * Exception for expired BankID sessions.
  * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@AllArgsConstructor
-@Data
-public class OrderResponseEvent {
-  
-  /** The servlet request. */
+public class BankIdSessionExpiredException extends BankIdException {
+
+  private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
+
   private final PollRequest request;
-  
-  /** The order response. */
-  private final OrderResponse response;
-  
+
+  /**
+   * Constructor.
+   * 
+   * @param request the {@link PollRequest}
+   */
+  public BankIdSessionExpiredException(final PollRequest request) {
+    super("The session towards BankID has timed out");
+    this.request = request;
+  }
+
+  /**
+   * Gets the {@link PollRequest} that were active when the session timed out.
+   * 
+   * @return a {@link PollRequest}
+   */
+  public PollRequest getRequest() {
+    return this.request;
+  }
+
 }

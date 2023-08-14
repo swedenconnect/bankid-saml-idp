@@ -32,15 +32,14 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
-import se.swedenconnect.bankid.idp.authn.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.SelectedDeviceInformation;
-import se.swedenconnect.bankid.idp.authn.ServiceInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
@@ -151,7 +150,7 @@ public class BankIdApiController {
         .orElseGet(() -> {
           final UserVisibleData userVisibleData = UserVisibleDataFactory.constructMessage(context, relyingParty);
           if (userVisibleData != null) {
-            this.eventPublisher.userVisibleData(userVisibleData, request).publish();
+            this.eventPublisher.userVisibleData(request, userVisibleData).publish();
           }
           return userVisibleData;
         });

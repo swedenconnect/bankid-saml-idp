@@ -1,60 +1,115 @@
+/*
+ * Copyright 2023 Sweden Connect
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package se.swedenconnect.bankid.idp.authn.session;
 
+import java.io.Serializable;
+import java.time.Instant;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import se.swedenconnect.bankid.idp.authn.StatusCodeFactory;
+import se.swedenconnect.bankid.idp.ApplicationVersion;
+import se.swedenconnect.bankid.idp.authn.api.StatusCodeFactory;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
-import java.time.Instant;
-
+/**
+ * Representation of an ongoing BankID session.
+ * 
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
+public class BankIdSessionData implements Serializable {
 
-public class BankIdSessionData {
+  private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
+
+  /** The autostart token. */
   private String autoStartToken;
+
+  /** The start token. */
   private String qrStartToken;
+
+  /** The start secret. */
   private String qrStartSecret;
+
+  /** The start time. */
   private Instant startTime;
+
+  /** The BankID order reference. */
   private String orderReference;
+
+  /** The latest progress status (hint). */
   private ProgressStatus status;
+
+  /** Whether the session has expired. */
   private Boolean expired;
-  private String hintCode;
+
+  /** The BankID message code (to display next). */
   private String messageCode;
+
+  /** Whether we should display a QR code. */
   private Boolean showQr;
 
+  /**
+   * Creates a {@link BankIdSessionData} given a {@link PollRequest} and an {@link OrderResponse}.
+   * 
+   * @param request the {@link PollRequest}
+   * @param response the {@link OrderResponse}
+   * @return a {@link BankIdSessionData}
+   */
   public static BankIdSessionData of(final PollRequest request, final OrderResponse response) {
-    return new BankIdSessionData(
-        response.getAutoStartToken(),
-        response.getQrStartToken(),
-        response.getQrStartSecret(),
-        response.getOrderTime(),
-        response.getOrderReference(),
-        ProgressStatus.STARTED,
-        false,
-        "",
-        "bankid.msg.rfa21",
-        request.getQr()
-    );
+    return BankIdSessionData.builder()
+        .autoStartToken(response.getAutoStartToken())
+        .qrStartToken(response.getQrStartToken())
+        .qrStartSecret(response.getQrStartSecret())
+        .startTime(response.getOrderTime())
+        .orderReference(response.getOrderReference())
+        .status(ProgressStatus.STARTED)
+        .expired(false)
+        .messageCode("bankid.msg.rfa21")
+        .showQr(request.getQr())
+        .build();
   }
 
-  public static BankIdSessionData of(final BankIdSessionData previous, final CollectResponse json) {
-    return new BankIdSessionData(
-        previous.autoStartToken,
-        previous.qrStartToken,
-        previous.qrStartSecret,
-        previous.getStartTime(),
-        previous.getOrderReference(),
-        json.getProgressStatus(),
-        json.getErrorCode() == ErrorCode.START_FAILED,
-        json.getHintCode(),
-        StatusCodeFactory.statusCode(json, previous.getShowQr()),
-        previous.getShowQr()
-    );
+  /**
+   * Creates a {@link BankIdSessionData} given a previous {@link BankIdSessionData} and an {@link CollectResponse}.
+   * 
+   * @param previous the previous {@link BankIdSessionData}
+   * @param response the {@link CollectResponse}
+   * @return a {@link BankIdSessionData}
+   */
+  public static BankIdSessionData of(final BankIdSessionData previous, final CollectResponse response) {
+    return BankIdSessionData.builder()
+        .autoStartToken(previous.getAutoStartToken())
+        .qrStartToken(previous.getQrStartToken())
+        .qrStartSecret(previous.getQrStartSecret())
+        .startTime(previous.getStartTime())
+        .orderReference(previous.getOrderReference())
+        .status(response.getProgressStatus())
+        .expired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
+        .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr()))
+        .showQr(previous.getShowQr())
+        .build();
   }
 }

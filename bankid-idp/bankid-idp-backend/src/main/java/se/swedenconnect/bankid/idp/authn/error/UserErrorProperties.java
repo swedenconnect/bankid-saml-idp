@@ -1,4 +1,4 @@
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -30,6 +30,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import se.swedenconnect.bankid.idp.authn.error.BankIdValidationException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
@@ -100,7 +101,7 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
     final BankIdAuthenticationToken bankIdToken = BankIdAuthenticationToken.class.cast(token.getAuthnToken());
     final CollectResponse authnData = (CollectResponse) bankIdToken.getDetails();
     if (authnData.getCompletionData() == null) {
-      throw BankIdAuthenticationExceptionFactory.validationError(authnData.getOrderReference());
+      throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID CompletionData");
     }
     // TODO: Compare pnr from principal selection with pnr from authnData
     // TODO: We should not hardwire loa3-uncertified
@@ -117,10 +118,10 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
       saml2UserAuthentication.getSaml2UserDetails().setSignMessageDisplayed(true);
       String signature = authnData.getCompletionData().getSignature();
       if (signature == null) {
-        throw BankIdAuthenticationExceptionFactory.validationError(authnData.getOrderReference());
+        throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID signature");
       }
       if (Strings.isBlank(signature)) {
-        throw BankIdAuthenticationExceptionFactory.invalidSignature(authnData.getOrderReference());
+        throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID signature - empty");
       }
     }
     return saml2UserAuthentication;

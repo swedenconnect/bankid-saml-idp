@@ -44,7 +44,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
-import se.swedenconnect.bankid.idp.authn.ErrorhandlerFilter;
+import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
 import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;

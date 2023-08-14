@@ -15,12 +15,9 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -29,8 +26,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
-import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
-
 /**
  * Web MVC configuration.
  * 
@@ -38,29 +33,14 @@ import se.swedenconnect.bankid.idp.config.UiConfigurationProperties.Language;
  * @author Felix Hellman
  */
 @Configuration
-@EnableConfigurationProperties(UiConfigurationProperties.class)
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
-  /** UI settings. */
-  private final UiConfigurationProperties ui;
 
   /**
    * Constructor.
    * 
    * @param ui the UI configuration
    */
-  public WebMvcConfiguration(final UiConfigurationProperties ui) {
-    this.ui = Objects.requireNonNull(ui, "ui must not be null");
-  }
-
-  /**
-   * Creates a bean holding the UI languages.
-   * 
-   * @return the UI languages
-   */
-  @Bean
-  List<Language> languages() {
-    return this.ui.getLanguages();
+  public WebMvcConfiguration() {
   }
 
   /**

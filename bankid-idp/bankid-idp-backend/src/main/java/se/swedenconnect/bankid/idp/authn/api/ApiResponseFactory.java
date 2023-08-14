@@ -40,7 +40,7 @@ public class ApiResponseFactory {
   public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
     String qrCode = "";
     // Only generate qr code when it has not been scanned and should be displayed
-    if (showQr && Optional.ofNullable(data.getHintCode()).map(ProgressStatus.OUTSTANDING_TRANSACTION.getValue()::equals)
+    if (showQr && Optional.ofNullable(data.getStatus()).map(ProgressStatus.OUTSTANDING_TRANSACTION::equals)
         .orElse(false)) {
       qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(),
           data.getStartTime());
@@ -48,6 +48,11 @@ public class ApiResponseFactory {
     return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
   }
 
+  /**
+   * Creates an {@link ApiResponse} indicating a timeout.
+   * 
+   * @return an {@link ApiResponse}
+   */
   public static ApiResponse createErrorResponseTimeExpired() {
     return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.timeout");
   }

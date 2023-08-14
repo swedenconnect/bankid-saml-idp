@@ -15,58 +15,32 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import java.time.Instant;
-import java.util.Objects;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.redisson.api.RMap;
-import org.redisson.api.RedissonClient;
-
 /**
- * Redis implementation of the {@link SessionDao} interface.
- *
+ * Implements the {@link SessionDao} interface using the session extracted from the {@link HttpServletRequest}.
+ * If using Spring session the session objects will be distributed.
+ * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class RedisSessionDao implements SessionDao {
-
-  private final RedissonClient client;
-
-  /**
-   * Constructor.
-   *
-   * @param client the Redis client
-   */
-  public RedisSessionDao(final RedissonClient client) {
-    this.client = Objects.requireNonNull(client, "client must not be null");
-  }
+public class ServletSessionDao implements SessionDao {
 
   /** {@inheritDoc} */
   @Override
   public void write(final String key, final Object value, final HttpServletRequest request) {
-    final RMap<Object, Object> map = this.getRedisHashForUser(request);
-    map.fastPut(key, value);
-    map.expire(Instant.now().plusSeconds(request.getSession().getMaxInactiveInterval()));
+    request.getSession().setAttribute(key, value);
   }
 
   /** {@inheritDoc} */
   @Override
   public <T> T read(final String key, final Class<T> tClass, final HttpServletRequest request) {
-    final RMap<Object, Object> map = this.getRedisHashForUser(request);
-    return tClass.cast(map.get(key));
+    return tClass.cast(request.getSession().getAttribute(key));
   }
 
   /** {@inheritDoc} */
   @Override
   public void remove(final String key, final HttpServletRequest request) {
-    final RMap<Object, Object> map = this.getRedisHashForUser(request);
-    map.remove(key);
+    request.getSession().setAttribute(key, null);
   }
-
-  /** {@inheritDoc} */
-  private RMap<Object, Object> getRedisHashForUser(final HttpServletRequest request) {
-    return this.client.getMap("session:%s".formatted(request.getSession().getId()));
-  }
-  
 }

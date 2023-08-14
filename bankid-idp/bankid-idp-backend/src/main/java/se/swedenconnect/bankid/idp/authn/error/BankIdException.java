@@ -13,31 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.error;
 
-import lombok.Getter;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
- * Exception class for BankID authentication errors.
- *
+ * Base class for all BankID exceptions.
+ * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class BankIdAuthenticationException extends RuntimeException {
+public abstract class BankIdException extends RuntimeException {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
-  @Getter
-  private final String identifier;
+  /**
+   * Default constructor.
+   */
+  protected BankIdException() {
+    super();
+  }
 
   /**
-   * Constructor.
-   *
-   * @param identifier the ID of the operation
+   * Constructor taking an error message.
+   * 
+   * @param msg the error message
    */
-  public BankIdAuthenticationException(final String identifier) {
-    super();
-    this.identifier = identifier;
+  protected BankIdException(final String msg) {
+    super(msg);
   }
+
+  /**
+   * Constructor taking an error message and the cause of the error.
+   * 
+   * @param msg the error message
+   * @param cause the cause of the error
+   */
+  protected BankIdException(final String msg, final Throwable cause) {
+    super(msg, cause);
+  }
+
 }
