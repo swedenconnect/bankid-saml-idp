@@ -1,7 +1,5 @@
 package se.swedenconnect.bankid.idp.authn.session;
 
-import org.springframework.data.redis.core.TimeToLive;
-
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;

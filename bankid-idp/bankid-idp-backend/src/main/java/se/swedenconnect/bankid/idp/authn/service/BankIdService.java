@@ -15,15 +15,22 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.idp.ApiResponseFactory;
-import se.swedenconnect.bankid.idp.authn.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.ServiceInformation;
+import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
+import se.swedenconnect.bankid.idp.authn.api.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
@@ -33,11 +40,6 @@ import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
-
-import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor

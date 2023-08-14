@@ -15,10 +15,21 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TimeZone;
+
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
@@ -30,12 +41,6 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.*;
 
 /**
  * The BankID {@link AuthenticationProvider}.
@@ -70,14 +75,14 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
   /**
    * Constructor.
    *
-   * @param authnPath                 the path to where we redirect the user for authentication
-   * @param resumeAuthnPath           the path that the authentication process uses to redirect the user back after a completed
-   *                                  authentication
+   * @param authnPath the path to where we redirect the user for authentication
+   * @param resumeAuthnPath the path that the authentication process uses to redirect the user back after a completed
+   *          authentication
    * @param supportedAuthnContextUris the supported LoA:s
-   * @param entityCategories          declared/supported entity categories
+   * @param entityCategories declared/supported entity categories
    */
   public BankIdAuthenticationProvider(final String authnPath, final String resumeAuthnPath,
-                                      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
+      final List<String> supportedAuthnContextUris, final List<String> entityCategories) {
     super(authnPath, resumeAuthnPath);
     this.supportedAuthnContextUris = Optional.ofNullable(supportedAuthnContextUris)
         .filter(s -> !s.isEmpty())
@@ -107,7 +112,8 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
     Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
-    if (SecurityContextHolder.getContext().getAuthentication() instanceof Saml2UserAuthenticationInputToken saml && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
+    if (SecurityContextHolder.getContext().getAuthentication() instanceof Saml2UserAuthenticationInputToken saml
+        && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
       saml2UserAuthentication.getSaml2UserDetails().setSignMessageDisplayed(true);
       String signature = authnData.getCompletionData().getSignature();
       if (signature == null) {
@@ -166,9 +172,7 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         new UserAttribute(
             AttributeConstants.ATTRIBUTE_NAME_TRANSACTION_IDENTIFIER,
             AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_TRANSACTION_IDENTIFIER,
-            authnData.getOrderReference()
-        )
-    );
+            authnData.getOrderReference()));
   }
 
   /**

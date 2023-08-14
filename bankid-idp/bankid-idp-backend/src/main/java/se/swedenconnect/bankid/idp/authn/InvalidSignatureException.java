@@ -6,6 +6,7 @@ package se.swedenconnect.bankid.idp.authn;
  * @author Felix Hellman
  */
 public class InvalidSignatureException extends BankIdAuthenticationException {
+
   public InvalidSignatureException(String identifier) {
     super(identifier);
   }

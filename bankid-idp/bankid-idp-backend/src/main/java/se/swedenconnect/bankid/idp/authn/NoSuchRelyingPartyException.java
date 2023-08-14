@@ -13,32 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp;
+package se.swedenconnect.bankid.idp.authn;
+
+import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
- * Internal class used for serialization across application classes.
+ * Runtime exception for cases where the flow is invoked for a non-registered RP.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public final class ApplicationVersion {
+public class NoSuchRelyingPartyException extends RuntimeException {
 
-  private static final int MAJOR = 1;
-  private static final int MINOR = 0;
-  private static final int PATCH = 0;
+  private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
   /**
-   * Global serialization value for classes.
-   */
-  public static final long SERIAL_VERSION_UID = getVersion().hashCode();
-
-  /**
-   * Gets the version string.
+   * Constructor.
    *
-   * @return the version string
+   * @param entityId the entityID for the SP that does not exist
    */
-  public static String getVersion() {
-    return MAJOR + "." + MINOR + "." + PATCH;
+  public NoSuchRelyingPartyException(final String entityId) {
+    super("Not registered SP - " + entityId);
   }
-
 }

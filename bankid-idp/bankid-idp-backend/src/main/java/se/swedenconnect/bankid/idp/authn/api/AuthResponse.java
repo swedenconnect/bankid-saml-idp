@@ -13,32 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp;
+package se.swedenconnect.bankid.idp.authn.api;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Internal class used for serialization across application classes.
+ * Representation of an authentication response.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public final class ApplicationVersion {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class AuthResponse {
 
-  private static final int MAJOR = 1;
-  private static final int MINOR = 0;
-  private static final int PATCH = 0;
+  /** The autostart token. */
+  private String autoStartToken;
 
-  /**
-   * Global serialization value for classes.
-   */
-  public static final long SERIAL_VERSION_UID = getVersion().hashCode();
-
-  /**
-   * Gets the version string.
-   *
-   * @return the version string
-   */
-  public static String getVersion() {
-    return MAJOR + "." + MINOR + "." + PATCH;
-  }
-
+  /** The QR code. */
+  private String qrCode;
 }
