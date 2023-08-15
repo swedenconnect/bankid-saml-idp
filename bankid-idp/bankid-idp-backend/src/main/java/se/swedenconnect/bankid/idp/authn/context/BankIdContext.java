@@ -23,10 +23,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
+import se.swedenconnect.spring.saml.idp.extensions.SignatureMessageExtension;
 
 /**
  * The context for a BankID operation.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -34,15 +35,15 @@ import se.swedenconnect.bankid.idp.ApplicationVersion;
 public class BankIdContext implements Serializable {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
-  
+
   /**
-   * The BankID state.
+   * The ID of the context. This is the same as the ID on the SAML AuthnRequest message that we are processing.
    */
   @Setter
   @Getter
-  @JsonProperty(value = "state", required = true)  
-  private BankIdState state;
-  
+  @JsonProperty(value = "client-id", required = true)
+  private String id;
+
   /**
    * The client ID.
    */
@@ -50,7 +51,7 @@ public class BankIdContext implements Serializable {
   @Getter
   @JsonProperty(value = "client-id", required = true)
   private String clientId;
-  
+
   /**
    * The operation - auth or sign.
    */
@@ -58,7 +59,7 @@ public class BankIdContext implements Serializable {
   @Getter
   @JsonProperty(value = "operation", required = true)
   private BankIdOperation operation;
-  
+
   /**
    * The personal identity number. Assigned if known at the beginning of the operation.
    */
@@ -66,7 +67,7 @@ public class BankIdContext implements Serializable {
   @Getter
   @JsonProperty(value = "personal-number", required = false)
   private String personalNumber;
-  
+
   /**
    * Holds information about whether the user selected "this device" or "other device" the
    * last time. Will only be assigned if operation is "sign".
@@ -75,5 +76,13 @@ public class BankIdContext implements Serializable {
   @Getter
   @JsonProperty(value = "previous-device", required = false)
   private PreviousDeviceSelection previousDeviceSelection;
-  
+
+  /**
+   * Holds the sign message (if the operation is sign and the extension has been set).
+   */
+  @Setter
+  @Getter
+  @JsonProperty(value = "sign-message", required = false)
+  private SignatureMessageExtension signMessage;
+
 }

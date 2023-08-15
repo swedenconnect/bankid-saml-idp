@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 Sweden Connect
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package se.swedenconnect.bankid.idp.concurrency;
 
 import java.util.Map;
@@ -5,17 +20,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 /**
- * This class is not meant for production use
+ * In-memory {@link TryLockRepository}.
+ * <p>
+ * This class is not intended for production use.
+ * </p>
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
  */
 public class InMemoryTryLockRepository implements TryLockRepository {
 
   private final Map<String, Lock> stringLockMap = new ConcurrentHashMap<>();
 
+  /** {@inheritDoc} */
   @Override
-  public TryLock get(String key) {
-    Lock lock = stringLockMap.computeIfAbsent(key, s -> new ReentrantLock());
+  public TryLock get(final String key) {
+    final Lock lock = this.stringLockMap.computeIfAbsent(key, s -> new ReentrantLock());
     return TryLock.create(lock::tryLock, lock::unlock);
   }
 }

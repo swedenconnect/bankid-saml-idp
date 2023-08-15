@@ -66,6 +66,14 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private Resource serverRootCertificate;
 
   /**
+   * Whether we are running in "standalone" mode, i.e., if we are using the built in Vue frontend app, this controller
+   * redirects calls made from the underlying SAML IdP library to our frontend start page.
+   */
+  @Getter
+  @Setter
+  private boolean standalone = true;
+
+  /**
    * Should be set to {@code true} if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
    */
   @Getter

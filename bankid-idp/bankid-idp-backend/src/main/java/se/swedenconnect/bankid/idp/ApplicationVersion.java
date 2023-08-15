@@ -17,14 +17,14 @@ package se.swedenconnect.bankid.idp;
 
 /**
  * Internal class used for serialization across application classes.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public final class ApplicationVersion {
 
   private static final int MAJOR = 1;
-  private static final int MINOR = 1;
+  private static final int MINOR = 0;
   private static final int PATCH = 0;
 
   /**
@@ -34,7 +34,7 @@ public final class ApplicationVersion {
 
   /**
    * Gets the version string.
-   * 
+   *
    * @return the version string
    */
   public static String getVersion() {

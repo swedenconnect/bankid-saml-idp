@@ -274,7 +274,21 @@
       </plugin>
 
     </plugins>
-
+    
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>      
+    </testResources>
+    
   </build>
 
 </project>

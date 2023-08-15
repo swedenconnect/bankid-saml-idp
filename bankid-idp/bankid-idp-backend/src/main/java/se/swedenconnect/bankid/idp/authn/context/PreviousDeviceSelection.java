@@ -28,6 +28,7 @@ public enum PreviousDeviceSelection {
 
   /** BankID signature. */
   OTHER("other"),
+  
   /** We have failed to determine the previous device */
   UNKNOWN("unknown");
 

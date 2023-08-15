@@ -13,44 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.config;
+package se.swedenconnect.bankid.idp.authn.api;
 
-import java.util.List;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Configuration properties for UI settings.
+ * Represents status information.
  * 
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@ConfigurationProperties("ui")
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class UiConfigurationProperties {
+public class ServiceInformation {
   
   /**
-   * The UI language settings.
+   * Represents the service status.
    */
-  private List<Language> languages;
-
-  /**
-   * UI language settings.
-   */
-  @Data
-  public static class Language {
-
-    /**
-     * The language tag.
-     */
-    private String tag;
+  public enum Status {
+    /** No issues. */
+    OK,
     
-    /**
-     * The text associated with the language tag, e.g. English.
-     */
-    private String text;
+    /** There are issues. */
+    ISSUES
   }
-  
+
+  /** The service info status. */
+  private Status status;
 }
