@@ -39,7 +39,6 @@ export default {
         },
         getErrorMessage: function () {
             let msg = this.$route.params.msg;
-            let pattern = /^(unknown|service|timeout|sign)$/;
             if (this.messageExists(msg)) {
                 return msg;
             }
