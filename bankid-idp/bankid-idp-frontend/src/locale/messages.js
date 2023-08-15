@@ -1,6 +1,23 @@
 export const messages = {
-        en: {
-            "bankid": {
+    en: {
+        "idp": {
+            "error": {
+                "unrecoverable": {
+                    "internal": "An internal error occurred",
+                    "unknown-peer": "The sender of the authentication request has not been registered at the Identity Provider",
+                    "replay": "Authentication request message has already been processed",
+                    "too-old": "Received message is too old and not accepted",
+                    "acs": "The indicated Assertion Consumer Service is not registered",
+                    "no-signature": "Authentication request was not signed - this is required",
+                    "bad-signature": "Signature validation on received authentication request failed",
+                    "format": "The format on the received authentication request is invalid",
+                    "decode": "The received message could not be decoded into a valid authentication request",
+                    "endpoint": "The endpoint information supplied in the authentication request do not correspond with the endpoint on which the message was delivered",
+                    "session": "Required session data could not be found"
+                }
+            }
+        },
+        "bankid": {
             "msg": {
                 "rfa1": "Start your BankID app.",
                 "rfa2": "The BankID app is not installed. Please contact your internet bank.",
@@ -52,6 +69,23 @@ export const messages = {
         }
     },
     sv: {
+        "idp": {
+            "error": {
+                "unrecoverable": {
+                    "internal": "Ett internt fel har inträffat",
+                    "unknown-peer": "Avsändaren av autentiseringsförsöket är inte registrerad hos IdP-leverantören",
+                    "replay": "Autentiseringsförsöket har redan blivit behandlat",
+                    "too-old": "Autentiseringsförsöket är för gammalt och kan inte accepteras",
+                    "acs": "Assertion Consumer Service är inte registrerad",
+                    "no-signature": "Autentiseringsförsöket är inte signerat",
+                    "bad-signature": "Autentiseringsförsökets signatur kunde inte valideras",
+                    "format": "Autentiseringsförsökets format är felaktigt",
+                    "decode": "Det mottagna meddelandet går ej att avläsa till ett giltigt autentiseringsresultat",
+                    "endpoint": "Endpoint informationen från autentiseringsförsöket är inte samma som den endpoint i meddelandet",
+                    "session": "Obligatorisk sessionsdata kunde ej hittas."
+                }
+            }
+        },
         "bankid": {
             "msg": {
                 "rfa1": "Starta BankID-appen.",
