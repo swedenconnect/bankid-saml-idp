@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.authn.error;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
  * Creates redirect views and links to be used by error handlers.
@@ -37,10 +38,10 @@ public class UserErrorRouteFactory {
   public enum ErrorMessage {
 
     /** Timeout error. */
-    TIMEOUT("timeout"),
+    TIMEOUT("bankid.msg.error.timeout"),
 
     /** Unknown error. */
-    UNKNOWN("unknown");
+    UNKNOWN("bankid.msg.error.unknown");
 
     private final String message;
 
@@ -63,13 +64,13 @@ public class UserErrorRouteFactory {
   }
 
   public String getRedirectView(final Exception e) {
-    final ErrorMessage errorMessage = getErrorMessage(e);
+    final String errorMessage = getErrorMessage(e);
     final String traceId = this.getTraceId(e);
     return "redirect:/bankid#/error/%s".formatted(this.build(errorMessage, traceId));
   }
 
   public String getRedirect(final Exception e) {
-    final ErrorMessage errorMessage = getErrorMessage(e);
+    final String errorMessage = getErrorMessage(e);
     final String traceId = this.getTraceId(e);
     return "bankid#/error/%s".formatted(this.build(errorMessage, traceId));
   }
@@ -81,16 +82,19 @@ public class UserErrorRouteFactory {
     return UUID.randomUUID().toString();
   }
 
-  private String build(final ErrorMessage message, final String traceId) {
+  private String build(final String message, final String traceId) {
     final StringBuilder builder = new StringBuilder();
-    builder.append(message.getMessage());
+    builder.append(message);
     if (this.properties.getShowTraceId()) {
       builder.append("/%s".formatted(traceId));
     }
     return builder.toString();
   }
 
-  private static ErrorMessage getErrorMessage(final Exception e) {
-    return ErrorMessage.UNKNOWN;
+  private static String getErrorMessage(final Exception e) {
+    if (e instanceof UnrecoverableSaml2IdpException unrecoverableSaml2IdpException) {
+      return unrecoverableSaml2IdpException.getError().getMessageCode();
+    }
+    return ErrorMessage.UNKNOWN.getMessage();
   }
 }

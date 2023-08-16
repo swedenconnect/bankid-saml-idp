@@ -21,8 +21,15 @@ import static org.hamcrest.Matchers.matchesPattern;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import se.swedenconnect.bankid.idp.authn.error.BankIdTraceableException;
 import se.swedenconnect.bankid.idp.authn.error.UserErrorRouteFactory;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
+
+import java.util.stream.Stream;
 
 class UserErrorRouteFactoryTest {
 
@@ -32,8 +39,18 @@ class UserErrorRouteFactoryTest {
         new UserErrorRouteFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
     final String redirect = userErrorRouteFactory.getRedirect(new RuntimeException());
     final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
-    Assertions.assertEquals("bankid#/error/unknown", redirect);
-    Assertions.assertEquals("redirect:/bankid#/error/unknown", redirectView);
+    Assertions.assertEquals("bankid#/error/bankid.msg.error.unknown", redirect);
+    Assertions.assertEquals("redirect:/bankid#/error/bankid.msg.error.unknown", redirectView);
+  }
+  @ParameterizedTest
+  @MethodSource("unrecoverableSaml2IpdExceptions")
+  void errorRouteUnrecoverableSaml2IdpException(UnrecoverableSaml2IdpException e) {
+    final UserErrorRouteFactory userErrorRouteFactory =
+        new UserErrorRouteFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
+    final String redirect = userErrorRouteFactory.getRedirect(e);
+    final String redirectView = userErrorRouteFactory.getRedirectView(e);
+    Assertions.assertEquals("bankid#/error/" + e.getError().getMessageCode(), redirect);
+    Assertions.assertEquals("redirect:/bankid#/error/" + e.getError().getMessageCode(), redirectView);
   }
 
   @Test
@@ -42,8 +59,8 @@ class UserErrorRouteFactoryTest {
         new UserErrorRouteFactory(UserErrorPropertiesFixture.SHOW_EMAIL_NO_TRACE);
     final String redirect = userErrorRouteFactory.getRedirect(new RuntimeException());
     final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
-    Assertions.assertEquals("bankid#/error/unknown", redirect);
-    Assertions.assertEquals("redirect:/bankid#/error/unknown", redirectView);
+    Assertions.assertEquals("bankid#/error/bankid.msg.error.unknown", redirect);
+    Assertions.assertEquals("redirect:/bankid#/error/bankid.msg.error.unknown", redirectView);
   }
 
   @Test
@@ -52,7 +69,7 @@ class UserErrorRouteFactoryTest {
         new UserErrorRouteFactory(UserErrorPropertiesFixture.SHOW_EMAIL_SHOW_TRACE);
     final String redirect = userErrorRouteFactory.getRedirect(new RuntimeException());
     final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
-    final String BASE_REGEX = "bankid#\\/error\\/unknown\\/";
+    final String BASE_REGEX = "bankid#\\/error\\/bankid.msg.error.unknown\\/";
     final String UUID_REGEX = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
     assertThat(redirect, matchesPattern(BASE_REGEX + UUID_REGEX));
     assertThat(redirectView, matchesPattern("redirect:/" + BASE_REGEX + UUID_REGEX));
@@ -66,9 +83,24 @@ class UserErrorRouteFactoryTest {
     final String expectedId = ex.getTraceId();
     final String redirect = userErrorRouteFactory.getRedirect(ex);
     final String redirectView = userErrorRouteFactory.getRedirectView(ex);
-    final String BASE_REGEX = "bankid#\\/error\\/unknown\\/";
+    final String BASE_REGEX = "bankid#\\/error\\/bankid.msg.error.unknown\\/";
     assertThat(redirect, matchesPattern(BASE_REGEX + expectedId));
     assertThat(redirectView, matchesPattern("redirect:/" + BASE_REGEX + expectedId));
   }
 
+  private static Stream<Arguments> unrecoverableSaml2IpdExceptions() {
+    return Stream.of(
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.ENDPOINT_CHECK_FAILURE)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_SESSION)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.FAILED_DECODE)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_ASSERTION_CONSUMER_SERVICE)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_FORMAT)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INTERNAL)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.REPLAY_DETECTED)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MESSAGE_TOO_OLD)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_SIGNATURE)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MISSING_AUTHNREQUEST_SIGNATURE)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.UNKNOWN_PEER))
+    );
+  }
 }

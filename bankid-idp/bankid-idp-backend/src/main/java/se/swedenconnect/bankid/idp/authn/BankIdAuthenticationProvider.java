@@ -42,6 +42,8 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
  * The BankID {@link AuthenticationProvider}.

@@ -39,9 +39,8 @@ export default {
         },
         getErrorMessage: function () {
             let msg = this.$route.params.msg;
-            let pattern = /^(unknown|service|timeout|sign)$/;
-            if (pattern.test(msg)) {
-                return "bankid.msg.error." + msg;
+            if (this.messageExists(msg)) {
+                return msg;
             }
             return "bankid.msg.error.unknown";
         },
@@ -60,6 +59,19 @@ export default {
                 this.displayEmail = r["displayInformation"];
                 this.contactEmail = r["email"]
             })
+        }, messageExists(message) {
+            var current = messages.en;
+            var keys = message.split('.');
+            console.log(keys);
+            for (const index in keys) {
+                let key = keys[index];
+                if (current.hasOwnProperty(key)) {
+                    current = current[key];
+                } else {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
