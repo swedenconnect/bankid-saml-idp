@@ -52,17 +52,22 @@ export default {
           if (response["qrCode"] !== "") {
               this.qrImage = response["qrCode"];
           }
+          if (response["status"] !== "NOT_STARTED") {
+            this.qrImage = "";
+          }
           this.token = response["autoStartToken"];
           this.messageCode = response["messageCode"];
         }
         return response;
       }).then(response => {
-
             if (response["status"] === "COMPLETE") {
                 window.location.href = PATHS.COMPLETE;
             }
             else if (response["status"] === "CANCEL") {
                 window.location.href = PATHS.CANCEL;
+            }
+            else if (response["status"] === "ERROR") {
+              this.qrImage = "";
             }
             else if (response["retry"] === true) {
               /* Time is defined in seconds and setTimeout is in millis*/

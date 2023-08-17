@@ -34,6 +34,7 @@ public class ApiResponse {
    * Representation of the status of the response.
    */
   public enum Status {
+    NOT_STARTED,
     /** The response is in progress. */
     IN_PROGRESS,
 
