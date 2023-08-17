@@ -44,37 +44,55 @@ public class BankIdSessionData implements Serializable {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
-  /** The autostart token. */
+  /**
+   * The autostart token.
+   */
   private String autoStartToken;
 
-  /** The start token. */
+  /**
+   * The start token.
+   */
   private String qrStartToken;
 
-  /** The start secret. */
+  /**
+   * The start secret.
+   */
   private String qrStartSecret;
 
-  /** The start time. */
+  /**
+   * The start time.
+   */
   private Instant startTime;
 
-  /** The BankID order reference. */
+  /**
+   * The BankID order reference.
+   */
   private String orderReference;
 
-  /** The latest progress status (hint). */
+  /**
+   * The latest progress status (hint).
+   */
   private ProgressStatus status;
 
-  /** Whether the session has expired. */
-  private Boolean expired;
+  /**
+   * Whether the session has expired.
+   */
+  private Boolean startFailed;
 
-  /** The BankID message code (to display next). */
+  /**
+   * The BankID message code (to display next).
+   */
   private String messageCode;
 
-  /** Whether we should display a QR code. */
+  /**
+   * Whether we should display a QR code.
+   */
   private Boolean showQr;
 
   /**
    * Creates a {@link BankIdSessionData} given a {@link PollRequest} and an {@link OrderResponse}.
-   * 
-   * @param request the {@link PollRequest}
+   *
+   * @param request  the {@link PollRequest}
    * @param response the {@link OrderResponse}
    * @return a {@link BankIdSessionData}
    */
@@ -86,7 +104,7 @@ public class BankIdSessionData implements Serializable {
         .startTime(response.getOrderTime())
         .orderReference(response.getOrderReference())
         .status(ProgressStatus.STARTED)
-        .expired(false)
+        .startFailed(false)
         .messageCode("bankid.msg.rfa21")
         .showQr(request.getQr())
         .build();
@@ -94,7 +112,7 @@ public class BankIdSessionData implements Serializable {
 
   /**
    * Creates a {@link BankIdSessionData} given a previous {@link BankIdSessionData} and an {@link CollectResponse}.
-   * 
+   *
    * @param previous the previous {@link BankIdSessionData}
    * @param response the {@link CollectResponse}
    * @return a {@link BankIdSessionData}
@@ -107,7 +125,7 @@ public class BankIdSessionData implements Serializable {
         .startTime(previous.getStartTime())
         .orderReference(previous.getOrderReference())
         .status(response.getProgressStatus())
-        .expired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
+        .startFailed(response.getErrorCode() == ErrorCode.START_FAILED)
         .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr()))
         .showQr(previous.getShowQr())
         .build();
