@@ -173,6 +173,9 @@ public interface BankIDMessage {
 
     /** Unknown error. Please try again. */
     RFA22,
+    
+    /** Process your machine-readable travel document using the BankID app. */
+    RFA23,
 
     /**
      * Extension: Should QR code or personal identity number be used when starting initiating the operation on other

@@ -217,7 +217,7 @@ public class BankIdApiController {
     return Optional.ofNullable(this.provider.getTokenRepository().getExternalAuthenticationToken(request))
         .map(RedirectForAuthenticationToken::getAuthnInputToken)
         .orElseThrow(() -> new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_SESSION,
-            "No input token available"));
+            "No input token available", null));
   }
 
   /**

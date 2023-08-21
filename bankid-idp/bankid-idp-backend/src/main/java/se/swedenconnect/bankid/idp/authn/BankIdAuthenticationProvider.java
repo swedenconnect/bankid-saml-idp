@@ -19,7 +19,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,8 +41,6 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserDetails;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.AbstractUserRedirectAuthenticationProvider;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.ResumedAuthenticationToken;
 import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
-import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
-import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
  * The BankID {@link AuthenticationProvider}.
@@ -114,11 +111,11 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3,
         Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
-    Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
-    if (SecurityContextHolder.getContext().getAuthentication() instanceof Saml2UserAuthenticationInputToken saml
+    final Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
+    if (SecurityContextHolder.getContext().getAuthentication() instanceof final Saml2UserAuthenticationInputToken saml
         && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
       saml2UserAuthentication.getSaml2UserDetails().setSignMessageDisplayed(true);
-      String signature = authnData.getCompletionData().getSignature();
+      final String signature = authnData.getCompletionData().getSignature();
       if (signature == null) {
         throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID signature");
       }
@@ -130,19 +127,32 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
   }
 
   private static List<UserAttribute> mapUserAttributes(final CollectResponse authnData) {
-    CompletionData completionData = authnData.getCompletionData();
+    final CompletionData completionData = authnData.getCompletionData();
     final CompletionData.User user = completionData.getUser();
 
     // Build the authnContextParams attribute ...
     //
-    final String authnContextParams = String.format("bankidNotBefore=%s;bankidNotAfter=%s;bankidUserAgentAddress=%s",
-        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotBefore())),
-            StandardCharsets.UTF_8),
-        URLEncoder.encode(iso8601DateFormatter.format(new Date(completionData.getCert().getNotAfter())),
-            StandardCharsets.UTF_8),
-        URLEncoder.encode(completionData.getDevice().getIpAddress(), StandardCharsets.UTF_8));
-
-    // authnData.getCert().getNotBefore()
+    final StringBuffer authnContextParamsString = new StringBuffer();
+    if (completionData.getBankIdIssueDate() != null) {
+      authnContextParamsString.append("bankidNotBefore=")
+          .append(URLEncoder.encode(completionData.getBankIdIssueDate(), StandardCharsets.UTF_8));
+    }
+    if (completionData.getDevice() != null) {
+      if (completionData.getDevice().getIpAddress() != null) {
+        if (!authnContextParamsString.isEmpty()) {
+          authnContextParamsString.append(";");
+        }
+        authnContextParamsString.append("bankidUserAgentAddress=")
+            .append(completionData.getDevice().getIpAddress());
+      }
+      if (completionData.getDevice().getUhi() != null) {
+        if (!authnContextParamsString.isEmpty()) {
+          authnContextParamsString.append(";");
+        }
+        authnContextParamsString.append("bankUniqueHardwareIdentifier=")
+            .append(completionData.getDevice().getUhi());
+      }
+    }
 
     return List.of(
         new UserAttribute(AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
@@ -163,7 +173,7 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         new UserAttribute(
             AttributeConstants.ATTRIBUTE_NAME_AUTH_CONTEXT_PARAMS,
             AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_AUTH_CONTEXT_PARAMS,
-            authnContextParams),
+            authnContextParamsString.toString()),
         new UserAttribute(
             AttributeConstants.ATTRIBUTE_NAME_USER_SIGNATURE,
             AttributeConstants.ATTRIBUTE_FRIENDLY_NAME_USER_SIGNATURE,

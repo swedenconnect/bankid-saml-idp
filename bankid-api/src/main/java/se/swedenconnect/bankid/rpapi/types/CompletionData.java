@@ -37,8 +37,14 @@ public class CompletionData implements Serializable {
   /** Information related to the device used during the BankID operation. */
   private Device device;
 
-  /** Information about the user's BankID certificate. */
-  private Cert cert;
+  /**
+   * The date the BankID was issued to the user. The issue date of the ID expressed using ISO 8601 date format
+   * YYYY-MM-DD with a UTC time zone offset.
+   */
+  private String bankIdIssueDate;
+
+  /** Information about extra verifications that were part of the transaction. */
+  private StepUp stepUp;
 
   /** The Base64-encoded BankID signature. */
   private String signature;
@@ -83,21 +89,41 @@ public class CompletionData implements Serializable {
   }
 
   /**
-   * Returns information about the user's BankID certificate.
-   *
-   * @return the certificate information
+   * Gets the date the BankID was issued to the user. The issue date of the ID expressed using ISO 8601 date format
+   * YYYY-MM-DD with a UTC time zone offset.
+   * 
+   * @return issue date
    */
-  public Cert getCert() {
-    return this.cert;
+  public String getBankIdIssueDate() {
+    return this.bankIdIssueDate;
   }
 
   /**
-   * Assigns information about the user's BankID certificate.
-   *
-   * @param cert the certificate information
+   * Assigns the date the BankID was issued to the user. The issue date of the ID expressed using ISO 8601 date format
+   * YYYY-MM-DD with a UTC time zone offset.
+   * 
+   * @param bankIdIssueDate issue date
    */
-  public void setCert(final Cert cert) {
-    this.cert = cert;
+  public void setBankIdIssueDate(final String bankIdIssueDate) {
+    this.bankIdIssueDate = bankIdIssueDate;
+  }
+
+  /**
+   * Gets the information about extra verifications that were part of the transaction.
+   * 
+   * @return information or {@code null}
+   */
+  public StepUp getStepUp() {
+    return this.stepUp;
+  }
+
+  /**
+   * Assigns the information about extra verifications that were part of the transaction.
+   * 
+   * @param stepUp information
+   */
+  public void setStepUp(final StepUp stepUp) {
+    this.stepUp = stepUp;
   }
 
   /**
@@ -139,8 +165,8 @@ public class CompletionData implements Serializable {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return String.format("user=[%s], device=[%s], cert=[%s], signature='%s', ocspResponse='%s'",
-        this.user, this.device, this.cert, this.signature, this.ocspResponse);
+    return String.format("user=[%s], device=[%s], bankIdIssueDate='%s', stepUp=[%s], signature='%s', ocspResponse='%s'",
+        this.user, this.device, this.bankIdIssueDate, this.stepUp, this.signature, this.ocspResponse);
   }
 
   /**
@@ -254,6 +280,9 @@ public class CompletionData implements Serializable {
     /** The device IP address. */
     private String ipAddress;
 
+    /** Unique hardware identifier for the user’s device. */
+    private String uhi;
+
     /**
      * Returns the device IP address.
      *
@@ -272,68 +301,69 @@ public class CompletionData implements Serializable {
       this.ipAddress = ipAddress;
     }
 
+    /**
+     * Returns the unique hardware identifier for the user’s device.
+     * 
+     * @return unique hardware identifier
+     */
+    public String getUhi() {
+      return this.uhi;
+    }
+
+    /**
+     * Assigns the unique hardware identifier for the user’s device.
+     * 
+     * @param uhi unique hardware identifier
+     */
+    public void setUhi(final String uhi) {
+      this.uhi = uhi;
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {
-      return String.format("ipAddress='%s'", this.ipAddress);
+      return String.format("ipAddress='%s', uhi='%s'", this.ipAddress, this.uhi);
     }
 
   }
 
   /**
-   * Represents the cert field of the completion data.
+   * Information about extra verifications that were part of the transaction.
    */
   @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Cert implements Serializable {
+  public static class StepUp implements Serializable {
 
     private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
-    /** The valid-from time for the user BankID certificate (given in millis since epoch). */
-    private long notBefore;
-
-    /** The valid-to time for the user BankID certificate (given in millis since epoch). */
-    private long notAfter;
+    /** Indicate if there was a check of the mrtd (machine readable travel document). */
+    private Boolean mrtd;
 
     /**
-     * Returns the valid-from time for the user BankID certificate.
-     *
-     * @return the valid-from time (in millis since epoch)
+     * Gets the MRTD status that indicates if there was a check of the MRTD (machine readable travel document).
+     * {@code true} means that the MRTD check was performed and passed, and {@code false} means that the check was
+     * performed but failed.
+     * 
+     * @return the MRTD status
      */
-    public long getNotBefore() {
-      return this.notBefore;
+    public Boolean getMrtd() {
+      return this.mrtd;
     }
 
     /**
-     * Assigns the valid-from time for the user BankID certificate.
-     *
-     * @param notBefore the valid-from time (in millis since epoch)
+     * Assigns the MRTD status that indicates if there was a check of the MRTD (machine readable travel document).
+     * {@code true} means that the MRTD check was performed and passed, and {@code false} means that the check was
+     * performed but failed.
+     * 
+     * @param mrtd the MRTD status
      */
-    public void setNotBefore(final long notBefore) {
-      this.notBefore = notBefore;
-    }
-
-    /**
-     * Returns the valid-to time for the user BankID certificate.
-     *
-     * @return the valid-to time (in millis since epoch)
-     */
-    public long getNotAfter() {
-      return this.notAfter;
-    }
-
-    /**
-     * Assigns the valid-to time for the user BankID certificate.
-     *
-     * @param notAfter the valid-to time (in millis since epoch)
-     */
-    public void setNotAfter(final long notAfter) {
-      this.notAfter = notAfter;
+    public void setMrtd(final Boolean mrtd) {
+      this.mrtd = mrtd;
     }
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
-      return String.format("notBefore=%d, notAfter=%d", this.notBefore, this.notAfter);
+      return String.format("mrtd=%d", this.mrtd);
     }
 
   }

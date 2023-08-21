@@ -90,17 +90,17 @@ class UserErrorRouteFactoryTest {
 
   private static Stream<Arguments> unrecoverableSaml2IpdExceptions() {
     return Stream.of(
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.ENDPOINT_CHECK_FAILURE)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_SESSION)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.FAILED_DECODE)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_ASSERTION_CONSUMER_SERVICE)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_FORMAT)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INTERNAL)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.REPLAY_DETECTED)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MESSAGE_TOO_OLD)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_SIGNATURE)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MISSING_AUTHNREQUEST_SIGNATURE)),
-        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.UNKNOWN_PEER))
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.ENDPOINT_CHECK_FAILURE, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_SESSION, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.FAILED_DECODE, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_ASSERTION_CONSUMER_SERVICE, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_FORMAT, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INTERNAL, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.REPLAY_DETECTED, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MESSAGE_TOO_OLD, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.INVALID_AUTHNREQUEST_SIGNATURE, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.MISSING_AUTHNREQUEST_SIGNATURE, null)),
+        Arguments.of(new UnrecoverableSaml2IdpException(UnrecoverableSaml2IdpError.UNKNOWN_PEER, null))
     );
   }
 }

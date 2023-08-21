@@ -22,13 +22,37 @@ import se.swedenconnect.bankid.rpapi.types.Requirement;
 
 import java.util.List;
 
+/**
+ * Configuration for specific per RP requirements.
+ * 
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class EntityRequirement {
-  private Boolean useFingerPrint;
-  private List<String> issuerCn;
+
+  /**
+   * Tells whether users are required to sign the transaction with their PIN code, even if they have biometrics
+   * activated.
+   */
+  private Boolean pinCode;
+
+  /**
+   * If present, and set to "true", the client needs to provide MRTD (Machine readable travel document) information to
+   * complete the order.Only Swedish passports and national ID cards are supported.
+   */
+  private Boolean mrtd;
+  
+  /**
+   * Object identifiers for which policies that should be used.
+   */
   private List<String> certificatePolicies;
+  
+  /**
+   * Requirement for which type of smart card reader that is required.
+   */
   private Requirement.CardReaderRequirement cardReader;
-  private Boolean tokenStartRequired;
+  
 }

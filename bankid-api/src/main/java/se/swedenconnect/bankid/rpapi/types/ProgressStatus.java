@@ -44,6 +44,12 @@ public enum ProgressStatus {
   STARTED("started"),
 
   /**
+   * Order is pending. A client has launched and received the order but additional steps for providing MRTD information
+   * is required to proceed with the order.
+   */
+  USER_MRTD("userMrtd"),
+
+  /**
    * The client has received the order.
    */
   USER_SIGN("userSign"),
@@ -59,8 +65,7 @@ public enum ProgressStatus {
    */
   COMPLETE("complete"),
   /**
-   * The order has expired. The BankID security RP must inform the user.
-   * Message app/program did not start
+   * The order has expired. The BankID security RP must inform the user. Message app/program did not start
    */
   EXPIRED_TRANSACTION("expiredTransaction");
 

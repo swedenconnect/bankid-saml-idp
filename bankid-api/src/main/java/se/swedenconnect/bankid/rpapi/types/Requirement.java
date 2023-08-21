@@ -18,8 +18,12 @@ package se.swedenconnect.bankid.rpapi.types;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Represents the structure in which a relying party can define how an authentication or signature process should be
@@ -62,17 +66,17 @@ public class Requirement {
   /** Certificate policy Object Identifier - Test BankID for some BankID Banks. */
   public static final String CP_TEST_BANKID = "1.2.752.60.1.6";
 
-  /** eID on smart card issued by Nordea CA (for production). */
-  public static final String NORDEA_CA_SMARTCARD = "Nordea CA for Smartcard users 12";
+  /**
+   * Tells whether users are required to sign the transaction with their PIN code, even if they have biometrics
+   * activated.
+   */
+  private Boolean pinCode;
 
-  /** eID on smart card issued by Nordea CA (for test). */
-  public static final String NORDEA_CA_SMARTCARD_TEST = "Nordea Test CA for Smartcard users 12";
-
-  /** eID on file issued by Nordea CA (for test). */
-  public static final String NORDEA_CA_FILE = "Nordea CA for Softcert users 13";
-
-  /** eID on file issued by Nordea CA (for test). */
-  public static final String NORDEA_CA_FILE_TEST = "Nordea Test CA for Softcert users 13";
+  /**
+   * If present, and set to "true", the client needs to provide MRTD (Machine readable travel document) information to
+   * complete the order.Only Swedish passports and national ID cards are supported.
+   */
+  private Boolean mrtd;
 
   /** Requirement for which type of smart card reader that is required. */
   private CardReaderRequirement cardReader;
@@ -80,23 +84,11 @@ public class Requirement {
   /** Object identifiers for which policies that should be used. */
   private List<String> certificatePolicies;
 
-  /** Nordea CA issuer common names. Controls which Nordea BankID types that are supported. */
-  private List<String> issuerCn;
-
   /**
-   * Tells whether the client must have been started using the autoStartToken. Deprecated: For v5.1, use
-   * {@code tokenStartRequired}.
+   * A personal eidentification number to be used to complete the transaction. If a BankID with another personal number
+   * attempts to sign the transaction, it fails.
    */
-  private Boolean autoStartTokenRequired;
-
-  /** Tells whether finger print use should be allowed. */
-  private Boolean allowFingerprint;
-
-  /**
-   * In BankID RP API v5.1 this replaces autoStartTokenRequired. Tells whether the client must have been started using
-   * the autoStartToken.
-   */
-  private Boolean tokenStartRequired;
+  private String personalNumber;
 
   /**
    * Creates a {@code RequirementBuilder}.
@@ -108,15 +100,65 @@ public class Requirement {
   }
 
   /**
+   * Creates a {@code RequirementBuilder} given an already existing requirement.
+   * 
+   * @param req the template requirement
+   * @return a builder
+   */
+  public static RequirementBuilder builder(final Requirement req) {
+    return new RequirementBuilder(req);
+  }
+
+  /**
    * Predicate that tells whether this object is "empty", meaning that no properties have been assigned.
    *
    * @return true if not properties have been assigned, and false otherwise
    */
   @JsonIgnore
   public boolean isEmpty() {
-    return this.cardReader == null && this.autoStartTokenRequired == null && this.tokenStartRequired == null
+    return this.pinCode == null && this.mrtd == null && this.cardReader == null
         && (this.certificatePolicies == null || this.certificatePolicies.isEmpty())
-        && this.issuerCn == null && this.allowFingerprint == null;
+        && this.personalNumber == null;
+  }
+
+  /**
+   * Gets the pin code requirement that tells whether users are required to sign the transaction with their PIN code,
+   * even if they have biometrics activated.
+   * 
+   * @return whether pin code is required
+   */
+  public Boolean getPinCode() {
+    return this.pinCode;
+  }
+
+  /**
+   * Sets whether users are required to sign the transaction with their PIN code, even if they have biometrics
+   * activated.
+   * 
+   * @param pinCode whether pin code is required
+   */
+  public void setPinCode(final Boolean pinCode) {
+    this.pinCode = pinCode;
+  }
+
+  /**
+   * Gets the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
+   * information to complete the order.Only Swedish passports and national ID cards are supported.
+   * 
+   * @return the MRTD flag
+   */
+  public Boolean getMrtd() {
+    return this.mrtd;
+  }
+
+  /**
+   * Assigns the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
+   * information to complete the order.Only Swedish passports and national ID cards are supported.
+   * 
+   * @param mrtd the MRTD flag
+   */
+  public void setMrtd(final Boolean mrtd) {
+    this.mrtd = mrtd;
   }
 
   /**
@@ -163,112 +205,35 @@ public class Requirement {
   }
 
   /**
-   * Returns the Nordea CA issuer common names. Controls which Nordea BankID types that are supported.
-   *
-   * @return a list of CN strings
+   * Gets the personal eidentification number to be used to complete the transaction. If a BankID with another personal
+   * number attempts to sign the transaction, it fails.
+   * 
+   * @return the personal number or {@code null}
    */
-  public List<String> getIssuerCn() {
-    return this.issuerCn;
+  public String getPersonalNumber() {
+    return this.personalNumber;
   }
 
   /**
-   * Assigns the Nordea CA issuer common names. Controls which Nordea BankID types that are supported.
-   * <p>
-   * It is recommended to use the {@link RequirementBuilder} to set up certificate policies and requirements for Nordea
-   * BankID usage.
-   * </p>
-   *
-   * @param issuerCn a list of CN strings
+   * Assigns the personal eidentification number to be used to complete the transaction. If a BankID with another
+   * personal number attempts to sign the transaction, it fails.
+   * 
+   * @param personalNumber the personal number
    */
-  public void setIssuerCn(final List<String> issuerCn) {
-    this.issuerCn = issuerCn;
-  }
-
-  /**
-   * Returns the {@code autoStartTokenRequired} flag that is used to determine whether the client must have been started
-   * using the autoStartToken.
-   *
-   * @return {@value Boolean#TRUE}, {@value Boolean#FALSE} or null (never FALSE prior to v5)
-   * @deprecated if v5.1 or later of the BankID RP is used, the {@link #getTokenStartRequired()} should be used
-   */
-  @Deprecated
-  public Boolean getAutoStartTokenRequired() {
-    return this.autoStartTokenRequired;
-  }
-
-  /**
-   * Assigns the {@code autoStartTokenRequired} flag that is used to determine whether the client must have been started
-   * using the autoStartToken.
-   *
-   * @param autoStartTokenRequired the auto start flag
-   * @deprecated if v5.1 or later of the BankID RP is used, the {@link #setTokenStartRequired(Boolean)} should be used
-   */
-  @Deprecated
-  public void setAutoStartTokenRequired(final Boolean autoStartTokenRequired) {
-    if (autoStartTokenRequired != null && !autoStartTokenRequired.booleanValue()) {
-      this.autoStartTokenRequired = null;
-    }
-    else {
-      this.autoStartTokenRequired = autoStartTokenRequired;
-    }
-  }
-
-  /**
-   * Returns the {@code allowFingerprint} flag telling whether finger print use should be allowed.
-   * <p>
-   * For default setup {@code null} is returned. This means fingerprint is allowed for authentication and disallowed for
-   * signature.
-   * </p>
-   *
-   * @return the allowFingerprint flag or null for default behaviuor
-   */
-  public Boolean getAllowFingerprint() {
-    return this.allowFingerprint;
-  }
-
-  /**
-   * Assigns the {@code allowFingerprint} flag telling whether finger print use should be allowed.
-   * <p>
-   * For default behaviour, this method does not have tobe invoked.
-   * </p>
-   *
-   * @param allowFingerprint the allowFingerprint flag
-   */
-  public void setAllowFingerprint(final Boolean allowFingerprint) {
-    this.allowFingerprint = allowFingerprint;
-  }
-
-  /**
-   * Returns the {@code tokenStartRequired} flag that is used to determine whether the client must have been started
-   * using the autoStartToken.
-   *
-   * @return a boolean telling whether token start is required (null means FALSE)
-   */
-  public Boolean getTokenStartRequired() {
-    return this.tokenStartRequired;
-  }
-
-  /**
-   * Assigns the {@code tokenStartRequired} flag that is used to determine whether the client must have been started
-   * using the autoStartToken.
-   *
-   * @param tokenStartRequired whether token start is required
-   */
-  public void setTokenStartRequired(final Boolean tokenStartRequired) {
-    this.tokenStartRequired = tokenStartRequired;
+  public void setPersonalNumber(final String personalNumber) {
+    this.personalNumber = personalNumber;
   }
 
   /** {@inheritDoc} */
   @Override
   public String toString() {
     return String.format(
-        "cardReader=%s, certificatePolicies=%s, issuerCn=%s, autoStartTokenRequired=%s, allowFingerprint=%s, tokenStartRequired=%s",
+        "pinCode=%s, mtrd=%s, cardReader=%s, certificatePolicies=%s",
+        this.pinCode != null ? this.pinCode : "<not set>",
+        this.mrtd != null ? this.mrtd : "<not-set>",
+        this.personalNumber != null ? this.personalNumber : "<not-set>",
         this.cardReader != null ? this.cardReader : "<not set>",
-        this.certificatePolicies != null ? this.certificatePolicies : "<not set - defaults apply>",
-        this.issuerCn != null ? this.issuerCn : "<not set - defaults apply>",
-        this.autoStartTokenRequired != null ? this.autoStartTokenRequired : "<not set>",
-        this.allowFingerprint != null ? this.allowFingerprint : "<not set>",
-        this.tokenStartRequired != null ? this.tokenStartRequired : "<not set>");
+        this.certificatePolicies != null ? this.certificatePolicies : "<not set - defaults apply>");
   }
 
   /**
@@ -311,6 +276,9 @@ public class Requirement {
       if (requirement == null) {
         return;
       }
+      this.requirement.setPinCode(requirement.getPinCode());
+      this.requirement.setMrtd(requirement.getMrtd());
+      this.requirement.setPersonalNumber(requirement.getPersonalNumber());
 
       if (requirement.getCertificatePolicies() != null && !requirement.getCertificatePolicies().isEmpty()) {
         this.enableMobile = requirement.getCertificatePolicies().contains(Requirement.CP_MOBILE_BANKID)
@@ -323,10 +291,6 @@ public class Requirement {
             || requirement.getCertificatePolicies().contains(Requirement.CP_NORDEA_EID_TEST);
       }
       this.requirement.setCardReader(requirement.getCardReader());
-      this.requirement.setAllowFingerprint(requirement.getAllowFingerprint());
-      this.requirement.setAutoStartTokenRequired(requirement.getAutoStartTokenRequired());
-      this.requirement.setTokenStartRequired(requirement.getTokenStartRequired());
-      this.requirement.setIssuerCn(requirement.getIssuerCn());
     }
 
     /**
@@ -347,19 +311,14 @@ public class Requirement {
           Arrays.asList(BANKID_ON_FILE(this.productionSetup), BANKID_ON_SMARTCARD(this.productionSetup),
               MOBILE_BANKID(this.productionSetup), NORDEA_EID(this.productionSetup));
 
-      final List<String> issuerCns =
-          Arrays.asList(NORDEA_CA_FILE(this.productionSetup), NORDEA_CA_SMARTCARD(this.productionSetup));
-
       if (!this.enableMobile) {
         oids.removeIf(item -> item.equals(MOBILE_BANKID(this.productionSetup)));
       }
       if (!this.enableOnFile) {
         oids.removeIf(item -> item.equals(BANKID_ON_FILE(this.productionSetup)));
-        issuerCns.removeIf(item -> item.equals(NORDEA_CA_FILE(this.productionSetup)));
       }
       if (!this.enableOnSmartCard) {
         oids.removeIf(item -> item.equals(BANKID_ON_SMARTCARD(this.productionSetup)));
-        issuerCns.removeIf(item -> item.equals(NORDEA_CA_SMARTCARD(this.productionSetup)));
 
         // Also unset the card reader requirements since we are not using smart cards.
         this.requirement.setCardReader(null);
@@ -367,18 +326,13 @@ public class Requirement {
         // If both BankID on file and BankID on smart card were disabled, we also turn off Nordea.
         if (!this.enableOnFile) {
           oids.removeIf(item -> item.equals(NORDEA_EID(this.productionSetup)));
-          this.requirement.setIssuerCn(null);
         }
       }
       if (!this.enableNordea) {
         oids.removeIf(item -> item.equals(NORDEA_EID(this.productionSetup)));
-        this.requirement.setIssuerCn(null);
       }
 
       this.requirement.setCertificatePolicies(oids);
-      if (issuerCns.size() != 2) {
-        this.requirement.setIssuerCn(issuerCns);
-      }
 
       return this.requirement;
     }
@@ -395,6 +349,42 @@ public class Requirement {
     }
 
     /**
+     * Sets whether users are required to sign the transaction with their PIN code, even if they have biometrics
+     * activated.
+     * 
+     * @param pinCode whether pin code is required
+     * @return the builder
+     */
+    public RequirementBuilder pinCode(final Boolean pinCode) {
+      this.requirement.setPinCode(pinCode);
+      return this;
+    }
+
+    /**
+     * Assigns the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
+     * information to complete the order.Only Swedish passports and national ID cards are supported.
+     * 
+     * @param mrtd the MRTD flag
+     * @return the builder
+     */
+    public RequirementBuilder mrtd(final Boolean mrtd) {
+      this.requirement.setMrtd(mrtd);
+      return this;
+    }
+
+    /**
+     * Assigns the personal eidentification number to be used to complete the transaction. If a BankID with another
+     * personal number attempts to sign the transaction, it fails.
+     * 
+     * @param personalNumber the personal number
+     * @return the builder
+     */
+    public RequirementBuilder personalNumber(final String personalNumber) {
+      this.requirement.setPersonalNumber(personalNumber);
+      return this;
+    }
+
+    /**
      * Assigns the requirement for which type of smart card reader that is required.
      *
      * <p>
@@ -406,51 +396,6 @@ public class Requirement {
      */
     public RequirementBuilder cardReader(final CardReaderRequirement cardReaderRequirement) {
       this.requirement.setCardReader(cardReaderRequirement);
-      return this;
-    }
-
-    /**
-     * Tells that the client must have been started using the autoStartToken.
-     *
-     * <p>
-     * See {@link Requirement#setAutoStartTokenRequired(Boolean)}.
-     * </p>
-     *
-     * @return the builder
-     * @deprecated for BankID RP API v5.1 use {@link #tokenStartRequired()}
-     */
-    @Deprecated
-    public RequirementBuilder autoStartTokenRequired() {
-      this.requirement.setAutoStartTokenRequired(Boolean.TRUE);
-      return this;
-    }
-
-    /**
-     * Assigns whether fingerprint is allowed.
-     *
-     * <p>
-     * See {@link Requirement#setAllowFingerprint(Boolean)}.
-     * </p>
-     *
-     * @param allowFingerprint the allowFingerprint flag
-     * @return the builder
-     */
-    public RequirementBuilder allowFingerprint(final boolean allowFingerprint) {
-      this.requirement.setAllowFingerprint(allowFingerprint);
-      return this;
-    }
-
-    /**
-     * Tells that the client must have been started using the autoStartToken.
-     *
-     * <p>
-     * See {@link Requirement#setTokenStartRequired(Boolean)}.
-     * </p>
-     *
-     * @return the builder
-     */
-    public RequirementBuilder tokenStartRequired() {
-      this.requirement.setTokenStartRequired(Boolean.TRUE);
       return this;
     }
 
@@ -536,13 +481,6 @@ public class Requirement {
       return production ? CP_NORDEA_EID : CP_NORDEA_EID_TEST;
     }
 
-    public static String NORDEA_CA_SMARTCARD(final boolean production) {
-      return production ? NORDEA_CA_SMARTCARD : NORDEA_CA_SMARTCARD_TEST;
-    }
-
-    public static String NORDEA_CA_FILE(final boolean production) {
-      return production ? NORDEA_CA_FILE : NORDEA_CA_FILE_TEST;
-    }
   }
 
   /**
