@@ -15,11 +15,13 @@
  */
 package se.swedenconnect.bankid.rpapi.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -28,16 +30,27 @@ import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.rpapi.service.*;
-import se.swedenconnect.bankid.rpapi.types.*;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.rpapi.service.AuthenticateRequest;
+import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.service.DataToSign;
+import se.swedenconnect.bankid.rpapi.service.QRGenerator;
+import se.swedenconnect.bankid.rpapi.service.SignatureRequest;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
+import se.swedenconnect.bankid.rpapi.types.ErrorResponse;
+import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+import se.swedenconnect.bankid.rpapi.types.Requirement;
+import se.swedenconnect.bankid.rpapi.types.UserCancelException;
 
 /**
  * An implementation of the BankID Relying Party API methods.
@@ -46,10 +59,10 @@ import java.util.concurrent.Executors;
  */
 public class BankIDClientImpl implements BankIDClient {
 
-  /**
-   * Class logger.
-   */
+  /** Class logger. */
   private static final Logger log = LoggerFactory.getLogger(BankIDClientImpl.class);
+
+  /** The executor service. */
   public final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
   /**
@@ -80,8 +93,8 @@ public class BankIDClientImpl implements BankIDClient {
   /**
    * Constructor.
    *
-   * @param identifier  the unique client identifier
-   * @param webClient   the {@link WebClient} that we use to send requests to the BankID server
+   * @param identifier the unique client identifier
+   * @param webClient the {@link WebClient} that we use to send requests to the BankID server
    * @param qrGenerator the QR code generator (may be {@code null} if QR codes are not used)
    */
   public BankIDClientImpl(final String identifier, final WebClient webClient, final QRGenerator qrGenerator) {
@@ -109,11 +122,13 @@ public class BankIDClientImpl implements BankIDClient {
 
     // Set up the request data.
     //
-    final AuthnRequest authnRequest = new AuthnRequest(request.getPersonalIdentityNumber(), request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData());
+    final AuthnRequest authnRequest =
+        new AuthnRequest(request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData());
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
     try {
       log.info("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
-    } catch (final JsonProcessingException e) {
+    }
+    catch (final JsonProcessingException e) {
       throw new RuntimeException(e);
     }
     try {
@@ -133,14 +148,14 @@ public class BankIDClientImpl implements BankIDClient {
             return m;
           })
           .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
-      //.log();
-    } catch (
-        final WebClientResponseException e) {
+      // .log();
+    }
+    catch (final WebClientResponseException e) {
       log.info("{}: authenticate. Error during auth-call - {} - {} - {}",
           this.identifier, e.getMessage(), e.getStatusCode(), e.getResponseBodyAsString());
       throw new BankIDException(this.getErrorResponse(e), "Auth-call failed", e);
-    } catch (
-        final Exception e) {
+    }
+    catch (final Exception e) {
       log.error("{}: authenticate. Error during auth-call - {}", this.identifier, e.getMessage(), e);
       throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during auth", e);
     }
@@ -155,31 +170,34 @@ public class BankIDClientImpl implements BankIDClient {
     Assert.notNull(request.getDataToSign(), "'dataToSign' must not be null");
     Assert.hasText(request.getDataToSign().getUserVisibleData(), "'dataToSign.userVisibleData' must not be null");
 
-    final SignRequest signRequest = new SignRequest(request.getPersonalIdentityNumber(), request.getEndUserIp(), request.getRequirement(), request.getDataToSign());
+    final SignRequest signRequest =
+        new SignRequest(request.getEndUserIp(), request.getRequirement(), request.getDataToSign());
     log.debug("{}: sign. request: [{}] [path: {}]", this.identifier, signRequest, SIGN_PATH);
 
-
-      return this.webClient.post()
-          .uri(SIGN_PATH)
-          .bodyValue(signRequest)
-          .retrieve()
-          .onRawStatus(s -> s == 400, c -> {
-            return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
-              return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
-            });
-          })
-          .bodyToMono(OrderResponse.class)
-          .onErrorComplete()
-          .doOnError(e -> {
-            if (e instanceof final WebClientResponseException webClientResponseException) {
-              log.info("{}: collect. Error during collect-call - {} - {} - {}",
-                  this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
-              throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
-            } else {
-              log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
-              throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
-            }
+    return this.webClient.post()
+        .uri(SIGN_PATH)
+        .bodyValue(signRequest)
+        .retrieve()
+        .onRawStatus(s -> s == 400, c -> {
+          return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+            return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
           });
+        })
+        .bodyToMono(OrderResponse.class)
+        .onErrorComplete()
+        .doOnError(e -> {
+          if (e instanceof final WebClientResponseException webClientResponseException) {
+            log.info("{}: collect. Error during collect-call - {} - {} - {}",
+                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(),
+                webClientResponseException.getResponseBodyAsString());
+            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed",
+                webClientResponseException);
+          }
+          else {
+            log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
+            throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
+          }
+        });
   }
 
   /**
@@ -201,16 +219,18 @@ public class BankIDClientImpl implements BankIDClient {
         .doOnError(e -> {
           if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
-                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
-            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
-          } else {
+                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(),
+                webClientResponseException.getResponseBodyAsString());
+            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed",
+                webClientResponseException);
+          }
+          else {
             log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
             throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
           }
         });
 
   }
-
 
   private Mono<? extends Throwable> defaultErrorHandler(final ClientResponse clientResponse) {
     return clientResponse.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
@@ -221,9 +241,10 @@ public class BankIDClientImpl implements BankIDClient {
   /**
    * {@inheritDoc}
    */
-
   @Override
-  public Mono<? extends CollectResponse> collect(final String orderReference) throws UserCancelException, BankIDException {
+  public Mono<? extends CollectResponse> collect(final String orderReference)
+      throws UserCancelException, BankIDException {
+    
     Assert.hasText(orderReference, "'orderReference' must not be null or empty");
     log.info("{}: collect: Request for collecting order {}", this.identifier, orderReference);
 
@@ -240,9 +261,12 @@ public class BankIDClientImpl implements BankIDClient {
         .doOnError(e -> {
           if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
-                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(), webClientResponseException.getResponseBodyAsString());
-            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed", webClientResponseException);
-          } else {
+                this.identifier, webClientResponseException.getMessage(), webClientResponseException.getStatusCode(),
+                webClientResponseException.getResponseBodyAsString());
+            throw new BankIDException(this.getErrorResponse(webClientResponseException), "Collect-call failed",
+                webClientResponseException);
+          }
+          else {
             log.error("{}: collect. Error during collect-call - {}", this.identifier, e.getMessage(), e);
             throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
           }
@@ -251,7 +275,8 @@ public class BankIDClientImpl implements BankIDClient {
 
   private static CollectResponse checkForError(final CollectResponse c) {
     if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
-      throw new BankIDException(c.getErrorCode(), String.format("Order '%s' failed with code '%s'", c.getOrderReference(), c.getErrorCode().getValue()));
+      throw new BankIDException(c.getErrorCode(),
+          String.format("Order '%s' failed with code '%s'", c.getOrderReference(), c.getErrorCode().getValue()));
     }
     return c;
   }
@@ -277,7 +302,8 @@ public class BankIDClientImpl implements BankIDClient {
     }
     try {
       return objectMapper.readValue(body, ErrorResponse.class);
-    } catch (final IOException e) {
+    }
+    catch (final IOException e) {
       log.error("{}: Failed to deserialize error response {} into ErrorResponse structure",
           this.identifier, exception.getResponseBodyAsString(), e);
       return new ErrorResponse(ErrorCode.UNKNOWN_ERROR, null);
@@ -289,17 +315,15 @@ public class BankIDClientImpl implements BankIDClient {
    */
   @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
   @JsonInclude(Include.NON_NULL)
+  @SuppressWarnings("unused")
   private static class AuthnRequest {
 
-    private String personalNumber;
     private String endUserIp;
     private Requirement requirement;
     private String userVisibleData;
     private String userVisibleDataFormat;
 
-    public AuthnRequest(final String personalNumber, final String endUserIp,
-                        final Requirement requirement, final UserVisibleData userVisibleData) {
-      this.personalNumber = personalNumber;
+    public AuthnRequest(final String endUserIp, final Requirement requirement, final UserVisibleData userVisibleData) {
       this.endUserIp = endUserIp;
       this.requirement = requirement;
       this.userVisibleData = Optional.ofNullable(userVisibleData).map(UserVisibleData::getUserVisibleData).orElse(null);
@@ -308,20 +332,15 @@ public class BankIDClientImpl implements BankIDClient {
     }
 
     public AuthnRequest() {
-
     }
 
     @Override
     public String toString() {
       return String.format(
-          "personalNumber='%s', endUserIp='%s', requirement=[%s], userVisibleData='%s', userVisibleDataFormat='%s'",
-          this.personalNumber, this.endUserIp, this.requirement,
+          "endUserIp='%s', requirement=[%s], userVisibleData='%s', userVisibleDataFormat='%s'",
+          this.endUserIp, this.requirement,
           Optional.ofNullable(this.userVisibleData).orElseGet(() -> "not-set"),
           Optional.ofNullable(this.userVisibleDataFormat).orElseGet(() -> "not-set"));
-    }
-
-    public void setPersonalNumber(final String personalNumber) {
-      this.personalNumber = personalNumber;
     }
 
     public void setEndUserIp(final String endUserIp) {
@@ -350,9 +369,8 @@ public class BankIDClientImpl implements BankIDClient {
 
     private final String userNonVisibleData;
 
-    public SignRequest(final String personalNumber, final String endUserIp, final Requirement requirement,
-                       final DataToSign dataToSign) {
-      super(personalNumber, endUserIp, requirement, dataToSign);
+    public SignRequest(final String endUserIp, final Requirement requirement, final DataToSign dataToSign) {
+      super(endUserIp, requirement, dataToSign);
       this.userNonVisibleData = dataToSign.getUserNonVisibleData();
     }
 
@@ -361,14 +379,16 @@ public class BankIDClientImpl implements BankIDClient {
       return String.format("%s, userNonVisibleData='%s'",
           super.toString(), Optional.ofNullable(this.userNonVisibleData).orElseGet(() -> "not-set"));
     }
+
   }
 
   /**
    * Represents the data sent in /collect and /cancel calls.
    */
   @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+  @SuppressWarnings("unused")
   private static class OrderRefRequest {
-    @SuppressWarnings("unused")
+
     private final String orderRef;
 
     public OrderRefRequest(final String orderRef) {

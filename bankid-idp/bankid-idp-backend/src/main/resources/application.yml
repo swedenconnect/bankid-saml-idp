@@ -50,7 +50,7 @@ spring:
     
 bankid:
   server-root-certificate: classpath:bankid-trust-prod.crt
-  service-url: https://appapi2.bankid.com/rp/v5.1
+  service-url: https://appapi2.bankid.com/rp/v6.0
   qr-code:
     size: 300
     image-format: PNG
@@ -185,7 +185,7 @@ session:
 bankid:
   standalone: true
   server-root-certificate: classpath:bankid-trust-test.crt
-  service-url: https://appapi2.test.bankid.com/rp/v5.1
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
   relying-parties:
   - id: test-my-eid
     entity-ids:
@@ -203,8 +203,7 @@ bankid:
         text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
     requirement:
-      use-finger-print: true
-      token-start-required: true
+      pin-code: false
 
 saml:
   idp:
@@ -248,7 +247,7 @@ tomcat:
 
 bankid:
   server-root-certificate: classpath:bankid-trust-test.crt
-  service-url: https://appapi2.test.bankid.com/rp/v5.1
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
   test-mode: true
   # Only one RP. This serves all SAML SP:s ... 
   relying-parties:

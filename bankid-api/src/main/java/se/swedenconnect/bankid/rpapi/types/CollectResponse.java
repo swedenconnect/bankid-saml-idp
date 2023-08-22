@@ -15,9 +15,15 @@
  */
 package se.swedenconnect.bankid.rpapi.types;
 
-import com.fasterxml.jackson.annotation.*;
-
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import se.swedenconnect.bankid.rpapi.LibraryVersion;
 
 /**
  * Representation of the response received from a collect call.
@@ -26,6 +32,8 @@ import java.io.Serializable;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollectResponse implements Serializable {
+
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /** The order reference string. */
   @JsonProperty(value = "orderRef", required = true)
@@ -42,20 +50,6 @@ public class CollectResponse implements Serializable {
   /** The completion data. Present if status=complete. */
   @JsonProperty(value = "completionData", required = false)
   private CompletionData completionData;
-
-  @JsonIgnore
-  @Override
-  public String toString() {
-    return "CollectResponseJson{" + "orderReference='" + orderReference + '\'' +
-        ", status=" + status +
-        ", hintCode='" + hintCode + '\'' +
-        ", completionData=" + completionData +
-        '}';
-  }
-
-  public String getHintCode() {
-    return hintCode;
-  }
 
   /**
    * Returns the {@code orderRef} corresponding to the auth or sign call.
@@ -143,12 +137,32 @@ public class CollectResponse implements Serializable {
   }
 
   /**
+   * Gets the hint code.
+   * 
+   * @return the hint code
+   */
+  public String getHintCode() {
+    return this.hintCode;
+  }
+
+  /**
    * Assigns the hint code.
    *
    * @param hintCode the hint code
    */
   public void setHintCode(final String hintCode) {
     this.hintCode = hintCode;
+  }
+
+  /** {@inheritDoc} */
+  @JsonIgnore
+  @Override
+  public String toString() {
+    return "CollectResponseJson{" + "orderReference='" + orderReference + '\'' +
+        ", status=" + status +
+        ", hintCode='" + hintCode + '\'' +
+        ", completionData=" + completionData +
+        '}';
   }
 
   /**

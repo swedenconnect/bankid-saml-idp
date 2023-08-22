@@ -41,10 +41,10 @@ public class BankIdRequestFactory {
    * @return an {@link AuthenticateRequest}
    */
   public AuthenticateRequest createAuthenticateRequest(final PollRequest request) {
-    return new AuthenticateRequest(request.getContext().getPersonalNumber(),
+    return new AuthenticateRequest(
         request.getRequest().getRemoteAddr(),
         request.getData(),
-        createRequirement(request));
+        createRequirement(request, request.getContext().getPersonalNumber()));
   }
 
   /**
@@ -55,10 +55,10 @@ public class BankIdRequestFactory {
    */
   public SignatureRequest createSignRequest(final PollRequest request) {
     if (request.getData() instanceof final DataToSign dataToSign) {
-      return new SignatureRequest(request.getContext().getPersonalNumber(),
+      return new SignatureRequest(
           request.getRequest().getRemoteAddr(),
           dataToSign,
-          createRequirement(request));
+          createRequirement(request, request.getContext().getPersonalNumber()));
     }
     else {
       throw new IllegalArgumentException(
@@ -66,17 +66,22 @@ public class BankIdRequestFactory {
     }
   }
 
-  private static Requirement createRequirement(final PollRequest request) {
+  private static Requirement createRequirement(final PollRequest request, final String personalIdentityNumber) {
     final Optional<EntityRequirement> requirement = Optional.ofNullable(request.getRelyingPartyData().getRequirement());
-    return requirement.map(e -> fromEntityRequirement(e))
-        .orElseGet(() -> new Requirement());
+    final Requirement.RequirementBuilder builder = requirement.isPresent()
+        ? Requirement.builder(fromEntityRequirement(requirement.get()))
+        : Requirement.builder();
+    
+    if (personalIdentityNumber != null) {
+      builder.personalNumber(personalIdentityNumber);
+    }
+    return builder.build();
   }
 
   private static Requirement fromEntityRequirement(final EntityRequirement entityRequirement) {
-    final Requirement requirement = new Requirement();
-    Optional.ofNullable(entityRequirement.getUseFingerPrint()).ifPresent(requirement::setAllowFingerprint);
-    Optional.ofNullable(entityRequirement.getIssuerCn()).ifPresent(requirement::setIssuerCn);
-    Optional.ofNullable(entityRequirement.getTokenStartRequired()).ifPresent(requirement::setTokenStartRequired);
+    final Requirement requirement = new Requirement();    
+    Optional.ofNullable(entityRequirement.getPinCode()).ifPresent(requirement::setPinCode);
+    Optional.ofNullable(entityRequirement.getMrtd()).ifPresent(requirement::setMrtd);
     Optional.ofNullable(entityRequirement.getCardReader()).ifPresent(requirement::setCardReader);
     Optional.ofNullable(entityRequirement.getCertificatePolicies()).ifPresent(requirement::setCertificatePolicies);
     return requirement;

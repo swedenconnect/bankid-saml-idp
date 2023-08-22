@@ -16,7 +16,11 @@
 package se.swedenconnect.bankid.rpapi.service;
 
 import reactor.core.publisher.Mono;
-import se.swedenconnect.bankid.rpapi.types.*;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+import se.swedenconnect.bankid.rpapi.types.Requirement;
+import se.swedenconnect.bankid.rpapi.types.UserCancelException;
 
 /**
  * An interface that declares the methods for a BankID Relying Party (client).
@@ -33,11 +37,15 @@ public interface BankIDClient {
    */
   String getIdentifier();
 
+  /**
+   * Initiates an authentication operation.
+   * 
+   * @param request the authentication request parameters
+   * @return an {@link OrderResponse}
+   */
+  Mono<OrderResponse> authenticate(final AuthenticateRequest request);
 
-  Mono<OrderResponse> authenticate(AuthenticateRequest request);
-
-
-  Mono<OrderResponse> sign(SignatureRequest request);
+  Mono<OrderResponse> sign(final SignatureRequest request);
 
   /**
    * Cancels an ongoing order.

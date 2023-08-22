@@ -23,7 +23,7 @@ public class BankIdIT {
     WebClient webClient = WebClient.builder().baseUrl("http://localhost:9000").build();
     BankIDClient client = new BankIDClientImpl("id", webClient, null);
 
-    Mono<OrderResponse> authenticateStep = client.authenticate(new AuthenticateRequest("1231231232", "1.1.1.1", new UserVisibleData(), new Requirement()));
+    Mono<OrderResponse> authenticateStep = client.authenticate(new AuthenticateRequest("1.1.1.1", new UserVisibleData(), new Requirement()));
     StepVerifier.create(authenticateStep)
         .expectNextMatches(o -> o.getOrderReference() != null)
         .verifyComplete();
@@ -35,7 +35,7 @@ public class BankIdIT {
 
     DataToSign dataToSign = new DataToSign();
     dataToSign.setUserVisibleData("Data visible to user!");
-    Mono<OrderResponse> signStep = client.sign(new SignatureRequest("1231231232", "1.1.1.1", dataToSign, new Requirement()));
+    Mono<OrderResponse> signStep = client.sign(new SignatureRequest("1.1.1.1", dataToSign, new Requirement()));
     StepVerifier.create(signStep)
         .expectNextMatches(sign -> sign.getOrderReference() != null)
         .verifyComplete();
