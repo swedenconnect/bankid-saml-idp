@@ -123,7 +123,7 @@ export const messages = {
                 "contact": "Om detta är ett återkommande problem så kontakta vänligen support via email",
                 "error-page-close": "Vänligen stäng sidan när du är klar",
                 error: {
-                    "timeout": "Tiden tog för att påbörja en inloggning. Vänligen tryck på avbryt och försök igen.",
+                    "timeout": "Det tog för lång tid att starta en inloggning. Vänligen tryck på avbryt och försök igen.",
                     "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare",
                     "unknown": "Någonting har gått fel, försök igen senare",
                     "sign": "Signaturen är inte korrekt, försök igen senare"

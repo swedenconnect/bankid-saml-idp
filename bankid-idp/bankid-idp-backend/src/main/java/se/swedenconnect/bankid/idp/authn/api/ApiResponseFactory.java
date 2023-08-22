@@ -15,11 +15,11 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import java.util.Optional;
-
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
+
+import java.util.Optional;
 
 /**
  * Helper class for creating an {@link ApiResponse} object.
@@ -32,9 +32,9 @@ public class ApiResponseFactory {
   /**
    * Creates an {@link ApiResponse}.
    *
-   * @param data the BankID session data
+   * @param data      the BankID session data
    * @param generator the QR code generator bean
-   * @param showQr whether to display the QR code
+   * @param showQr    whether to display the QR code
    * @return an {@link ApiResponse}
    */
   public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
@@ -50,7 +50,7 @@ public class ApiResponseFactory {
 
   /**
    * Creates an {@link ApiResponse} indicating a timeout.
-   * 
+   *
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createErrorResponseTimeExpired() {
@@ -58,11 +58,14 @@ public class ApiResponseFactory {
   }
 
   private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
+
     return switch (sessionData.getStatus()) {
-    case COMPLETE:
-      yield ApiResponse.Status.COMPLETE;
-    default:
-      yield ApiResponse.Status.IN_PROGRESS;
+      case OUTSTANDING_TRANSACTION:
+        yield ApiResponse.Status.NOT_STARTED;
+      case COMPLETE:
+        yield ApiResponse.Status.COMPLETE;
+      default:
+        yield ApiResponse.Status.IN_PROGRESS;
     };
   }
 

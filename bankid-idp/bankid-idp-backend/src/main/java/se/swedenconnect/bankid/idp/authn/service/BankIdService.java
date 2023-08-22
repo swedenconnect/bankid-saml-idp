@@ -84,7 +84,7 @@ public class BankIdService {
         .map(BankIdSessionState::getBankIdSessionData)
         .map(sessionData -> this.collect(request)
             .map(c -> BankIdSessionData.of(sessionData, c))
-            .flatMap(b -> this.reInitIfExpired(request))
+            .flatMap(b -> this.reInitIfExpired(request, b))
             .map(b -> ApiResponseFactory.create(
                 b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
             .onErrorResume(e -> this.handleError(e, request)))
@@ -158,6 +158,10 @@ public class BankIdService {
       this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
+    if (e.getCause() instanceof BankIDException bankIDException && ErrorCode.EXPIRED_TRANSACTION.equals(bankIDException.getErrorCode()) ) {
+      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
+      return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
+    }
     return Mono.error(e);
   }
 
@@ -167,15 +171,17 @@ public class BankIdService {
    * @param request the {@link PollRequest}
    * @return a {@link BankIdSessionData}
    */
-  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request) {
+  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request, final BankIdSessionData bankIdSessionData) {
     final BankIdSessionState state = request.getState();
-    final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
-    if (bankIdSessionData.getExpired()) {
+    if (bankIdSessionData.getStartFailed()) {
       if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
       return this.init(request)
           .map(orderResponse -> BankIdSessionData.of(request, orderResponse));
+    }
+    if (bankIdSessionData.getSessionExpired()) {
+      return Mono.error(new BankIdSessionExpiredException(request));
     }
     else {
       return Mono.just(bankIdSessionData);

@@ -113,7 +113,7 @@ public class BankIdSessionDataListener {
   }
 
   /**
-   * Handles a published {@link OrderCancellationEvent(} to delete relevant user session data.
+   * Handles a published {@link OrderCancellationEvent} to delete relevant user session data.
    *
    * @param event event to be processed
    * @see OrderCancellationEvent

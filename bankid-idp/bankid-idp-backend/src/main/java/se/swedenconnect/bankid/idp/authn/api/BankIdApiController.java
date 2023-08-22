@@ -39,6 +39,8 @@ import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.idp.authn.error.BankIdException;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
@@ -132,7 +134,8 @@ public class BankIdApiController {
           .data(this.getMessage(request, bankIdContext, relyingParty))
           .state(state)
           .build();
-      return this.service.poll(pollRequest);
+      return this.service.poll(pollRequest)
+          .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
