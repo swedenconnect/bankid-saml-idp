@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     poll: function () {
-      poll(this.otherDevice && !this.sign).then(response => {
+      poll(this.otherDevice).then(response => {
         if (response["retry"] !== true) {
           if (response["qrCode"] !== "") {
               this.qrImage = response["qrCode"];
