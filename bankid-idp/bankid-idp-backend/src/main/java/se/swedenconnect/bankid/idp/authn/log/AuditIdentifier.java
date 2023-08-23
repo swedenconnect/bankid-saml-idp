@@ -44,5 +44,8 @@ public class AuditIdentifier {
   
   /** The audit event type. */
   private final Type eventType;
+
+  /** AuthNRequest ID */
+  private final String authnRequestId;
   
 }

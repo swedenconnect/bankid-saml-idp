@@ -15,41 +15,62 @@
  */
 package se.swedenconnect.bankid.idp.authn.log;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
+import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
+import se.swedenconnect.spring.saml.idp.authentication.provider.external.RedirectForAuthenticationToken;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Component
 @ConditionalOnProperty(value = "audit.logging.module", havingValue = "default")
 @Slf4j
+@AllArgsConstructor
 public class DefaultEventLogger {
-  
+
+  private final BankIdAuthenticationProvider provider;
+
   @EventListener
   public void handleOrderResponse(final OrderResponseEvent event) {
     final RelyingPartyData relyingPartyData = event.getRequest().getRelyingPartyData();
-    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.START));
+    HttpServletRequest request = event.getRequest().getRequest();
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
+    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.START, authRequestId));
   }
 
   @EventListener
   public void handleCollectResponse(final CollectResponseEvent event) {
-    log.debug("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), event.getRequest().getRelyingPartyData(), AuditIdentifier.Type.COLLECT));
+    HttpServletRequest request = event.getRequest().getRequest();
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
+    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    log.debug("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), event.getRequest().getRelyingPartyData(), AuditIdentifier.Type.COLLECT, authRequestId));
   }
 
 
   @EventListener
   public void handleCompletion(final OrderCompletionEvent event) {
-    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.SUCCESS));
+    HttpServletRequest request = event.getRequest();
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
+    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.SUCCESS, authRequestId));
   }
 
 
   @EventListener
   public void handleOrderCancellationEvent(final OrderCancellationEvent event) {
-    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.FAILURE));
+    HttpServletRequest request = event.getRequest();
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
+    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.FAILURE, authRequestId));
   }
 }
