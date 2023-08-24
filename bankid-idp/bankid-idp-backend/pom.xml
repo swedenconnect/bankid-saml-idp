@@ -58,9 +58,9 @@
     
   <dependencyManagement>
 
-    <dependencies>
-      
+    <dependencies>      
     </dependencies>
+    
   </dependencyManagement>  
   
   <dependencies>
@@ -239,10 +239,18 @@
         <version>${spring.boot.version}</version>
         <executions>
           <execution>
+            <id>repackage</id>
             <goals>
-              <goal>repackage</goal>
-              <goal>build-info</goal>
+              <goal>repackage</goal>              
             </goals>
+            <configuration>
+              <classifier>exec</classifier>
+            </configuration>            
+          </execution>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>            
           </execution>
         </executions>
       </plugin>
