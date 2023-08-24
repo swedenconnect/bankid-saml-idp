@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.TimeSeriesEntry;
 import org.springframework.boot.actuate.audit.AuditEvent;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -13,7 +14,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
-public class TimeSeriesRedisAuditStrategy implements RedisAuditStrategy {
+public class TimeSeriesAuditStrategy implements AuditEventRepository {
   private final RedissonClient client;
   private final AuditEventMapper mapper;
   @Override

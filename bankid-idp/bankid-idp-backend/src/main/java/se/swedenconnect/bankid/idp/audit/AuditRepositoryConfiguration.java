@@ -2,6 +2,7 @@ package se.swedenconnect.bankid.idp.audit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.api.RedissonClient;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -10,19 +11,14 @@ import org.springframework.context.annotation.Primary;
 public class AuditRepositoryConfiguration {
 
   @Bean
-  public RedisAuditStrategy redisListAuditStrategy(final RedissonClient client, final AuditEventMapper mapper) {
-    return new ListRedisAuditStrategy(client, mapper);
+  public AuditEventRepository redisListAuditStrategy(final RedissonClient client, final AuditEventMapper mapper) {
+    return new ListAuditStrategy(client, mapper);
   }
 
   @Bean
   @Primary
-  public RedisAuditStrategy redisTimeSeriesAuditStrategy(final RedissonClient client, final AuditEventMapper mapper) {
-    return new TimeSeriesRedisAuditStrategy(client, mapper);
-  }
-
-  @Bean
-  public RedisAuditEventRegistry redisAuditEventRegistry(RedisAuditStrategy strategy) {
-    return new RedisAuditEventRegistry(strategy);
+  public AuditEventRepository redisTimeSeriesAuditStrategy(final RedissonClient client, final AuditEventMapper mapper) {
+    return new TimeSeriesAuditStrategy(client, mapper);
   }
 
   @Bean
