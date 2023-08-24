@@ -48,7 +48,7 @@ public class DefaultAuditEventModule {
     final RelyingPartyData relyingPartyData = event.getRequest().getRelyingPartyData();
     HttpServletRequest request = event.getRequest().getRequest();
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
     AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.SUCCESS, authRequestId);
     AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
     return new AuditApplicationEvent(auditEvent);
@@ -58,7 +58,7 @@ public class DefaultAuditEventModule {
   public AuditApplicationEvent handleCompletion(final OrderCompletionEvent event) {
     HttpServletRequest request = event.getRequest();
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
+    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
     AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.SUCCESS, authRequestId);
     AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
     return new AuditApplicationEvent(auditEvent);
