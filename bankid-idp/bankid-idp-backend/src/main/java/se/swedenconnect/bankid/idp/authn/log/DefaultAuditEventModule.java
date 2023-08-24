@@ -39,7 +39,7 @@ import java.util.Map;
 @ConditionalOnProperty(value = "audit.logging.module", havingValue = "default")
 @Slf4j
 @AllArgsConstructor
-public class DefaultEventLogger {
+public class DefaultAuditEventModule {
 
   private final BankIdAuthenticationProvider provider;
 
@@ -49,20 +49,10 @@ public class DefaultEventLogger {
     HttpServletRequest request = event.getRequest().getRequest();
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
     String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
-    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.START, authRequestId));
     AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.SUCCESS, authRequestId);
     AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
     return new AuditApplicationEvent(auditEvent);
   }
-
-  @EventListener
-  public void handleCollectResponse(final CollectResponseEvent event) {
-    HttpServletRequest request = event.getRequest().getRequest();
-    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
-    log.debug("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest().getRequest(), event.getRequest().getRelyingPartyData(), AuditIdentifier.Type.COLLECT, authRequestId));
-  }
-
 
   @EventListener
   public AuditApplicationEvent handleCompletion(final OrderCompletionEvent event) {
@@ -70,17 +60,7 @@ public class DefaultEventLogger {
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
     String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
     AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.SUCCESS, authRequestId);
-    log.info("AuditEvent:{}", auditIdentifier);
     AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
     return new AuditApplicationEvent(auditEvent);
-  }
-
-
-  @EventListener
-  public void handleOrderCancellationEvent(final OrderCancellationEvent event) {
-    HttpServletRequest request = event.getRequest();
-    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = ((Saml2UserAuthenticationInputToken) token.getAuthnInputToken()).getAuthnRequestToken().getAuthnRequest().getID();
-    log.info("AuditEvent:{}", AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.FAILURE, authRequestId));
   }
 }
