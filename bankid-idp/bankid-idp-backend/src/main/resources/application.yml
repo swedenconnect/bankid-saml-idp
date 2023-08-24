@@ -176,7 +176,7 @@ server:
       timeout: 15m
 
 audit:
-  logging:
+  event:
     module: default
 
 session:

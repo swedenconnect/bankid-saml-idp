@@ -36,7 +36,7 @@ import java.time.Instant;
 import java.util.Map;
 
 @Component
-@ConditionalOnProperty(value = "audit.logging.module", havingValue = "default")
+@ConditionalOnProperty(value = "audit.event.module", havingValue = "default")
 @Slf4j
 @AllArgsConstructor
 public class DefaultAuditEventModule {
