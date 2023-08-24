@@ -221,7 +221,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, metrics, prometheus, loggers
+        include: health, metrics, prometheus, loggers, auditevents
   server:
     port: 8444
 user:
