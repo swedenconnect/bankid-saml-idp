@@ -50,7 +50,6 @@ import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ErrorResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
-import se.swedenconnect.bankid.rpapi.types.UserCancelException;
 
 /**
  * An implementation of the BankID Relying Party API methods.
@@ -137,18 +136,14 @@ public class BankIDClientImpl implements BankIDClient {
           .contentType(MediaType.APPLICATION_JSON)
           .bodyValue(authnRequest)
           .retrieve()
-          .onRawStatus(s -> s == 400, c -> {
-            return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
-              return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
-            });
-          })
+          .onRawStatus(StatusCodePredicates.userError(), BankIdErrorBodyExtractors.userErrorBodyExtractor())
+          .onRawStatus(StatusCodePredicates.serverError(), BankIdErrorBodyExtractors.serverErrorBodyExtractor())
           .bodyToMono(OrderResponse.class)
           .map(m -> {
             log.info("{}: authenticate. response: [{}]", this.identifier, m.toString());
             return m;
           })
           .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
-      // .log();
     }
     catch (final WebClientResponseException e) {
       log.info("{}: authenticate. Error during auth-call - {} - {} - {}",

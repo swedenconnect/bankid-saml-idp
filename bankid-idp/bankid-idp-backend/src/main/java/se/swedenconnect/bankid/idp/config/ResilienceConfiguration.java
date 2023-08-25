@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +23,10 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.micrometer.tagged.TaggedCircuitBreakerMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdUserException;
+
+import java.time.Duration;
 
 /**
  * Configuration for setting up the Resilience4j beans.
@@ -33,14 +38,27 @@ import io.micrometer.core.instrument.MeterRegistry;
 public class ResilienceConfiguration {
 
   @Bean
-  CircuitBreakerRegistry circuitBreakerRegistry(final MeterRegistry registry) {
-    final CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
+  public CircuitBreakerConfig circuitBreakerConfig() {
+    return new CircuitBreakerConfig.Builder()
+        .recordException(e -> e instanceof BankIdServerException)
+        .waitDurationInOpenState(Duration.ofMillis(1))
+        .slidingWindowSize(10)
+        .minimumNumberOfCalls(10)
+        .enableAutomaticTransitionFromOpenToHalfOpen()
+        .permittedNumberOfCallsInHalfOpenState(10)
+        .failureRateThreshold(80)
+        .build();
+  }
+
+  @Bean
+  public CircuitBreakerRegistry circuitBreakerRegistry(final CircuitBreakerConfig config, final MeterRegistry registry) {
+    final CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(config);
     TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(registry);
     return circuitBreakerRegistry;
   }
 
   @Bean
-  CircuitBreaker circuitBreaker(final CircuitBreakerRegistry registry) {
+  public CircuitBreaker circuitBreaker(final CircuitBreakerRegistry registry) {
     return registry.circuitBreaker("bankid");
   }
 }
