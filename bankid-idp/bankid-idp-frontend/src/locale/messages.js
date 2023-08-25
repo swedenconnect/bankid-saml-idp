@@ -56,6 +56,7 @@ export const messages = {
                 "btn-other": "Mobile BankID on Other Device",
                 "btn-cancel": "Cancel",
                 "btn-autostart": "Click here if the BankID application did not start automatically within 5 seconds.",
+                "btn-error-continue": "Continue",
                 "cancel-progress": "Stopping authentication ...",
                 "contact": "If this is a recurring error please contact support",
                 "error-page-close": "Please close this web browser window when you are done",
@@ -63,7 +64,8 @@ export const messages = {
                     "timeout": "The time for starting a new authentication has expired. Please try again.",
                     "service": "This service is currently experiencing some issues, please try again later",
                     "unknown": "Something went wrong. Please try again later.",
-                    "sign": "Signature is invalid. Please try again later."
+                    "sign": "Signature is invalid. Please try again later.",
+                    "server": "The underlying BankID service has responded with errors, please try again later"
                 }
             }
         }
@@ -119,6 +121,7 @@ export const messages = {
                 "btn-other": "Mobilt BankID på annan enhet",
                 "btn-cancel": "Avbryt",
                 "btn-autostart": "Klicka här om BankID-appen inte startar inom 5 sekunder.",
+                "btn-error-continue": "Fortsätt",
                 "cancel-progress": "Avbryter ...",
                 "contact": "Om detta är ett återkommande problem så kontakta vänligen support via email",
                 "error-page-close": "Vänligen stäng sidan när du är klar",
@@ -126,7 +129,8 @@ export const messages = {
                     "timeout": "Det tog för lång tid att starta en inloggning. Vänligen tryck på avbryt och försök igen.",
                     "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare",
                     "unknown": "Någonting har gått fel, försök igen senare",
-                    "sign": "Signaturen är inte korrekt, försök igen senare"
+                    "sign": "Signaturen är inte korrekt, försök igen senare",
+                    "server": "Den underliggande tjänsten svarar med fel, försök igen senare"
                 }
             }
         }

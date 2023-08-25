@@ -20,6 +20,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,6 +77,11 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
         .orElseThrow(() -> new NoSuchRelyingPartyException(entityId));
     this.eventPublisher.orderCompletion(request, relyingParty).publish();
     return this.complete(request, new BankIdAuthenticationToken(data));
+  }
+
+  @GetMapping("/view/error")
+  public ModelAndView completeWithError(final HttpServletRequest request) {
+    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
   }
 
   /**

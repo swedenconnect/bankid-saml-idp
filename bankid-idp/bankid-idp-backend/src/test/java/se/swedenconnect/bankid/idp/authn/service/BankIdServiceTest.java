@@ -25,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 
 class BankIdServiceTest {
-
-
   @Test
   void pollAndReInit() {
     ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);

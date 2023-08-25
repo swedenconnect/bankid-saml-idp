@@ -36,6 +36,7 @@ import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
@@ -85,8 +86,7 @@ public class BankIdService {
         .map(sessionData -> this.collect(request)
             .map(c -> BankIdSessionData.of(sessionData, c))
             .flatMap(b -> this.reInitIfExpired(request, b))
-            .map(b -> ApiResponseFactory.create(
-                b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
+            .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
             .onErrorResume(e -> this.handleError(e, request)))
         .orElseGet(() -> this.onNoSession(request));
   }
