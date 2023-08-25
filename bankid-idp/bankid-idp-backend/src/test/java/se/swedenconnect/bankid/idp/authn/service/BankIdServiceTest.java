@@ -1,5 +1,6 @@
 package se.swedenconnect.bankid.idp.authn.service;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -14,6 +15,7 @@ import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.config.ResilienceConfiguration;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
@@ -123,12 +125,8 @@ class BankIdServiceTest {
     BankIDClient client = Mockito.mock(BankIDClient.class);
     when(client.collect(any())).thenReturn(Mono.error(new BankIdServerException("")));
     when(client.authenticate(any())).thenReturn(Mono.error(new BankIdServerException("")));
-    for (int x = 0; x < 10; x++) {
-      try {
-        service.poll(BankIdResponseFixture.createPollRequest(client)).block();
-      } catch (Exception e) {
-        //
-      }
+    for (int x = 0; x < config.getMinimumNumberOfCalls(); x++) {
+        Assertions.assertThrows(BankIdServerException.class, () -> service.poll(BankIdResponseFixture.createPollRequest(client)).block());
     }
     try {
       Thread.sleep(50);
