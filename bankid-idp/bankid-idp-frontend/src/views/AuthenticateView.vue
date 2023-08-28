@@ -59,12 +59,12 @@
         return 'data:image/png;base64, ' + this.qrImage;
       },
       cancelRequest: function () {
-        cancel().then((r) => {
+        cancel().then(() => {
           window.location.href = PATHS.CANCEL;
         });
       },
       acceptError: function () {
-        cancel().then((r) => {
+        cancel().then(() => {
           window.location.href = PATHS.ERROR;
         });
       },

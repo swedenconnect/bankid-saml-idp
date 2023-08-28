@@ -1,6 +1,4 @@
 <script>
-  import { status } from '@/Service';
-
   export default {
     props: {
       message: String,
