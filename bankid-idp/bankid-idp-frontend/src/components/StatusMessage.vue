@@ -1,8 +1,3 @@
-<template>
-  <div class="container-fluid status">
-    <p>{{ $t(message) }}</p>
-  </div>
-</template>
 <script>
   import { status } from '@/Service';
 
@@ -12,3 +7,9 @@
     },
   };
 </script>
+
+<template>
+  <div class="container-fluid status">
+    <p>{{ $t(message) }}</p>
+  </div>
+</template>

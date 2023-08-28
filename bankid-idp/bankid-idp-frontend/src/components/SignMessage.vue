@@ -5,6 +5,7 @@
     },
   };
 </script>
+
 <template>
   <div class="full-width sign-message">
     <div class="row no-gutters">

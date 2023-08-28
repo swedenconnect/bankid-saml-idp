@@ -1,3 +1,17 @@
+<script>
+  export default {
+    name: 'localechanger',
+    methods: {
+      selectLanguage: function (lang) {
+        this.$i18n.locale = lang;
+      },
+      getLanguage: function () {
+        return this.$i18n.locale;
+      },
+    },
+  };
+</script>
+
 <template>
   <div class="container main" id="languageDiv">
     <br />
@@ -12,16 +26,3 @@
   </div>
   <br />
 </template>
-<script>
-  export default {
-    name: 'localechanger',
-    methods: {
-      selectLanguage: function (lang) {
-        this.$i18n.locale = lang;
-      },
-      getLanguage: function () {
-        return this.$i18n.locale;
-      },
-    },
-  };
-</script>

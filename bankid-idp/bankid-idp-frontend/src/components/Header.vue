@@ -1,17 +1,3 @@
-<template>
-  <div class="container-fluid header">
-    <center>
-      <div class="row">
-        <div class="column">
-          <img class="top-logo-dim" :src="getImage()" alt="Logo" :hidden="hideImage()" />
-        </div>
-        <div class="column">
-          <img class="top-logo-dim" src="@/assets/BankID_logo.svg" alt="Logo" />
-        </div>
-      </div>
-    </center>
-  </div>
-</template>
 <script>
   export default {
     props: {
@@ -34,3 +20,18 @@
     },
   };
 </script>
+
+<template>
+  <div class="container-fluid header">
+    <center>
+      <div class="row">
+        <div class="column">
+          <img class="top-logo-dim" :src="getImage()" alt="Logo" :hidden="hideImage()" />
+        </div>
+        <div class="column">
+          <img class="top-logo-dim" src="@/assets/BankID_logo.svg" alt="Logo" />
+        </div>
+      </div>
+    </center>
+  </div>
+</template>

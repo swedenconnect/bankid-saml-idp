@@ -4,13 +4,6 @@
   import Localechanger from '@/components/LanguageSelector.vue';
 </script>
 
-<template>
-  <Header :sp-info="spInfo" />
-  <Localechanger />
-  <RouterView />
-  <Footer />
-</template>
-
 <script>
   import { spInformation } from '@/Service';
 
@@ -27,3 +20,10 @@
     },
   };
 </script>
+
+<template>
+  <Header :sp-info="spInfo" />
+  <Localechanger />
+  <RouterView />
+  <Footer />
+</template>

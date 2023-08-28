@@ -1,13 +1,3 @@
-<template>
-  <div>
-    <p>{{ $t(message) }}</p>
-  </div>
-  <div :hidden="otherDevice">
-    <button @click="navigateToApp">
-      {{ $t('bankid.msg.btn-autostart') }}
-    </button>
-  </div>
-</template>
 <script>
   import { createLink } from '@/AutoStartLinkFactory';
 
@@ -34,3 +24,14 @@
     },
   };
 </script>
+
+<template>
+  <div>
+    <p>{{ $t(message) }}</p>
+  </div>
+  <div :hidden="otherDevice">
+    <button @click="navigateToApp">
+      {{ $t('bankid.msg.btn-autostart') }}
+    </button>
+  </div>
+</template>

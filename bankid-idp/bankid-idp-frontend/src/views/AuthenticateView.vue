@@ -1,33 +1,3 @@
-<template>
-  <div class="container main" id="main">
-    <div class="row" id="mainRow">
-      <div class="col-sm-12 content-container">
-        <StatusMessage />
-        <Status
-          :otherDevice="otherDevice || showContinueErrorButton()"
-          :autoStartToken="token"
-          :message="messageCode"
-        />
-        <QRDisplay :image="qrImage" />
-        <button v-if="showContinueErrorButton()" @click="acceptError">
-          <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-        </button>
-      </div>
-    </div>
-    <div class="col-sm-12 return">
-      <button
-        v-if="!showContinueErrorButton()"
-        @click="cancelRequest"
-        class="btn btn-link"
-        type="submit"
-        name="action"
-        value="cancel"
-      >
-        <span>{{ $t('bankid.msg.btn-cancel') }}</span>
-      </button>
-    </div>
-  </div>
-</template>
 <script>
   import QRDisplay from '@/components/QRDisplay.vue';
   import Status from '@/components/Status.vue';
@@ -104,3 +74,34 @@
     },
   };
 </script>
+
+<template>
+  <div class="container main" id="main">
+    <div class="row" id="mainRow">
+      <div class="col-sm-12 content-container">
+        <StatusMessage />
+        <Status
+          :otherDevice="otherDevice || showContinueErrorButton()"
+          :autoStartToken="token"
+          :message="messageCode"
+        />
+        <QRDisplay :image="qrImage" />
+        <button v-if="showContinueErrorButton()" @click="acceptError">
+          <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-12 return">
+      <button
+        v-if="!showContinueErrorButton()"
+        @click="cancelRequest"
+        class="btn btn-link"
+        type="submit"
+        name="action"
+        value="cancel"
+      >
+        <span>{{ $t('bankid.msg.btn-cancel') }}</span>
+      </button>
+    </div>
+  </div>
+</template>
