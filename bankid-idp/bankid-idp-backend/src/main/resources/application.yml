@@ -183,6 +183,8 @@ session:
   module: redis
 
 bankid:
+  audit:
+    module: "redistimeseries"
   standalone: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
