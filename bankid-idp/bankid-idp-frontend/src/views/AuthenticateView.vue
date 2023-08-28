@@ -15,7 +15,7 @@
         responseStatus: '',
       };
     },
-    components: { StatusMessage, Status, QRDisplay },
+    components: { StatusMessage, StatusItem, QRDisplay },
     props: {
       otherDevice: Boolean,
       sign: Boolean,
