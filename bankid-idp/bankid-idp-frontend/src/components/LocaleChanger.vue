@@ -1,6 +1,5 @@
 <script>
   export default {
-    name: 'localechanger',
     methods: {
       selectLanguage: function (lang) {
         this.$i18n.locale = lang;

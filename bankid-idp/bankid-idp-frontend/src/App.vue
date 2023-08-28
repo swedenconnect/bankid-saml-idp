@@ -1,7 +1,7 @@
 <script setup>
   import AppFooter from '@/components/AppFooter.vue';
   import AppHeader from '@/components/AppHeader.vue';
-  import Localechanger from '@/components/LanguageSelector.vue';
+  import LocaleChanger from '@/components/LocaleChanger.vue';
 </script>
 
 <script>
@@ -23,7 +23,7 @@
 
 <template>
   <AppHeader :sp-info="spInfo" />
-  <Localechanger />
+  <LocaleChanger />
   <RouterView />
   <AppFooter />
 </template>
