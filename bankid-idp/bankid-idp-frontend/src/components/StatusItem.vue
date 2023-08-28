@@ -4,8 +4,8 @@
   export default {
     props: {
       otherDevice: Boolean,
-      autoStartToken: '',
-      message: '',
+      autoStartToken: String,
+      message: String,
     },
     methods: {
       getAutoStartLink: function () {
