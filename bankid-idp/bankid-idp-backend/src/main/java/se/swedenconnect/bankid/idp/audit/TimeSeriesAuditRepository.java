@@ -33,12 +33,12 @@ public class TimeSeriesAuditRepository implements AuditEventRepository {
   private final RedissonClient client;
   private final AuditEventMapper mapper;
   @Override
-  public void add(AuditEvent event) {
+  public void add(final AuditEvent event) {
     client.getTimeSeries("audit:ts").add(event.getTimestamp().toEpochMilli(), mapper.write(event));
   }
 
   @Override
-  public List<AuditEvent> find(String principal, Instant after, String type) {
+  public List<AuditEvent> find(final String principal, final Instant after, final String type) {
     Collection<TimeSeriesEntry<Object, Object>> timeSeries = client.getTimeSeries("audit:ts").entryRange(after.toEpochMilli(), Instant.now().plus(1, ChronoUnit.MINUTES).toEpochMilli());
     Stream<AuditEvent> auditEventStream = timeSeries.stream()
         .map(e -> mapper.read((String) e.getValue()));

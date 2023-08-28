@@ -23,7 +23,7 @@ import se.swedenconnect.bankid.rpapi.types.BankIDException;
  * @author Felix Hellman
  */
 public class BankIdUserException extends BankIDException {
-  public BankIdUserException(String message) {
+  public BankIdUserException(final String message) {
     super(message);
   }
 }

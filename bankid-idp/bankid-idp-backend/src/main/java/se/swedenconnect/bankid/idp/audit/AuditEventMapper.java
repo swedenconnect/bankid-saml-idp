@@ -41,7 +41,7 @@ public class AuditEventMapper {
    * @param event to serialize
    * @return json-string
    */
-  public String write(AuditEvent event) {
+  public String write(final AuditEvent event) {
     try {
       return mapper.writerFor(AuditEvent.class).writeValueAsString(event);
     } catch (IOException e) {
@@ -55,7 +55,7 @@ public class AuditEventMapper {
    * @return AuditEvent
    */
 
-  public AuditEvent read(String event) {
+  public AuditEvent read(final String event) {
     try {
       // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
       return mapper.readerFor(BankidAuditEvent.class).readValue(event);
@@ -73,7 +73,7 @@ public class AuditEventMapper {
      */
 
     @JsonCreator
-    public BankidAuditEvent(@JsonProperty("principal") String principal, @JsonProperty("type") String type, @JsonProperty("data") Map<String, Object> data) {
+    public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type, @JsonProperty("data") final Map<String, Object> data) {
       super(principal, type, data);
     }
   }

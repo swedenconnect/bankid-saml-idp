@@ -23,7 +23,7 @@ import java.util.function.IntPredicate;
  * @author Felix Hellman
  */
 public class StatusCodePredicates {
-  public static IntPredicate compareBetween(int from, int to) {
+  public static IntPredicate compareBetween(final int from, final int to) {
     return (toCompare) -> {
       return toCompare >= from && toCompare < to;
     };

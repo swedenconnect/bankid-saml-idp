@@ -52,7 +52,7 @@ public class AuditRepositoryConfiguration {
   }
 
   @Bean
-  public AuditEventMapper auditEventMapper(ObjectMapper mapper) {
+  public AuditEventMapper auditEventMapper(final ObjectMapper mapper) {
     return new AuditEventMapper(mapper);
   }
 }

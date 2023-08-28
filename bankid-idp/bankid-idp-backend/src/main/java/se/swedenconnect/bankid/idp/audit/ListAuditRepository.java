@@ -31,12 +31,12 @@ public class ListAuditRepository implements AuditEventRepository {
   private final AuditEventMapper mapper;
 
   @Override
-  public void add(AuditEvent event) {
+  public void add(final AuditEvent event) {
     client.getList("audit:list").add(event);
   }
 
   @Override
-  public List<AuditEvent> find(String principal, Instant after, String type) {
+  public List<AuditEvent> find(final String principal, final Instant after, final String type) {
     return client.getList("audit:list").stream()
         .map(String.class::cast)
         .map(mapper::read)
