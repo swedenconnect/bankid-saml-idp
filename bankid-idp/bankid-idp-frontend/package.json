@@ -7,7 +7,9 @@
     "build": "vite build --base=/bankid/idp",
     "preview": "vite preview",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
   },
   "dependencies": {
     "pinia": "^2.1.6",
@@ -17,7 +19,12 @@
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
+    "@rushstack/eslint-patch": "^1.3.2",
     "@vitejs/plugin-vue": "^4.3.3",
+    "@vue/eslint-config-prettier": "^8.0.0",
+    "eslint": "^8.46.0",
+    "eslint-plugin-vue": "^9.16.1",
+    "prettier": "^3.0.0",
     "vite": "^4.4.9",
     "vitest": "^0.34.2"
   }
