@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
@@ -48,58 +49,68 @@ public class BankIdEventPublisher {
   }
 
   /**
-   * Publishes an event after we have received an order (auth or sign) repsonse.
+   * Builds an event after we have received an order (auth or sign) repsonse.
    * 
    * @param request the polling request
    * @param response the order response
-   * @return an event
+   * @return an event to be published
    */
   public EventBuilder orderResponse(final PollRequest request, final OrderResponse response) {
     return new EventBuilder(new OrderResponseEvent(request, response), this.publisher);
   }
 
   /**
-   * Publishes an event efter we have received a collect reponse after polling.
+   * Builds an event efter we have received a collect reponse after polling.
    * 
    * @param request the polling request
    * @param collectResponse the collect reponse
-   * @return an event
+   * @return an event to be published
    */
   public EventBuilder collectResponse(final PollRequest request, final CollectResponse collectResponse) {
     return new EventBuilder(new CollectResponseEvent(request, collectResponse), this.publisher);
   }
 
   /**
-   * Publishes an event after order cancellation.
+   * Builds an event after order cancellation.
    * 
    * @param request the HTTP servlet request
    * @param data the RP data
-   * @return an event
+   * @return an event to be published
    */
   public EventBuilder orderCancellation(final HttpServletRequest request, final RelyingPartyData data) {
     return new EventBuilder(new OrderCancellationEvent(request, data), this.publisher);
   }
 
   /**
-   * Publishes an event after an order has been completed
+   * Builds an event after an order has been completed
    * 
    * @param request the HTTP servlet request
    * @param data the RP data
-   * @return an event
+   * @return an event to be published
    */
   public EventBuilder orderCompletion(final HttpServletRequest request, final RelyingPartyData data) {
     return new EventBuilder(new OrderCompletionEvent(request, data), this.publisher);
   }
 
   /**
-   * Publishes an event after data to be displayed in the BankID app has been created.
+   * Builds an event after data to be displayed in the BankID app has been created.
    * 
    * @param request the HTTP servlet request
    * @param data the data to display
-   * @return an event
+   * @return an event to be published
    */
   public EventBuilder userVisibleData(final HttpServletRequest request, final UserVisibleData data) {
     return new EventBuilder(new UserVisibleDataEvent(request, data), this.publisher);
+  }
+
+  /**
+   * Builds an event that the authentication has been aborted
+   *
+   * @param request the HTTP servlet request
+   * @return an event to be published
+   */
+  public EventBuilder abortAuthEvent(HttpServletRequest request) {
+    return new EventBuilder(new AbortAuthEvent(request), this.publisher);
   }
 
   /**

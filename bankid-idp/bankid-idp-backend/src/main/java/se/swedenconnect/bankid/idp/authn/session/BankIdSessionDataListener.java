@@ -20,16 +20,14 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.UserVisibleDataEvent;
+import se.swedenconnect.bankid.idp.authn.events.*;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.spring.saml.idp.events.Saml2PostUserAuthenticationEvent;
 
 /**
  * A listener for BankID session events.
@@ -59,6 +57,17 @@ public class BankIdSessionDataListener {
   public BankIdSessionDataListener(final BankIdSessionWriter writer, final BankIdSessionReader reader) {
     this.writer = writer;
     this.reader = reader;
+  }
+
+  /**
+   * Removes BankID data from the current session
+   *
+   * @param event event to be processed
+   * @see OrderResponseEvent
+   */
+  @EventListener
+  public void handleAbortAuthEvent(final AbortAuthEvent event) {
+    this.writer.delete(event.getRequest());
   }
 
   /**

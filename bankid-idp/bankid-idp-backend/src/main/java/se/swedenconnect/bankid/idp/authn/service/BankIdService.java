@@ -71,7 +71,7 @@ public class BankIdService {
       final BankIdRequestFactory requestFactory) {
     this.eventPublisher = Objects.requireNonNull(eventPublisher, "eventPublisher must not be null");
     this.circuitBreaker = Objects.requireNonNull(circuitBreaker, "circuitBreaker must not be null");
-    this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(() -> new BankIdRequestFactory());
+    this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(BankIdRequestFactory::new);
   }
 
   /**
@@ -151,6 +151,7 @@ public class BankIdService {
 
   private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
+      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
     if (e.getCause() instanceof final BankIDException bankIDException

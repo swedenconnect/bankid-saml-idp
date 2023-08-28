@@ -138,7 +138,6 @@ public class BankIdApiController {
       return this.service.poll(pollRequest)
           .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
           .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
-      // TODO: 2023-08-25 When continue button is clicked, make sure user returns to SP with Saml Error
     }
   }
 

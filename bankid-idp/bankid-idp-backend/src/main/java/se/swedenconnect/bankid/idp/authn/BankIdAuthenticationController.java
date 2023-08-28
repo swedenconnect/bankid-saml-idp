@@ -79,8 +79,15 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
     return this.complete(request, new BankIdAuthenticationToken(data));
   }
 
+  /**
+   * Method for completing the operation and returning to the SAML engine in cases of failed authentication.
+   *
+   * @param request the HTTP servlet request
+   * @return a {@link ModelAndView}
+   */
   @GetMapping("/view/error")
   public ModelAndView completeWithError(final HttpServletRequest request) {
+    eventPublisher.abortAuthEvent(request).publish();
     return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
   }
 
@@ -92,6 +99,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
    */
   @GetMapping("/view/cancel")
   public ModelAndView cancelView(final HttpServletRequest request) {
+    eventPublisher.abortAuthEvent(request).publish();
     return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 
