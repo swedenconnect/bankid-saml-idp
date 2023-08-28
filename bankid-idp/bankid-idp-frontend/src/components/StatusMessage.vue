@@ -1,14 +1,14 @@
 <template>
-    <div class="container-fluid status">
-        <p> {{ $t(message)}} </p>
-    </div>
+  <div class="container-fluid status">
+    <p>{{ $t(message) }}</p>
+  </div>
 </template>
 <script>
-import {status} from "@/Service";
+  import { status } from '@/Service';
 
-export default {
+  export default {
     props: {
-        message: String
-    }
-}
+      message: String,
+    },
+  };
 </script>

@@ -1,17 +1,17 @@
 <script>
-export default {
+  export default {
     props: {
-        signMessage : String
-    }
-}
+      signMessage: String,
+    },
+  };
 </script>
 <template>
   <div class="full-width sign-message">
     <div class="row no-gutters">
       <div class="col">
-        <span :text="sign-message">{{ signMessage }}</span>
+        <span :text="sign - message">{{ signMessage }}</span>
       </div>
     </div>
   </div>
-  <input type="hidden" name="signMessageDisplayed"/>
+  <input type="hidden" name="signMessageDisplayed" />
 </template>

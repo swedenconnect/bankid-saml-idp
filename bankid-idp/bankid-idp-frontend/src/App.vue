@@ -1,30 +1,29 @@
 <script setup>
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
-import Localechanger from "@/components/LanguageSelector.vue";
+  import Footer from '@/components/Footer.vue';
+  import Header from '@/components/Header.vue';
+  import Localechanger from '@/components/LanguageSelector.vue';
 </script>
 
 <template>
-
-  <Header :sp-info=spInfo />
-  <Localechanger/>
-  <RouterView/>
-  <Footer/>
+  <Header :sp-info="spInfo" />
+  <Localechanger />
+  <RouterView />
+  <Footer />
 </template>
 
 <script>
-import {spInformation} from "@/Service";
+  import { spInformation } from '@/Service';
 
-export default {
+  export default {
     data() {
-        return {
-            spInfo: {}
-        }
+      return {
+        spInfo: {},
+      };
     },
     mounted() {
-        spInformation().then(r => {
-            this.spInfo = r;
-        });
-    }
-}
+      spInformation().then((r) => {
+        this.spInfo = r;
+      });
+    },
+  };
 </script>
