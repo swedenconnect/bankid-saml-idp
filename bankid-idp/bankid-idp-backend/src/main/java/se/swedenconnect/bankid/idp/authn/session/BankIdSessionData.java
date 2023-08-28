@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 import se.swedenconnect.bankid.idp.authn.api.StatusCodeFactory;
+import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
@@ -95,6 +96,11 @@ public class BankIdSessionData implements Serializable {
   private Boolean showQr;
 
   /**
+   * Sign or auth operation
+   */
+  private BankIdOperation operation;
+
+  /**
    * Creates a {@link BankIdSessionData} given a {@link PollRequest} and an {@link OrderResponse}.
    *
    * @param request  the {@link PollRequest}
@@ -113,6 +119,7 @@ public class BankIdSessionData implements Serializable {
         .sessionExpired(false)
         .messageCode("bankid.msg.rfa21")
         .showQr(request.getQr())
+        .operation(request.getContext().getOperation())
         .build();
   }
 
@@ -135,6 +142,7 @@ public class BankIdSessionData implements Serializable {
         .sessionExpired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
         .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr()))
         .showQr(previous.getShowQr())
+        .operation(previous.getOperation())
         .build();
   }
 }

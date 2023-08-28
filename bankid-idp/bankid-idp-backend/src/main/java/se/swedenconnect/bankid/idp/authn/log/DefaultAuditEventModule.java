@@ -21,18 +21,16 @@ import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
-import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
-import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
+import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
+import se.swedenconnect.bankid.idp.authn.events.*;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.spring.saml.idp.authentication.provider.external.RedirectForAuthenticationToken;
 
-import javax.servlet.http.HttpServletRequest;
-import java.time.Instant;
 import java.util.Map;
 
 @Component
@@ -41,26 +39,80 @@ import java.util.Map;
 @AllArgsConstructor
 public class DefaultAuditEventModule {
 
+  public enum AuditEventTypes {
+    BANKID_RECEIVED_REQUEST("BANKID_RECEIVED_REQUEST"),
+    INIT("BANKID_INIT"),
+    AUTH_COMPLETE("BANKID_AUTH_COMPLETE"),
+    SIGN_COMPLETE("BANKID_SIGN_COMPLETE"),
+    BANKID_CANCEL("BANKID_CANCEL"),
+
+    BANKID_ERROR("BANKID_ERROR");
+
+    AuditEventTypes(String name) {
+    }
+  }
+
   private final BankIdAuthenticationProvider provider;
 
+  private final BankIdSessionReader sessions;
+
   @EventListener
-  public AuditApplicationEvent handleOrderResponse(final OrderResponseEvent event) {
-    final RelyingPartyData relyingPartyData = event.getRequest().getRelyingPartyData();
-    HttpServletRequest request = event.getRequest().getRequest();
-    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
-    AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest().getRequest(), relyingPartyData, AuditIdentifier.Type.SUCCESS, authRequestId);
-    AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
-    return new AuditApplicationEvent(auditEvent);
+  @Order(Integer.MIN_VALUE)
+  public AuditEvent handleRecievedRequestEvent(RecievedRequestEvent event) {
+    AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.BANKID_RECEIVED_REQUEST.name());
+    log.info("Publishing audit event: {}", auditEvent);
+    return auditEvent;
   }
 
   @EventListener
-  public AuditApplicationEvent handleCompletion(final OrderCompletionEvent event) {
-    HttpServletRequest request = event.getRequest();
-    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(request);
-    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
-    AuditIdentifier auditIdentifier = AuditIdentifierFactory.create(event.getRequest(), event.getData(), AuditIdentifier.Type.SUCCESS, authRequestId);
-    AuditEvent auditEvent = new AuditEvent(Instant.now(), token.getPrincipal().toString(), "type", Map.of("data", auditIdentifier));
-    return new AuditApplicationEvent(auditEvent);
+  @Order(Integer.MIN_VALUE)
+  public AuditEvent handleOrderResponse(final OrderResponseEvent event) {
+    AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.INIT.name());
+    log.info("Publishing audit event: {}", auditEvent);
+    return auditEvent;
   }
+
+  @EventListener
+  @Order(Integer.MIN_VALUE)
+  public AuditEvent handleCompletion(final OrderCompletionEvent event) {
+    BankIdSessionData bankIdSessionData = sessions.loadSessionData(event.getRequest()).getBankIdSessionData();
+    CollectResponse collectResponse = sessions.loadCompletionData(event.getRequest());
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
+    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
+    AuditEvent auditEvent = new AuditEvent(token.getPrincipal().toString(), getCompletionType(bankIdSessionData.getOperation()), AuditIdentifierFactory.createCompleteAuditIdentifier(event.getRequest(), event.getData(), authRequestId, bankIdSessionData, collectResponse));
+    log.info("Publishing audit event: {}", auditEvent);
+    return auditEvent;
+  }
+
+  @EventListener
+  @Order(Integer.MIN_VALUE)
+  public AuditEvent handleCancel(final OrderCancellationEvent event) {
+    AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.BANKID_CANCEL.name());
+    log.info("Publishing audit event: {}", auditEvent);
+    return auditEvent;
+  }
+
+  @EventListener
+  @Order(Integer.MIN_VALUE)
+  public AuditEvent handleError(final BankIdErrorEvent event) {
+    AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.BANKID_ERROR.name());
+    log.info("Publishing audit event: {}", auditEvent);
+    return auditEvent;
+  }
+
+  private String getCompletionType(BankIdOperation operation) {
+    if (operation.equals(BankIdOperation.SIGN)) {
+      return AuditEventTypes.SIGN_COMPLETE.name();
+    }
+    return AuditEventTypes.AUTH_COMPLETE.name();
+  }
+
+  private AuditEvent createAuditEvent(AbstractBankIdEvent event, String auditEventType) {
+    BankIdSessionData bankIdSessionData = sessions.loadSessionData(event.getRequest()).getBankIdSessionData();
+    RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
+    String authRequestId = token.getAuthnInputToken().getAuthnRequestToken().getAuthnRequest().getID();
+    Map<String, Object> auditIdentifier = AuditIdentifierFactory.createAuditIdentifier(event.getRequest(), event.getData(), authRequestId, bankIdSessionData);
+    return new AuditEvent(token.getPrincipal().toString(), auditEventType, auditIdentifier);
+  }
+
 }

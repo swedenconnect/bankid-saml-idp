@@ -26,13 +26,6 @@ import java.util.List;
 @ToString
 public class AuditIdentifier {
 
-  public enum Type {
-    SUCCESS,
-    FAILURE,
-    START,
-    COLLECT
-  }
-
   /** The session ID. */
   private final String sessionId;
   
@@ -41,9 +34,6 @@ public class AuditIdentifier {
   
   /** The entityID:s. */
   private final List<String> entityIds;
-  
-  /** The audit event type. */
-  private final Type eventType;
 
   /** AuthNRequest ID */
   private final String authnRequestId;

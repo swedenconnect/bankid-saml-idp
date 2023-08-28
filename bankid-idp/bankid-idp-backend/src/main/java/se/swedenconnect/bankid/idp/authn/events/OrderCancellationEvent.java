@@ -27,13 +27,9 @@ import javax.servlet.http.HttpServletRequest;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@AllArgsConstructor
-@Data
-public class OrderCancellationEvent {
-  
-  /** The servlet request. */
-  private final HttpServletRequest request;
-  
-  /** The relying party. */
-  private final RelyingPartyData data;
+
+public class OrderCancellationEvent extends AbstractBankIdEvent {
+  public OrderCancellationEvent(HttpServletRequest request, RelyingPartyData data) {
+    super(request, data);
+  }
 }

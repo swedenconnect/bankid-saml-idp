@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.stereotype.Service;
 
@@ -79,10 +80,10 @@ public class BankIdSessionDataListener {
   @EventListener
   public void handleOrderResponse(final OrderResponseEvent event) {
     log.info("Order response event was published {} for session {}",
-        event.getResponse(), event.getRequest().getRequest().getSession().getId());
+        event.getResponse(), event.getRequest().getSession().getId());
 
-    final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getRequest(), event.getResponse());
-    this.writer.save(event.getRequest().getRequest(), bankIdSessionData);
+    final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getPollRequest(), event.getResponse());
+    this.writer.save(event.getRequest(), bankIdSessionData);
   }
 
   /**
@@ -113,6 +114,7 @@ public class BankIdSessionDataListener {
    * @see OrderCompletionEvent
    */
   @EventListener
+  @Order(Integer.MAX_VALUE)
   public void handleCompletion(final OrderCompletionEvent event) {
     final BankIdSessionState sessionState = this.reader.loadSessionData(event.getRequest());
     final Boolean otherDevice = sessionState.getBankIdSessionData().getShowQr();

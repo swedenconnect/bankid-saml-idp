@@ -142,6 +142,7 @@ public class BankIdService {
    * @return an {@link ApiResponse}
    */
   private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
+    eventPublisher.recievedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData()).publish();
     return this.init(pollRequest)
         .map(b -> BankIdSessionData.of(pollRequest, b))
         .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
@@ -151,7 +152,7 @@ public class BankIdService {
 
   private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
-      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
+      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
     if (e.getCause() instanceof final BankIDException bankIDException
@@ -160,9 +161,10 @@ public class BankIdService {
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
     if (e.getCause() instanceof BankIDException bankIDException && ErrorCode.EXPIRED_TRANSACTION.equals(bankIDException.getErrorCode()) ) {
-      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
+      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
       return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
     }
+    eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();;
     return Mono.error(e);
   }
 
