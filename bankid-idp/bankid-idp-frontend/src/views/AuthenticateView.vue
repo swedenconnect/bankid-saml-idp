@@ -1,6 +1,6 @@
 <script>
   import QRDisplay from '@/components/QRDisplay.vue';
-  import Status from '@/components/Status.vue';
+  import StatusItem from '@/components/StatusItem.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
@@ -80,7 +80,7 @@
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
         <StatusMessage />
-        <Status
+        <StatusItem
           :otherDevice="otherDevice || showContinueErrorButton()"
           :autoStartToken="token"
           :message="messageCode"

@@ -1,6 +1,6 @@
 <script setup>
-  import Footer from '@/components/Footer.vue';
-  import Header from '@/components/Header.vue';
+  import AppFooter from '@/components/AppFooter.vue';
+  import AppHeader from '@/components/AppHeader.vue';
   import Localechanger from '@/components/LanguageSelector.vue';
 </script>
 
@@ -22,8 +22,8 @@
 </script>
 
 <template>
-  <Header :sp-info="spInfo" />
+  <AppHeader :sp-info="spInfo" />
   <Localechanger />
   <RouterView />
-  <Footer />
+  <AppFooter />
 </template>
