@@ -1,29 +1,23 @@
-<script>
+<script setup>
+  import { onBeforeMount, ref } from 'vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { status } from '@/Service';
 
-  export default {
-    components: { StatusMessage, DeviceSelect },
-    data() {
-      return {
-        displayServiceMessage: false,
-      };
-    },
-    beforeMount() {
-      status().then((s) => {
-        if (s['status'] !== 'OK') {
-          this.displayServiceMessage = true;
-        }
-      });
-    },
-    methods: {
-      cancelSelection: function () {
-        window.location.href = PATHS.CANCEL;
-      },
-    },
+  const displayServiceMessage = ref(false);
+
+  const cancelSelection = () => {
+    window.location.href = PATHS.CANCEL;
   };
+
+  onBeforeMount(() => {
+    status().then((s) => {
+      if (s['status'] !== 'OK') {
+        displayServiceMessage.value = true;
+      }
+    });
+  });
 </script>
 
 <template>
