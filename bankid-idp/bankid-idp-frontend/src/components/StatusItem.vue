@@ -1,28 +1,29 @@
-<script>
+<script setup>
+  import { watch } from 'vue';
   import { createLink } from '@/AutoStartLinkFactory';
 
-  export default {
-    props: {
-      otherDevice: Boolean,
-      autoStartToken: String,
-      message: String,
-    },
-    methods: {
-      getAutoStartLink: function () {
-        return createLink(window.navigator.userAgent, this.autoStartToken, window.location.href);
-      },
-      navigateToApp: function () {
-        window.location.href = this.getAutoStartLink();
-      },
-    },
-    watch: {
-      autoStartToken(oldToken, newToken) {
-        if (!this.otherDevice && !newToken) {
-          this.navigateToApp();
-        }
-      },
-    },
+  const props = defineProps({
+    otherDevice: Boolean,
+    autoStartToken: String,
+    message: String,
+  });
+
+  const getAutoStartLink = () => {
+    return createLink(window.navigator.userAgent, props.autoStartToken, window.location.href);
   };
+
+  const navigateToApp = () => {
+    window.location.href = getAutoStartLink();
+  };
+
+  watch(
+    () => props.autoStartToken,
+    (newToken, oldToken) => {
+      if (!props.otherDevice && !newToken) {
+        navigateToApp();
+      }
+    },
+  );
 </script>
 
 <template>
