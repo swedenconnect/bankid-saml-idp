@@ -1,16 +1,14 @@
-<script>
-  export default {
-    props: {
-      signMessage: String,
-    },
-  };
+<script setup>
+  const props = defineProps({
+    signMessage: String,
+  });
 </script>
 
 <template>
   <div class="full-width sign-message">
     <div class="row no-gutters">
       <div class="col">
-        <span :text="sign - message">{{ signMessage }}</span>
+        <span>{{ props.signMessage }}</span>
       </div>
     </div>
   </div>
