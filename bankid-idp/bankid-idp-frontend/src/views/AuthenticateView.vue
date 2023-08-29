@@ -1,7 +1,6 @@
 <script>
   import QRDisplay from '@/components/QRDisplay.vue';
   import StatusItem from '@/components/StatusItem.vue';
-  import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
 
@@ -15,7 +14,7 @@
         responseStatus: '',
       };
     },
-    components: { StatusMessage, StatusItem, QRDisplay },
+    components: { StatusItem, QRDisplay },
     props: {
       otherDevice: Boolean,
       sign: Boolean,
