@@ -41,6 +41,6 @@ export async function spInformation() {
   return (await fetch(CONTEXT_PATH + '/api/sp')).json();
 }
 
-export async function selectedDecvice() {
+export async function selectedDevice() {
   return (await fetch(CONTEXT_PATH + '/api/device')).json();
 }

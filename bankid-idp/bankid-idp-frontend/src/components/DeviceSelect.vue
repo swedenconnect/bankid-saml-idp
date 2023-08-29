@@ -2,7 +2,7 @@
   import { onBeforeMount, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { shallSelectDeviceAutomatically } from '@/AutoStartLinkFactory';
-  import { selectedDecvice } from '@/Service';
+  import { selectedDevice } from '@/Service';
 
   const router = useRouter();
 
@@ -17,7 +17,7 @@
   });
 
   onBeforeMount(async () => {
-    const r = await selectedDecvice();
+    const r = await selectedDevice();
     if (r['isSign']) {
       if (r['device'] === 'this') {
         authenticate('sign-same');
