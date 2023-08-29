@@ -117,9 +117,11 @@ public class BankIdEventPublisher {
   public EventBuilder bankIdErrorEvent(final HttpServletRequest request, final RelyingPartyData data) {
     return new EventBuilder(new BankIdErrorEvent(request, data), this.publisher);
   }
-
-  public EventBuilder recievedRequest(HttpServletRequest request, RelyingPartyData relyingPartyData) {
-    return new EventBuilder(new RecievedRequestEvent(request, relyingPartyData), this.publisher);
+  /**
+   * Builds an event to inform about received request
+   */
+  public EventBuilder receivedRequest(HttpServletRequest request, RelyingPartyData relyingPartyData, PollRequest pollRequest) {
+    return new EventBuilder(new RecievedRequestEvent(request, relyingPartyData, pollRequest), this.publisher);
   }
 
   /**

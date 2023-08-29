@@ -26,6 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
@@ -39,7 +40,7 @@ public class TimeSeriesAuditRepository implements AuditEventRepository {
 
   @Override
   public List<AuditEvent> find(final String principal, final Instant after, final String type) {
-    Collection<TimeSeriesEntry<Object, Object>> timeSeries = client.getTimeSeries("audit:ts").entryRange(after.toEpochMilli(), Instant.now().plus(1, ChronoUnit.MINUTES).toEpochMilli());
+    Collection<TimeSeriesEntry<Object, Object>> timeSeries = client.getTimeSeries("audit:ts").entryRange(Optional.ofNullable(after).orElse(Instant.EPOCH).toEpochMilli(), Instant.now().plus(1, ChronoUnit.MINUTES).toEpochMilli());
     Stream<AuditEvent> auditEventStream = timeSeries.stream()
         .map(e -> mapper.read((String) e.getValue()));
     if (Objects.nonNull(principal)) {

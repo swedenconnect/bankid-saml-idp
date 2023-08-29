@@ -36,7 +36,6 @@ import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
@@ -142,7 +141,7 @@ public class BankIdService {
    * @return an {@link ApiResponse}
    */
   private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
-    eventPublisher.recievedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData()).publish();
+    eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest).publish();
     return this.init(pollRequest)
         .map(b -> BankIdSessionData.of(pollRequest, b))
         .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
