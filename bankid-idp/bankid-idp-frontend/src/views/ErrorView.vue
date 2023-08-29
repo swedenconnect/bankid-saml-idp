@@ -1,6 +1,5 @@
 <script>
   import StatusMessage from '@/components/StatusMessage.vue';
-  import { messages } from '@/locale/messages';
   import { PATHS } from '@/Redirects';
   import { contactInformation } from '@/Service';
 
@@ -21,7 +20,7 @@
       },
       getErrorMessage: function () {
         let msg = this.$route.params.msg;
-        if (this.messageExists(msg)) {
+        if (this.$i18n.te(msg)) {
           return msg;
         }
         return 'bankid.msg.error.unknown';
@@ -41,20 +40,6 @@
           this.displayEmail = r['displayInformation'];
           this.contactEmail = r['email'];
         });
-      },
-      messageExists(message) {
-        var current = messages.en;
-        var keys = message.split('.');
-        console.log(keys);
-        for (const index in keys) {
-          let key = keys[index];
-          if (current.hasOwnProperty(key)) {
-            current = current[key];
-          } else {
-            return false;
-          }
-        }
-        return true;
       },
     },
   };
