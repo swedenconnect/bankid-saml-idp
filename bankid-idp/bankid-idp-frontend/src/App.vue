@@ -1,24 +1,15 @@
 <script setup>
+  import { onMounted, ref } from 'vue';
   import AppFooter from '@/components/AppFooter.vue';
   import AppHeader from '@/components/AppHeader.vue';
   import LocaleChanger from '@/components/LocaleChanger.vue';
-</script>
-
-<script>
   import { spInformation } from '@/Service';
 
-  export default {
-    data() {
-      return {
-        spInfo: {},
-      };
-    },
-    mounted() {
-      spInformation().then((r) => {
-        this.spInfo = r;
-      });
-    },
-  };
+  const spInfo = ref(null);
+
+  onMounted(async () => {
+    spInfo.value = await spInformation();
+  });
 </script>
 
 <template>
