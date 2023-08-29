@@ -39,7 +39,7 @@ public class OrderResponseEvent extends AbstractBankIdEvent {
    */
   private final OrderResponse response;
 
-  public OrderResponseEvent(HttpServletRequest request, RelyingPartyData data, PollRequest request1, OrderResponse response) {
+  public OrderResponseEvent(final HttpServletRequest request, final RelyingPartyData data, final PollRequest request1, final OrderResponse response) {
     super(request, data);
     this.request = request1;
     this.response = response;

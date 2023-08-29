@@ -114,7 +114,7 @@ public class BankIdConfiguration {
             .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
                 "/**/resume")
             .permitAll()
-            .antMatchers("/actuator/**", "/q/**")
+            .antMatchers("/actuator/**")
             .permitAll()
             .anyRequest().denyAll());
 

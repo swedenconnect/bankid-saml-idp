@@ -60,7 +60,7 @@ public class DefaultAuditEventModule {
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditApplicationEvent handleReceivedRequestEvent(RecievedRequestEvent event) {
+  public AuditApplicationEvent handleReceivedRequestEvent(final RecievedRequestEvent event) {
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
     Map<String, Object> auditIdentifier = AuditIdentifierFactory.createInitialAuditIdentifier(event.getPollRequest(), token);
     AuditEvent auditEvent = new AuditEvent(token.getPrincipal().toString(), AuditEventTypes.BANKID_RECEIVED_REQUEST.typeName, auditIdentifier);
@@ -103,14 +103,14 @@ public class DefaultAuditEventModule {
     return new AuditApplicationEvent(auditEvent);
   }
 
-  private String getCompletionType(BankIdOperation operation) {
+  private String getCompletionType(final BankIdOperation operation) {
     if (operation.equals(BankIdOperation.SIGN)) {
       return AuditEventTypes.SIGN_COMPLETE.typeName;
     }
     return AuditEventTypes.AUTH_COMPLETE.typeName;
   }
 
-  private AuditEvent createAuditEvent(AbstractBankIdEvent event, String auditEventType, BankIdSessionData bankIdSessionData) {
+  private AuditEvent createAuditEvent(final AbstractBankIdEvent event, final String auditEventType, final BankIdSessionData bankIdSessionData) {
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
     Map<String, Object> auditIdentifier = AuditIdentifierFactory.createAuditIdentifier(event.getData(), token, bankIdSessionData);
     return new AuditEvent(token.getPrincipal().toString(), auditEventType, auditIdentifier);

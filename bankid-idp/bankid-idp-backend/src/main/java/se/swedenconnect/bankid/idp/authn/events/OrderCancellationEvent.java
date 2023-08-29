@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 public class OrderCancellationEvent extends AbstractBankIdEvent {
-  public OrderCancellationEvent(HttpServletRequest request, RelyingPartyData data) {
+  public OrderCancellationEvent(final HttpServletRequest request, final RelyingPartyData data) {
     super(request, data);
   }
 }

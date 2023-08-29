@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 public class RecievedRequestEvent extends AbstractBankIdEvent {
 
   private final PollRequest pollRequest;
-  public RecievedRequestEvent(HttpServletRequest request, RelyingPartyData data, PollRequest pollRequest) {
+  public RecievedRequestEvent(final HttpServletRequest request, final RelyingPartyData data, final PollRequest pollRequest) {
     super(request, data);
     this.pollRequest = pollRequest;
   }

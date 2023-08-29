@@ -120,7 +120,7 @@ public class BankIdEventPublisher {
   /**
    * Builds an event to inform about received request
    */
-  public EventBuilder receivedRequest(HttpServletRequest request, RelyingPartyData relyingPartyData, PollRequest pollRequest) {
+  public EventBuilder receivedRequest(final HttpServletRequest request, final RelyingPartyData relyingPartyData, final PollRequest pollRequest) {
     return new EventBuilder(new RecievedRequestEvent(request, relyingPartyData, pollRequest), this.publisher);
   }
 
