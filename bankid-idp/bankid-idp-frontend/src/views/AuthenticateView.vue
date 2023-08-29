@@ -1,77 +1,69 @@
-<script>
+<script setup>
+  import { onMounted, ref } from 'vue';
   import QRDisplay from '@/components/QRDisplay.vue';
   import StatusItem from '@/components/StatusItem.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
 
-  export default {
-    data() {
-      return {
-        qrImage: '',
-        token: '',
-        shouldCancel: false,
-        messageCode: 'bankid.msg.rfa13',
-        responseStatus: '',
-      };
-    },
-    components: { StatusItem, QRDisplay },
-    props: {
-      otherDevice: Boolean,
-      sign: Boolean,
-    },
-    mounted() {
-      this.poll();
-    },
-    methods: {
-      poll: function () {
-        poll(this.otherDevice)
-          .then((response) => {
-            if (response['retry'] !== true) {
-              this.responseStatus = response['status'];
-              if (response['qrCode'] !== '') {
-                this.qrImage = response['qrCode'];
-              }
-              if (response['status'] !== 'NOT_STARTED') {
-                this.qrImage = '';
-              }
-              this.token = response['autoStartToken'];
-              this.messageCode = response['messageCode'];
-            }
-            return response;
-          })
-          .then((response) => {
-            if (response['status'] === 'COMPLETE') {
-              window.location.href = PATHS.COMPLETE;
-            } else if (response['status'] === 'CANCEL') {
-              window.location.href = PATHS.CANCEL;
-            } else if (response['status'] === 'ERROR') {
-              this.qrImage = '';
-            } else if (response['retry'] === true) {
-              /* Time is defined in seconds and setTimeout is in millis*/
-              window.setTimeout(() => this.poll(), parseInt(response['time'] * 1000));
-            } else {
-              window.setTimeout(() => this.poll(), 500);
-            }
-          });
-      },
-      base64Image: function () {
-        return 'data:image/png;base64, ' + this.qrImage;
-      },
-      cancelRequest: function () {
-        cancel().then(() => {
+  const qrImage = ref('');
+  const token = ref('');
+  const messageCode = ref('bankid.msg.rfa13');
+  const responseStatus = ref('');
+
+  const props = defineProps({
+    otherDevice: Boolean,
+    sign: Boolean,
+  });
+
+  const polling = () => {
+    poll(props.otherDevice)
+      .then((response) => {
+        if (response['retry'] !== true) {
+          responseStatus.value = response['status'];
+          if (response['qrCode'] !== '') {
+            qrImage.value = response['qrCode'];
+          }
+          if (response['status'] !== 'NOT_STARTED') {
+            qrImage.value = '';
+          }
+          token.value = response['autoStartToken'];
+          messageCode.value = response['messageCode'];
+        }
+        return response;
+      })
+      .then((response) => {
+        if (response['status'] === 'COMPLETE') {
+          window.location.href = PATHS.COMPLETE;
+        } else if (response['status'] === 'CANCEL') {
           window.location.href = PATHS.CANCEL;
-        });
-      },
-      acceptError: function () {
-        cancel().then(() => {
-          window.location.href = PATHS.ERROR;
-        });
-      },
-      showContinueErrorButton: function () {
-        return this.responseStatus === 'ERROR';
-      },
-    },
+        } else if (response['status'] === 'ERROR') {
+          qrImage.value = '';
+        } else if (response['retry'] === true) {
+          /* Time is defined in seconds and setTimeout is in millis*/
+          window.setTimeout(() => polling(), parseInt(response['time'] * 1000));
+        } else {
+          window.setTimeout(() => polling(), 500);
+        }
+      });
   };
+
+  const cancelRequest = async () => {
+    await cancel();
+    window.location.href = PATHS.CANCEL;
+  };
+
+  const acceptError = async () => {
+    await cancel();
+    window.location.href = PATHS.ERROR;
+  };
+
+  const showContinueErrorButton = () => {
+    return responseStatus.value === 'ERROR';
+  };
+
+  onMounted(() => {
+    polling();
+  });
 </script>
 
 <template>
