@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.authn.log;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.audit.AuditEvent;
+import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -59,47 +60,47 @@ public class DefaultAuditEventModule {
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditEvent handleReceivedRequestEvent(RecievedRequestEvent event) {
+  public AuditApplicationEvent handleReceivedRequestEvent(RecievedRequestEvent event) {
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
     Map<String, Object> auditIdentifier = AuditIdentifierFactory.createInitialAuditIdentifier(event.getPollRequest(), token);
     AuditEvent auditEvent = new AuditEvent(token.getPrincipal().toString(), AuditEventTypes.BANKID_RECEIVED_REQUEST.typeName, auditIdentifier);
     log.info("Publishing audit event: {}", auditEvent);
-    return auditEvent;
+    return new AuditApplicationEvent(auditEvent);
   }
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditEvent handleOrderResponse(final OrderResponseEvent event) {
+  public AuditApplicationEvent handleOrderResponse(final OrderResponseEvent event) {
     AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.INIT.typeName, BankIdSessionData.of(event.getPollRequest(), event.getResponse()));
     log.info("Publishing audit event: {}", auditEvent);
-    return auditEvent;
+    return new AuditApplicationEvent(auditEvent);
   }
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditEvent handleCompletion(final OrderCompletionEvent event) {
+  public AuditApplicationEvent handleCompletion(final OrderCompletionEvent event) {
     BankIdSessionData bankIdSessionData = sessions.loadSessionData(event.getRequest()).getBankIdSessionData();
     CollectResponse collectResponse = sessions.loadCompletionData(event.getRequest());
     RedirectForAuthenticationToken token = provider.getTokenRepository().getExternalAuthenticationToken(event.getRequest());
     AuditEvent auditEvent = new AuditEvent(token.getPrincipal().toString(), getCompletionType(bankIdSessionData.getOperation()), AuditIdentifierFactory.createCompleteAuditIdentifier(event.getData(), token, bankIdSessionData, collectResponse));
     log.info("Publishing audit event: {}", auditEvent);
-    return auditEvent;
+    return new AuditApplicationEvent(auditEvent);
   }
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditEvent handleCancel(final OrderCancellationEvent event) {
+  public AuditApplicationEvent handleCancel(final OrderCancellationEvent event) {
     AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.BANKID_CANCEL.typeName, sessions.loadSessionData(event.getRequest()).getBankIdSessionData());
     log.info("Publishing audit event: {}", auditEvent);
-    return auditEvent;
+    return new AuditApplicationEvent(auditEvent);
   }
 
   @EventListener
   @Order(Integer.MIN_VALUE)
-  public AuditEvent handleError(final BankIdErrorEvent event) {
+  public AuditApplicationEvent handleError(final BankIdErrorEvent event) {
     AuditEvent auditEvent = createAuditEvent(event, AuditEventTypes.BANKID_ERROR.typeName, sessions.loadSessionData(event.getRequest()).getBankIdSessionData());
     log.info("Publishing audit event: {}", auditEvent);
-    return auditEvent;
+    return new AuditApplicationEvent(auditEvent);
   }
 
   private String getCompletionType(BankIdOperation operation) {

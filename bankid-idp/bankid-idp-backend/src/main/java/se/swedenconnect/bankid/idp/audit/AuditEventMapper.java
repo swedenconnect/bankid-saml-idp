@@ -24,6 +24,7 @@ import org.springframework.boot.actuate.audit.AuditEvent;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Wrapper for ObjectMapper to handle AuditEvent
@@ -58,7 +59,8 @@ public class AuditEventMapper {
   public AuditEvent read(final String event) {
     try {
       // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
-      return mapper.readerFor(BankidAuditEvent.class).readValue(event);
+      BankidAuditEvent auditEvent = mapper.readerFor(BankidAuditEvent.class).readValue(event);
+      return auditEvent;
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -74,7 +76,7 @@ public class AuditEventMapper {
 
     @JsonCreator
     public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type, @JsonProperty("data") final Map<String, Object> data) {
-      super(principal, type, data);
+      super(principal, type, Optional.ofNullable(data).orElse(Map.of()));
     }
   }
 }
