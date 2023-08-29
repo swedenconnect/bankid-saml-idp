@@ -1,6 +1,9 @@
 package se.swedenconnect.bankid.idp.authn.service;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -9,7 +12,10 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
+import se.swedenconnect.bankid.idp.config.ResilienceConfiguration;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
@@ -19,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 
 class BankIdServiceTest {
-
-
   @Test
   void pollAndReInit() {
     ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
@@ -106,5 +110,27 @@ class BankIdServiceTest {
     Assertions.assertEquals("bankid.msg.error.timeout", response2.getMessageCode());
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(2)).collect(any());
+  }
+
+  @Test
+  void circuitBreakerWillNeverBeOpen() {
+    ResilienceConfiguration resilienceConfiguration = new ResilienceConfiguration();
+    CircuitBreakerConfig config = resilienceConfiguration.circuitBreakerConfig();
+    CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
+    CircuitBreaker circuitBreaker = resilienceConfiguration.circuitBreaker(registry);
+    BankIdService service = new BankIdService(Mockito.mock(BankIdEventPublisher.class), circuitBreaker, new BankIdRequestFactory());
+
+    BankIDClient client = Mockito.mock(BankIDClient.class);
+    when(client.collect(any())).thenReturn(Mono.error(new BankIdServerException("")));
+    when(client.authenticate(any())).thenReturn(Mono.error(new BankIdServerException("")));
+    for (int x = 0; x < config.getMinimumNumberOfCalls(); x++) {
+        Assertions.assertThrows(BankIdServerException.class, () -> service.poll(BankIdResponseFixture.createPollRequest(client)).block());
+    }
+    try {
+      Thread.sleep(50);
+    } catch (Exception e) {
+      // Do nothing
+    }
+    Assertions.assertSame(CircuitBreaker.State.HALF_OPEN, circuitBreaker.getState());
   }
 }

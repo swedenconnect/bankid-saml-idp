@@ -20,6 +20,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -79,6 +80,18 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
   }
 
   /**
+   * Method for completing the operation and returning to the SAML engine in cases of failed authentication.
+   *
+   * @param request the HTTP servlet request
+   * @return a {@link ModelAndView}
+   */
+  @GetMapping("/view/error")
+  public ModelAndView completeWithError(final HttpServletRequest request) {
+    eventPublisher.abortAuthEvent(request).publish();
+    return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.AUTHN_FAILED));
+  }
+
+  /**
    * Method for completing the operation and returning to the SAML engine in cases of cancelled operation.
    *
    * @param request the HTTP servlet request
@@ -86,6 +99,7 @@ public class BankIdAuthenticationController extends AbstractAuthenticationContro
    */
   @GetMapping("/view/cancel")
   public ModelAndView cancelView(final HttpServletRequest request) {
+    eventPublisher.abortAuthEvent(request).publish();
     return this.complete(request, new Saml2ErrorStatusException(Saml2ErrorStatus.CANCEL));
   }
 

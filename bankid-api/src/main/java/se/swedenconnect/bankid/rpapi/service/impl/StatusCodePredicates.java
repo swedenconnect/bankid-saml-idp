@@ -13,23 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn.events;
+package se.swedenconnect.bankid.rpapi.service.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-
-import javax.servlet.http.HttpServletRequest;
-
+import java.util.function.IntPredicate;
 /**
- * An event for the cancellation of an order.
- * 
+ * Predicates for matching status codes
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
+public class StatusCodePredicates {
+  public static IntPredicate compareBetween(final int from, final int to) {
+    return (toCompare) -> {
+      return toCompare >= from && toCompare < to;
+    };
+  }
 
-public class OrderCancellationEvent extends AbstractBankIdEvent {
-  public OrderCancellationEvent(final HttpServletRequest request, final RelyingPartyData data) {
-    super(request, data);
+  /**
+   *
+   * @return Predicate to determine user error
+   */
+  public static IntPredicate userError() {
+    return compareBetween(400, 500);
+  }
+
+  /**
+   *
+   * @return Predicate to determine server error
+   */
+  public static IntPredicate serverError() {
+    return compareBetween(500, 600);
   }
 }

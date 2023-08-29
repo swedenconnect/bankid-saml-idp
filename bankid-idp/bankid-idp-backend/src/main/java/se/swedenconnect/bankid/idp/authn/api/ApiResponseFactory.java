@@ -57,6 +57,10 @@ public class ApiResponseFactory {
     return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.timeout");
   }
 
+  public static ApiResponse createErrorResponseBankIdServerException() {
+    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.server");
+  }
+
   private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
 
     return switch (sessionData.getStatus()) {

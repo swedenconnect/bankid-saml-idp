@@ -13,36 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn.log;
+package se.swedenconnect.bankid.rpapi.service.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
-import java.util.List;
-
-@AllArgsConstructor
-@Data
-@ToString
-public class AuditIdentifier {
-
-  public enum Type {
-    SUCCESS,
-    FAILURE,
-    START,
-    COLLECT
+/**
+ * Exception class for 5XX API errors
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
+public class BankIdServerException extends BankIDException {
+  public BankIdServerException(final String message) {
+    super(message);
   }
-
-  /** The session ID. */
-  private final String sessionId;
-  
-  /** The relying party ID. */
-  private final String relayingParty;
-  
-  /** The entityID:s. */
-  private final List<String> entityIds;
-  
-  /** The audit event type. */
-  private final Type eventType;
-  
 }

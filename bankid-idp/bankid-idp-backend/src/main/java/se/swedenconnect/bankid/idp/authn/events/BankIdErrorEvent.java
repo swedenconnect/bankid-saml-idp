@@ -15,41 +15,18 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * An event for an order (sign or auth) response.
+ * An event for the cancellation of an order.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class OrderResponseEvent extends AbstractBankIdEvent {
-
-  /**
-   * The servlet request.
-   */
-  private final PollRequest request;
-
-  /**
-   * The order response.
-   */
-  private final OrderResponse response;
-
-  public OrderResponseEvent(final HttpServletRequest request, final RelyingPartyData data, final PollRequest request1, final OrderResponse response) {
+public class BankIdErrorEvent extends AbstractBankIdEvent {
+  public BankIdErrorEvent(HttpServletRequest request, RelyingPartyData data) {
     super(request, data);
-    this.request = request1;
-    this.response = response;
-  }
-
-  public PollRequest getPollRequest() {
-    return request;
-  }
-
-  public OrderResponse getResponse() {
-    return response;
   }
 }

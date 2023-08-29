@@ -9,6 +9,7 @@ import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.config.EntityRequirement;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
+import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -83,10 +84,13 @@ public class BankIdResponseFixture {
   private static PollRequest.PollRequestBuilder getPollRequestBuilder(BankIDClient client) {
     HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
     Mockito.when(servletRequest.getRemoteAddr()).thenReturn("1.1.1.1");
+    UserVisibleData userVisibleData = new UserVisibleData();
+    userVisibleData.setUserVisibleData("Uservisibledata");
     PollRequest.PollRequestBuilder builder = PollRequest.builder()
         .qr(false)
         .request(servletRequest)
         .context(BankIdResponseFixture.createAuth())
+        .data(userVisibleData)
         .relyingPartyData(new RelyingPartyData(client, List.of("relying-party"), new DisplayText(), new DisplayText(), new EntityRequirement()));
     return builder;
   }

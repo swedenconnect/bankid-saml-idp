@@ -20,16 +20,15 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
-import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
-import se.swedenconnect.bankid.idp.authn.events.UserVisibleDataEvent;
+import se.swedenconnect.bankid.idp.authn.events.*;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+import se.swedenconnect.spring.saml.idp.events.Saml2PostUserAuthenticationEvent;
 
 /**
  * A listener for BankID session events.
@@ -62,6 +61,17 @@ public class BankIdSessionDataListener {
   }
 
   /**
+   * Removes BankID data from the current session
+   *
+   * @param event event to be processed
+   * @see OrderResponseEvent
+   */
+  @EventListener
+  public void handleAbortAuthEvent(final AbortAuthEvent event) {
+    this.writer.delete(event.getRequest());
+  }
+
+  /**
    * Writes a published {@link OrderResponseEvent} to the user's session.
    *
    * @param event event to be processed
@@ -70,10 +80,10 @@ public class BankIdSessionDataListener {
   @EventListener
   public void handleOrderResponse(final OrderResponseEvent event) {
     log.info("Order response event was published {} for session {}",
-        event.getResponse(), event.getRequest().getRequest().getSession().getId());
+        event.getResponse(), event.getRequest().getSession().getId());
 
-    final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getRequest(), event.getResponse());
-    this.writer.save(event.getRequest().getRequest(), bankIdSessionData);
+    final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getPollRequest(), event.getResponse());
+    this.writer.save(event.getRequest(), bankIdSessionData);
   }
 
   /**
@@ -104,6 +114,7 @@ public class BankIdSessionDataListener {
    * @see OrderCompletionEvent
    */
   @EventListener
+  @Order(Integer.MAX_VALUE)
   public void handleCompletion(final OrderCompletionEvent event) {
     final BankIdSessionState sessionState = this.reader.loadSessionData(event.getRequest());
     final Boolean otherDevice = sessionState.getBankIdSessionData().getShowQr();

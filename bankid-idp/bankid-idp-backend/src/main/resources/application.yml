@@ -176,13 +176,15 @@ server:
       timeout: 15m
 
 audit:
-  logging:
+  event:
     module: default
 
 session:
   module: redis
 
 bankid:
+  audit:
+    module: "redistimeseries"
   standalone: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
@@ -221,7 +223,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, metrics, prometheus, loggers
+        include: health, metrics, prometheus, loggers, auditevents
   server:
     port: 8444
 user:

@@ -52,6 +52,7 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -135,6 +136,7 @@ public class BankIdApiController {
           .state(state)
           .build();
       return this.service.poll(pollRequest)
+          .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
           .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }

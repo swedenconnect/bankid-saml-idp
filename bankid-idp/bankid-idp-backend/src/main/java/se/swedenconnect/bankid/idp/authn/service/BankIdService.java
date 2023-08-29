@@ -70,7 +70,7 @@ public class BankIdService {
       final BankIdRequestFactory requestFactory) {
     this.eventPublisher = Objects.requireNonNull(eventPublisher, "eventPublisher must not be null");
     this.circuitBreaker = Objects.requireNonNull(circuitBreaker, "circuitBreaker must not be null");
-    this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(() -> new BankIdRequestFactory());
+    this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(BankIdRequestFactory::new);
   }
 
   /**
@@ -85,8 +85,7 @@ public class BankIdService {
         .map(sessionData -> this.collect(request)
             .map(c -> BankIdSessionData.of(sessionData, c))
             .flatMap(b -> this.reInitIfExpired(request, b))
-            .map(b -> ApiResponseFactory.create(
-                b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
+            .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
             .onErrorResume(e -> this.handleError(e, request)))
         .orElseGet(() -> this.onNoSession(request));
   }
@@ -142,6 +141,7 @@ public class BankIdService {
    * @return an {@link ApiResponse}
    */
   private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
+    eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest).publish();
     return this.init(pollRequest)
         .map(b -> BankIdSessionData.of(pollRequest, b))
         .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
@@ -151,6 +151,7 @@ public class BankIdService {
 
   private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
+      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
     if (e.getCause() instanceof final BankIDException bankIDException
@@ -159,9 +160,10 @@ public class BankIdService {
       return Mono.just(ApiResponseFactory.createUserCancelResponse());
     }
     if (e.getCause() instanceof BankIDException bankIDException && ErrorCode.EXPIRED_TRANSACTION.equals(bankIDException.getErrorCode()) ) {
-      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
+      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
       return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
     }
+    eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();;
     return Mono.error(e);
   }
 

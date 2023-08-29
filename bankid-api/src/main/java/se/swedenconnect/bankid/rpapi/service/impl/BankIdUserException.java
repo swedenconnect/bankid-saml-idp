@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn.events;
+package se.swedenconnect.bankid.rpapi.service.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-
-import javax.servlet.http.HttpServletRequest;
-
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 /**
- * An event for the cancellation of an order.
- * 
+ * Exception class for 4XX API errors
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-
-public class OrderCancellationEvent extends AbstractBankIdEvent {
-  public OrderCancellationEvent(final HttpServletRequest request, final RelyingPartyData data) {
-    super(request, data);
+public class BankIdUserException extends BankIDException {
+  public BankIdUserException(final String message) {
+    super(message);
   }
 }
