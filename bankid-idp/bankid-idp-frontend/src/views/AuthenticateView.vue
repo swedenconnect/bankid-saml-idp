@@ -79,7 +79,6 @@
   <div class="container main" id="main">
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
-        <StatusMessage />
         <StatusItem
           :otherDevice="otherDevice || showContinueErrorButton()"
           :autoStartToken="token"
