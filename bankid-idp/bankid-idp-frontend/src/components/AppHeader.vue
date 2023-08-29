@@ -1,21 +1,16 @@
 <script>
   export default {
     props: {
-      spInfo: {},
-    },
-    data() {
-      return {
-        defaultImage: '/idp/assets/logo.svg',
-      };
+      spInfo: {
+        type: Object,
+        default() {
+          return { imageUrl: '' };
+        },
+      },
     },
     methods: {
       getImage: function () {
         return this.spInfo['imageUrl'];
-      },
-      hideImage: function () {
-        return (
-          !this.spInfo.hasOwnProperty('imageUrl') || this.spInfo['imageUrl'] === '' || this.spInfo['imageUrl'] === null
-        );
       },
     },
   };
@@ -26,7 +21,8 @@
     <center>
       <div class="row">
         <div class="column">
-          <img class="top-logo-dim" :src="getImage()" alt="Logo" :hidden="hideImage()" />
+          <img v-if="getImage()" class="top-logo-dim" :src="getImage()" alt="Logo" />
+          <img v-else class="top-logo-dim" src="@/assets/logo.svg" alt="Logo" />
         </div>
         <div class="column">
           <img class="top-logo-dim" src="@/assets/BankID_logo.svg" alt="Logo" />
