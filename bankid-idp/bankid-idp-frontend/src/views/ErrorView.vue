@@ -1,47 +1,38 @@
-<script>
+<script setup>
+  import { onBeforeMount, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRoute } from 'vue-router';
   import StatusMessage from '@/components/StatusMessage.vue';
-  import { PATHS } from '@/Redirects';
   import { contactInformation } from '@/Service';
 
-  export default {
-    data() {
-      return {
-        contactEmail: '',
-        displayEmail: false,
-      };
-    },
-    beforeMount() {
-      this.getContactInformation();
-    },
-    components: { StatusMessage },
-    methods: {
-      cancelSelection: function () {
-        window.location.href = PATHS.CANCEL;
-      },
-      getErrorMessage: function () {
-        let msg = this.$route.params.msg;
-        if (this.$i18n.te(msg)) {
-          return msg;
-        }
-        return 'bankid.msg.error.unknown';
-      },
-      getTraceId: function () {
-        let pattern = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
-        if (pattern.test(this.$route.params.trace)) {
-          return '' + this.$route.params.trace;
-        }
-        return '';
-      },
-      getMailToEmail: function () {
-        return 'mailto: ' + this.contactEmail;
-      },
-      getContactInformation: function () {
-        contactInformation().then((r) => {
-          this.displayEmail = r['displayInformation'];
-          this.contactEmail = r['email'];
-        });
-      },
-    },
+  const contactEmail = ref('');
+  const displayEmail = ref(false);
+  const route = useRoute();
+  const { te } = useI18n();
+
+  onBeforeMount(() => getContactInformation());
+
+  const getErrorMessage = () => {
+    let msg = route.params.msg;
+    if (te(msg)) {
+      return msg;
+    }
+    return 'bankid.msg.error.unknown';
+  };
+
+  const getTraceId = () => {
+    let pattern = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+    if (pattern.test(route.params.trace)) {
+      return '' + route.params.trace;
+    }
+    return '';
+  };
+
+  const getContactInformation = () => {
+    contactInformation().then((r) => {
+      displayEmail.value = r['displayInformation'];
+      contactEmail.value = r['email'];
+    });
   };
 </script>
 
