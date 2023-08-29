@@ -7,6 +7,7 @@ import { messages } from './locale/messages';
 import router from './router';
 
 const i18n = createI18n({
+  legacy: false,
   locale: 'sv',
   fallbackLocale: 'en',
   messages,
