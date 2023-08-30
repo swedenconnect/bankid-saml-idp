@@ -24,6 +24,8 @@ import se.swedenconnect.bankid.idp.authn.session.ServletSessionDao;
 import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.InMemoryTryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
+import se.swedenconnect.opensaml.saml2.response.replay.InMemoryReplayChecker;
+import se.swedenconnect.spring.saml.idp.authnrequest.validation.AbstractMessageReplayChecker;
 
 @Slf4j
 @Configuration
@@ -41,5 +43,10 @@ public class InMemorySessionConfiguration {
   public SessionDao springSessionBankidSessions() {
     log.warn("Starting application with in memory sessions, this is not meant for production use");
     return new ServletSessionDao();
+  }
+
+  @Bean
+  public InMemoryReplayChecker inMemoryReplayChecker() {
+    return new InMemoryReplayChecker();
   }
 }

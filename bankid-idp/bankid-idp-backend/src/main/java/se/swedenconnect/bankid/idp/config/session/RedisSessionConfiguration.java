@@ -34,6 +34,7 @@ import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
 import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
+import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
 
 import java.io.IOException;
 
@@ -78,5 +79,10 @@ public class RedisSessionConfiguration {
   @Bean
   public SessionDao redisSessionDao(final RedissonClient client) {
     return new RedisSessionDao(client);
+  }
+
+  @Bean
+  public RedisReplayChecker redisReplayChecker(final RedissonClient client) {
+    return new RedisReplayChecker(client);
   }
 }
