@@ -25,6 +25,7 @@
     "@tsconfig/node18": "^18.2.0",
     "@types/jsdom": "^21.1.1",
     "@types/node": "^18.17.5",
+    "@types/ua-parser-js": "^0.7.37",
     "@vitejs/plugin-vue": "^4.3.3",
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/eslint-config-typescript": "^11.0.3",
