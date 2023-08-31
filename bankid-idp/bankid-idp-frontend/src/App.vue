@@ -1,30 +1,20 @@
 <script setup>
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
-import Localechanger from "@/components/LanguageSelector.vue";
+  import { onMounted, ref } from 'vue';
+  import AppFooter from '@/components/AppFooter.vue';
+  import AppHeader from '@/components/AppHeader.vue';
+  import LocaleChanger from '@/components/LocaleChanger.vue';
+  import { spInformation } from '@/Service';
+
+  const spInfo = ref(null);
+
+  onMounted(async () => {
+    spInfo.value = await spInformation();
+  });
 </script>
 
 <template>
-
-  <Header :sp-info=spInfo />
-  <Localechanger/>
-  <RouterView/>
-  <Footer/>
+  <AppHeader :sp-info="spInfo" />
+  <LocaleChanger />
+  <RouterView />
+  <AppFooter />
 </template>
-
-<script>
-import {spInformation} from "@/Service";
-
-export default {
-    data() {
-        return {
-            spInfo: {}
-        }
-    },
-    mounted() {
-        spInformation().then(r => {
-            this.spInfo = r;
-        });
-    }
-}
-</script>

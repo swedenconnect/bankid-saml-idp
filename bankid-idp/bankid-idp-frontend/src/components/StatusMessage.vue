@@ -1,14 +1,11 @@
-<template>
-    <div class="container-fluid status">
-        <p> {{ $t(message)}} </p>
-    </div>
-</template>
-<script>
-import {status} from "@/Service";
-
-export default {
-    props: {
-        message: String
-    }
-}
+<script setup>
+  const props = defineProps({
+    message: String,
+  });
 </script>
+
+<template>
+  <div class="container-fluid status">
+    <p>{{ $t(props.message) }}</p>
+  </div>
+</template>

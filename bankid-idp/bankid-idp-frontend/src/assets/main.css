@@ -1,7 +1,7 @@
 html,
 body {
-  background-color: #F5F5F5;
-  font-family: "Open Sans", sans-serif;
+  background-color: #f5f5f5;
+  font-family: 'Open Sans', sans-serif;
 }
 
 hr {
@@ -44,7 +44,7 @@ a {
 }
 
 .content-container {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 29px;
   margin-top: 20px;
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
@@ -84,41 +84,22 @@ a {
 }
 
 .authn-listing {
-	padding: 20px;
+  padding: 20px;
 }
 
 .authn-listing .row {
-	padding-bottom: 10px;
-	padding-top: 10px;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .authn-listing .attribute-row {
-  border-bottom: 1px solid #D0CACA;
+  border-bottom: 1px solid #d0caca;
   padding-bottom: 10px;
   padding-top: 10px;
 }
 
 .authn-listing .attribute-value {
-	font-weight: bold;
-	
-  /* These are technically the same, but use both */
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-
-  -ms-word-break: break-all;
-  /* This is the dangerous one in WebKit, as it breaks things wherever */
-  word-break: break-all;
-  /* Instead use this non-standard one: */
-  word-break: break-word;
-
-  /* Adds a hyphen where the word breaks, if supported (No Blink) */
-  -ms-hyphens: auto;
-  -moz-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;	
-}
-
-.dont-break-out {
+  font-weight: bold;
 
   /* These are technically the same, but use both */
   overflow-wrap: break-word;
@@ -137,13 +118,31 @@ a {
   hyphens: auto;
 }
 
+.dont-break-out {
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
 .expand-button {
-  background-image: url("../images/arrow_dropdown_down.svg");
+  background-image: url('../images/arrow_dropdown_down.svg');
   background-size: 8px 8px;
 }
 
 .collapse-button {
-  background-image: url("../images/arrow_dropdown_up.svg");
+  background-image: url('../images/arrow_dropdown_up.svg');
   background-size: 8px 8px;
 }
 
@@ -183,14 +182,14 @@ a {
 }
 
 .underlined-clickable {
-	cursor: pointer;
-	text-decoration: underline;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .drop-down-container .drop-down {
   padding: 0;
-  background-color: #F7F7F7;
-  border: 1px solid #D8D8D8;
+  background-color: #f7f7f7;
+  border: 1px solid #d8d8d8;
   border-radius: 3px;
   margin-top: 9px;
 }
@@ -202,7 +201,7 @@ a {
 
 .drop-down-container .drop-down > p {
   cursor: pointer;
-  background-image: url("../images/arrow_dropdown.svg");
+  background-image: url('../images/arrow_dropdown.svg');
   background-repeat: no-repeat;
   background-size: 8px 8px;
   background-position: calc(100% - 20px) 50%;
@@ -213,7 +212,7 @@ a {
 }
 
 .drop-down-container .drop-down.open > p {
-  background-image: url("../images/arrow_dropdown_up.svg");
+  background-image: url('../images/arrow_dropdown_up.svg');
 }
 
 .drop-down-container .drop-down.open .drop-down-info {
@@ -222,7 +221,7 @@ a {
 
 .drop-down-container .drop-down-info {
   display: none;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .drop-down-container .drop-down:first-of-type {
@@ -248,13 +247,11 @@ a {
 
 .providers .provider {
   margin: 9px auto;
-  background-color: #F7F7F7;
-  border: 1px solid #D8D8D8;
+  background-color: #f7f7f7;
+  border: 1px solid #d8d8d8;
   border-radius: 3px;
   cursor: pointer;
 }
-
-
 
 .providers .provider-button {
   display: block;
@@ -357,8 +354,8 @@ a {
 .advanced .box {
   margin-top: 9px;
   padding: 20px 32px;
-  background-color: #F7F7F7;
-  border: 1px solid #D8D8D8;
+  background-color: #f7f7f7;
+  border: 1px solid #d8d8d8;
   border-radius: 3px;
   margin-bottom: 33px;
 }
@@ -370,8 +367,8 @@ a {
 .verification .box {
   margin-top: 9px;
   padding: 20px 32px;
-  background-color: #F7F7F7;
-  border: 1px solid #D8D8D8;
+  background-color: #f7f7f7;
+  border: 1px solid #d8d8d8;
   border-radius: 3px;
   cursor: pointer;
   margin-bottom: 33px;
@@ -422,14 +419,14 @@ a {
 
 .sign-message {
   margin-bottom: 30px;
-  background-color: #F7F7F7;
-  border: 1px solid #D0CACA;
+  background-color: #f7f7f7;
+  border: 1px solid #d0caca;
   padding: 23px 28px;
 }
 
 .sign-message div {
   margin: 0;
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
 .main {
@@ -443,7 +440,7 @@ a {
   margin-right: 10px;
 }
 .float-right {
-  float: right!important;
+  float: right !important;
 }
 
 .col-sm-12 {
@@ -459,7 +456,7 @@ a {
 }
 
 .row::after {
-  content: "";
+  content: '';
   clear: both;
   display: table;
 }

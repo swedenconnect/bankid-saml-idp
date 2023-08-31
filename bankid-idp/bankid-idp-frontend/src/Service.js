@@ -1,20 +1,19 @@
-import {getXSRFCookie} from "@/cookies";
+import { getXSRFCookie } from '@/cookies';
 
-const CONTEXT_PATH = import.meta.env.BASE_URL
+const CONTEXT_PATH = import.meta.env.BASE_URL;
 
 export async function poll(showQr) {
-
   const requestOptions = {
     method: 'POST',
-    headers: {'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie()},
+    headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
     credentials: 'include',
   };
-  const response = await fetch(CONTEXT_PATH + "/api/poll?qr=" + showQr, requestOptions);
+  const response = await fetch(CONTEXT_PATH + '/api/poll?qr=' + showQr, requestOptions);
   const data = await response.json();
   if (!response.ok) {
     if (response.status === 429) {
-      let retryAfter = response.headers.get("Retry-After");
-      return {"retry": true, "time": retryAfter};
+      let retryAfter = response.headers.get('Retry-After');
+      return { retry: true, time: retryAfter };
     }
     // TODO handle unexpected error
   }
@@ -22,28 +21,26 @@ export async function poll(showQr) {
 }
 
 export async function status() {
-  return (await fetch(CONTEXT_PATH + "/api/status")).json();
+  return (await fetch(CONTEXT_PATH + '/api/status')).json();
 }
 
 export async function contactInformation() {
-  return (await fetch(CONTEXT_PATH + "/api/contact")).json();
+  return (await fetch(CONTEXT_PATH + '/api/contact')).json();
 }
 
 export async function cancel() {
   const requestOptions = {
     method: 'POST',
-    headers: {'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie()},
+    headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
     credentials: 'include',
   };
-  return await fetch(CONTEXT_PATH + "/api/cancel", requestOptions);
+  return await fetch(CONTEXT_PATH + '/api/cancel', requestOptions);
 }
 
 export async function spInformation() {
-  return (await fetch(CONTEXT_PATH + "/api/sp")).json();
+  return (await fetch(CONTEXT_PATH + '/api/sp')).json();
 }
 
-export async function selectedDecvice() {
-  return (await fetch(CONTEXT_PATH + "/api/device")).json();
-
+export async function selectedDevice() {
+  return (await fetch(CONTEXT_PATH + '/api/device')).json();
 }
-
