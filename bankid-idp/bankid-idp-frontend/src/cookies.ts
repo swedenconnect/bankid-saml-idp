@@ -1,10 +1,10 @@
-export function getCookie(cookieName) {
-  let cookie = {};
+export function getCookie(cookieName: string): string {
+  const cookie: { [key: string]: string } = {};
   document.cookie.split(';').forEach(function (el) {
-    let [key, value] = el.split('=');
+    const [key, value] = el.split('=');
     cookie[key.trim()] = value;
   });
-  return cookie[cookieName];
+  return cookie[cookieName] ? cookie[cookieName] : '';
 }
 
 export function getXSRFCookie() {
