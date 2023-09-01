@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
@@ -13,7 +13,7 @@
   onBeforeMount(() => getContactInformation());
 
   const getErrorMessage = () => {
-    let msg = route.params.msg;
+    const msg = route.params.msg as string;
     if (te(msg)) {
       return msg;
     }
@@ -21,9 +21,10 @@
   };
 
   const getTraceId = () => {
-    let pattern = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
-    if (pattern.test(route.params.trace)) {
-      return '' + route.params.trace;
+    const pattern = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+    const trace = route.params.trace as string;
+    if (pattern.test(trace)) {
+      return trace;
     }
     return '';
   };
