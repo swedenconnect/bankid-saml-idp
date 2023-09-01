@@ -1,50 +1,57 @@
-<script setup>
+<script setup lang="ts">
   import { onMounted, ref } from 'vue';
   import QRDisplay from '@/components/QRDisplay.vue';
   import StatusItem from '@/components/StatusItem.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
+  import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
 
   const qrImage = ref('');
   const token = ref('');
   const messageCode = ref('bankid.msg.rfa13');
-  const responseStatus = ref('');
+  const responseStatus = ref<ApiResponseStatus | null>(null);
 
-  const props = defineProps({
-    otherDevice: Boolean,
-    sign: Boolean,
-  });
+  const props = defineProps<{
+    otherDevice: boolean;
+    sign: boolean;
+  }>();
+
+  function isApiResponse(obj: any): obj is ApiResponse {
+    return obj && 'status' in obj;
+  }
+
+  function isRetryResponse(obj: any): obj is RetryResponse {
+    return obj && 'retry' in obj;
+  }
 
   const polling = () => {
-    poll(props.otherDevice)
-      .then((response) => {
-        if (response['retry'] !== true) {
-          responseStatus.value = response['status'];
-          if (response['qrCode'] !== '') {
-            qrImage.value = response['qrCode'];
-          }
-          if (response['status'] !== 'NOT_STARTED') {
-            qrImage.value = '';
-          }
-          token.value = response['autoStartToken'];
-          messageCode.value = response['messageCode'];
+    poll(props.otherDevice).then((response) => {
+      if (isApiResponse(response)) {
+        responseStatus.value = response.status;
+        if (response.qrCode !== '') {
+          qrImage.value = response.qrCode;
         }
-        return response;
-      })
-      .then((response) => {
-        if (response['status'] === 'COMPLETE') {
-          window.location.href = PATHS.COMPLETE;
-        } else if (response['status'] === 'CANCEL') {
-          window.location.href = PATHS.CANCEL;
-        } else if (response['status'] === 'ERROR') {
+        if (response.status !== 'NOT_STARTED') {
           qrImage.value = '';
-        } else if (response['retry'] === true) {
-          /* Time is defined in seconds and setTimeout is in millis*/
-          window.setTimeout(() => polling(), parseInt(response['time'] * 1000));
-        } else {
-          window.setTimeout(() => polling(), 500);
         }
-      });
+        token.value = response.autoStartToken;
+        messageCode.value = response.messageCode;
+
+        if (response.status === 'COMPLETE') {
+          window.location.href = PATHS.COMPLETE;
+        } else if (response.status === 'CANCEL') {
+          window.location.href = PATHS.CANCEL;
+        } else if (response.status === 'ERROR') {
+          qrImage.value = '';
+        }
+      }
+      if (isRetryResponse(response) && response.retry === true) {
+        /* Time is defined in seconds and setTimeout is in milliseconds */
+        window.setTimeout(() => polling(), parseInt(response.time) * 1000);
+      } else {
+        window.setTimeout(() => polling(), 500);
+      }
+    });
   };
 
   const cancelRequest = async () => {

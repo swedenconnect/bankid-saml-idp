@@ -2,6 +2,7 @@ import { getXSRFCookie } from '@/cookies';
 import type {
   ApiResponse,
   CustomerContactInformation,
+  RetryResponse,
   SelectedDeviceInformation,
   SpInformation,
   Status,
@@ -20,7 +21,7 @@ export async function poll(showQr: boolean) {
   if (!response.ok) {
     if (response.status === 429) {
       const retryAfter = response.headers.get('Retry-After');
-      return { retry: true, time: retryAfter };
+      return { retry: true, time: retryAfter } as RetryResponse;
     }
     // TODO handle unexpected error
   }
