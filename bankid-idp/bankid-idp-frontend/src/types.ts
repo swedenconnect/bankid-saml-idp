@@ -1,10 +1,11 @@
-export enum ApiResponseStatus {
+const enum ApiResponseStatusEnum {
   NOT_STARTED,
   IN_PROGRESS,
   ERROR,
   COMPLETE,
   CANCEL,
 }
+export type ApiResponseStatus = keyof typeof ApiResponseStatusEnum;
 export interface ApiResponse {
   status: ApiResponseStatus;
   qrCode: string;
@@ -12,10 +13,16 @@ export interface ApiResponse {
   messageCode: string;
 }
 
-export enum StatusDescription {
+export interface RetryResponse {
+  retry: boolean;
+  time: string;
+}
+
+const enum StatusDescriptionEnum {
   OK,
   ISSUES,
 }
+export type StatusDescription = keyof typeof StatusDescriptionEnum;
 export interface Status {
   status: StatusDescription;
 }
