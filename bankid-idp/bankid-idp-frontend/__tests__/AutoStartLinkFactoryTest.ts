@@ -31,13 +31,13 @@ const testArguments = [
 
 test('Parameterized Test : Device Detection : Link Creation', () => {
   testArguments.forEach((arg) => {
-    let appLink = createLink(arg['userAgent'], 'token', 'location.se');
+    const appLink = createLink(arg['userAgent'], 'token', 'location.se');
     expect(appLink, 'Link was not same as expected actual:' + appLink + ' expected:' + arg['link']).toBe(arg['link']);
   });
 });
 test('Parameterized Test : Device Detection : Start Automatically', () => {
   testArguments.forEach((arg) => {
-    let automaticDeviceSelected = shallSelectDeviceAutomatically(arg['userAgent']);
+    const automaticDeviceSelected = shallSelectDeviceAutomatically(arg['userAgent']);
     expect(
       automaticDeviceSelected,
       'Automatic start was not same as expected actual:' +
@@ -50,9 +50,9 @@ test('Parameterized Test : Device Detection : Start Automatically', () => {
 
 test('Parameterized Test : Device Detection : Device Type', () => {
   testArguments.forEach((arg) => {
-    let uap = new UAParser(arg['userAgent']);
-    let ua = uap.getResult();
-    let device = getType(ua);
+    const uap = new UAParser(arg['userAgent']);
+    const ua = uap.getResult();
+    const device = getType(ua);
     console.log(ua);
     expect(device, 'Device was not same as expected actual:' + device + ' expected:' + arg['device']).toBe(
       arg['device'],
