@@ -118,7 +118,7 @@ class BankIdServiceTest {
     CircuitBreakerConfig config = resilienceConfiguration.circuitBreakerConfig();
     CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
     CircuitBreaker circuitBreaker = resilienceConfiguration.circuitBreaker(registry);
-    BankIdService service = new BankIdService(Mockito.mock(BankIdEventPublisher.class), circuitBreaker, new BankIdRequestFactory());
+    BankIdService service = new BankIdService(new BankIdEventPublisher(Mockito.mock(ApplicationEventPublisher.class)), circuitBreaker, new BankIdRequestFactory());
 
     BankIDClient client = Mockito.mock(BankIDClient.class);
     when(client.collect(any())).thenReturn(Mono.error(new BankIdServerException("")));
