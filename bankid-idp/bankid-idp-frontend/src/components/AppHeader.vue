@@ -1,10 +1,13 @@
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue';
+  import type { SpInformation } from '@/types';
 
-  const props = defineProps({
-    spInfo: {
-      type: Object,
-    },
+  interface Props {
+    spInfo: SpInformation | null;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    spInfo: null,
   });
 
   const getImage = computed(() => (props.spInfo ? props.spInfo.imageUrl : ''));

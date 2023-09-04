@@ -1,30 +1,33 @@
 import { UAParser } from 'ua-parser-js';
 
-export function createLink(userAgent, token, location) {
-  let uap = new UAParser(userAgent);
-  let ua = uap.getResult();
+export function createLink(userAgent: string, token: string, location: string) {
+  const uap = new UAParser(userAgent);
+  const ua = uap.getResult();
+
   switch (getType(ua)) {
-    case 'pc':
-      return getDefaultRedirect(token);
     case 'iphone-phone':
       if (ua.browser.name === 'Mobile Safari' || ua.browser.name === 'Safari') {
-        return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location;
+        getMobileRedirect(token, location);
       }
       // Unsupported browser on iphone
-      return getDefaultRedirect();
+      return getDefaultRedirect(token);
     case 'android-phone':
-      return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location;
+      getMobileRedirect(token, location);
   }
   return getDefaultRedirect(token);
 }
 
-function getDefaultRedirect(token) {
+function getDefaultRedirect(token: string) {
   return 'bankid:///?autostarttoken=' + token + '&redirect=null';
 }
 
-export function shallSelectDeviceAutomatically(userAgent) {
-  let uap = new UAParser(userAgent);
-  let ua = uap.getResult();
+function getMobileRedirect(token: string, location: string) {
+  return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location;
+}
+
+export function shallSelectDeviceAutomatically(userAgent: string) {
+  const uap = new UAParser(userAgent);
+  const ua = uap.getResult();
   switch (getType(ua)) {
     case 'desktop':
       return false;
@@ -35,7 +38,7 @@ export function shallSelectDeviceAutomatically(userAgent) {
   return false;
 }
 
-export function getType(ua) {
+export function getType(ua: UAParser.IResult) {
   if (ua.device.type === undefined) {
     return 'desktop';
   }

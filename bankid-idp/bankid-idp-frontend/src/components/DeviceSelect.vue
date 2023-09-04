@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
   import { onBeforeMount, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { shallSelectDeviceAutomatically } from '@/AutoStartLinkFactory';
@@ -6,7 +6,7 @@
 
   const router = useRouter();
 
-  const authenticate = (pushLocation) => {
+  const authenticate = (pushLocation: string) => {
     router.push({ name: pushLocation });
   };
 

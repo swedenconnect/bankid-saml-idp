@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
