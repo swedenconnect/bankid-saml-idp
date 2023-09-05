@@ -90,7 +90,7 @@
         </button>
       </div>
     </div>
-    <div class="col-sm-12 return">
+    <div class="return">
       <button
         v-if="!showContinueErrorButton()"
         @click="cancelRequest"

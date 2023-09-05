@@ -22,31 +22,21 @@ a {
   margin: 0 auto;
 }
 
-.lang {
-  padding-top: 29px;
-  padding-bottom: 5px;
-  padding-left: 15px;
-  padding-right: 15px;
-  display: block;
+.btn-link {
+  padding: 28px;
+  border: none;
+  color: #000000;
+  font-size: 14px;
+  line-height: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+  background-color: transparent;
 }
 
 .content-container {
   background: #ffffff;
   padding: 29px;
-  margin-top: 20px;
-  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
-}
-
-.btn-link {
-  font-weight: inherit;
-  background-color: transparent;
-
-  color: #000000;
-  text-decoration: underline;
-  font-size: 14px;
-  line-height: 16px;
 }
 
 .sign-message {
@@ -91,13 +81,6 @@ a {
   .container {
     width: 620px;
   }
-}
-
-/* Return */
-
-.return {
-  padding: 23px;
-  /* border-bottom: 1px solid #D0CACA;*/
 }
 
 /* Helpers */
