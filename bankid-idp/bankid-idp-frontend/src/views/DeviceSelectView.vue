@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
+  import BankIdLogo from '@/components/BankIdLogo.vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
-  import { status } from '@/Service';
+  import { getOverrides, status } from '@/Service';
 
   const displayServiceMessage = ref(false);
 
@@ -16,6 +17,12 @@
       if (s['status'] !== 'OK') {
         displayServiceMessage.value = true;
       }
+      getOverrides().then((response) => {
+        console.log(response);
+        const style = document.createElement('style');
+        style.appendChild(document.createTextNode(response.css[0].style));
+        // document.head.append(style);
+      });
     });
   });
 </script>
@@ -25,7 +32,7 @@
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
         <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
-
+        <BankIdLogo />
         <h2>BankID</h2>
         <p>{{ $t('bankid.msg.rfa20') }}</p>
 

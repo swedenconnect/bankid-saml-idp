@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
+  import BankIdLogo from '@/components/BankIdLogo.vue';
   import QRDisplay from '@/components/QRDisplay.vue';
   import StatusItem from '@/components/StatusItem.vue';
   import { PATHS } from '@/Redirects';
@@ -77,6 +78,7 @@
   <div class="container main" id="main">
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
+        <BankIdLogo />
         <StatusItem
           :otherDevice="otherDevice || showContinueErrorButton()"
           :autoStartToken="token"

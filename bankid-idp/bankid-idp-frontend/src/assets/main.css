@@ -2,6 +2,7 @@ html,
 body {
   background-color: #f5f5f5;
   font-family: 'Open Sans', sans-serif;
+  margin: 0;
 }
 
 hr {
@@ -14,25 +15,6 @@ a {
   text-decoration: underline;
   font-size: 14px;
   line-height: 16px;
-}
-
-.top-logo {
-  padding: 19px 0;
-}
-
-@media (min-width: 576px) {
-  .top-logo-dim {
-    height: 60px;
-    width: auto;
-    margin-top: 20px;
-  }
-}
-
-@media (max-width: 576px) {
-  .top-logo-dim {
-    height: 40px;
-    width: auto;
-  }
 }
 
 .lang {
@@ -168,13 +150,6 @@ a {
   content: '';
   clear: both;
   display: table;
-}
-
-.header {
-  background-color: #fff;
-  -webkit-box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
 }
 
 @media (min-width: 576px) {
