@@ -2,13 +2,9 @@
   import { computed } from 'vue';
   import type { SpInformation } from '@/types';
 
-  interface Props {
+  const props = defineProps<{
     spInfo: SpInformation | null;
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    spInfo: null,
-  });
+  }>();
 
   const getImage = computed(() => (props.spInfo ? props.spInfo.imageUrl : ''));
 </script>

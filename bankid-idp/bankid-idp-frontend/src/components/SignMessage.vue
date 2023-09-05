@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  const props = defineProps({
-    signMessage: String,
-  });
+  const props = defineProps<{
+    signMessage: string;
+  }>();
 </script>
 
 <template>
