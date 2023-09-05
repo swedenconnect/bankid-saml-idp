@@ -44,62 +44,6 @@ a {
   line-height: 16px;
 }
 
-.providers {
-  margin-top: 20px;
-}
-
-.providers p.info {
-  font-size: 18px;
-  line-height: 24px;
-}
-
-.providers .provider {
-  margin: 9px auto;
-  background-color: #f7f7f7;
-  border: 1px solid #d8d8d8;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.providers .provider-button {
-  display: block;
-  width: 100%;
-  border: none;
-  padding: 0px 28px;
-  margin-bottom: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  text-align: center;
-  background: none;
-}
-
-.providers .provider img,
-.providers .provider p {
-  display: inline-block;
-}
-
-.providers .provider img {
-  width: 53px;
-}
-
-.providers .provider p {
-  margin: 0 0 0 8px;
-  width: calc(100% - 66px);
-  vertical-align: middle;
-  text-align: left;
-}
-
-.providers .provider p.idp-description {
-  margin-left: 65px;
-  font-style: italic;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.providers .provider-button:first-of-type {
-  margin-top: 23px;
-}
-
 .sign-message {
   margin-bottom: 30px;
   background-color: #f7f7f7;
