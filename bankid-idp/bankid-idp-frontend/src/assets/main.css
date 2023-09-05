@@ -34,20 +34,6 @@ a {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
-.copyright {
-  margin: 23px auto;
-}
-
-.copyright p {
-  font-size: 10px;
-  line-height: 24px;
-  margin-right: 10px;
-}
-
-.copyright img {
-  transform: translateY(5%);
-}
-
 .btn-link {
   font-weight: inherit;
   background-color: transparent;

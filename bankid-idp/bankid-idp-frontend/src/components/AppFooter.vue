@@ -1,6 +1,20 @@
 <template>
-  <div class="container col-sm-12 copyright">
-    <img class="float-right" height="16" src="@/assets/logo-notext.svg" alt="Logo" />
-    <p class="float-right">{{ $t('bankid.msg.copyright') }}</p>
-  </div>
+  <footer>
+    <p class="copyright">{{ $t('bankid.msg.copyright') }}</p>
+    <img height="16" src="@/assets/logo-notext.svg" alt="Logo" />
+  </footer>
 </template>
+
+<style scoped>
+  footer {
+    max-width: 620px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+  }
+  .copyright {
+    font-size: 10px;
+  }
+</style>
