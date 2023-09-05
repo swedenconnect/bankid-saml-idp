@@ -31,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @ConditionalOnProperty(value = "bankid.standalone", havingValue = "true", matchIfMissing = true)
+// TODO: 2023-09-05 Give a better name like bankid.disablefrontend 
 public class FrontendController {
 
   /**

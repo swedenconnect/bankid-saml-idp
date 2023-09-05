@@ -48,7 +48,7 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
 public class BankIdAuthenticationController extends AbstractAuthenticationController<BankIdAuthenticationProvider> {
 
   /** The path to where the Spring Security SAML IdP flow directs the user agent to. */
-  public static final String AUTHN_PATH = "/bankid";
+  public static final String AUTHN_PATH = "/bankid"; // TODO: 2023-09-05 Make configurable
 
   /** Relying parties that we serve. */
   private final RelyingPartyRepository rpRepository;
