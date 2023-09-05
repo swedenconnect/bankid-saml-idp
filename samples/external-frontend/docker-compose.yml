@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  frontend:
+    image: nginx
+    depends_on:
+      - backend
+    networks: 
+      - idp
+    ports:
+      - 8000:80
+      - 8443:443
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./selfsigned/sites/local.dev.swedenconnect.se.key:/etc/ssl/private/local.dev.swedenconnect.se.key
+      - ./selfsigned/sites/local.dev.swedenconnect.se.crt:/etc/ssl/certs/local.dev.swedenconnect.se.crt
+      - .self-signed.conf:/etc/nginx/snippets/self-signed.conf
+      - .ssl-params.conf:/etc/nginx/snippets/ssl-params.conf
+      - ./selfsigned/dhparam.pem:/etc/ssl/certs/dhparam.pem
+  backend:
+    image: local.dev.swedenconnect.se/bankid-saml-idp
+    ports:
+      - 8445:8445
+    volumes:
+      - ./selfsigned/sites/java/ssl.jks:/opt/bankid-idp/ssl.jks
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_REDIS_HOST=redisstack
+      - SPRING_REDIS_TLS_ENABLEHOSTNAMEVERIFICATION=false
+      - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks
+      - SERVER_PORT=8445
+      - SERVER_FORWARDHEADERSSTRATEGY=native
+    depends_on:
+      - redisstack
+    networks:
+      - idp
+  redisstack:
+     image: redis/redis-stack:latest
+     ports:
+      - 6379:6379
+      - 8001:8001
+     networks:
+      - idp
+     volumes:
+      - ../../bankid-idp/bankid-idp-backend/src/main/resources/local/redis/:/tls
+     environment:
+      - REDIS_ARGS=--requirepass supersecret --tls-port 6379 --port 0 --tls-cert-file /tls/server.crt --tls-key-file /tls/server.key --tls-ca-cert-file /tls/ca.crt 
+
+networks:
+  idp:
+    name: idp
