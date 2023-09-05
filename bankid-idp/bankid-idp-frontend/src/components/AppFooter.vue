@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="main-width">
     <p class="copyright">{{ $t('bankid.msg.copyright') }}</p>
     <img height="16" src="@/assets/logo-notext.svg" alt="Logo" />
   </footer>
@@ -7,8 +7,6 @@
 
 <style scoped>
   footer {
-    max-width: 620px;
-    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: end;

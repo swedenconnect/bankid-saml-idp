@@ -17,6 +17,11 @@ a {
   line-height: 16px;
 }
 
+.main-width {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
 .lang {
   padding-top: 29px;
   padding-bottom: 5px;

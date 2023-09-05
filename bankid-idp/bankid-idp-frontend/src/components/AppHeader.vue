@@ -11,7 +11,7 @@
 
 <template>
   <header>
-    <div class="top-logo-container">
+    <div class="top-logo-container main-width">
       <img v-if="getImage" class="top-logo-dim" :src="getImage" alt="Logo" />
       <img v-else class="top-logo-dim" src="@/assets/logo.svg" alt="Logo" />
     </div>
@@ -25,8 +25,6 @@
   }
 
   .top-logo-container {
-    max-width: 620px;
-    margin: 0 auto;
     padding: 20px;
   }
 
