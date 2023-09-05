@@ -72,7 +72,7 @@ bankid:
     - http://id.elegnamnden.se/sprop/1.0/mobile-auth
     - http://id.elegnamnden.se/sprop/1.0/scal2
     - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
-    
+    authn-path: "/bankid"
 ui:
   languages:
   - tag: sv
@@ -185,7 +185,8 @@ session:
 bankid:
   audit:
     module: "redistimeseries"
-  standalone: true
+  builtinfrontend:
+    disable: false
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
   relying-parties:
