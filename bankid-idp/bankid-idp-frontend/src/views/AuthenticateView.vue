@@ -84,7 +84,7 @@
           :message="messageCode"
         />
         <QRDisplay :image="qrImage" />
-        <button v-if="showContinueErrorButton()" @click="acceptError">
+        <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
           <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
         </button>
       </div>
