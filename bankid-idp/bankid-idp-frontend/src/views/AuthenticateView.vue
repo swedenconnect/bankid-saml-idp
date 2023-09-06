@@ -79,7 +79,7 @@
       <div class="col-sm-12 content-container">
         <BankIdLogo />
         <p>{{ $t(messageCode) }}</p>
-        <AutoStart :otherDevice="otherDevice || showContinueErrorButton()" :autoStartToken="token" />
+        <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
         <QRDisplay :image="qrImage" />
         <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
           <span>{{ $t('bankid.msg.btn-error-continue') }}</span>

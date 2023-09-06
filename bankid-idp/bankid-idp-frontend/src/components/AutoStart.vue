@@ -3,7 +3,6 @@
   import { createLink } from '@/AutoStartLinkFactory';
 
   const props = defineProps<{
-    otherDevice: boolean;
     autoStartToken: string;
   }>();
 
@@ -18,7 +17,7 @@
   watch(
     () => props.autoStartToken,
     (newToken) => {
-      if (!props.otherDevice && newToken) {
+      if (newToken) {
         navigateToApp();
       }
     },
@@ -26,5 +25,5 @@
 </script>
 
 <template>
-  <a v-if="!otherDevice" :href="getAutoStartLink()">{{ $t('bankid.msg.btn-autostart') }}</a>
+  <a :href="getAutoStartLink()">{{ $t('bankid.msg.btn-autostart') }}</a>
 </template>
