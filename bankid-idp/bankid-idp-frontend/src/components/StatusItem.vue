@@ -19,7 +19,7 @@
   watch(
     () => props.autoStartToken,
     (newToken) => {
-      if (!props.otherDevice && !newToken) {
+      if (!props.otherDevice && newToken) {
         navigateToApp();
       }
     },
