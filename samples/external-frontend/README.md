@@ -60,10 +60,3 @@ If forwarding to the backend is misconfigured you might see an issue similar to 
 
 #### Invalid Nginx Path Rewrite
 Since the BankID-IDP Application uses a context-path that the frontend assumes still exists for assets, we need to rewrite the path when fetching assets from nginx rather than the application otherwise an issue similar to this will occur.
-
-    location ~ ^/bankid/idp/assets/(?<filename>.+)$ {
-        rewrite ^ /assets/$filename break;
-        root /usr/share/nginx/html;
-    }
-
-> TODO insert example here
