@@ -30,7 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Felix Hellman
  */
 @Controller
-@ConditionalOnProperty(value = "bankid.standalone", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(value = "bankid.builtinfrontend.disable", havingValue = "false", matchIfMissing = true)
 public class FrontendController {
 
   /**

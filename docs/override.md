@@ -48,7 +48,44 @@ in your POM:
 
 ```
 
-Also configure the Spring Boot Maven plugin so that the core backend application's main class
+### Creating a new application entry point
+To enable scanning of beans for the original application and your custom beans we need to define a new application entry point
+
+#### Example
+In this example we will define a new Spring boot application in the package `com.test`
+```java
+package com.test;
+
+@EnableConfigurationProperties
+@SpringBootApplication(
+        exclude = {RedissonAutoConfiguration.class, RedisAutoConfiguration.class},
+        scanBasePackageClasses = {
+                com.test.Application.class,
+                se.swedenconnect.bankid.idp.IdpApplication.class
+        }
+)
+public class Application {
+  public static void main(String[] args) {
+    try {
+      OpenSAMLInitializer.getInstance()
+              .initialize(
+                      new OpenSAMLSecurityDefaultsConfig(new SwedishEidSecurityConfiguration()),
+                      new OpenSAMLSecurityExtensionConfig());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    SpringApplication.run(Application.class, args);
+  }
+}
+
+```
+
+#### Example Repository
+> TODO Create Example Repository
+
+### Configure Maven Plugin
+
+Also configure the Spring Boot Maven plugin so that the new backend application's main class
 is found:
 
 ```
@@ -66,7 +103,7 @@ is found:
             <goal>repackage</goal>
           </goals>
           <configuration>
-            <mainClass>se.swedenconnect.bankid.idp.IdpApplication</mainClass>
+            <mainClass>com.test.Application</mainClass>
           </configuration>
         </execution>
         <execution>
@@ -76,7 +113,8 @@ is found:
         </execution>
       </executions>
     </plugin>
-    
+  </plugins>
+</build>
     ....
 
 ``` 
