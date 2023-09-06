@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { onBeforeMount, onMounted, ref } from 'vue';
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import QRDisplay from '@/components/QRDisplay.vue';
@@ -9,7 +9,7 @@
 
   const qrImage = ref('');
   const token = ref('');
-  const messageCode = ref('bankid.msg.rfa13'); // Njaaaee...
+  const messageCode = ref('');
   const responseStatus = ref<ApiResponseStatus | null>(null);
 
   const props = defineProps<{
@@ -67,6 +67,12 @@
   const showContinueErrorButton = () => {
     return responseStatus.value === 'ERROR';
   };
+
+  onBeforeMount(() => {
+    if (!props.otherDevice) {
+      messageCode.value = 'bankid.msg.rfa13';
+    }
+  });
 
   onMounted(() => {
     polling();
