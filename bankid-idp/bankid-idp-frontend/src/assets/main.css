@@ -39,18 +39,6 @@ a {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
-.sign-message {
-  margin-bottom: 30px;
-  background-color: #f7f7f7;
-  border: 1px solid #d0caca;
-  padding: 23px 28px;
-}
-
-.sign-message div {
-  margin: 0;
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-}
-
 .main {
   margin-left: auto;
   margin-right: auto;
