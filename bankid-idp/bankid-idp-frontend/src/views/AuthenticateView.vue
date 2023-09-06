@@ -14,7 +14,6 @@
 
   const props = defineProps<{
     otherDevice: boolean;
-    sign: boolean;
   }>();
 
   function isApiResponse(obj: any): obj is ApiResponse {
