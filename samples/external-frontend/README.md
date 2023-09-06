@@ -59,4 +59,4 @@ If forwarding to the backend is misconfigured you might see an issue similar to 
 > 2030-01-01 00:00:00.000 ERROR 1 --- [nio-8445-exec-4] .c.b.s.i.ReceivedEndpointSecurityHandler : Message Handler:  SAML message intended destination endpoint 'https://local.dev.swedenconnect.se:8443/bankid/idp/saml2/redirect/authn' did not match the recipient endpoint 'https://local.dev.swedenconnect.se:8445/bankid/idp/saml2/redirect/authn'
 
 #### Invalid Nginx Path Rewrite
-Since the BankID-IDP Application uses a context-path that the frontend assumes still exists for assets, we need to rewrite the path when fetching assets from nginx rather than the application otherwise an issue similar to this will occur.
+Since the BankID-IDP Application uses a context-path that the frontend assumes still exists for assets, we need to rewrite the path when fetching assets from nginx rather than the application.
