@@ -44,7 +44,7 @@
       <!-- ./col-sm-12 content-container -->
 
       <div class="return">
-        <button @click="cancelSelection" class="btn btn-link" type="submit" name="action" value="cancel">
+        <button @click="cancelSelection" class="btn-link" type="submit" name="action" value="cancel">
           <span>{{ $t('bankid.msg.btn-cancel') }}</span>
         </button>
       </div>

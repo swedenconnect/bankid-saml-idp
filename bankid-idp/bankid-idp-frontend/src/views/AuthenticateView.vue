@@ -93,7 +93,7 @@
       <button
         v-if="!showContinueErrorButton()"
         @click="cancelRequest"
-        class="btn btn-link"
+        class="btn-link"
         type="submit"
         name="action"
         value="cancel"
