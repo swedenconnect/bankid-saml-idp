@@ -9,7 +9,7 @@
 
   const qrImage = ref('');
   const token = ref('');
-  const messageCode = ref('bankid.msg.rfa13');
+  const messageCode = ref('bankid.msg.rfa13'); // Njaaaee...
   const responseStatus = ref<ApiResponseStatus | null>(null);
 
   const props = defineProps<{
@@ -78,11 +78,8 @@
     <div class="row" id="mainRow">
       <div class="col-sm-12 content-container">
         <BankIdLogo />
-        <StatusItem
-          :otherDevice="otherDevice || showContinueErrorButton()"
-          :autoStartToken="token"
-          :message="messageCode"
-        />
+        <p>{{ $t(messageCode) }}</p>
+        <StatusItem :otherDevice="otherDevice || showContinueErrorButton()" :autoStartToken="token" />
         <QRDisplay :image="qrImage" />
         <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
           <span>{{ $t('bankid.msg.btn-error-continue') }}</span>

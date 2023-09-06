@@ -5,7 +5,6 @@
   const props = defineProps<{
     otherDevice: boolean;
     autoStartToken: string;
-    message: string;
   }>();
 
   const getAutoStartLink = () => {
@@ -27,6 +26,5 @@
 </script>
 
 <template>
-  <p>{{ $t(message) }}</p>
   <a v-if="!otherDevice" :href="getAutoStartLink()">{{ $t('bankid.msg.btn-autostart') }}</a>
 </template>
