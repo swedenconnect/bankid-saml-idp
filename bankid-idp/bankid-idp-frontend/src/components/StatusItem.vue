@@ -27,12 +27,6 @@
 </script>
 
 <template>
-  <div>
-    <p>{{ $t(message) }}</p>
-  </div>
-  <div :hidden="otherDevice">
-    <button @click="navigateToApp">
-      {{ $t('bankid.msg.btn-autostart') }}
-    </button>
-  </div>
+  <p>{{ $t(message) }}</p>
+  <a v-if="!otherDevice" :href="getAutoStartLink()">{{ $t('bankid.msg.btn-autostart') }}</a>
 </template>
