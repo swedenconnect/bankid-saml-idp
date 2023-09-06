@@ -87,18 +87,3 @@ a {
   margin-left: -29px;
   margin-right: -29px;
 }
-
-.container-fluid {
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: -20px;
-  margin-top: -20px;
-}
-
-.container-fluid.status {
-  border: black;
-  border-style: double;
-  background: beige;
-}
