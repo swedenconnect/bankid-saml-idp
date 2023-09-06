@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
+  import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import QRDisplay from '@/components/QRDisplay.vue';
-  import StatusItem from '@/components/StatusItem.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
   import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
@@ -79,7 +79,7 @@
       <div class="col-sm-12 content-container">
         <BankIdLogo />
         <p>{{ $t(messageCode) }}</p>
-        <StatusItem :otherDevice="otherDevice || showContinueErrorButton()" :autoStartToken="token" />
+        <AutoStart :otherDevice="otherDevice || showContinueErrorButton()" :autoStartToken="token" />
         <QRDisplay :image="qrImage" />
         <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
           <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
