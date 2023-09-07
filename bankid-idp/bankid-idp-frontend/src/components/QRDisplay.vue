@@ -39,5 +39,7 @@
   }
   img {
     border: 2px solid black;
+    max-width: 60vw;
+    max-height: 60vw;
   }
 </style>
