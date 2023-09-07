@@ -5,16 +5,12 @@ body {
   margin: 0;
 }
 
-a {
+a,
+.btn-link {
   color: #000000;
-  text-decoration: underline;
   font-size: 14px;
   line-height: 16px;
-}
-
-.main-width {
-  max-width: 620px;
-  margin: 0 auto;
+  text-decoration: underline;
 }
 
 .btn-default {
@@ -30,12 +26,13 @@ a {
 .btn-link {
   padding: 28px;
   border: none;
-  color: #000000;
-  font-size: 14px;
-  line-height: 16px;
-  text-decoration: underline;
   cursor: pointer;
   background-color: transparent;
+}
+
+.main-width {
+  max-width: 620px;
+  margin: 0 auto;
 }
 
 .content-container {
