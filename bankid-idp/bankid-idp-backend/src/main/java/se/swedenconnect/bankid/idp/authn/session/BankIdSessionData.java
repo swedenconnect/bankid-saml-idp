@@ -140,7 +140,7 @@ public class BankIdSessionData implements Serializable {
         .status(response.getProgressStatus())
         .startFailed(response.getErrorCode() == ErrorCode.START_FAILED)
         .sessionExpired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
-        .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr()))
+        .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr(), previous.getOperation()))
         .showQr(previous.getShowQr())
         .operation(previous.getOperation())
         .build();
