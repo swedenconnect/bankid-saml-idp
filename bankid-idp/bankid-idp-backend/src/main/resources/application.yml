@@ -80,7 +80,7 @@ bankid:
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp
-    base-url: https://local.dev.swedenconnect.se:${server.port}/idp    
+    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}    
     credentials:
       sign:
         resource: classpath:idp-credentials.jks
@@ -242,7 +242,7 @@ bankid:
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp/local
-    base-url: https://local.dev.swedenconnect.se:${server.port}/idp
+    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
     metadata-providers:
     - location: classpath:local/local-metadata.xml
 
