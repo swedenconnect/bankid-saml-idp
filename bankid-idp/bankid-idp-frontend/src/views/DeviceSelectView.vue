@@ -28,27 +28,18 @@
 </script>
 
 <template>
-  <div class="container main" id="main">
-    <div class="row" id="mainRow">
-      <div class="col-sm-12 content-container">
-        <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
-        <BankIdLogo />
-        <h2>BankID</h2>
-        <p>{{ $t('bankid.msg.rfa20') }}</p>
+  <div class="content-container main-width">
+    <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
+    <BankIdLogo />
+    <h2>BankID</h2>
+    <p>{{ $t('bankid.msg.rfa20') }}</p>
+    <DeviceSelect />
+  </div>
 
-        <hr class="full-width" />
-        <br />
-        <!-- TODO padding -->
-        <DeviceSelect />
-      </div>
-      <!-- ./col-sm-12 content-container -->
-
-      <div class="return">
-        <button @click="cancelSelection" class="btn-link" type="submit" name="action" value="cancel">
-          <span>{{ $t('bankid.msg.btn-cancel') }}</span>
-        </button>
-      </div>
-    </div>
+  <div class="return main-width">
+    <button @click="cancelSelection" class="btn-link" type="submit" name="action" value="cancel">
+      <span>{{ $t('bankid.msg.btn-cancel') }}</span>
+    </button>
   </div>
   <!-- main -->
 </template>
