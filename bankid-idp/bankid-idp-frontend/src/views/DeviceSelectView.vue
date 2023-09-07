@@ -28,7 +28,7 @@
 </script>
 
 <template>
-  <div class="content-container main-width">
+  <div class="content-container">
     <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
     <BankIdLogo />
     <h2>BankID</h2>
@@ -36,7 +36,7 @@
     <DeviceSelect />
   </div>
 
-  <div class="return main-width">
+  <div class="return">
     <button @click="cancelSelection" class="btn-link" type="submit" name="action" value="cancel">
       <span>{{ $t('bankid.msg.btn-cancel') }}</span>
     </button>

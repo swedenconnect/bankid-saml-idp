@@ -80,7 +80,7 @@
 </script>
 
 <template>
-  <div class="content-container main-width">
+  <div class="content-container">
     <BankIdLogo />
     <p>{{ $t(messageCode) }}</p>
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
@@ -89,7 +89,7 @@
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
   </div>
-  <div class="return main-width">
+  <div class="return">
     <button
       v-if="!showContinueErrorButton()"
       @click="cancelRequest"

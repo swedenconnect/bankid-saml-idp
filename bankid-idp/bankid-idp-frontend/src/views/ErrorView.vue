@@ -38,7 +38,7 @@
 </script>
 
 <template>
-  <div class="content-container main-width">
+  <div class="content-container">
     <h2>Bankid</h2>
     <StatusMessage :message="getErrorMessage()" />
     <p v-if="displayEmail && contactEmail">{{ $t('bankid.msg.contact') }}</p>
