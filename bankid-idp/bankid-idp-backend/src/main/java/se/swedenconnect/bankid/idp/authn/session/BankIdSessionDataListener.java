@@ -21,14 +21,17 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.events.*;
+import se.swedenconnect.bankid.idp.authn.events.AbortAuthEvent;
+import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
+import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
+import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
+import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
+import se.swedenconnect.bankid.idp.authn.events.UserVisibleDataEvent;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
-import se.swedenconnect.spring.saml.idp.events.Saml2PostUserAuthenticationEvent;
 
 /**
  * A listener for BankID session events.
@@ -95,13 +98,13 @@ public class BankIdSessionDataListener {
   @EventListener
   public void handleCollectResponse(final CollectResponseEvent event) {
     final HttpSession session = event.getRequest().getRequest().getSession();
-    
+
     log.info("Collect response event was published {} for session {}", event.getCollectResponse(), session.getId());
-    
+
     final BankIdSessionData previous =
         this.reader.loadSessionData(event.getRequest().getRequest()).getBankIdSessionData();
     this.writer.save(event.getRequest().getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
-    
+
     if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
       this.writer.save(event.getRequest().getRequest(), event.getCollectResponse());
     }

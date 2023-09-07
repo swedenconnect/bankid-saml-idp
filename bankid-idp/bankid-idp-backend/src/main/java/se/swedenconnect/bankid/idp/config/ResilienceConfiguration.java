@@ -15,22 +15,21 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.micrometer.tagged.TaggedCircuitBreakerMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
-import se.swedenconnect.bankid.rpapi.service.impl.BankIdUserException;
-
-import java.time.Duration;
 
 /**
  * Configuration for setting up the Resilience4j beans.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */

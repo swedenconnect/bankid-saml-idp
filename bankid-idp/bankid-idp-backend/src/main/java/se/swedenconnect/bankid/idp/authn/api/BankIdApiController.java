@@ -40,7 +40,6 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.error.BankIdException;
-import se.swedenconnect.bankid.idp.authn.error.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
