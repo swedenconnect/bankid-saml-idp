@@ -80,29 +80,25 @@
 </script>
 
 <template>
-  <div class="container main" id="main">
-    <div class="row" id="mainRow">
-      <div class="col-sm-12 content-container">
-        <BankIdLogo />
-        <p>{{ $t(messageCode) }}</p>
-        <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
-        <QRDisplay :image="qrImage" />
-        <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
-          <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-        </button>
-      </div>
-    </div>
-    <div class="return">
-      <button
-        v-if="!showContinueErrorButton()"
-        @click="cancelRequest"
-        class="btn-link"
-        type="submit"
-        name="action"
-        value="cancel"
-      >
-        <span>{{ $t('bankid.msg.btn-cancel') }}</span>
-      </button>
-    </div>
+  <div class="content-container main-width">
+    <BankIdLogo />
+    <p>{{ $t(messageCode) }}</p>
+    <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
+    <QRDisplay :image="qrImage" />
+    <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
+      <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
+    </button>
+  </div>
+  <div class="return main-width">
+    <button
+      v-if="!showContinueErrorButton()"
+      @click="cancelRequest"
+      class="btn-link"
+      type="submit"
+      name="action"
+      value="cancel"
+    >
+      <span>{{ $t('bankid.msg.btn-cancel') }}</span>
+    </button>
   </div>
 </template>
