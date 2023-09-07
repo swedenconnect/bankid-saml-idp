@@ -41,5 +41,4 @@
       <span>{{ $t('bankid.msg.btn-cancel') }}</span>
     </button>
   </div>
-  <!-- main -->
 </template>
