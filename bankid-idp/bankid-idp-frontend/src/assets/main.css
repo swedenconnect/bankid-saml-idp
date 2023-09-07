@@ -54,15 +54,6 @@ a {
   margin-right: auto;
 }
 
-.copyright p {
-  font-size: 10px;
-  line-height: 24px;
-  margin-right: 10px;
-}
-.float-right {
-  float: right !important;
-}
-
 .col-sm-12 {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
