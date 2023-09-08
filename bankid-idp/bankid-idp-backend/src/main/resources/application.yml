@@ -147,7 +147,6 @@ logging:
       swedenconnect:
         spring:
           saml: TRACE
-
 ---
 spring:
   config:
@@ -194,7 +193,6 @@ bankid:
     entity-ids:
     - http://sandbox.swedenconnect.se/testmyeid
     - http://sandbox.swedenconnect.se/testmyeid-sign
-    - https://demo.swedenconnect.se/sp
     credential:
       name: "test-cred"
       resource: classpath:FPTestcert4_20220818.p12
@@ -279,3 +277,32 @@ logging:
           saml: DEBUG
     
 
+---
+spring:
+  config:
+    activate:
+      on-profile: integrationtest
+bankid:
+  audit:
+    module: "redistimeseries"
+  builtinfrontend:
+    disable: false
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  relying-parties:
+    - id: test-my-eid
+      entity-ids:
+        - https://demo.swedenconnect.se/sp
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: false
+        login-text:
+          text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+          format: simple-markdown-v1
+      requirement:
+        pin-code: false

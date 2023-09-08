@@ -7,7 +7,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"local"})
+@ActiveProfiles({"local", "integrationtest"})
 public class BankIdIdpIntegrationSetup extends TestContainerSetup {
   protected static final TestSp testSp;
 
