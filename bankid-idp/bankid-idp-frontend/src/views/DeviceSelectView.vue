@@ -4,7 +4,7 @@
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
-  import { getOverrides, status } from '@/Service';
+  import { status } from '@/Service';
 
   const displayServiceMessage = ref(false);
 
@@ -17,12 +17,6 @@
       if (s['status'] !== 'OK') {
         displayServiceMessage.value = true;
       }
-      getOverrides().then((response) => {
-        console.log(response);
-        const style = document.createElement('style');
-        style.appendChild(document.createTextNode(response.css[0].style));
-        // document.head.append(style);
-      });
     });
   });
 </script>
