@@ -194,6 +194,7 @@ bankid:
     entity-ids:
     - http://sandbox.swedenconnect.se/testmyeid
     - http://sandbox.swedenconnect.se/testmyeid-sign
+    - https://demo.swedenconnect.se/sp
     credential:
       name: "test-cred"
       resource: classpath:FPTestcert4_20220818.p12
