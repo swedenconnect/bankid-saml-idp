@@ -2,33 +2,43 @@
   import { computed } from 'vue';
   import type { SpInformation } from '@/types';
 
-  interface Props {
+  const props = defineProps<{
     spInfo: SpInformation | null;
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    spInfo: null,
-  });
+  }>();
 
   const getImage = computed(() => (props.spInfo ? props.spInfo.imageUrl : ''));
 </script>
 
 <template>
-  <div class="container-fluid header">
-    <div class="row">
-      <div class="column">
-        <img v-if="getImage" class="top-logo-dim" :src="getImage" alt="Logo" />
-        <img v-else class="top-logo-dim" src="@/assets/logo.svg" alt="Logo" />
-      </div>
-      <div class="column">
-        <img class="top-logo-dim" src="@/assets/BankID_logo.svg" alt="Logo" />
-      </div>
+  <header>
+    <div class="top-logo-container main-width">
+      <img v-if="getImage" class="top-logo-dim" :src="getImage" alt="Logo" />
+      <img v-else class="top-logo-dim" src="@/assets/logo.svg" alt="Logo" />
     </div>
-  </div>
+  </header>
 </template>
 
 <style scoped>
-  .header {
-    text-align: center;
+  header {
+    background: #fff;
+    box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .top-logo-container {
+    padding: 20px;
+  }
+
+  @media (min-width: 576px) {
+    .top-logo-dim {
+      height: 60px;
+      width: auto;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .top-logo-dim {
+      height: 40px;
+      width: auto;
+    }
   }
 </style>

@@ -1,19 +1,19 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { onBeforeMount, onMounted, ref } from 'vue';
+  import AutoStart from '@/components/AutoStart.vue';
+  import BankIdLogo from '@/components/BankIdLogo.vue';
   import QRDisplay from '@/components/QRDisplay.vue';
-  import StatusItem from '@/components/StatusItem.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
   import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
 
   const qrImage = ref('');
   const token = ref('');
-  const messageCode = ref('bankid.msg.rfa13');
+  const messageCode = ref('');
   const responseStatus = ref<ApiResponseStatus | null>(null);
 
   const props = defineProps<{
     otherDevice: boolean;
-    sign: boolean;
   }>();
 
   function isApiResponse(obj: any): obj is ApiResponse {
@@ -68,37 +68,37 @@
     return responseStatus.value === 'ERROR';
   };
 
+  onBeforeMount(() => {
+    if (!props.otherDevice) {
+      messageCode.value = 'bankid.msg.rfa13';
+    }
+  });
+
   onMounted(() => {
     polling();
   });
 </script>
 
 <template>
-  <div class="container main" id="main">
-    <div class="row" id="mainRow">
-      <div class="col-sm-12 content-container">
-        <StatusItem
-          :otherDevice="otherDevice || showContinueErrorButton()"
-          :autoStartToken="token"
-          :message="messageCode"
-        />
-        <QRDisplay :image="qrImage" />
-        <button v-if="showContinueErrorButton()" @click="acceptError">
-          <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-        </button>
-      </div>
-    </div>
-    <div class="col-sm-12 return">
-      <button
-        v-if="!showContinueErrorButton()"
-        @click="cancelRequest"
-        class="btn btn-link"
-        type="submit"
-        name="action"
-        value="cancel"
-      >
-        <span>{{ $t('bankid.msg.btn-cancel') }}</span>
-      </button>
-    </div>
+  <div class="content-container">
+    <BankIdLogo />
+    <p>{{ $t(messageCode) }}</p>
+    <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
+    <QRDisplay :image="qrImage" />
+    <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
+      <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
+    </button>
+  </div>
+  <div class="return">
+    <button
+      v-if="!showContinueErrorButton()"
+      @click="cancelRequest"
+      class="btn-link"
+      type="submit"
+      name="action"
+      value="cancel"
+    >
+      <span>{{ $t('bankid.msg.btn-cancel') }}</span>
+    </button>
   </div>
 </template>

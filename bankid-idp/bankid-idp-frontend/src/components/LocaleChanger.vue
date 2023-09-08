@@ -9,16 +9,14 @@
 </script>
 
 <template>
-  <div class="container main" id="languageDiv">
-    <br />
-    <div class="col-sm-12 float-right">
-      <button class="btn btn-link" v-if="locale === 'en'" @click="selectLanguage('sv')">
-        <span> Svenska </span>
-      </button>
-      <button class="btn btn-link" v-if="locale === 'sv'" @click="selectLanguage('en')">
-        <span> English </span>
-      </button>
-    </div>
+  <div class="locale-changer main-width">
+    <button class="btn-link" v-if="locale === 'en'" @click="selectLanguage('sv')">Svenska</button>
+    <button class="btn-link" v-if="locale === 'sv'" @click="selectLanguage('en')">English</button>
   </div>
-  <br />
 </template>
+
+<style scoped>
+  .locale-changer {
+    text-align: right;
+  }
+</style>

@@ -52,6 +52,7 @@ export const messages = {
                 "cancel-progress": "Stopping authentication ...",
                 "contact": "If this is a recurring error please contact support",
                 "error-page-close": "Please close this web browser window when you are done",
+                "copyright": "Copyright © Service provided by Sweden Connect",
                 error: {
                     "timeout": "The time for starting a new authentication has expired. Please try again.",
                     "service": "This service is currently experiencing some issues, please try again later",
@@ -111,6 +112,7 @@ export const messages = {
                 "cancel-progress": "Avbryter ...",
                 "contact": "Om detta är ett återkommande problem så kontakta vänligen support via email",
                 "error-page-close": "Vänligen stäng sidan när du är klar",
+                "copyright": "Copyright © Tjänsten levereras av Sweden Connect",
                 error: {
                     "timeout": "Det tog för lång tid att starta en inloggning. Vänligen tryck på avbryt och försök igen.",
                     "service": "Just nu har vi en driftstörning med denna tjänst, försök igen senare",

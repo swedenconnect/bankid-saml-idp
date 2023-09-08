@@ -16,6 +16,8 @@
 <template>
   <AppHeader :sp-info="spInfo" />
   <LocaleChanger />
-  <RouterView />
+  <main class="main-width">
+    <RouterView />
+  </main>
   <AppFooter />
 </template>
