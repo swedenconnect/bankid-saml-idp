@@ -15,6 +15,11 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import lombok.Setter;
+import org.opensaml.core.xml.util.XMLObjectSupport;
+import org.opensaml.saml.common.xml.SAMLConstants;
+import org.opensaml.saml.saml2.metadata.*;
+import org.opensaml.security.credential.UsageType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,9 +36,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-
-import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
@@ -49,6 +53,11 @@ import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * BankID IdP configuration.
@@ -123,14 +132,34 @@ public class BankIdConfiguration {
   }
 
   /**
+   * Gets the bankIdWebClientFactory bean
+   * @return Lambda function to create webclient from RelyingParty
+   */
+
+  @Bean
+  Function<RelyingParty, WebClient> bankIdWebClientFactory() {
+    return rp -> {
+      try {
+        final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
+            this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
+        webClientFactory.afterPropertiesSet();
+        return webClientFactory.createInstance();
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to create bean for webclient supplier ", e); // TODO: 2023-09-11 Better exception
+      }
+    };
+  }
+
+  /**
    * Gets the {@link RelyingPartyRepository} bean.
    *
    * @param qrGenerator the {@link QRGenerator} bean
+   * @param webClientFactory the WebClientMapper bean (function to create webclient from RelyingParty)
    * @return a {@link RelyingPartyRepository}
    * @throws Exception for errors creating the RP data
    */
   @Bean
-  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator) throws Exception {
+  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator, Function<RelyingParty, WebClient> webClientFactory) throws Exception {
 
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
     for (final RelyingParty rp : this.properties.getRelyingParties()) {
@@ -139,19 +168,14 @@ public class BankIdConfiguration {
         if (!this.properties.isTestMode()) {
           throw new IllegalArgumentException(
               "IdP is not in test mode, but Relying Party '%s' does not declare any SP:s".formatted(rp.getId()));
-        }
-        else if (this.properties.getRelyingParties().size() > 1) {
+        } else if (this.properties.getRelyingParties().size() > 1) {
           throw new IllegalArgumentException("Relying Party '%s' configured to serve all SP:s, but there are more RP"
               + " configurations - This is not permitted");
         }
       }
 
-      final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
-          this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
-      webClientFactory.afterPropertiesSet();
 
-      final BankIDClient client =
-          new BankIDClientImpl(rp.getId(), webClientFactory.createInstance(), qrGenerator);
+      final BankIDClient client = new BankIDClientImpl(rp.getId(), webClientFactory.apply(rp), qrGenerator);
 
       relyingParties.add(new RelyingPartyData(client, rp.getEntityIds(),
           rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText(), rp.getRequirement()));

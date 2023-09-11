@@ -18,6 +18,8 @@ package se.swedenconnect.bankid.idp.authn.error;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 
 /**
  * Exception class errors during BankID operations that we assign a trace ID to. This is useful for display purposes.
@@ -26,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Felix Hellman
  */
 @Slf4j
-public class BankIdTraceableException extends BankIdException {
+public class BankIdTraceableException extends BankIDException {
 
   private static final long serialVersionUID = -6220282820833829340L;
 
@@ -52,7 +54,7 @@ public class BankIdTraceableException extends BankIdException {
    * @param cause the cause of the error
    */
   public BankIdTraceableException(final String orderRef, final String msg, final Throwable cause) {
-    super(msg, cause);
+    super(ErrorCode.UNKNOWN_ERROR, msg, cause);
     this.orderRef = orderRef;
     this.traceId = UUID.randomUUID().toString();
 

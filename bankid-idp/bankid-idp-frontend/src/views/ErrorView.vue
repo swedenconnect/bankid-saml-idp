@@ -38,17 +38,12 @@
 </script>
 
 <template>
-  <div class="container main" id="main">
-    <div class="row" id="mainRow">
-      <div class="col-sm-12 content-container">
-        <h2>Bankid</h2>
-        <br />
-        <StatusMessage :message="getErrorMessage()" />
-        <p v-if="displayEmail && contactEmail">{{ $t('bankid.msg.contact') }}</p>
-        <p v-if="displayEmail && contactEmail">Email: {{ contactEmail }}</p>
-        <p v-if="displayEmail && getTraceId()">Id: {{ getTraceId() }}</p>
-        <p>{{ $t('bankid.msg.error-page-close') }}</p>
-      </div>
-    </div>
+  <div class="content-container">
+    <h2>Bankid</h2>
+    <StatusMessage :message="getErrorMessage()" />
+    <p v-if="displayEmail && contactEmail">{{ $t('bankid.msg.contact') }}</p>
+    <p v-if="displayEmail && contactEmail">Email: {{ contactEmail }}</p>
+    <p v-if="displayEmail && getTraceId()">Id: {{ getTraceId() }}</p>
+    <p>{{ $t('bankid.msg.error-page-close') }}</p>
   </div>
 </template>

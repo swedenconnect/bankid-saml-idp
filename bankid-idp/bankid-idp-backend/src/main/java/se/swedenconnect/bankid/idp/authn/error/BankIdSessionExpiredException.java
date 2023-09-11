@@ -17,6 +17,7 @@ package se.swedenconnect.bankid.idp.authn.error;
 
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
 /**
  * Exception for expired BankID sessions.
@@ -24,7 +25,7 @@ import se.swedenconnect.bankid.idp.authn.service.PollRequest;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class BankIdSessionExpiredException extends BankIdException {
+public class BankIdSessionExpiredException extends BankIDException {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
