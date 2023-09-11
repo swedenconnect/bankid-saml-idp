@@ -13,18 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 
+/**
+ * Contains information about a previously made user selection of device.
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class SelectedDeviceInformation {
 
+  /**
+   * Is the current BankID operation a sign operation?
+   */
   public boolean isSign;
 
+  /**
+   * The selected device. The string representation of the {@link PreviousDeviceSelection} enum.
+   */
   public String device;
 }

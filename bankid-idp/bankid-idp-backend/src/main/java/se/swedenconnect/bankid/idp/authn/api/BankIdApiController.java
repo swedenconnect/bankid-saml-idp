@@ -32,7 +32,6 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
-import se.swedenconnect.bankid.idp.authn.SelectedDeviceInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
@@ -99,11 +98,8 @@ public class BankIdApiController {
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
     final BankIdContext bankIdContext = this.getContext(request);
     final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
-    PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
-    if (previousDeviceSelection == null) {
-      log.warn("Failed to find previous selected device for user");
-      previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
-    }
+    final PreviousDeviceSelection previousDeviceSelection = Optional.ofNullable(bankIdContext.getPreviousDeviceSelection())
+        .orElseGet(() -> PreviousDeviceSelection.UNKNOWN);
     return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 

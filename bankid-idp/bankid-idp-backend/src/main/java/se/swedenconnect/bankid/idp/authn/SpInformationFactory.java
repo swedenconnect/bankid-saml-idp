@@ -15,25 +15,35 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import org.opensaml.core.xml.LangBearing;
-import org.opensaml.core.xml.schema.XSString;
-import org.opensaml.core.xml.schema.impl.XSURIImpl;
-import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
-import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.opensaml.core.xml.LangBearing;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSURIImpl;
+import org.opensaml.saml.ext.saml2mdui.impl.LogoImpl;
+
+import se.swedenconnect.spring.saml.idp.response.Saml2ResponseAttributes;
+
 /**
+ * Helper class for delivering SP information.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public class SpInformationFactory {
-  public static SpInformation getSpInformation(HttpServletRequest request) {
+
+  /**
+   * Obtains the information for the current SP information.
+   *
+   * @param request the servlet request
+   * @return a {@link SpInformation}
+   */
+  public static SpInformation getSpInformation(final HttpServletRequest request) {
     final Saml2ResponseAttributes attribute = (Saml2ResponseAttributes) request.getSession()
         .getAttribute("se.swedenconnect.spring.saml.idp.web.filters.ResponseAttributes");
     if (attribute == null) {

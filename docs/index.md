@@ -33,91 +33,39 @@ or audit logging according to the organization's requirements).
 
 - Publish SAML metadata to Sweden Connect (or other federation).
 
-Section XX, YY and ZZ will go into details around this.
+See below for instructions on how to build your own BankID SAML IdP application.
 
-<a name="development"></a>
-## Development
+<a name="documentation">
+## Documentation
 
-All contributors to this project are expected to follow the guidelines stated in the [Contributing to the BankID SAML IdP](https://github.com/swedenconnect/bankid-saml-idp/blob/main/CONTRIBUTING.md) document.
+- [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html)
+  - Links to relevant information about how to sign BankID contracts and how to find technical information published by BankID and Sweden Connect.
+  
+- [Development Guidelines for the SAML IdP for BankID](https://docs.swedenconnect.se/bankid-saml-idp/development.html)
 
+  - Also see the [Contributing to the BankID SAML IdP](https://github.com/swedenconnect/bankid-saml-idp/blob/main/CONTRIBUTING.md) document.
+  
+- [Configuration of the BankID SAML IdP](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html)
 
+- Code Documentation
 
+  - [Generated Javadoc](https://docs.swedenconnect.se/bankid-saml-idp/apidocs)
+  
+  - [BankID Back-end API](https://docs.swedenconnect.se/bankid-saml-idp/idp-api.md)
 
+- Building
+  - TODO
 
+- [Making Overrides and Customizations to the Application](https://docs.swedenconnect.se/bankid-saml-idp/override.html)
 
-<a name="technical-cocumentation"></a>
-## Technical Documentation
+- [Events and Audit Logging](https://docs.swedenconnect.se/bankid-saml-idp/logging.html)
 
-<a name="obtaining-the-bankid-idp-artifacts"></a>
-### Obtaining the BankID IdP Artifacts
+- [Monitoring the Application](https://docs.swedenconnect.se/bankid-saml-idp/monitoring.html)
 
-<a name="configuration-of-the-bankid-idp"></a>
-### Configuration of the BankID IdP
+- Deployment
 
+  - TODO
 
-## Building
-
-> TODO
-
-### Building docker image and pushing to registry
-
-```bash
-export DOCKER_REPO=yourdockerrepo:port
-mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:build
-```
-
-### Building, local docker file only
-```bash
-export DOCKER_REPO=local
-mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
-```
-
-## Configuring the IdP
-
-There are three distinct parts in configuring the BankID SAML IdP:
-
-- Spring Boot configuration where features such as TLS, management ports, session handling, Redis,
-logging levels and so on are configured. Read more about this at https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html.
-
-- SAML IdP configuration. This is described in the [Spring Security SAML Identity Provider](https://github.com/swedenconnect/saml-identity-provider) repository.
-
-- BankID configuration. This is the BankID-specific configuration used by the BankID SAML IdP. See below for all possible settings.
-
-Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) file for an example of how to configure the service.
-
-### BankID Configuration
-
-Below follows all BankID-specific settings:
-
-| Property | Description | Type | Default value |
-| :--- | :--- | :--- | :--- |
-| `bankid.service-url` | The URL to the BankID API. | `String` | `https://appapi2.bankid.com/rp/v5.1` |
-| `bankid.`<br />`server-root-certificate` | The root certificate of the BankID server TLS credential. | A `Resource` pointing at an X.509 certificate. | `classpath:bankid-trust-prod.crt` |
-| `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | - | - |
-| `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | - | - |
-| TODO: more | - | - | - |
-
-<a name="authentication-configuration"></a>
-#### Authentication Configuration
-
-> TODO
-
-<a name="qr-code-generation-configuration"></a>
-#### QR Code Generation Configuration
-
-> TODO
-
-## Customizing the BankID IdP
-
-### Customizing the BankID UI
-
-> TODO: We describe how the UI can be modified.
-
-### Audit Logging
-
-### Session Handling
 
 -----
 

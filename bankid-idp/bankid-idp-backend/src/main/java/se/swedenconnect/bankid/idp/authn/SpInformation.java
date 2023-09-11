@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Represents information about an SP for display in the UI.
  *
  * @author Martin Lindström
  * @author Felix Hellman
@@ -33,8 +34,13 @@ import java.util.Map;
 @Data
 public class SpInformation {
 
-  // language -> name
+  /**
+   * A mapping between language codes and display names.
+   */
   private Map<String, String> displayNames = new HashMap<>();
 
+  /**
+   * The URL for the SP's logotype.
+   */
   private String imageUrl;
 }

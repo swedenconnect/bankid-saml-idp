@@ -59,6 +59,26 @@ To start Redis, simply run:
 > docker compose -f ${CODE_ROOT}/bankid-idp-backend/env/local/redis/docker-compose.yml up
 ```
 
+<a name="using-docker"></a>
+## Using Docker
+
+**Building Docker image and pushing to registry:**
+
+```bash
+export DOCKER_REPO=yourdockerrepo:port
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:build
+```
+
+**Building, local Docker image only:**
+
+```bash
+export DOCKER_REPO=local
+mvn clean install
+mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
+```
+
+
 -----
 
 Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
