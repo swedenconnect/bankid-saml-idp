@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.api.BankIdApiController;
+import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,9 +29,14 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser
-  void bankIdInit(BankIdFrontendClient client) {
+  void genericFailureOnPoll(BankIdFrontendClient client) {
+    String orderReference = BankIdApiMock.mockAuth();
     ApiResponse apiResponse = client.poll();
     Assertions.assertNotNull(apiResponse);
     Assertions.assertNotNull(apiResponse.getAutoStartToken());
+    BankIdApiMock.pendingCollect(orderReference, CollectResponse.Status.FAILED);
+    ApiResponse failed = client.poll();
+    Assertions.assertNotNull(failed);
+    Assertions.assertEquals(failed.getStatus(), ApiResponse.Status.ERROR);
   }
 }

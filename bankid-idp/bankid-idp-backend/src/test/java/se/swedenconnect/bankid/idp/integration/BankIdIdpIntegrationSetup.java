@@ -18,31 +18,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 public class BankIdIdpIntegrationSetup extends TestContainerSetup {
   public static final TestSp testSp;
 
+  public static final BankIdApiMock apiMock = new BankIdApiMock();
+
   @LocalServerPort
   public int port;
 
   static {
-    WireMockServer wireMockServer = new WireMockServer(9000);
-    wireMockServer.start();
-    String response = """
-        {
-          "orderRef": "%s",
-          "autoStartToken": "%s",
-          "qrStartToken": "%s",
-          "qrStartSecret": "%s",
-          "status": "%s"
-        }
-        """.formatted(
-        UUID.randomUUID().toString(),
-        UUID.randomUUID().toString(),
-        UUID.randomUUID().toString(),
-        UUID.randomUUID().toString(),
-        "PENDING"
-    );
-    wireMockServer.stubFor(post("/auth").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
-    wireMockServer.stubFor(post("/collect").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
-    wireMockServer.stubFor(post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
-    wireMockServer.stubFor(post("/cancel").willReturn(aResponse()));
     try {
       testSp = new TestSp();
     } catch (Exception e) {

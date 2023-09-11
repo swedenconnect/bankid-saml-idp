@@ -133,4 +133,8 @@ public class BankIdFrontendClient {
     return OpenSamlTestBase.unmarshall(
         new ByteArrayInputStream(result), EntityDescriptor.class);
   }
+
+  public String getSession() {
+    return session;
+  }
 }
