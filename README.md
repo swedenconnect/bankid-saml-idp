@@ -20,69 +20,26 @@ The BankID IdP uses the [SAML IdP Spring Boot starter](https://github.com/sweden
 
 The repository also contains a Java library implementing the [BankID Relying Party API](https://www.bankid.com/utvecklare/guider/teknisk-integrationsguide).
 
-## Building
+## Documentation
 
-> TODO
+Visit the [BankID SAML IdP Documentation](https://docs.swedenconnect.se/bankid-saml-idp/) to learn how
+to customize, extend, and build and deploy the application.
 
-### Building docker image and pushing to registry
+You may also want to read the [Sweden Connect eID Framework](https://docs.swedenconnect.se/technical-framework/) specifications and [BankID Development Guides](https://www.bankid.com/utvecklare/guider).
 
-```bash
-export DOCKER_REPO=yourdockerrepo:port
-mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:build
-```
+## Downloading Artifacts
 
-### Building, local docker file only
-```bash
-export DOCKER_REPO=local
-mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
-```
+The BankID SAML IdP artifacts are published to [Maven Central](https://central.sonatype.com/).
 
-## Configuring the IdP
+> TODO: include details
 
-There are three distinct parts in configuring the BankID SAML IdP:
+## Contributing
 
-- Spring Boot configuration where features such as TLS, management ports, session handling, Redis,
-logging levels and so on are configured. Read more about this at https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html.
+Pull requests are welcome. See the [Contributor Guidelines](CONTRIBUTING.md) for details.
 
-- SAML IdP configuration. This is described in the [Spring Security SAML Identity Provider](https://github.com/swedenconnect/saml-identity-provider) repository.
+## License
 
-- BankID configuration. This is the BankID-specific configuration used by the BankID SAML IdP. See below for all possible settings.
-
-Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) file for an example of how to configure the service.
-
-### BankID Configuration
-
-Below follows all BankID-specific settings:
-
-| Property | Description | Type | Default value |
-| :--- | :--- | :--- | :--- |
-| `bankid.service-url` | The URL to the BankID API. | `String` | `https://appapi2.bankid.com/rp/v5.1` |
-| `bankid.`<br />`server-root-certificate` | The root certificate of the BankID server TLS credential. | A `Resource` pointing at an X.509 certificate. | `classpath:bankid-trust-prod.crt` |
-| `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | - | - |
-| `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | - | - |
-| TODO: more | - | - | - |
-
-<a name="authentication-configuration"></a>
-#### Authentication Configuration
-
-> TODO
-
-<a name="qr-code-generation-configuration"></a>
-#### QR Code Generation Configuration
-
-> TODO
-
-## Customizing the BankID IdP
-
-### Customizing the BankID UI
-
-> TODO: We describe how the UI can be modified.
-
-### Audit Logging
-
-### Session Handling
+The BankID SAML IdP is Open Source software released under the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 -----
 
