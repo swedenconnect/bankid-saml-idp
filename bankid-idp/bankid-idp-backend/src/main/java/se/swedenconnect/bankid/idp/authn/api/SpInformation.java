@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.api;
 
 import lombok.AllArgsConstructor;
 
@@ -43,4 +43,5 @@ public class SpInformation {
    * The URL for the SP's logotype.
    */
   private String imageUrl;
+
 }
