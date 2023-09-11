@@ -137,4 +137,23 @@ public class BankIdFrontendClient {
   public String getSession() {
     return session;
   }
+
+  public String complete() {
+    List<String> block = client.get()
+        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/complete")
+        .cookie("BANKIDSESSION", session)
+        .cookie("XSRF-TOKEN", xsrfToken)
+        .header("X-XSRF-TOKEN", xsrfToken)
+        .header("Access-Control-Allow-Credentials", "true")
+        .exchangeToMono(f -> {
+          if (f.statusCode().value() == 302) {
+            return Mono.just(f.headers().header("Location"));
+          }
+          return Mono.error(new RuntimeException("Expected redirect"));
+        })
+        .log()
+        .block();
+    Assertions.assertTrue(!block.isEmpty());
+    return block.get(0);
+  }
 }
