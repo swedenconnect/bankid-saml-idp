@@ -39,7 +39,6 @@ import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.error.BankIdException;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
@@ -52,6 +51,7 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -136,7 +136,7 @@ public class BankIdApiController {
           .build();
       return this.service.poll(pollRequest)
           .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 

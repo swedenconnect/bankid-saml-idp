@@ -16,6 +16,7 @@
 package se.swedenconnect.bankid.idp.authn.error;
 
 import se.swedenconnect.bankid.idp.ApplicationVersion;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
 /**
  * Runtime exception for cases where the flow is invoked for a non-registered RP.
@@ -23,7 +24,7 @@ import se.swedenconnect.bankid.idp.ApplicationVersion;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class NoSuchRelyingPartyException extends BankIdException {
+public class NoSuchRelyingPartyException extends BankIDException {
 
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
