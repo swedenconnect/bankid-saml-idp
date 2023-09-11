@@ -136,8 +136,7 @@ public class BankIdApiController {
           .build();
       return this.service.poll(pollRequest)
           .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired())); // TODO: 2023-09-11 Refactor this, we can not have two almost identical exceptions
-
+          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
