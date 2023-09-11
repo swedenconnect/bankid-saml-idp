@@ -43,7 +43,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser
-  void willLogin(BankIdFrontendClient client) throws JsonProcessingException {
+  void userCanCompleteLogin(BankIdFrontendClient client) throws JsonProcessingException {
     String orderReference = BankIdApiMock.mockAuth();
     ApiResponse apiResponse = client.poll();
     Assertions.assertNotNull(apiResponse);
