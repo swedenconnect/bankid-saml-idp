@@ -33,7 +33,7 @@ import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
 /**
  * Representation of an ongoing BankID session.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -117,7 +117,9 @@ public class BankIdSessionData implements Serializable {
         .status(ProgressStatus.STARTED)
         .startFailed(false)
         .sessionExpired(false)
-        .messageCode("bankid.msg.rfa21")
+        .messageCode(request.getContext().getOperation() == BankIdOperation.AUTH
+          ? "bankid.msg.rfa21-auth"
+          : "bankid.msg.rfa21-sign")
         .showQr(request.getQr())
         .operation(request.getContext().getOperation())
         .build();

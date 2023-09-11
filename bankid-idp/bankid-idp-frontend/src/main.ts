@@ -1,4 +1,5 @@
 import './assets/main.css';
+import './assets/open-sans-fonts.css';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { createI18n } from 'vue-i18n';

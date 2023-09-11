@@ -15,21 +15,26 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-
 import javax.servlet.http.HttpServletRequest;
+
+import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 
 /**
  * An event for the cancellation of an order.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-
 public class OrderCancellationEvent extends AbstractBankIdEvent {
+
+  /**
+   * Constructor.
+   *
+   * @param request the servlet request
+   * @param data the RP data
+   */
   public OrderCancellationEvent(final HttpServletRequest request, final RelyingPartyData data) {
     super(request, data);
   }
+
 }

@@ -20,6 +20,10 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.metadata.*;
 import org.opensaml.security.credential.UsageType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -46,10 +50,6 @@ import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIDClientImpl;
 import se.swedenconnect.bankid.rpapi.service.impl.ZxingQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
-import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
-import se.swedenconnect.opensaml.sweid.saml2.authn.psc.RequestedPrincipalSelection;
-import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.MatchValueBuilder;
-import se.swedenconnect.opensaml.sweid.saml2.authn.psc.build.RequestedPrincipalSelectionBuilder;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
@@ -104,8 +104,8 @@ public class BankIdConfiguration {
   @Order(2)
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
     http
-        .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
-        .cors().and()
+        .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        .cors(Customizer.withDefaults())
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
             .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
@@ -210,59 +210,11 @@ public class BankIdConfiguration {
       configurer
           .authnRequestProcessor(c -> c.authenticationProvider(
               pc -> pc.signatureMessagePreprocessor(signMessageProcessor)))
-          .idpMetadataEndpoint(mdCustomizer -> {
-            mdCustomizer.entityDescriptorCustomizer(this.metadataCustomizer());
-          })
           .userAuthentication(c -> {
             c.attributeProducers(producers -> {
               producers.add(new BankIdAttributeProducer());
             });
           });
-    };
-  }
-
-  // For customizing the metadata published by the IdP
-  //
-  private Customizer<EntityDescriptor> metadataCustomizer() {
-    return e -> {
-      final RequestedPrincipalSelection rps = RequestedPrincipalSelectionBuilder.builder()
-          .matchValues(MatchValueBuilder.builder()
-              .name(AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER)
-              .build())
-          .build();
-
-      final IDPSSODescriptor ssoDescriptor = e.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
-      Extensions extensions = ssoDescriptor.getExtensions();
-      if (extensions == null) {
-        extensions = (Extensions) XMLObjectSupport.buildXMLObject(Extensions.DEFAULT_ELEMENT_NAME);
-        ssoDescriptor.setExtensions(extensions);
-      }
-      extensions.getUnknownXMLObjects().add(rps);
-
-      KeyDescriptor encryption = null;
-      for (final KeyDescriptor kd : ssoDescriptor.getKeyDescriptors()) {
-        if (Objects.equals(UsageType.ENCRYPTION, kd.getUse())) {
-          encryption = kd;
-          break;
-        }
-        if (kd.getUse() == null || Objects.equals(UsageType.UNSPECIFIED, kd.getUse())) {
-          encryption = kd;
-        }
-      }
-      if (encryption != null) {
-        final String[] algs = {"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p",
-            "http://www.w3.org/2009/xmlenc11#aes256-gcm",
-            "http://www.w3.org/2009/xmlenc11#aes192-gcm",
-            "http://www.w3.org/2009/xmlenc11#aes128-gcm"
-        };
-        for (final String alg : algs) {
-          final EncryptionMethod method =
-              (EncryptionMethod) XMLObjectSupport.buildXMLObject(EncryptionMethod.DEFAULT_ELEMENT_NAME);
-          method.setAlgorithm(alg);
-          encryption.getEncryptionMethods().add(method);
-        }
-      }
-
     };
   }
 

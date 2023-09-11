@@ -15,16 +15,19 @@
  */
 package se.swedenconnect.bankid.idp.audit;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import org.springframework.boot.actuate.audit.AuditEvent;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.boot.actuate.audit.AuditEvent;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.AllArgsConstructor;
+import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
  * Wrapper for ObjectMapper to handle AuditEvent
@@ -39,19 +42,22 @@ public class AuditEventMapper {
 
   /**
    * Serializes AuditEvent to json
+   *
    * @param event to serialize
    * @return json-string
    */
   public String write(final AuditEvent event) {
     try {
       return mapper.writerFor(AuditEvent.class).writeValueAsString(event);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
   /**
    * Deserializes AuditEvent from json
+   *
    * @param event to deserialize
    * @return AuditEvent
    */
@@ -61,21 +67,27 @@ public class AuditEventMapper {
       // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
       BankidAuditEvent auditEvent = mapper.readerFor(BankidAuditEvent.class).readValue(event);
       return auditEvent;
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
   private static class BankidAuditEvent extends AuditEvent {
+
+    private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
+
     /**
      * Adds a JsonCreator for Jackson to be able to serialize AuditEvnets
+     *
      * @param principal to deserialize
      * @param type to deserialize
      * @param data to deserialize
      */
 
     @JsonCreator
-    public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type, @JsonProperty("data") final Map<String, Object> data) {
+    public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type,
+        @JsonProperty("data") final Map<String, Object> data) {
       super(principal, type, Optional.ofNullable(data).orElse(Map.of()));
     }
   }
