@@ -1,7 +1,6 @@
 import './assets/main.css';
 import './assets/open-sans-fonts.css';
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
 import { createI18n } from 'vue-i18n';
 import { getOverrides } from '@/Service';
 import App from './App.vue';
@@ -65,8 +64,6 @@ async function initializeApp() {
   });
 
   const app = createApp(App);
-  const pinia = createPinia();
-  app.use(pinia);
   app.use(router);
   app.use(i18n);
 
