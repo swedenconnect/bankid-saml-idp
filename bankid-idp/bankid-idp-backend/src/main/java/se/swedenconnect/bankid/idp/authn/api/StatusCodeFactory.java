@@ -51,6 +51,7 @@ public class StatusCodeFactory {
     put(c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus()), "rfa13");
     put(c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.AUTH), "rfa21-auth");
     put(c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.SIGN), "rfa21-sign");
+    put(c -> PENDING.equals(c.getCollectResponse().getStatus()) && "userMrtd".equals(c.getCollectResponse().getHintCode()), "rfa23");
     put(c -> FAILED.equals(c.getCollectResponse().getStatus()), "rfa22");
   }};
 

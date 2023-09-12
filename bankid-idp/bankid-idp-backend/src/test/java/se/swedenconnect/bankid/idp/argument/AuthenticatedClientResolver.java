@@ -11,13 +11,13 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import se.swedenconnect.bankid.idp.integration.BankIdFrontendClient;
+import se.swedenconnect.bankid.idp.integration.FrontendClient;
 import se.swedenconnect.bankid.idp.integration.BankIdIdpIntegrationSetup;
 
 public class AuthenticatedClientResolver implements ParameterResolver {
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return parameterContext.getParameter().getType() == BankIdFrontendClient.class;
+    return parameterContext.getParameter().getType() == FrontendClient.class;
   }
 
   @Override
@@ -30,7 +30,7 @@ public class AuthenticatedClientResolver implements ParameterResolver {
             .build();
         HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
         WebClient client = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
-        return BankIdFrontendClient.init(client, BankIdIdpIntegrationSetup.testSp);
+        return FrontendClient.init(client, BankIdIdpIntegrationSetup.testSp);
       } catch (Exception e) {
         throw new ParameterResolutionException("Failed to resolve AuthenticatedUserClient", e);
       }
