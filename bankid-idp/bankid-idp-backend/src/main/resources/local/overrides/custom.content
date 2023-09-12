@@ -1,7 +1,7 @@
 [
     {
-        "title":"xyz.nocall.title",
-        "text":"xyz.nocall.text",
+        "title":"my.nocall.title",
+        "text":"my.nocall.text",
         "position":"ABOVE",
         "type":"INFO"
     }
