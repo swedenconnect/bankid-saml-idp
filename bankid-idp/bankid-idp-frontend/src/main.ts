@@ -45,6 +45,7 @@ function applyMessageOverrides(originalMessages: Messages, overrides: MessageOve
 
 async function initializeApp() {
   let messagesToBeLoaded = messages as Messages;
+  let customContent = [];
 
   const overrides = await getOverrides();
   if (overrides.css.length > 0) {
@@ -55,6 +56,9 @@ async function initializeApp() {
   if (overrides.messages.length > 0) {
     messagesToBeLoaded = applyMessageOverrides(messages, overrides.messages);
   }
+  if (overrides.content.length > 0) {
+    customContent = overrides.content;
+  }
 
   const i18n = createI18n({
     legacy: false,
@@ -64,6 +68,7 @@ async function initializeApp() {
   });
 
   const app = createApp(App);
+  app.provide('customContent', customContent);
   app.use(router);
   app.use(i18n);
 
