@@ -36,6 +36,8 @@ import se.swedenconnect.bankid.idp.authn.SelectedDeviceInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformation;
 import se.swedenconnect.bankid.idp.authn.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
+import se.swedenconnect.bankid.idp.authn.api.overrides.FrontendOverrideResponse;
+import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
@@ -89,6 +91,9 @@ public class BankIdApiController {
   /** Factory for handling customer contacts in the UI. */
   private final CustomerContactInformationFactory customerContactInformationFactory;
 
+  /** Service for generating overrides for front-end content*/
+  private final OverrideService overrides;
+
   /**
    * Gets information about the selected device.
    *
@@ -138,6 +143,11 @@ public class BankIdApiController {
           .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
           .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
+  }
+
+  @GetMapping("/api/overrides")
+  public Mono<FrontendOverrideResponse> getFrontendOverrides() {
+    return Mono.just(overrides.generateOverrides());
   }
 
   /**
