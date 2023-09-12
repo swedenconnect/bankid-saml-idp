@@ -17,6 +17,7 @@ package se.swedenconnect.bankid.idp.authn.session;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -74,6 +75,11 @@ public class BankIdSessionData implements Serializable {
    * The latest progress status (hint).
    */
   private ProgressStatus status;
+
+  /**
+   * The latest error code (hint)
+   */
+  private ErrorCode errorCode;
 
   /**
    * Whether the start has failed or not
@@ -139,11 +145,12 @@ public class BankIdSessionData implements Serializable {
         .qrStartSecret(previous.getQrStartSecret())
         .startTime(previous.getStartTime())
         .orderReference(previous.getOrderReference())
-        .status(response.getProgressStatus())
+        .status(Optional.ofNullable(response.getProgressStatus()).orElse(previous.getStatus()))
         .startFailed(response.getErrorCode() == ErrorCode.START_FAILED)
         .sessionExpired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
         .messageCode(StatusCodeFactory.statusCode(response, previous.getShowQr(), previous.getOperation()))
         .showQr(previous.getShowQr())
+        .errorCode(response.getErrorCode())
         .operation(previous.getOperation())
         .build();
   }

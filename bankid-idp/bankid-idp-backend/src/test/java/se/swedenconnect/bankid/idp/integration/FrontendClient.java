@@ -17,9 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -47,9 +45,19 @@ public class FrontendClient {
     this.port = port;
   }
 
-  public Mono<ApiResponse> poll() {
-    return client.post()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/api/poll")
+  public Mono<ApiResponse> poll(boolean qr) {
+    WebClient.RequestBodySpec uri = client.post()
+    .uri(uriBuilder -> {
+      uriBuilder.scheme("https");
+      uriBuilder.port(8443);
+      uriBuilder.host("local.dev.swedenconnect.se");
+      uriBuilder.path("/idp/api/poll");
+      if (qr) {
+        uriBuilder.queryParam("qr", qr);
+      }
+      return uriBuilder.build();
+    });
+    return uri
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)
@@ -97,7 +105,6 @@ public class FrontendClient {
     WebClient initClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
     ClientResponse block = initClient.post()
         .uri(uriBuilder -> {
-          uriBuilder.queryParam("qr", true);
           uriBuilder.scheme("https");
           uriBuilder.port(8443);
           uriBuilder.host("local.dev.swedenconnect.se");

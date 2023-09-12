@@ -182,9 +182,6 @@ public class BankIdService {
       return this.init(request)
           .map(orderResponse -> BankIdSessionData.of(request, orderResponse));
     }
-    if (bankIdSessionData.getSessionExpired()) {
-      return Mono.error(new BankIdSessionExpiredException(request));
-    }
     else {
       return Mono.just(bankIdSessionData);
     }

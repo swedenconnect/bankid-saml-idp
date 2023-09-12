@@ -267,10 +267,10 @@ public class BankIDClientImpl implements BankIDClient {
   }
 
   private static CollectResponse checkForError(final CollectResponse c) {
-    if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
+    /*if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
       throw new BankIDException(c.getErrorCode(),
           String.format("Order '%s' failed with code '%s'", c.getOrderReference(), c.getErrorCode().getValue()));
-    }
+    }*/
     return c;
   }
 
