@@ -63,6 +63,11 @@ public class BankIdResponseFactory {
     user.setSurname("Test");
     user.setPersonalNumber("200001011111");
     completionData.setUser(user);
+
+    CompletionData.Device device = new CompletionData.Device();
+    device.setIpAddress("1.1.1.1");
+    completionData.setDevice(device);
+    
     return collect(orderResponse, c -> c
         .completionData(completionData)
         .status(CollectResponse.Status.COMPLETE));
