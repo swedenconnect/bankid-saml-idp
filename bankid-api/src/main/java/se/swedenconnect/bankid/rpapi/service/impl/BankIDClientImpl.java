@@ -249,7 +249,6 @@ public class BankIDClientImpl implements BankIDClient {
     return retrieve
         .onRawStatus(s -> s >= 400, this::defaultErrorHandler)
         .bodyToMono(CollectResponse.class)
-        .map(BankIDClientImpl::checkForError)
         .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
           if (e instanceof final WebClientResponseException webClientResponseException) {
@@ -264,14 +263,6 @@ public class BankIDClientImpl implements BankIDClient {
             throw new BankIDException(ErrorCode.UNKNOWN_ERROR, "Unknown error during collect", e);
           }
         });
-  }
-
-  private static CollectResponse checkForError(final CollectResponse c) {
-    /*if (c.getStatus().equals(CollectResponse.Status.FAILED) && !c.getErrorCode().equals(ErrorCode.START_FAILED)) {
-      throw new BankIDException(c.getErrorCode(),
-          String.format("Order '%s' failed with code '%s'", c.getOrderReference(), c.getErrorCode().getValue()));
-    }*/
-    return c;
   }
 
   /**
