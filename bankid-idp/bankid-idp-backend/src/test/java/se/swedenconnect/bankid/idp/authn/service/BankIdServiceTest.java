@@ -106,7 +106,7 @@ class BankIdServiceTest {
       return Mono.just(transactionExpired);
     });
     ApiResponse response2 = service.poll(pollrequest2).block();
-    Assertions.assertEquals("bankid.msg.error.timeout", response2.getMessageCode());
+    Assertions.assertEquals("bankid.msg.rfa8", response2.getMessageCode());
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(2)).collect(any());
   }

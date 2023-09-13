@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,7 +76,6 @@ import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.opensaml.OpenSamlCredential;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -87,6 +85,9 @@ import javax.xml.transform.stream.StreamResult;
 public class TestSp {
 
   public static final String ENTITY_ID = "https://demo.swedenconnect.se/sp";
+  public static final String SIGN_ID = "https://demo.swedenconnect.se/sp/sign";
+
+  private final boolean signMode;
   public static final String ACS = "https://demo.swedenconnect.se/sp/sso";
 
   private PkiCredential spSignCredential;
@@ -113,13 +114,14 @@ public class TestSp {
    *
    * @throws Exception for errors
    */
-  public TestSp() throws Exception {
+  public TestSp(boolean signMode) throws Exception {
     this.spSignCredential = new KeyStoreCredential(
         new ClassPathResource("test-sp.jks"), "JKS", "secret".toCharArray(), "sign", "secret".toCharArray());
     this.spSignCredential.init();
     this.spEncryptCredential = new KeyStoreCredential(
         new ClassPathResource("test-sp.jks"), "JKS", "secret".toCharArray(), "encrypt", "secret".toCharArray());
     this.spEncryptCredential.init();
+    this.signMode = signMode;
   }
 
   public void setupResponseProcessor(final MetadataResolver metadataResolver) throws Exception {
@@ -150,7 +152,7 @@ public class TestSp {
         : null;
 
     return EntityDescriptorBuilder.builder()
-        .entityID(ENTITY_ID)
+        .entityID(getEntityId())
         .extensions(extensions)
         .roleDescriptors(
             SPSSODescriptorBuilder.builder()
@@ -295,7 +297,7 @@ public class TestSp {
   public AuthnRequestGenerator createAuthnRequestGenerator(final PkiCredential credential,
                                                            final EntityDescriptor idpMetadata) throws Exception {
 
-    final SwedishEidAuthnRequestGenerator generator = new SwedishEidAuthnRequestGenerator(ENTITY_ID,
+    final SwedishEidAuthnRequestGenerator generator = new SwedishEidAuthnRequestGenerator(getEntityId(),
         Optional.ofNullable(credential)
             .map(OpenSamlCredential::new)
             .orElse(null),
@@ -325,11 +327,29 @@ public class TestSp {
   }
 
   public String getFilePath() {
-    return new File("").getAbsolutePath() + "/src/test/resources/sp-metadata.xml";
+    if (signMode) {
+      return getSignFilePath();
+    }
+    return getAuthFilePath();
   }
 
+  public String getAuthFilePath() {
+    return new File("").getAbsolutePath() + "/src/test/resources/sp-metadata.xml";
+  }
+  public String getSignFilePath() {return new File("").getAbsolutePath() + "/src/test/resources/sp-sign-metadata.xml";}
+
   public String getResourcePath() {
+    if (signMode) {
+      return "classpath:/sp-sign-metadata.xml";
+    }
     return "classpath:/sp-metadata.xml";
+  }
+
+  public String getEntityId() {
+    if (signMode) {
+      return SIGN_ID;
+    }
+    return ENTITY_ID;
   }
 
 }

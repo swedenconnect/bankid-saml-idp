@@ -5,11 +5,11 @@ import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 
-import java.security.Principal;
-
 @AllArgsConstructor
 @Data
 public class AuthenticatedUserSecurityContext implements SecurityContext {
+
+  private final Boolean sign;
 
   @Override
   public Authentication getAuthentication() {

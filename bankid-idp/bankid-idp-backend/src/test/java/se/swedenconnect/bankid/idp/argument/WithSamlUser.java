@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = SamlUserSecurityContextFactory.class)
 public @interface WithSamlUser {
-
+  boolean isSign() default false;
 }

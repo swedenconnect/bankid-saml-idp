@@ -1,17 +1,17 @@
-package se.swedenconnect.bankid.idp.integration;
+package se.swedenconnect.bankid.idp.integration.client;
 
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.RoleDescriptor;
 import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.saml.saml2.metadata.impl.IDPSSODescriptorImpl;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -23,6 +23,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
+import se.swedenconnect.bankid.idp.integration.OpenSamlTestBase;
+import se.swedenconnect.bankid.idp.integration.TestSp;
+import se.swedenconnect.bankid.idp.integration.TestSpConstants;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGenerator;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGeneratorContext;
 import se.swedenconnect.spring.saml.idp.settings.EndpointSettings;
@@ -32,36 +35,47 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Optional;
 
-public class BankIdFrontendClient {
+public class FrontendClient {
   private final WebClient client;
   private final int port;
 
   private String session;
   private String xsrfToken;
 
-  private BankIdFrontendClient(WebClient client, int port) {
+  private FrontendClient(WebClient client, int port) {
     this.client = client;
     this.port = port;
   }
 
-  public ApiResponse poll() {
-    return client.post()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/api/poll")
+  public Mono<ApiResponse> poll(boolean qr) {
+    WebClient.RequestBodySpec uri = client.post()
+    .uri(uriBuilder -> {
+      uriBuilder.scheme("https");
+      uriBuilder.port(8443);
+      uriBuilder.host("local.dev.swedenconnect.se");
+      uriBuilder.path("/idp/api/poll");
+      if (qr) {
+        uriBuilder.queryParam("qr", qr);
+      }
+      return uriBuilder.build();
+    });
+    return uri
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)
         .header("Access-Control-Allow-Credentials", "true")
         .exchangeToMono(f -> {
+          if (f.statusCode().value() == 429) {
+            return Mono.error(new CannotAcquireLockException("Resource is busy"));
+          }
           if (!f.statusCode().is2xxSuccessful()) {
             return Mono.error(new IllegalStateException("Wrong status code code:" + f.statusCode().value()));
           }
           return f.bodyToMono(ApiResponse.class);
-        })
-        .log()
-        .block();
+        });
   }
 
-  public static BankIdFrontendClient init(WebClient client, TestSp testSp) throws Exception {
+  public static FrontendClient init(WebClient client, TestSp testSp, boolean sign) throws Exception {
     final EntityDescriptor spMetadata = testSp.getSpMetadata();
     final EntityDescriptor idpMetadata = getIdpMetadata();
     RoleDescriptor roleDescriptor = idpMetadata.getRoleDescriptors().get(0);
@@ -74,13 +88,8 @@ public class BankIdFrontendClient {
 
     final AuthnRequestGenerator generator = testSp.createAuthnRequestGenerator(idpMetadata);
 
-    final AuthnRequestGeneratorContext context = new AuthnRequestGeneratorContext() {
+    final AuthnRequestGeneratorContext context = SAMLContexts.getContext(sign, idpMetadata.getEntityID());
 
-      @Override
-      public String getPreferredBinding() {
-        return SAMLConstants.SAML2_POST_BINDING_URI;
-      }
-    };
     MockHttpSession session = new MockHttpSession();
     RequestBuilder request = testSp.generateRequest("https://bankid.swedenconnect.se/idp/local", generator, context, "s01e01", session, 8443);
     MockHttpServletRequest authRequest = request.buildRequest(Mockito.mock(ServletContext.class));
@@ -105,17 +114,17 @@ public class BankIdFrontendClient {
         .block();
     List<String> cookies = block.headers().header("Set-Cookie");
     Assertions.assertFalse(cookies.isEmpty());
-    BankIdFrontendClient bankIdFrontendClient = new BankIdFrontendClient(client, 8443);
+    FrontendClient frontendClient = new FrontendClient(client, 8443);
     Assertions.assertFalse(cookies.isEmpty());
-    bankIdFrontendClient.session = cookies.get(0).split(";")[0].split("=")[1];
+    frontendClient.session = cookies.get(0).split(";")[0].split("=")[1];
     List<String> xsrfCookie = client.get().uri("https://localhost:" + 8443 + "/idp/api/sp")
-        .header("BANKIDSESSION", bankIdFrontendClient.session)
+        .header("BANKIDSESSION", frontendClient.session)
         .exchange()
         .block()
         .headers()
         .header("Set-Cookie");
-    bankIdFrontendClient.xsrfToken = xsrfCookie.get(0).split(";")[0].split("=")[1];
-    return bankIdFrontendClient;
+    frontendClient.xsrfToken = xsrfCookie.get(0).split(";")[0].split("=")[1];
+    return frontendClient;
   }
 
   public static EntityDescriptor getIdpMetadata() throws Exception {
@@ -153,7 +162,26 @@ public class BankIdFrontendClient {
         })
         .log()
         .block();
-    Assertions.assertTrue(!block.isEmpty());
+    Assertions.assertFalse(block.isEmpty());
     return block.get(0);
+  }
+
+  public String cancel () {
+    List<String> location = client.get()
+        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/cancel")
+        .cookie("BANKIDSESSION", session)
+        .cookie("XSRF-TOKEN", xsrfToken)
+        .header("X-XSRF-TOKEN", xsrfToken)
+        .header("Access-Control-Allow-Credentials", "true")
+        .exchangeToMono(f -> {
+          if (f.statusCode().value() == 302) {
+            return Mono.just(f.headers().header("Location"));
+          }
+          return Mono.error(new RuntimeException("Expected redirect"));
+        })
+        .log()
+        .block();
+    Assertions.assertFalse(location.isEmpty());
+    return location.get(0);
   }
 }
