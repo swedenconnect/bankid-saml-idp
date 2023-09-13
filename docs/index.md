@@ -51,7 +51,7 @@ See below for instructions on how to build your own BankID SAML IdP application.
 
   - [Generated Javadoc](https://docs.swedenconnect.se/bankid-saml-idp/apidocs)
   
-  - [BankID Back-end API](https://docs.swedenconnect.se/bankid-saml-idp/idp-api.md)
+  - [BankID Back-end API](https://docs.swedenconnect.se/bankid-saml-idp/idp-api.html)
 
 - Building
   - TODO

@@ -54,6 +54,8 @@ bankid:
   qr-code:
     size: 300
     image-format: PNG
+  audit:
+    repository: "memory"
   user-message-defaults:
     fallback-sign-text:
       text: "Jag skriver härmed under den information som visades på föregående sida." 
@@ -205,18 +207,15 @@ server:
     session:
       timeout: 15m
 
-audit:
-  event:
-    module: default
-
 session:
   module: redis
 
 bankid:
   audit:
-    module: "redistimeseries"
-  builtinfrontend:
-    disable: false
+    repository: "memory"      
+    # "redistimeseries"
+    log-file: target/audit.log
+  built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
   relying-parties:
@@ -315,9 +314,8 @@ spring:
       on-profile: integrationtest
 bankid:
   audit:
-    module: "redistimeseries"
-  builtinfrontend:
-    disable: false
+    repository: "redistimeseries"
+  built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
   relying-parties:

@@ -13,7 +13,7 @@ public class IntegrationConfiguration {
 
   @Bean
   @Primary
-  public Function<BankIdConfigurationProperties.RelyingParty, WebClient> testWebClientFactory() {
+  public Function<BankIdConfigurationProperties.RelyingPartyConfiguration, WebClient> testWebClientFactory() {
     return rp -> {
       return WebClient.builder().baseUrl("http://localhost:9000").build();
     };
