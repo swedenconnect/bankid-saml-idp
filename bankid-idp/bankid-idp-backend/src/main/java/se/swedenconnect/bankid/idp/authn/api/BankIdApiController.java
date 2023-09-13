@@ -32,8 +32,6 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
-import se.swedenconnect.bankid.idp.authn.SpInformation;
-import se.swedenconnect.bankid.idp.authn.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
@@ -98,8 +96,11 @@ public class BankIdApiController {
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
     final BankIdContext bankIdContext = this.getContext(request);
     final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
-    final PreviousDeviceSelection previousDeviceSelection = Optional.ofNullable(bankIdContext.getPreviousDeviceSelection())
-        .orElseGet(() -> PreviousDeviceSelection.UNKNOWN);
+    PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
+    if (previousDeviceSelection == null) {
+      log.warn("Failed to find previous selected device for user");
+      previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
+    }
     return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 
@@ -131,8 +132,10 @@ public class BankIdApiController {
           .state(state)
           .build();
       return this.service.poll(pollRequest)
-          .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIdServerException,
+              e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
+          .onErrorResume(e -> e instanceof BankIDException,
+              e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
@@ -194,7 +197,7 @@ public class BankIdApiController {
    */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    return Mono.just(SpInformationFactory.getSpInformation(request));
+    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo()));
   }
 
   /**
