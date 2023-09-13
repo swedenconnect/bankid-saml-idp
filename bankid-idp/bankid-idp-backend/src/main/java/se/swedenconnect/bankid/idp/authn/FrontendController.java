@@ -25,12 +25,12 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * If we are running in "standalone" mode, i.e., if we are using the built in Vue frontend app, this controller
  * redirects calls made from the underlying SAML IdP library to our frontend start page.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @Controller
-@ConditionalOnProperty(value = "bankid.builtinfrontend.disable", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(value = "bankid.builtInFrontend", havingValue = "true", matchIfMissing = true)
 public class FrontendController {
 
   /**

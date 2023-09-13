@@ -129,7 +129,7 @@ has made the current authentication request to the BankID IdP.
 When writing a custom frontend it is also useful to now about about the backend views described in
 this section. You can either replace the index page with your own frontend or host it separately.
 
-If the frontend should be hosted separately the `/bankid` path (see below) should be disabled by using the configuration flag `bankid.builtinfrontend.disable = true`. 
+If the frontend should be hosted separately the `/bankid` path (see below) should be disabled by using the configuration flag `bankid.built-in-frontend = false`. 
 
 ### /bankid
 

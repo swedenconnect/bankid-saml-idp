@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.audit;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.boot.actuate.audit.AuditEvent;
@@ -26,31 +27,39 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.AllArgsConstructor;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
- * Wrapper for ObjectMapper to handle AuditEvent
+ * Wrapper for ObjectMapper to handle AuditEvent.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@AllArgsConstructor
 public class AuditEventMapper {
 
+  /** The underlying {@link ObjectMapper}. */
   private final ObjectMapper mapper;
 
   /**
-   * Serializes AuditEvent to json
+   * Constructor.
+   *
+   * @param mapper the {@link ObjectMapper}
+   */
+  public AuditEventMapper(final ObjectMapper mapper) {
+    this.mapper = Objects.requireNonNull(mapper, "mapper must not be null");
+  }
+
+  /**
+   * Serializes AuditEvent to JSON.
    *
    * @param event to serialize
    * @return json-string
    */
   public String write(final AuditEvent event) {
     try {
-      return mapper.writerFor(AuditEvent.class).writeValueAsString(event);
+      return this.mapper.writerFor(AuditEvent.class).writeValueAsString(event);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new UncheckedIOException(e);
     }
   }
@@ -65,14 +74,17 @@ public class AuditEventMapper {
   public AuditEvent read(final String event) {
     try {
       // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
-      BankidAuditEvent auditEvent = mapper.readerFor(BankidAuditEvent.class).readValue(event);
+      final BankidAuditEvent auditEvent = this.mapper.readerFor(BankidAuditEvent.class).readValue(event);
       return auditEvent;
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
+  /**
+   * Helper class for reading events.
+   */
   private static class BankidAuditEvent extends AuditEvent {
 
     private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
@@ -84,7 +96,6 @@ public class AuditEventMapper {
      * @param type to deserialize
      * @param data to deserialize
      */
-
     @JsonCreator
     public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type,
         @JsonProperty("data") final Map<String, Object> data) {

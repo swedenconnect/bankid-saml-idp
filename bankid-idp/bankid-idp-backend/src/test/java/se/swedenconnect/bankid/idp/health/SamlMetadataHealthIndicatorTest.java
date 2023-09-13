@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
-import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 
 /**
  * Test cases for SamlMetadataHealthIndicator.
@@ -46,13 +46,13 @@ public class SamlMetadataHealthIndicatorTest {
   public void testAllPresent() throws Exception {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
 
-    final RelyingParty rp1 = new RelyingParty();
+    final RelyingPartyConfiguration rp1 = new RelyingPartyConfiguration();
     rp1.setId("A");
     rp1.getEntityIds().add("https://www.example.com/a1");
     rp1.getEntityIds().add("https://www.example.com/a2");
     props.getRelyingParties().add(rp1);
 
-    final RelyingParty rp2 = new RelyingParty();
+    final RelyingPartyConfiguration rp2 = new RelyingPartyConfiguration();
     rp2.setId("B");
     rp2.getEntityIds().add("https://www.example.com/b1");
     rp2.getEntityIds().add("https://www.example.com/b2");
@@ -85,13 +85,13 @@ public class SamlMetadataHealthIndicatorTest {
   public void testMissingMetadata() throws Exception {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
 
-    final RelyingParty rp1 = new RelyingParty();
+    final RelyingPartyConfiguration rp1 = new RelyingPartyConfiguration();
     rp1.setId("A");
     rp1.getEntityIds().add("https://www.example.com/a1");
     rp1.getEntityIds().add("https://www.example.com/a2");
     props.getRelyingParties().add(rp1);
 
-    final RelyingParty rp2 = new RelyingParty();
+    final RelyingPartyConfiguration rp2 = new RelyingPartyConfiguration();
     rp2.setId("B");
     rp2.getEntityIds().add("https://www.example.com/b1");
     rp2.getEntityIds().add("https://www.example.com/b2");
@@ -137,7 +137,7 @@ public class SamlMetadataHealthIndicatorTest {
   public void testTestMode() throws Exception {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
 
-    final RelyingParty rp1 = new RelyingParty();
+    final RelyingPartyConfiguration rp1 = new RelyingPartyConfiguration();
     rp1.setId("A");
     props.getRelyingParties().add(rp1);
 
@@ -157,7 +157,7 @@ public class SamlMetadataHealthIndicatorTest {
   public void testResolverError() throws Exception {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
 
-    final RelyingParty rp1 = new RelyingParty();
+    final RelyingPartyConfiguration rp1 = new RelyingPartyConfiguration();
     rp1.setId("A");
     rp1.getEntityIds().add("https://www.example.com/a1");
     rp1.getEntityIds().add("https://www.example.com/a2");

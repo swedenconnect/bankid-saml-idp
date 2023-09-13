@@ -15,14 +15,10 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import lombok.Setter;
-import org.opensaml.core.xml.util.XMLObjectSupport;
-import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.metadata.*;
-import org.opensaml.security.credential.UsageType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,10 +34,12 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
-import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
@@ -53,11 +51,6 @@ import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * BankID IdP configuration.
@@ -137,7 +130,7 @@ public class BankIdConfiguration {
    */
 
   @Bean
-  Function<RelyingParty, WebClient> bankIdWebClientFactory() {
+  Function<RelyingPartyConfiguration, WebClient> bankIdWebClientFactory() {
     return rp -> {
       try {
         final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
@@ -159,10 +152,10 @@ public class BankIdConfiguration {
    * @throws Exception for errors creating the RP data
    */
   @Bean
-  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator, Function<RelyingParty, WebClient> webClientFactory) throws Exception {
+  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator, Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
 
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
-    for (final RelyingParty rp : this.properties.getRelyingParties()) {
+    for (final RelyingPartyConfiguration rp : this.properties.getRelyingParties()) {
 
       if (rp.getEntityIds().isEmpty()) {
         if (!this.properties.isTestMode()) {

@@ -33,7 +33,6 @@ import se.swedenconnect.bankid.idp.authn.error.BankIdValidationException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
-import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.spring.saml.idp.attributes.UserAttribute;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthentication;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
@@ -103,12 +102,11 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
       throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID CompletionData");
     }
     // TODO: Compare pnr from principal selection with pnr from authnData
-    // TODO: We should not hardwire loa3-uncertified
 
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
-        LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3,
+        this.getAuthnContextUri(bankIdToken),
         Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
 
     final Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
@@ -221,6 +219,22 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
   @Override
   public List<String> getSupportedAuthnContextUris() {
     return this.supportedAuthnContextUris;
+  }
+
+  /**
+   * Returns the authentication context URI that should be used for the operation.
+   * <p>
+   * The BankID IdP should only be configured with one URI and the default implementation uses the first URI in the list
+   * of supported URI:s.
+   * </p>
+   *
+   * @param token the BankID authentication token
+   * @return the URI
+   */
+  protected String getAuthnContextUri(final BankIdAuthenticationToken token) {
+    return !this.supportedAuthnContextUris.isEmpty()
+        ? this.supportedAuthnContextUris.get(0)
+        : null;
   }
 
   /**

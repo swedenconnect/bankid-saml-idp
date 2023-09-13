@@ -42,7 +42,7 @@ import se.swedenconnect.security.credential.utils.X509Utils;
 /**
  * Spring factory class for configuring and creating a {@link WebClient} instance that can be used to communicate with
  * the BankID server.
- * 
+ *
  * @author Martin Lindström
  */
 public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
@@ -51,10 +51,10 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
   private final Logger log = LoggerFactory.getLogger(WebClientFactoryBean.class);
 
   /** The BankID webservice URL (production). */
-  public static final String PRODUCTION_WEB_SERVICE_URL = "https://appapi2.bankid.com/rp/v5.1";
+  public static final String PRODUCTION_WEB_SERVICE_URL = "https://appapi2.bankid.com/rp/v6.0";
 
   /** The BankID webservice URL (test). */
-  public static final String TEST_WEB_SERVICE_URL = "https://appapi2.test.bankid.com/rp/v5.1";
+  public static final String TEST_WEB_SERVICE_URL = "https://appapi2.test.bankid.com/rp/v6.0";
 
   /** A resource pointing at the server TLS root certificate for production. */
   public static final Supplier<Resource> PRODUCTION_ROOT_CERTIFICATE =
@@ -83,7 +83,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
 
   /**
    * Creates a factory bean for creating {@link WebClient}s.
-   * 
+   *
    * @param webServiceUrl the web service URL to the BankID server - defaults to {@link #PRODUCTION_WEB_SERVICE_URL}
    * @param trustedRoot the resource to the root certificate that we trust when verifying the BankID server certificate
    *          - defaults to {@link #PRODUCTION_ROOT_CERTIFICATE}
@@ -110,7 +110,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
   /**
    * Creates a {@link WebClientFactoryBean} with the {@code webServiceUrl} set to {@link #PRODUCTION_WEB_SERVICE_URL}
    * and the {@code trustedRoot} set to {@link #PRODUCTION_ROOT_CERTIFICATE}.
-   * 
+   *
    * @param rpCredential the credential holding the client TLS key and certificate (BankID relying party certificate)
    * @return a {@link WebClientFactoryBean}
    */
@@ -121,7 +121,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
   /**
    * Creates a {@link WebClientFactoryBean} with the {@code webServiceUrl} set to {@link #TEST_WEB_SERVICE_URL} and the
    * {@code trustedRoot} set to {@link #TEST_ROOT_CERTIFICATE}.
-   * 
+   *
    * @param rpCredential the credential holding the client TLS key and certificate (BankID relying party certificate)
    * @return a {@link WebClientFactoryBean}
    */
@@ -133,7 +133,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
    * Creates a {@link WebClientFactoryBean} with the {@code webServiceUrl} set to {@link #TEST_WEB_SERVICE_URL}, the
    * {@code trustedRoot} set to {@link #TEST_ROOT_CERTIFICATE} and the credentials loaded from
    * {@link #TEST_RP_CREDENTIAL}.
-   * 
+   *
    * @return a {@link WebClientFactoryBean}
    */
   public static WebClientFactoryBean forTest() {
@@ -193,7 +193,7 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
 
   /**
    * Assigns the {@link WebClient.Builder} to use. Defaults to {@link WebClient#builder()}.
-   * 
+   *
    * @param webClientBuilder a builder
    */
   public void setWebClientBuilder(final WebClient.Builder webClientBuilder) {

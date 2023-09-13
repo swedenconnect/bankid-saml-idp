@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.core.io.ClassPathResource;
@@ -31,6 +32,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
@@ -66,12 +68,12 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private Resource serverRootCertificate;
 
   /**
-   * Whether we are running in "standalone" mode, i.e., if we are using the built in Vue frontend app, this controller
+   * Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller
    * redirects calls made from the underlying SAML IdP library to our frontend start page.
    */
   @Getter
   @Setter
-  private boolean standalone = true;
+  private boolean builtInFrontend = true;
 
   /**
    * Should be set to {@code true} if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
@@ -92,7 +94,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
    */
   @NestedConfigurationProperty
   @Getter
-  private final QrCode qrCode = new QrCode();
+  private final QrCodeConfiguration qrCode = new QrCodeConfiguration();
 
   /**
    * Configuration for health endpoints.
@@ -102,17 +104,24 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final HealthConfiguration health = new HealthConfiguration();
 
   /**
+   * Configuration for audit support.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final AuditConfiguration audit = new AuditConfiguration();
+
+  /**
    * Default text(s) to display during authentication/signing.
    */
   @NestedConfigurationProperty
   @Getter
-  private final UserMessage userMessageDefaults = new UserMessage();
+  private final UserMessageConfiguration userMessageDefaults = new UserMessageConfiguration();
 
   /**
    * The relying parties handled by this IdP.
    */
   @Getter
-  private final List<RelyingParty> relyingParties = new ArrayList<>();
+  private final List<RelyingPartyConfiguration> relyingParties = new ArrayList<>();
 
   /**
    * {@inheritDoc}
@@ -120,28 +129,39 @@ public class BankIdConfigurationProperties implements InitializingBean {
   @Override
   public void afterPropertiesSet() throws Exception {
     if (!StringUtils.hasText(this.serviceUrl)) {
-      this.serviceUrl = WebClientFactoryBean.PRODUCTION_WEB_SERVICE_URL;
+      if (!this.testMode) {
+        this.serviceUrl = WebClientFactoryBean.TEST_WEB_SERVICE_URL;
+      }
+      else {
+        this.serviceUrl = WebClientFactoryBean.PRODUCTION_WEB_SERVICE_URL;
+      }
       log.info("bankid.service-url was not assigned, defaulting to {}", this.serviceUrl);
     }
 
     if (this.serverRootCertificate == null) {
-      this.serverRootCertificate = WebClientFactoryBean.PRODUCTION_ROOT_CERTIFICATE.get();
+      if (!this.testMode) {
+        this.serverRootCertificate = WebClientFactoryBean.PRODUCTION_ROOT_CERTIFICATE.get();
+      }
+      else {
+        this.serverRootCertificate = WebClientFactoryBean.TEST_ROOT_CERTIFICATE.get();
+      }
       log.info("bankid.server-root-certificate was not assigned, defaulting to {}",
           ((ClassPathResource) this.serverRootCertificate).getPath());
     }
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
+    this.audit.afterPropertiesSet();
 
     this.userMessageDefaults.afterPropertiesSet();
     Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
         "bankid.user-message-defaults.fallback-sign-text must be assigned");
 
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
-    for (final RelyingParty rp : this.relyingParties) {
+    for (final RelyingPartyConfiguration rp : this.relyingParties) {
       rp.afterPropertiesSet();
 
-      final RelyingParty.RpUserMessage msg = rp.getUserMessage();
+      final RelyingPartyConfiguration.RpUserMessage msg = rp.getUserMessage();
 
       if (msg.getFallbackSignText() == null) {
         msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
@@ -156,7 +176,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
    * QR code configuration.
    */
   @Data
-  public static final class QrCode implements InitializingBean {
+  public static final class QrCodeConfiguration implements InitializingBean {
 
     /**
      * The height and width in pixels of the QR code. Defaults to {@link AbstractQRGenerator#DEFAULT_SIZE}.
@@ -187,7 +207,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   /**
    * Texts to display during authentication and signature.
    */
-  public static class UserMessage implements InitializingBean {
+  public static class UserMessageConfiguration implements InitializingBean {
 
     /**
      * Text to display when authenticating.
@@ -221,7 +241,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
    * Configuration for a relying party. A BankID Relying Party can serve any number of SAML SP:s (usually they are from
    * the same organization).
    */
-  public static class RelyingParty implements InitializingBean {
+  public static class RelyingPartyConfiguration implements InitializingBean {
 
     /**
      * The ID for the Relying Party. Used in logging and may be used for statistics.
@@ -292,7 +312,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     /**
      * For configuring user messages per RP.
      */
-    public static class RpUserMessage extends UserMessage {
+    public static class RpUserMessage extends UserMessageConfiguration {
 
       /**
        * If the default user message login text has been assigned, and a specific RP wishes to not use login messages it
@@ -385,6 +405,49 @@ public class BankIdConfigurationProperties implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
       if (this.rpCertificateWarnThreshold == null) {
         this.rpCertificateWarnThreshold = RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT;
+      }
+    }
+
+  }
+
+  /**
+   * Audit logging configuration.
+   */
+  public static class AuditConfiguration implements InitializingBean {
+
+    /**
+     * The type of {@link AuditEventRepository} that should be used. Possible values are: {@code memory} for an
+     * in-memory repository, {@code redislist} for a Redis list implementation, {@code redistimeseries} for a Redis time
+     * series implementation or {@code other} if you extend the BankID IdP with your own implementation.
+     */
+    @Getter
+    @Setter
+    private String repository;
+
+    /**
+     * If assigned, the audit events will not only be stored according to the {@code repository} but also be written to
+     * the given log file. If set, a complete path must be given.
+     */
+    @Getter
+    @Setter
+    private String logFile;
+
+    /**
+     * The supported events that will be logged to the given repository (and possibly the file). The default
+     * is {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
+     */
+    @Getter
+    private List<String> supportedEvents = new ArrayList<>();
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (!StringUtils.hasText(this.repository)) {
+        this.repository = "memory";
+        log.info("bankid.audit.repository has not been assigned, defaulting to '{}'", this.repository);
+      }
+      if (this.supportedEvents.isEmpty()) {
+        this.supportedEvents = AbstractBankIdAuditEventRepository.DEFAULT_SUPPORTED_EVENTS;
       }
     }
 

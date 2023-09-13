@@ -40,7 +40,7 @@ docker compose up
   - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks         # Override the builtin ssl certificate with the one speicifeid in the example
   - SERVER_PORT=8445                                    # Change Port
   - SERVER_FORWARDHEADERSSTRATEGY=native                # Enable Spring Boot to read ForwardHeaders
-  - BANKID_BUILTINFRONTEND_DISABLE=true                 # Disable the built-in frontend
+  - BANKID_BUILT_IN_FRONTEND=false                      # Disable the built-in frontend
   - BANKID_AUTHN_AUTHNPATH=/                            # Change AuthNPath to redirect the user back to / when AuthNRequest has been handled
 ```
 ### Routing for Nginx

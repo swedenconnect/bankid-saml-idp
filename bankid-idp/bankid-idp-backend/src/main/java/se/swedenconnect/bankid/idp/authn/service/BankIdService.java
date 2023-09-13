@@ -43,7 +43,7 @@ import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
 /**
  * The BankID service. This component is responsible of communicating with the BankID server using the RP API.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -61,7 +61,7 @@ public class BankIdService {
 
   /**
    * Constructor.
-   * 
+   *
    * @param eventPublisher the BankID event publisher
    * @param circuitBreaker the circuit breaker (for resilliance)
    * @param requestFactory for generating requests to the BankID server
@@ -75,7 +75,7 @@ public class BankIdService {
 
   /**
    * Sends a request to the BankID server. If we don't have a session we initiate an auth or sign operation.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return an {@link ApiResponse}
    */
@@ -85,14 +85,15 @@ public class BankIdService {
         .map(sessionData -> this.collect(request)
             .map(c -> BankIdSessionData.of(sessionData, c))
             .flatMap(b -> this.reInitIfExpired(request, b))
-            .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(), request.getQr()))
+            .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(),
+                request.getQr()))
             .onErrorResume(e -> this.handleError(e, request)))
         .orElseGet(() -> this.onNoSession(request));
   }
 
   /**
    * Handles a cancelled operation.
-   * 
+   *
    * @param request the HTTP servlet request
    * @param state the BankID session state
    * @param data the RP
@@ -109,7 +110,7 @@ public class BankIdService {
 
   /**
    * Initiates an operation.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return an {@link OrderResponse}
    */
@@ -136,12 +137,13 @@ public class BankIdService {
 
   /**
    * Is invoked if we don't have a BankID session. Will initiate an operation.
-   * 
+   *
    * @param pollRequest the {@link PollRequest}
    * @return an {@link ApiResponse}
    */
   private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
-    eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest).publish();
+    this.eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest)
+        .publish();
     return this.init(pollRequest)
         .map(b -> BankIdSessionData.of(pollRequest, b))
         .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
@@ -149,31 +151,50 @@ public class BankIdService {
                 pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr())));
   }
 
+  /**
+   * Handles errors.
+   *
+   * @param e the error
+   * @param request the polling request
+   * @return an {@link ApiResponse}
+   */
   private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
-      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
+      this.eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData(),
+          ErrorCode.EXPIRED_TRANSACTION, bankIdSessionExpiredException.getMessage())
+          .publish();
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
     }
-    if (e.getCause() instanceof final BankIDException bankIDException
-        && ErrorCode.USER_CANCEL.equals(bankIDException.getErrorCode())) {
-      this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
-      return Mono.just(ApiResponseFactory.createUserCancelResponse());
+    if (e.getCause() instanceof final BankIDException bankIdException) {
+      if (ErrorCode.USER_CANCEL == bankIdException.getErrorCode()) {
+        this.eventPublisher.orderCancellation(request.getRequest(), request.getRelyingPartyData()).publish();
+        return Mono.just(ApiResponseFactory.createUserCancelResponse());
+      }
+      else if (ErrorCode.EXPIRED_TRANSACTION == bankIdException.getErrorCode()) {
+        this.eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData(),
+            ErrorCode.EXPIRED_TRANSACTION, "BankID response timeout").publish();
+        return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
+      }
+      else {
+        this.eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData(),
+            bankIdException.getErrorCode(), bankIdException.getDetails()).publish();
+        return Mono.error(e);
+      }
     }
-    if (e.getCause() instanceof BankIDException bankIDException && ErrorCode.EXPIRED_TRANSACTION.equals(bankIDException.getErrorCode()) ) {
-      eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();
-      return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
-    }
-    eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData()).publish();;
+
+    this.eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData(),
+        ErrorCode.UNKNOWN_ERROR, e.getMessage()).publish();
     return Mono.error(e);
   }
 
   /**
    * If the session has expired we initiate a new auth/sign operation.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return a {@link BankIdSessionData}
    */
-  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request, final BankIdSessionData bankIdSessionData) {
+  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request,
+      final BankIdSessionData bankIdSessionData) {
     final BankIdSessionState state = request.getState();
     if (bankIdSessionData.getStartFailed()) {
       if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
@@ -189,7 +210,7 @@ public class BankIdService {
 
   /**
    * Collects a response.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return a {@link CollectResponse}
    */
@@ -205,7 +226,7 @@ public class BankIdService {
 
   /**
    * Is invoked if the session has expired.
-   * 
+   *
    * @param request the HTTP servlet request
    * @param pollRequest the {@link PollRequest}
    * @return an {@link ApiResponse}
@@ -217,7 +238,7 @@ public class BankIdService {
 
   /**
    * Delivers service information.
-   * 
+   *
    * @return a {@link ServiceInformation}
    */
   public Mono<ServiceInformation> getServiceInformation() {

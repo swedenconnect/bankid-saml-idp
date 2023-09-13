@@ -15,18 +15,40 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
-
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.Getter;
+import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
+
 /**
- * An event for the cancellation of an order.
+ * An event for a BankID error.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public class BankIdErrorEvent extends AbstractBankIdEvent {
-  public BankIdErrorEvent(HttpServletRequest request, RelyingPartyData data) {
+
+  /** The error code. */
+  @Getter
+  final String errorCode;
+
+  /** The error description. */
+  @Getter
+  final String errorDescription;
+
+  /**
+   * Constructor.
+   *
+   * @param request the servlet request
+   * @param data the relying party data
+   * @param errorCode the error code
+   * @param errorDescription the error description
+   */
+  public BankIdErrorEvent(final HttpServletRequest request, final RelyingPartyData data,
+      final String errorCode, final String errorDescription) {
     super(request, data);
+    this.errorCode = errorCode;
+    this.errorDescription = errorDescription;
   }
+
 }
