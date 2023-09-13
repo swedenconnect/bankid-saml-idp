@@ -1,6 +1,5 @@
 package se.swedenconnect.bankid.idp.integration.response;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;

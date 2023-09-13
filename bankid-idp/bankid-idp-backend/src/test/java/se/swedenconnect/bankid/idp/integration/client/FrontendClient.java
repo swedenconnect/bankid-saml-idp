@@ -1,11 +1,10 @@
-package se.swedenconnect.bankid.idp.integration;
+package se.swedenconnect.bankid.idp.integration.client;
 
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.RoleDescriptor;
@@ -24,6 +23,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
+import se.swedenconnect.bankid.idp.integration.OpenSamlTestBase;
+import se.swedenconnect.bankid.idp.integration.TestSp;
+import se.swedenconnect.bankid.idp.integration.TestSpConstants;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGenerator;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGeneratorContext;
 import se.swedenconnect.spring.saml.idp.settings.EndpointSettings;
@@ -73,7 +75,7 @@ public class FrontendClient {
         });
   }
 
-  public static FrontendClient init(WebClient client, TestSp testSp) throws Exception {
+  public static FrontendClient init(WebClient client, TestSp testSp, boolean sign) throws Exception {
     final EntityDescriptor spMetadata = testSp.getSpMetadata();
     final EntityDescriptor idpMetadata = getIdpMetadata();
     RoleDescriptor roleDescriptor = idpMetadata.getRoleDescriptors().get(0);
@@ -86,13 +88,8 @@ public class FrontendClient {
 
     final AuthnRequestGenerator generator = testSp.createAuthnRequestGenerator(idpMetadata);
 
-    final AuthnRequestGeneratorContext context = new AuthnRequestGeneratorContext() {
+    final AuthnRequestGeneratorContext context = SAMLContexts.getContext(sign, idpMetadata.getEntityID());
 
-      @Override
-      public String getPreferredBinding() {
-        return SAMLConstants.SAML2_POST_BINDING_URI;
-      }
-    };
     MockHttpSession session = new MockHttpSession();
     RequestBuilder request = testSp.generateRequest("https://bankid.swedenconnect.se/idp/local", generator, context, "s01e01", session, 8443);
     MockHttpServletRequest authRequest = request.buildRequest(Mockito.mock(ServletContext.class));

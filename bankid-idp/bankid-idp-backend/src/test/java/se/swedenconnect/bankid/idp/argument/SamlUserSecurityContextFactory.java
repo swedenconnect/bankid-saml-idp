@@ -7,7 +7,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 public class SamlUserSecurityContextFactory implements WithSecurityContextFactory<WithSamlUser> {
   @Override
   public SecurityContext createSecurityContext(WithSamlUser annotation) {
-    AuthenticatedUserSecurityContext context = new AuthenticatedUserSecurityContext();
+    AuthenticatedUserSecurityContext context = new AuthenticatedUserSecurityContext(annotation.isSign());
     SecurityContextHolder.setContext(context);
     return context;
   }

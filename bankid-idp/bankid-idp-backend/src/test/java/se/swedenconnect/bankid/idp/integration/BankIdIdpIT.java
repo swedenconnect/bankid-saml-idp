@@ -3,25 +3,26 @@ package se.swedenconnect.bankid.idp.integration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.api.BankIdApiController;
+import se.swedenconnect.bankid.idp.integration.client.FrontendClient;
+import se.swedenconnect.bankid.idp.integration.response.OrderAndCollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
-import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
-import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -108,47 +109,18 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     BankIdApiMock.resetDelay();
   }
 
-  @Test
-  @WithSamlUser
-  void testUserMessage_auth_noQR(FrontendClient client) {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
-    BankIdApiMock.mockAuth(orderResponse);
-
-    List<CollectResponse> collectResponses = new ArrayList<>();
-
-    collectResponses.addAll(List.of(
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.NO_CLIENT.getValue())),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ErrorCode.CANCELLED.getValue()).status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ErrorCode.ALREADY_IN_PROGRESS.getValue()).status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ErrorCode.MAINTENANCE.getValue()).status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ErrorCode.USER_CANCEL.getValue()).status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ErrorCode.EXPIRED_TRANSACTION.getValue()).status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.USER_SIGN.getValue())),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())),
-        BankIdResponseFactory.collect(orderResponse, c -> c),
-        BankIdResponseFactory.collect(orderResponse, c -> c.status(CollectResponse.Status.FAILED)),
-        BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.USER_MRTD.getValue()))
-    ));
-
-    Flux<ApiResponse> responses = Flux.fromIterable(collectResponses)
-        .delayElements(Duration.ofMillis(500))
-        .flatMap(c -> {
-          BankIdApiMock.nextCollect(c);
-          return client.poll(false);
-        });
-
-    StepVerifier.create(responses)
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa1"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa3"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa4"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa5"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa6"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa8"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa9-auth"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa13"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa21-auth"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa22"))
-        .expectNextMatches(a -> a.getMessageCode().equals("bankid.msg.rfa23"))
+  @ParameterizedTest
+  @MethodSource({"se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll"})
+  void testUserMessage(String expectedMessageCode, Boolean sign, OrderAndCollectResponse response, Boolean showQr) {
+    FrontendClient client = AuthenticatedClientResolver.createFrontEndClient(sign);
+    if (sign) {
+      BankIdApiMock.mockSign(response.getOrderResponse());
+    } else {
+      BankIdApiMock.mockAuth(response.getOrderResponse());
+    }
+    BankIdApiMock.nextCollect(response.getCollectResponse());
+    StepVerifier.create(client.poll(showQr))
+        .expectNextMatches(a -> expectedMessageCode.equals(a.getMessageCode()))
         .verifyComplete();
   }
 }

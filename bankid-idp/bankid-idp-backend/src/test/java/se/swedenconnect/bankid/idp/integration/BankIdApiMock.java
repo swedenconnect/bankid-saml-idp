@@ -56,4 +56,12 @@ public class BankIdApiMock {
   public static void resetDelay() {
     server.setGlobalFixedDelay(0);
   }
+
+  public static void mockSign(OrderResponse orderResponse) {
+    String json = BankIdResponseFactory.serialize(orderResponse);
+    CollectResponse first = BankIdResponseFactory.collect(orderResponse);
+    String collectJson = BankIdResponseFactory.serialize(first);
+    server.stubFor(post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
+    server.stubFor(post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference()))).willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(collectJson)));
+  }
 }

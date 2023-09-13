@@ -36,7 +36,7 @@ public class StatusCodeFactory {
 
   private static final List<StatusResolver> RESOLVES = new ArrayList<>() {
     {
-      add(new StatusResolver("rfa1", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus())));
+      add(new StatusResolver("rfa1", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus()) && !c.getShowQr()));
       add(new StatusResolver("rfa3", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.CANCELLED.equals(c.getCollectResponse().getErrorCode())));
       add(new StatusResolver("rfa4", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.ALREADY_IN_PROGRESS.equals(c.getCollectResponse().getErrorCode())));
       add(new StatusResolver("rfa5", c -> FAILED.equals(c.getCollectResponse().getStatus()) && Objects.nonNull(c.getCollectResponse().getErrorCode()) && List.of(ErrorCode.REQUEST_TIMEOUT, ErrorCode.MAINTENANCE, ErrorCode.INTERNAL_ERROR).contains(c.getCollectResponse().getErrorCode())));
@@ -49,19 +49,9 @@ public class StatusCodeFactory {
       add(new StatusResolver("rfa21-sign", c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.SIGN) && Objects.isNull(c.getCollectResponse().getHintCode())));
       add(new StatusResolver("rfa22", c -> FAILED.equals(c.getCollectResponse().getStatus())));
       add(new StatusResolver("rfa23", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_MRTD.equals(c.getCollectResponse().getProgressStatus())));
+      add(new StatusResolver("ext2", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus()) && c.getShowQr()));
     }
   };
-
-
-  private static final Map<Predicate<StatusData>, String> MESSAGE_CONDITIONS = new HashMap<>() {
-  {
-    put(c -> FAILED.equals(c.getCollectResponse().getStatus()), "rfa22");
-  }};
-
-  private static final Map<Predicate<StatusData>, String> QR_MESSAGE_CONDITIONS = Map.of(
-      c ->  c.getShowQr() && PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()), "rfa9",
-      c -> c.getShowQr() && PENDING.equals(c.getCollectResponse().getStatus()), "ext2"
-  );
 
   public static String statusCode(final CollectResponse json, final Boolean showQr, final BankIdOperation operation) {
     StatusData statusData = new StatusData(json, showQr, operation);

@@ -3,6 +3,7 @@ package se.swedenconnect.bankid.idp.integration;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import se.swedenconnect.bankid.idp.integration.response.CollectResponseBuilder;
+import se.swedenconnect.bankid.idp.integration.response.OrderAndCollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
@@ -65,5 +66,11 @@ public class BankIdResponseFactory {
     return collect(orderResponse, c -> c
         .completionData(completionData)
         .status(CollectResponse.Status.COMPLETE));
+  }
+
+  public static OrderAndCollectResponse createCombined(Function<CollectResponseBuilder, CollectResponseBuilder> customizer) {
+    OrderResponse start = start();
+    CollectResponse collect = collect(start, customizer);
+    return new OrderAndCollectResponse(start, collect);
   }
 }
