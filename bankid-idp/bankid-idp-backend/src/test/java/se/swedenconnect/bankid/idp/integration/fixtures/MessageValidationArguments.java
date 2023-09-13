@@ -82,7 +82,7 @@ public class MessageValidationArguments {
         ),
         Arguments.of("bankid.msg.ext2",
             false,
-            BankIdResponseFactory.createCombined(c -> c.hintCode(ProgressStatus.NO_CLIENT.getValue())),
+            BankIdResponseFactory.createCombined(c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())),
             true
         )
     );

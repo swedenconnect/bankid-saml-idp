@@ -44,12 +44,12 @@ public class StatusCodeFactory {
       add(new StatusResolver("rfa8", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.EXPIRED_TRANSACTION.equals(c.getCollectResponse().getErrorCode())));
       add(new StatusResolver("rfa9-auth", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()) && BankIdOperation.AUTH.equals(c.getOperation())));
       add(new StatusResolver("rfa9-sign", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()) && BankIdOperation.SIGN.equals(c.getOperation())));
-      add(new StatusResolver("rfa13", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus())));
+      add(new StatusResolver("rfa13", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus()) && !c.getShowQr()));
       add(new StatusResolver("rfa21-auth", c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.AUTH) && Objects.isNull(c.getCollectResponse().getHintCode())));
       add(new StatusResolver("rfa21-sign", c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.SIGN) && Objects.isNull(c.getCollectResponse().getHintCode())));
       add(new StatusResolver("rfa22", c -> FAILED.equals(c.getCollectResponse().getStatus())));
       add(new StatusResolver("rfa23", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_MRTD.equals(c.getCollectResponse().getProgressStatus())));
-      add(new StatusResolver("ext2", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus()) && c.getShowQr()));
+      add(new StatusResolver("ext2", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus()) && c.getShowQr()));
     }
   };
 
