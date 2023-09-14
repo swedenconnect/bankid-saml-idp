@@ -48,7 +48,10 @@
       if (isRetryResponse(response) && response.retry === true) {
         /* Time is defined in seconds and setTimeout is in milliseconds */
         window.setTimeout(() => polling(), parseInt(response.time) * 1000);
-      } else {
+      } else if (
+        isRetryResponse(response) ||
+        (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
+      ) {
         window.setTimeout(() => polling(), 500);
       }
     });
