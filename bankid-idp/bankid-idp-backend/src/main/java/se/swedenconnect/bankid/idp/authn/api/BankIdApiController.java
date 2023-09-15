@@ -197,7 +197,11 @@ public class BankIdApiController {
    */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo()));
+
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
+    final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
+
+    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
   }
 
   /**

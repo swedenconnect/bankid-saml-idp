@@ -35,9 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.authn.DisplayText;
+import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
+import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
 import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
@@ -152,10 +154,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
     this.audit.afterPropertiesSet();
-
     this.userMessageDefaults.afterPropertiesSet();
-    Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
-        "bankid.user-message-defaults.fallback-sign-text must be assigned");
 
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingPartyConfiguration rp : this.relyingParties) {
@@ -164,9 +163,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
       final RelyingPartyConfiguration.RpUserMessage msg = rp.getUserMessage();
 
       if (msg.getFallbackSignText() == null) {
+        Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
+            "bankid.user-message-defaults.fallback-sign-text must be assigned");
+
         msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
       }
-      if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()) {
+      if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()
+          && this.userMessageDefaults.getLoginText() != null) {
         msg.setLoginText(this.userMessageDefaults.getLoginText());
       }
     }
@@ -274,9 +277,21 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private RpUserMessage userMessage;
 
+    /**
+     * The UI info for a Relying Party is normally extracted from the SAML metadata, but there are cases where you may
+     * want to manually configure these data elements (for example if the metadata does not contain this information, or
+     * you simply want to override it). This element holds this information.
+     */
     @Getter
     @Setter
-    private EntityRequirement requirement;
+    private RelyingPartyUiInfo uiInfo;
+
+    /**
+     * Specific BankID requirements for this Relying Party.
+     */
+    @Getter
+    @Setter
+    private BankIdRequirement bankidRequirements;
 
     /**
      * {@inheritDoc}
@@ -375,8 +390,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
       if (!StringUtils.hasText(this.authnPath)) {
         this.authnPath = BankIdAuthenticationController.AUTHN_PATH;
       }
-      Assert.hasText(this.resumePath, "bankid.authn.resume-path must be set");
-      Assert.notEmpty(this.supportedLoas, "At least one URI must be assigned to bankid.authn.supported-loas");
+      if (!StringUtils.hasText(this.resumePath)) {
+        this.resumePath = "/resume";
+      }
+      if (this.supportedLoas.isEmpty()) {
+        this.supportedLoas.add(LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3);
+        log.info("bankid.authn.supported-loas has not been assigned, defaulting to {}", this.supportedLoas);
+      }
     }
 
   }
@@ -433,8 +453,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
     private String logFile;
 
     /**
-     * The supported events that will be logged to the given repository (and possibly the file). The default
-     * is {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
+     * The supported events that will be logged to the given repository (and possibly the file). The default is
+     * {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
      */
     @Getter
     private List<String> supportedEvents = new ArrayList<>();

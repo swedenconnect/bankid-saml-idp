@@ -101,7 +101,6 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
     if (authnData.getCompletionData() == null) {
       throw new BankIdValidationException(authnData.getOrderReference(), "Missing BankID CompletionData");
     }
-    // TODO: Compare pnr from principal selection with pnr from authnData
 
     final List<UserAttribute> userAttributes = mapUserAttributes(authnData);
     final Saml2UserDetails userDetails = new Saml2UserDetails(userAttributes,

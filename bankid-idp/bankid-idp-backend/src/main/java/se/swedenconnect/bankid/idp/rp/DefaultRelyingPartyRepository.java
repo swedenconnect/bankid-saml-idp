@@ -25,7 +25,7 @@ import java.util.Optional;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class InMemoryRelyingPartyRepository implements RelyingPartyRepository {
+public class DefaultRelyingPartyRepository implements RelyingPartyRepository {
 
   /**
    * The configured relying parties.
@@ -37,7 +37,7 @@ public class InMemoryRelyingPartyRepository implements RelyingPartyRepository {
    *
    * @param relyingParties the relying parties
    */
-  public InMemoryRelyingPartyRepository(final List<RelyingPartyData> relyingParties) {
+  public DefaultRelyingPartyRepository(final List<RelyingPartyData> relyingParties) {
     this.relyingParties = Optional.ofNullable(relyingParties)
         .map(Collections::unmodifiableList)
         .orElseThrow(() -> new IllegalArgumentException("relyingParties must not be null"));

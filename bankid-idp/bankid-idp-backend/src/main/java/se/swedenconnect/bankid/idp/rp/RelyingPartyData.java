@@ -21,12 +21,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import se.swedenconnect.bankid.idp.authn.DisplayText;
-import se.swedenconnect.bankid.idp.config.EntityRequirement;
+import se.swedenconnect.bankid.idp.config.BankIdRequirement;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 
 /**
  * The data associated to a BankID relying party.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -48,24 +48,42 @@ public class RelyingPartyData {
   /** The text to display when signing if a {@code SignMessage} is not received. */
   private final DisplayText fallbackSignText;
 
-  // TODO: custom display texts, custom logo ...
+  /** The BankID requirements (may be {@code null}). */
+  private final BankIdRequirement requirement;
 
-  private final EntityRequirement requirement;
+  /**
+   * The UI info for a Relying Party is normally extracted from the SAML metadata, but there are cases where you may
+   * want to manually configure these data elements (for example if the metadata does not contain this information, or
+   * you simply want to override it). This element holds this information.
+   */
+  private final RelyingPartyUiInfo uiInfo;
 
+  /**
+   * Constructor.
+   *
+   * @param client the BankID client
+   * @param entityIds the SAML entityID:s for this RP
+   * @param loginText the login text to use (may be {@code null})
+   * @param fallbackSignText the fallback text for signature messages (must be set)
+   * @param uiInfo optional UI info
+   * @param requirement optional specific BankID requirements
+   */
   public RelyingPartyData(final BankIDClient client, final List<String> entityIds,
-      final DisplayText loginText, final DisplayText fallbackSignText, EntityRequirement requirement) {
+      final DisplayText loginText, final DisplayText fallbackSignText,
+      final RelyingPartyUiInfo uiInfo, final BankIdRequirement requirement) {
     this.client = Objects.requireNonNull(client, "client must not be null");
     this.entityIds = Optional.ofNullable(entityIds)
         .map(Collections::unmodifiableList)
         .orElseGet(Collections::emptyList);
     this.loginText = loginText;
     this.fallbackSignText = Objects.requireNonNull(fallbackSignText, "fallbackSignText must not be null");
+    this.uiInfo = uiInfo;
     this.requirement = requirement;
   }
 
   /**
    * Gets the ID for this Relying Party.
-   * 
+   *
    * @return the ID
    */
   public String getId() {
@@ -74,7 +92,7 @@ public class RelyingPartyData {
 
   /**
    * Gets the BankID client for this Relying Party.
-   * 
+   *
    * @return a {@link BankIDClient}
    */
   public BankIDClient getClient() {
@@ -86,7 +104,7 @@ public class RelyingPartyData {
    * <p>
    * If the list is empty and the IdP is in test mode, this means that all SP:s are served by this RP.
    * </p>
-   * 
+   *
    * @return a list of entityID:s
    */
   public List<String> getEntityIds() {
@@ -95,7 +113,7 @@ public class RelyingPartyData {
 
   /**
    * Gets text to display when authenticating.
-   * 
+   *
    * @return the text or {@code null}
    */
   public DisplayText getLoginText() {
@@ -104,7 +122,7 @@ public class RelyingPartyData {
 
   /**
    * Gets the text to display when signing if a {@code SignMessage} is not received.
-   * 
+   *
    * @return the sign text
    */
   public DisplayText getFallbackSignText() {
@@ -112,17 +130,26 @@ public class RelyingPartyData {
   }
 
   /**
-   * Gets the BankId requirement for relaying party
+   * Gets the {@link RelyingPartyUiInfo} if present
+   *
+   * @return the {@link RelyingPartyUiInfo} or {@code null}
+   */
+  public RelyingPartyUiInfo getUiInfo() {
+    return this.uiInfo;
+  }
+
+  /**
+   * Gets the BankID requirements for the relaying party.
    *
    * @return the requirements
    */
-  public EntityRequirement getRequirement() {
-    return requirement;
+  public BankIdRequirement getRequirement() {
+    return this.requirement;
   }
 
   /**
    * Predicate that tells whether the supplied SAML entityID is served by this RP.
-   * 
+   *
    * @param entityId the SAML SP entityID
    * @return {@code true} if this RP serves this SP and {@code false} otherwise
    */

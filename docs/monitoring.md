@@ -1,6 +1,6 @@
 ![Logo](images/sweden-connect.png)
 
-# Monitoring the Application
+# Monitoring the BankID IdP Application
 
 The BankID IdP application uses the Spring Boot Actuator feature that enables monitoring over HTTP.
 See the [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.monitoring) for details.

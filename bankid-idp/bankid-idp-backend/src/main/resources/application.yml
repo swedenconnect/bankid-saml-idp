@@ -234,8 +234,9 @@ bankid:
       login-text:
         text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
-    requirement:
-      pin-code: false
+    bankid-requirements:
+      pin-code-auth: false
+      pin-code-sign: true
 
 saml:
   idp:
@@ -334,5 +335,7 @@ bankid:
         login-text:
           text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
           format: simple-markdown-v1
-      requirement:
-        pin-code: false
+      bankid-requirements:
+        pin-code-auth: false
+        pin-code-sign: true
+        

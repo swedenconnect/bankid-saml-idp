@@ -40,7 +40,7 @@ import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
-import se.swedenconnect.bankid.idp.rp.InMemoryRelyingPartyRepository;
+import se.swedenconnect.bankid.idp.rp.DefaultRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
@@ -126,6 +126,7 @@ public class BankIdConfiguration {
 
   /**
    * Gets the bankIdWebClientFactory bean
+   *
    * @return Lambda function to create webclient from RelyingParty
    */
 
@@ -137,8 +138,10 @@ public class BankIdConfiguration {
             this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
         webClientFactory.afterPropertiesSet();
         return webClientFactory.createInstance();
-      } catch (Exception e) {
-        throw new RuntimeException("Failed to create bean for webclient supplier ", e); // TODO: 2023-09-11 Better exception
+      }
+      catch (Exception e) {
+        throw new RuntimeException("Failed to create bean for webclient supplier ", e); // TODO: 2023-09-11 Better
+                                                                                        // exception
       }
     };
   }
@@ -152,7 +155,8 @@ public class BankIdConfiguration {
    * @throws Exception for errors creating the RP data
    */
   @Bean
-  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator, Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
+  RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator,
+      Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
 
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
     for (final RelyingPartyConfiguration rp : this.properties.getRelyingParties()) {
@@ -161,19 +165,20 @@ public class BankIdConfiguration {
         if (!this.properties.isTestMode()) {
           throw new IllegalArgumentException(
               "IdP is not in test mode, but Relying Party '%s' does not declare any SP:s".formatted(rp.getId()));
-        } else if (this.properties.getRelyingParties().size() > 1) {
+        }
+        else if (this.properties.getRelyingParties().size() > 1) {
           throw new IllegalArgumentException("Relying Party '%s' configured to serve all SP:s, but there are more RP"
               + " configurations - This is not permitted");
         }
       }
 
-
       final BankIDClient client = new BankIDClientImpl(rp.getId(), webClientFactory.apply(rp), qrGenerator);
 
       relyingParties.add(new RelyingPartyData(client, rp.getEntityIds(),
-          rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText(), rp.getRequirement()));
+          rp.getUserMessage().getLoginText(), rp.getUserMessage().getFallbackSignText(),
+          rp.getUiInfo(), rp.getBankidRequirements()));
     }
-    return new InMemoryRelyingPartyRepository(relyingParties);
+    return new DefaultRelyingPartyRepository(relyingParties);
   }
 
   /**

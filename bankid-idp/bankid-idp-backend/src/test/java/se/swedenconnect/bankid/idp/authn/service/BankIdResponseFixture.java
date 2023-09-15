@@ -6,7 +6,7 @@ import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
-import se.swedenconnect.bankid.idp.config.EntityRequirement;
+import se.swedenconnect.bankid.idp.config.BankIdRequirement;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
@@ -91,7 +91,7 @@ public class BankIdResponseFixture {
         .request(servletRequest)
         .context(BankIdResponseFixture.createAuth())
         .data(userVisibleData)
-        .relyingPartyData(new RelyingPartyData(client, List.of("relying-party"), new DisplayText(), new DisplayText(), new EntityRequirement()));
+        .relyingPartyData(new RelyingPartyData(client, List.of("relying-party"), new DisplayText(), new DisplayText(), null, new BankIdRequirement()));
     return builder;
   }
 }

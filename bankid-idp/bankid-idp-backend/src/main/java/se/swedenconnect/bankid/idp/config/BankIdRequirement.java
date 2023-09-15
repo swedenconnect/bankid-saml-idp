@@ -15,44 +15,50 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
 
-import java.util.List;
-
 /**
- * Configuration for specific per RP requirements.
- * 
+ * Configuration for specific RP BankID requirements.
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EntityRequirement {
+public class BankIdRequirement {
 
   /**
-   * Tells whether users are required to sign the transaction with their PIN code, even if they have biometrics
+   * Tells whether users are required to use their PIN code during BankID authentication, even if they have biometrics
    * activated.
    */
-  private Boolean pinCode;
+  private boolean pinCodeAuth = false;
+
+  /**
+   * Tells whether users are required to use their PIN code during BankID signing, even if they have biometrics
+   * activated.
+   */
+  private boolean pinCodeSign = true;
 
   /**
    * If present, and set to "true", the client needs to provide MRTD (Machine readable travel document) information to
-   * complete the order.Only Swedish passports and national ID cards are supported.
+   * complete the order. Only Swedish passports and national ID cards are supported.
    */
   private Boolean mrtd;
-  
+
   /**
    * Object identifiers for which policies that should be used.
    */
   private List<String> certificatePolicies;
-  
+
   /**
    * Requirement for which type of smart card reader that is required.
    */
   private Requirement.CardReaderRequirement cardReader;
-  
+
 }
