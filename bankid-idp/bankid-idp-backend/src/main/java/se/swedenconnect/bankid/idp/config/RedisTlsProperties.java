@@ -34,7 +34,7 @@ import lombok.Setter;
 public class RedisTlsProperties implements InitializingBean {
 
   /**
-   * Configuration for the {@link KeyStore} holding the Redis client SSL/TLS credential.
+   * Configuration for the KeyStore holding the Redis client SSL/TLS credential.
    */
   @Getter
   @Setter
@@ -48,7 +48,7 @@ public class RedisTlsProperties implements InitializingBean {
   private boolean enableHostnameVerification = true;
 
   /**
-   * In order to configure a specific trust for SSL/TLS we can supply a trust {@link KeyStore}.
+   * In order to configure a specific trust for SSL/TLS we can supply a trust KeyStore.
    */
   @Getter
   @Setter

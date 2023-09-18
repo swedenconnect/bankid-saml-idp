@@ -210,9 +210,6 @@ server:
     session:
       timeout: 15m
 
-session:
-  module: redis
-
 bankid:
   audit:
     repository: "redistimeseries"
@@ -220,6 +217,8 @@ bankid:
   built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
+  session:
+    module: redis
   ui:
     user-error:
       contact-email: contact@email.com

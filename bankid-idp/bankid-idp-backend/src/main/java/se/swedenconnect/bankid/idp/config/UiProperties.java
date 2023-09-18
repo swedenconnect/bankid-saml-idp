@@ -68,8 +68,7 @@ public class UiProperties implements InitializingBean {
     private DisplayText loginText;
 
     /**
-     * If no {@code SignMessage} extension was received in the {@code AuthnRequest} message, this text will be
-     * displayed.
+     * If no SignMessage extension was received in the AuthnRequest message, this text will be displayed.
      */
     @Getter
     @Setter
@@ -108,7 +107,8 @@ public class UiProperties implements InitializingBean {
     private boolean showContactInformation = false;
 
     /**
-     * Whether an ID should be displayed for the user when an error has occurred. Using this ID, the user can contact user support.
+     * Whether an ID should be displayed for the user when an error has occurred. Using this ID, the user can contact
+     * user support.
      */
     @Getter
     @Setter

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.core.io.ClassPathResource;
@@ -62,7 +61,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
   /**
    * The root certificate of the BankID server TLS credential. Defaults to
-   * {@code classpath:trust/bankid-trust-prod.crt}.
+   * "classpath:trust/bankid-trust-prod.crt".
    */
   @Getter
   @Setter
@@ -77,7 +76,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private boolean builtInFrontend = true;
 
   /**
-   * Should be set to {@code true} if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
+   * Should be set to 'true' if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
    */
   @Getter
   @Setter
@@ -103,6 +102,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
   @NestedConfigurationProperty
   @Getter
   private final HealthConfiguration health = new HealthConfiguration();
+
+  /**
+   * Session module configuration.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final SessionConfiguration session = new SessionConfiguration();
 
   /**
    * Configuration for audit support.
@@ -152,6 +158,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
+    this.session.afterPropertiesSet();
     this.audit.afterPropertiesSet();
     this.ui.afterPropertiesSet();
 
@@ -181,12 +188,12 @@ public class BankIdConfigurationProperties implements InitializingBean {
   public static final class QrCodeConfiguration implements InitializingBean {
 
     /**
-     * The height and width in pixels of the QR code. Defaults to {@link AbstractQRGenerator#DEFAULT_SIZE}.
+     * The height and width in pixels of the QR code.
      */
     private Integer size;
 
     /**
-     * The image format for the generated QR code. Defaults to {@link QRGenerator.ImageFormat#PNG}.
+     * The image format for the generated QR code.
      */
     private QRGenerator.ImageFormat imageFormat;
 
@@ -297,7 +304,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
       /**
        * If the default user message login text has been assigned, and a specific RP wishes to not use login messages it
-       * should set this flag to {@code false} (and not assign {@code login-text}).
+       * should set this flag to 'false' (and not assign 'login-text').
        */
       @Getter
       @Setter
@@ -397,21 +404,44 @@ public class BankIdConfigurationProperties implements InitializingBean {
   }
 
   /**
+   * Session handling configuration.
+   */
+  public static class SessionConfiguration implements InitializingBean {
+
+    /**
+     * The session module to use. Supported values are "memory" and "redis". Set to other value if you extend the BankID
+     * IdP with your own session handling.
+     */
+    @Getter
+    @Setter
+    private String module;
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (!StringUtils.hasText(this.module)) {
+        this.module = "memory";
+      }
+    }
+
+  }
+
+  /**
    * Audit logging configuration.
    */
   public static class AuditConfiguration implements InitializingBean {
 
     /**
-     * The type of {@link AuditEventRepository} that should be used. Possible values are: {@code memory} for an
-     * in-memory repository, {@code redislist} for a Redis list implementation, {@code redistimeseries} for a Redis time
-     * series implementation or {@code other} if you extend the BankID IdP with your own implementation.
+     * The type of AuditEventRepository that should be used. Possible values are: "memory" for an in-memory repository,
+     * "redislist" for a Redis list implementation, "redistimeseries" for a Redis time series implementation or another
+     * value if you extend the BankID IdP with your own implementation.
      */
     @Getter
     @Setter
     private String repository;
 
     /**
-     * If assigned, the audit events will not only be stored according to the {@code repository} but also be written to
+     * If assigned, the audit events will not only be stored according to the "repository" but also be written to
      * the given log file. If set, a complete path must be given.
      */
     @Getter

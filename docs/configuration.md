@@ -32,6 +32,7 @@ comprise of configuration for the BankID integration and integration against the
 | `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | [IdpConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
 | `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
 | `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
+| `bankid.session.module` | Configuration for which session module that should be active. Supported values are `memory` and `redis`. Set to other value if you extend the BankID IdP with your own session handling. | String | `memory` |
 | `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
 | `bankid.ui.*` | Configuration concerning the BankID IdP UI (including texts displayed in the BankID app). See [UI Configuration](#ui-configuration) below. | [UiProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#ui-configuration) |
 | `bankid.`<br />`relying-parties[].*` | A list of configuration elements for each Relying Party that is allowed to communicate with the BankID SAML IdP. See [Relying Party Configuration](#relying-party-configuration) below. | [RelyingPartyConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
@@ -195,17 +196,91 @@ Also see [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/bl
 <a name="saml-idp-configuration"></a>
 ## SAML IdP Configuration
 
-> TODO
+The BankID SAML IdP is built upon the [Spring Security SAML Identity Provider](https://github.com/swedenconnect/saml-identity-provider) module. This module is a Sweden Connect Open Source module for
+a generic SAML IdP that is compatible with the [Sweden Connect eID Framework](https://docs.swedenconnect.se/technical-framework/).
+
+All Spring configuration settings for this module are documented [here](https://docs.swedenconnect.se/saml-identity-provider/configuration.html).
+
+The [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) contains sensible defaults and you basically need to change
+the following:
+
+- `saml.idp.entity-id` - The SAML entityID of your IdP.
+
+- `saml.idp.credentials.*` - Your IdP credentials (keys and certificates).
+
+- `saml.idp.metadata-providers.*` - Where to download federation metadata.
+
+- `saml.idp.metadata.*` - SAML metadata for your IdP.
+
 
 <a name="spring-boot-configuration"></a>
 ## Spring Boot Configuration
 
-> TODO: Intro
+The BankID SAML IdP is a Spring Boot application, and apart from the above described configuration you
+need to supply Spring Boot configuration. See [Spring Boot Common Application Properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html) for a listing
+of available settings.
+
+Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) file for an example of how to configure the service.
+
+<a name="management-and-supervision"></a>
+### Management and Supervision
+
+In order for the health-endpoint and any other Spring Boot Actuator endpoints to function, the 
+[Spring Boot Actuator](https://www.baeldung.com/spring-boot-actuators) needs to be configured.
+
+Recommended settings are:
+
+```yml
+management:
+  server:
+    port: 8444
+  endpoint:
+    health:
+      status:
+        order:
+        - DOWN
+        - OUT_OF_SERVICE
+        - UP
+        - WARNING
+        - UNKNOWN
+        http-mapping:
+          WARNING: 503
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers
+```
 
 <a name="redis-configuration"></a>
 ### Redis Configuration
 
-> TODO
+If `bankid.session.module` is set to `redis` Redis will be used for session management. You will then
+have to configure Redis further using the Spring Boot Redis configuration.
+
+Good resources for how to configure Redis under Spring Boot are:
+
+- https://www.baeldung.com/spring-data-redis-properties
+
+- https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+
+Example:
+
+```yml
+spring:
+  config:
+    activate:
+      on-profile: local
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT:6379}
+    password: supersecret
+    ssl: true
+    ssl-ext:
+      <see below>
+```
 
 <a name="redis-ssltls-configuration-extension"></a>
 #### Redis SSL/TLS Configuration Extension
@@ -250,6 +325,8 @@ spring:
 
 
 ### Implement your own module
+
+> TODO: move
 
 You can implement your own module, if you want to be able to use something else than redis, e.g. psql, mysql
 

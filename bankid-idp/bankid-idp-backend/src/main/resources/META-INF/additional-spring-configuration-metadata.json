@@ -1,9 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "session.module",
-      "type": "java.lang.String",
-      "description": "Should be either memory or redis."
-    }
-  ]
-}

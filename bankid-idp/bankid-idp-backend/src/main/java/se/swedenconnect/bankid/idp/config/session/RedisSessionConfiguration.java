@@ -43,7 +43,7 @@ import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
  * @author Felix Hellman
  */
 @Configuration
-@ConditionalOnProperty(value = "session.module", havingValue = "redis")
+@ConditionalOnProperty(value = "bankid.session.module", havingValue = "redis")
 @Import({ RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
 @EnableRedisHttpSession
 public class RedisSessionConfiguration {
