@@ -12,7 +12,8 @@ public class ContentOverride {
     ABOVE,
     BELOW,
     DEVICESELECT,
-    QRCODE
+    QRCODE,
+    AUTOSTART
   }
 
   public enum Type {

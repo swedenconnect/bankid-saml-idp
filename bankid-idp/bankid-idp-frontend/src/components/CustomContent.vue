@@ -1,8 +1,10 @@
 <script setup lang="ts">
   import { inject } from 'vue';
 
+  type Position = 'above' | 'below' | 'deviceselect' | 'qrcode' | 'autostart';
+
   const props = defineProps<{
-    position: string;
+    position: Position;
   }>();
 
   const customContent = inject('customContent') as Array<any>;

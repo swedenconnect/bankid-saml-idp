@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
+  import CustomContent from '@/components/CustomContent.vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
@@ -23,6 +24,7 @@
 
 <template>
   <div class="content-container">
+    <CustomContent position="deviceselect" />
     <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
     <BankIdLogo />
     <h2>BankID</h2>
