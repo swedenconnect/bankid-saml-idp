@@ -1,0 +1,162 @@
+spring:
+  config:
+    activate:
+      on-profile: integrationtest
+  redis:
+    host: ${REDIS_HOST:local.dev.swedenconnect.se}
+    port: ${REDIS_PORT:6379}
+    password: supersecret
+    ssl: true
+    ssl-ext:
+      enable-hostname-verification: true
+      credential:
+        resource: classpath:local/redis/redis.p12
+        password: changeit
+      trust:
+        resource: classpath:local/redis/trust.p12
+        password: changeit
+bankid:
+  ui:
+    user-message-defaults:
+      fallback-sign-text:
+        text: "Jag skriver härmed under den information som visades på föregående sida."
+        format: plain-text
+      login-text:
+        text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+        format: simple-markdown-v1
+  audit:
+    repository: "redistimeseries"
+  built-in-frontend: true
+  session:
+    module: redis
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  relying-parties:
+    - id: test-my-eid
+      entity-ids:
+        - https://demo.swedenconnect.se/sp
+        - https://demo.swedenconnect.se/sp/sign
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: false
+        login-text:
+          text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+          format: simple-markdown-v1
+      bankid-requirements:
+        pin-code-auth: false
+        pin-code-sign: true
+saml:
+  idp:
+    entity-id: https://bankid.swedenconnect.se/idp
+    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
+    credentials:
+      sign:
+        resource: classpath:idp-credentials.jks
+        alias: sign
+        password: secret
+        type: JKS
+      encrypt:
+        resource: classpath:idp-credentials.jks
+        alias: encrypt
+        password: secret
+        type: JKS
+      metadata-sign:
+        resource: classpath:idp-credentials.jks
+        alias: metadata
+        password: secret
+        type: JKS
+    endpoints:
+      metadata: /saml2/metadata
+    metadata:
+      digest-methods:
+        - http://www.w3.org/2001/04/xmlenc#sha256
+        - http://www.w3.org/2001/04/xmldsig-more#sha384
+        - http://www.w3.org/2001/04/xmlenc#sha512
+      include-digest-methods-under-role: true
+      signing-methods:
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha384
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha512
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256
+          min-key-size: 256
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384
+          min-key-size: 256
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512
+          min-key-size: 256
+      include-signing-methods-under-role: true
+      encryption-methods:
+        - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
+        - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
+          digest-method: http://www.w3.org/2001/04/xmlenc#sha256
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes256-gcm
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes192-gcm
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes128-gcm
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes256-cbc
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes192-cbc
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes128-cbc
+      requested-principal-selection:
+        - "urn:oid:1.2.752.29.4.13"
+      ui-info:
+        display-names:
+          en: BankID
+          sv: BankID
+        descriptions:
+          en: BankID Identity Provider
+          sv: BankID legitimeringstjänst
+        logotypes:
+          - path: /images/BankID_logo.svg
+            height: 171
+            width: 206
+      organization:
+        names:
+          en: Sweden Connect
+          sv: Sweden Connect
+        display-names:
+          en: Sweden Connect
+          sv: Sweden Connect
+        urls:
+          en: https://www.swedenconnect.se
+          sv: https://www.swedenconnect.se
+      contact-persons:
+        technical:
+          company: Sweden Connect
+          email-addresses:
+            - operations@swedenconnect.se
+        support:
+          company: Sweden Connect
+          email-addresses:
+            - operations@swedenconnect.se
+server:
+  port: 8443
+  servlet:
+    session:
+      cookie:
+        name: BANKIDSESSION
+      timeout: 15m
+    context-path: /bankid/idp
+  ssl:
+    enabled: true
+    key-store: classpath:ssl.jks
+    key-store-type: JKS
+    key-alias: local
+    key-store-password: secret
+    key-password: secret
+  error:
+    include-message: always
+    include-exception: true
+    include-stacktrace: always
+    path: "/icandothis"

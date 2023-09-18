@@ -115,7 +115,7 @@ public class FrontendClient {
     final AuthnRequestGeneratorContext context = SAMLContexts.getContext(sign, idpMetadata.getEntityID());
 
     MockHttpSession session = new MockHttpSession();
-    RequestBuilder request = testSp.generateRequest("https://bankid.swedenconnect.se/idp/local", generator, context, "s01e01", session, 8443);
+    RequestBuilder request = testSp.generateRequest("https://bankid.swedenconnect.se/idp", generator, context, "s01e01", session, 8443);
     MockHttpServletRequest authRequest = request.buildRequest(Mockito.mock(ServletContext.class));
     String samlRequest = authRequest.getParameter("SAMLRequest");
     SslContext sslContext = SslContextBuilder
