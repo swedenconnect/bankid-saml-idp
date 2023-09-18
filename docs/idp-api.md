@@ -123,6 +123,27 @@ has made the current authentication request to the BankID IdP.
 | `imageUrl` | String | URL to the SP logotype. |
 
 
+<a name="contact-information"></a>
+### Contact Information
+
+An endpoint that delivers service contact information. Typically this information is displayed when
+an error has occurred.
+
+**Path:** `/api/contact`
+
+**Method:** GET
+
+**Request Parameters:** None
+
+**Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
+
+**Response Object:** [CustomerContactInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/CustomerContactInformation.java)
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `email` | String | The email address that should be displayed in the UI for customer support/contact. |
+| `displayInformation` | Boolean | Whether the UI should display contact information. |
+
 <a name="views"></a>
 ## Views
 

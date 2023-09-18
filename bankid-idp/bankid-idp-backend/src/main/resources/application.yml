@@ -56,13 +56,14 @@ bankid:
     image-format: PNG
   audit:
     repository: "memory"
-  user-message-defaults:
-    fallback-sign-text:
-      text: "Jag skriver härmed under den information som visades på föregående sida." 
-      format: plain-text
-    login-text:
-      text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
-      format: simple-markdown-v1
+  ui:
+    user-message-defaults:
+      fallback-sign-text:
+        text: "Jag skriver härmed under den information som visades på föregående sida." 
+        format: plain-text
+      login-text:
+        text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+        format: simple-markdown-v1
   authn:
     resume-path: /resume 
     provider-name: "BankID"
@@ -190,13 +191,15 @@ spring:
     port: ${REDIS_PORT:6379}
     password: supersecret
     ssl: true
-    tls:
-      p12KeyStorePath: classpath:local/redis/redis.p12
-      p12KeyStorePassword: changeit
-      p12TrustStorePath: classpath:local/redis/trust.p12
-      p12TrustStorePassword: changeit
-      enableHostnameVerification: true
-  session:
+    ssl-ext:
+      enable-hostname-verification: true
+      credential:
+        resource: classpath:local/redis/redis.p12
+        password: changeit
+      trust:
+        resource: classpath:local/redis/trust.p12
+        password: changeit
+  session:    
     timeout: 15m
 server:
   error:
@@ -207,17 +210,20 @@ server:
     session:
       timeout: 15m
 
-session:
-  module: redis
-
 bankid:
   audit:
-    repository: "memory"      
-    # "redistimeseries"
+    repository: "redistimeseries"
     log-file: target/audit.log
   built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
+  session:
+    module: redis
+  ui:
+    user-error:
+      contact-email: contact@email.com
+      show-contact-information: true
+      show-trace-id: true        
   relying-parties:
   - id: test-my-eid
     entity-ids:
@@ -234,8 +240,9 @@ bankid:
       login-text:
         text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
-    requirement:
-      pin-code: false
+    bankid-requirements:
+      pin-code-auth: false
+      pin-code-sign: true
 
 saml:
   idp:
@@ -256,11 +263,7 @@ management:
         include: health, metrics, prometheus, loggers, auditevents
   server:
     port: 8444
-user:
-  error:
-    contact-email: contact@email.com
-    show-contact-information: true
-    show-trace-id: true
+    
 ---
 server:
   port: 8082
@@ -334,5 +337,7 @@ bankid:
         login-text:
           text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
           format: simple-markdown-v1
-      requirement:
-        pin-code: false
+      bankid-requirements:
+        pin-code-auth: false
+        pin-code-sign: true
+        

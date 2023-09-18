@@ -18,6 +18,8 @@ package se.swedenconnect.bankid.idp.authn.error;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
+
+import se.swedenconnect.bankid.idp.config.UiProperties;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
@@ -30,7 +32,7 @@ import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 public class UserErrorRouteFactory {
 
   /** The properties that determines what to display in the error UI view. */
-  private final UserErrorProperties properties;
+  private final UiProperties.UserErrorProperties properties;
 
   /**
    * Error message enum.
@@ -59,7 +61,7 @@ public class UserErrorRouteFactory {
    *
    * @param properties the properties that determines what to display in the error UI view
    */
-  public UserErrorRouteFactory(final UserErrorProperties properties) {
+  public UserErrorRouteFactory(final UiProperties.UserErrorProperties properties) {
     this.properties = properties;
   }
 
@@ -85,7 +87,7 @@ public class UserErrorRouteFactory {
   private String build(final String message, final String traceId) {
     final StringBuilder builder = new StringBuilder();
     builder.append(message);
-    if (this.properties.getShowTraceId()) {
+    if (this.properties.isShowTraceId()) {
       builder.append("/%s".formatted(traceId));
     }
     return builder.toString();

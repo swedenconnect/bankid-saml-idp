@@ -30,8 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
-import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
-import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.api.overrides.FrontendOverrideResponse;
 import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
@@ -206,7 +204,11 @@ public class BankIdApiController {
    */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo()));
+
+    final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
+    final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
+
+    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
   }
 
   /**

@@ -15,15 +15,25 @@
  */
 package se.swedenconnect.bankid.rpapi.service.impl;
 
+import se.swedenconnect.bankid.rpapi.LibraryVersion;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
 /**
- * Exception class for 5XX API errors
+ * Exception class for 5XX API errors.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public class BankIdServerException extends BankIDException {
+
+  /** For serializing. */
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
+
+  /**
+   * Constructor.
+   *
+   * @param message the error message
+   */
   public BankIdServerException(final String message) {
     super(message);
   }

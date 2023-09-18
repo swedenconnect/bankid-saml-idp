@@ -15,11 +15,22 @@
  */
 package se.swedenconnect.bankid.idp.authn;
 
-import se.swedenconnect.bankid.idp.authn.error.UserErrorProperties;
+import se.swedenconnect.bankid.idp.config.UiProperties.UserErrorProperties;
 
 public class UserErrorPropertiesFixture {
 
-  public static final UserErrorProperties EMPTY_PROPERTIES = new UserErrorProperties("", false, false);
-  public static final UserErrorProperties SHOW_EMAIL_NO_TRACE = new UserErrorProperties("contact@email.com", false, true);
-  public static final UserErrorProperties SHOW_EMAIL_SHOW_TRACE = new UserErrorProperties("contact@email.com", true, true);
+  public static final UserErrorProperties EMPTY_PROPERTIES = new UserErrorProperties();
+  public static UserErrorProperties SHOW_EMAIL_NO_TRACE;
+  public static UserErrorProperties SHOW_EMAIL_SHOW_TRACE;
+
+  static {
+    SHOW_EMAIL_NO_TRACE = new UserErrorProperties();
+    SHOW_EMAIL_NO_TRACE.setContactEmail("contact@email.com");
+    SHOW_EMAIL_NO_TRACE.setShowContactInformation(true);
+
+    SHOW_EMAIL_SHOW_TRACE = new UserErrorProperties();
+    SHOW_EMAIL_SHOW_TRACE.setContactEmail("contact@email.com");
+    SHOW_EMAIL_SHOW_TRACE.setShowContactInformation(true);
+    SHOW_EMAIL_SHOW_TRACE.setShowTraceId(true);
+  }
 }

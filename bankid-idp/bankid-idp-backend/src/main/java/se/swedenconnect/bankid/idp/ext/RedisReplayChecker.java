@@ -15,69 +15,73 @@
  */
 package se.swedenconnect.bankid.idp.ext;
 
-import lombok.AllArgsConstructor;
-import org.redisson.api.RScoredSortedSet;
-import org.redisson.api.RedissonClient;
-import se.swedenconnect.spring.saml.idp.authnrequest.validation.AbstractMessageReplayChecker;
-
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.SortedSet;
 
+import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RedissonClient;
+
+import se.swedenconnect.spring.saml.idp.authnrequest.validation.AbstractMessageReplayChecker;
+
 /**
- * ReplayChecker Using Two Redis Sorted Set
- * One for replays and one for expiration
+ * ReplayChecker using two Redis sorted set. One for replays and one for expiration.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@AllArgsConstructor
 public class RedisReplayChecker extends AbstractMessageReplayChecker {
 
-  public static final Duration TIME_TO_LIVE = Duration.of(5, ChronoUnit.MINUTES);
-  /*
-   * The client for redisson
-   */
+  /** The client for redisson. */
   private final RedissonClient client;
 
   /**
-   * {@inheritDoc}
+   * Constructor.
+   *
+   * @param client the Redis client
    */
-  @Override
-  protected boolean existsInCache(String s) {
-    removeExpired();
-    return getRedisSortedSet().contains(s);
+  public RedisReplayChecker(final RedissonClient client) {
+    this.client = Objects.requireNonNull(client, "client must not be null");
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void addToCache(String s) {
-    removeExpired();
-    addEntry(s);
+  protected boolean existsInCache(final String s) {
+    this.removeExpired();
+    return this.getRedisSortedSet().contains(s);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void addToCache(final String s) {
+    this.removeExpired();
+    this.addEntry(s);
   }
 
   /**
    * @param s id to add
    */
 
-  private void addEntry(String s) {
-    SortedSet<String> redisSortedSet = getRedisSortedSet();
-    RScoredSortedSet<String> expirationsSortedSet = getExpirationsSortedSet();
+  private void addEntry(final String s) {
+    final SortedSet<String> redisSortedSet = this.getRedisSortedSet();
+    final RScoredSortedSet<String> expirationsSortedSet = this.getExpirationsSortedSet();
     redisSortedSet.add(s);
-    expirationsSortedSet.add(Instant.now().plus(TIME_TO_LIVE).getEpochSecond(), s);
+    expirationsSortedSet.add(Instant.now().plus(this.replayCacheExpiration).getEpochSecond(), s);
   }
 
   /**
    * Remove all entries that has expired
    */
   private void removeExpired() {
-    SortedSet<String> redisSortedSet = getRedisSortedSet();
-    RScoredSortedSet<String> expirationsSortedSet = getExpirationsSortedSet();
-    Collection<String> expiredEntries = expirationsSortedSet.valueRange(Instant.EPOCH.getEpochSecond(), true, Instant.now().getEpochSecond(), true);
+    final SortedSet<String> redisSortedSet = this.getRedisSortedSet();
+    final RScoredSortedSet<String> expirationsSortedSet = this.getExpirationsSortedSet();
+    final Collection<String> expiredEntries =
+        expirationsSortedSet.valueRange(Instant.EPOCH.getEpochSecond(), true, Instant.now().getEpochSecond(), true);
     expirationsSortedSet.removeAll(expiredEntries);
     redisSortedSet.removeAll(expiredEntries);
   }
@@ -86,13 +90,13 @@ public class RedisReplayChecker extends AbstractMessageReplayChecker {
    * Method that returns the sorted set used for the replay checker
    */
   private SortedSet<String> getRedisSortedSet() {
-    return client.getLexSortedSet("replaychecker");
+    return this.client.getLexSortedSet("replaychecker");
   }
 
   /*
    * Method that returns time to live for replaychecker
    */
   private RScoredSortedSet<String> getExpirationsSortedSet() {
-    return client.getScoredSortedSet("replaychecker_ttl");
+    return this.client.getScoredSortedSet("replaychecker_ttl");
   }
 }

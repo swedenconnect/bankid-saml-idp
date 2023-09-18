@@ -34,7 +34,7 @@ import se.swedenconnect.opensaml.saml2.response.replay.InMemoryReplayChecker;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(value = "session.module", havingValue = "memory", matchIfMissing = true)
+@ConditionalOnProperty(value = "bankid.session.module", havingValue = "memory", matchIfMissing = true)
 public class InMemorySessionConfiguration {
 
   // This is meant for development, can cause issues if deployed in a production environment
@@ -54,4 +54,5 @@ public class InMemorySessionConfiguration {
   InMemoryReplayChecker inMemoryReplayChecker() {
     return new InMemoryReplayChecker();
   }
+
 }

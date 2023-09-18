@@ -19,7 +19,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import se.swedenconnect.bankid.idp.config.EntityRequirement;
+import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
+import se.swedenconnect.bankid.idp.config.BankIdRequirement;
 import se.swedenconnect.bankid.rpapi.service.AuthenticateRequest;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.SignatureRequest;
@@ -27,7 +28,7 @@ import se.swedenconnect.bankid.rpapi.types.Requirement;
 
 /**
  * Component for sending authentication and signature requests to the BankID server.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -36,7 +37,7 @@ public class BankIdRequestFactory {
 
   /**
    * Creates a BankID authentication request.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return an {@link AuthenticateRequest}
    */
@@ -44,12 +45,12 @@ public class BankIdRequestFactory {
     return new AuthenticateRequest(
         request.getRequest().getRemoteAddr(),
         request.getData(),
-        createRequirement(request, request.getContext().getPersonalNumber()));
+        createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.AUTH));
   }
 
   /**
    * Creates a BankID signature request.
-   * 
+   *
    * @param request the {@link PollRequest}
    * @return an {@link AuthenticateRequest}
    */
@@ -58,7 +59,7 @@ public class BankIdRequestFactory {
       return new SignatureRequest(
           request.getRequest().getRemoteAddr(),
           dataToSign,
-          createRequirement(request, request.getContext().getPersonalNumber()));
+          createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.SIGN));
     }
     else {
       throw new IllegalArgumentException(
@@ -66,21 +67,24 @@ public class BankIdRequestFactory {
     }
   }
 
-  private static Requirement createRequirement(final PollRequest request, final String personalIdentityNumber) {
-    final Optional<EntityRequirement> requirement = Optional.ofNullable(request.getRelyingPartyData().getRequirement());
+  private static Requirement createRequirement(final PollRequest request, final String personalIdentityNumber,
+      final BankIdOperation operation) {
+    final Optional<BankIdRequirement> requirement = Optional.ofNullable(request.getRelyingPartyData().getRequirement());
     final Requirement.RequirementBuilder builder = requirement.isPresent()
-        ? Requirement.builder(fromEntityRequirement(requirement.get()))
-        : Requirement.builder();
-    
+        ? Requirement.builder(fromEntityRequirement(requirement.get(), operation))
+        : Requirement.builder(fromEntityRequirement(new BankIdRequirement(), operation));
+
     if (personalIdentityNumber != null) {
       builder.personalNumber(personalIdentityNumber);
     }
     return builder.build();
   }
 
-  private static Requirement fromEntityRequirement(final EntityRequirement entityRequirement) {
-    final Requirement requirement = new Requirement();    
-    Optional.ofNullable(entityRequirement.getPinCode()).ifPresent(requirement::setPinCode);
+  private static Requirement fromEntityRequirement(final BankIdRequirement entityRequirement, final BankIdOperation operation) {
+    final Requirement requirement = new Requirement();
+    requirement.setPinCode(operation == BankIdOperation.AUTH
+        ? entityRequirement.isPinCodeAuth()
+        : entityRequirement.isPinCodeSign());
     Optional.ofNullable(entityRequirement.getMrtd()).ifPresent(requirement::setMrtd);
     Optional.ofNullable(entityRequirement.getCardReader()).ifPresent(requirement::setCardReader);
     Optional.ofNullable(entityRequirement.getCertificatePolicies()).ifPresent(requirement::setCertificatePolicies);

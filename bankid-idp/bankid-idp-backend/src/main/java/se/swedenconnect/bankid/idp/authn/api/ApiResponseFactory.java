@@ -15,13 +15,12 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import com.beust.ah.A;
+import java.util.Objects;
+import java.util.Optional;
+
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Helper class for creating an {@link ApiResponse} object.

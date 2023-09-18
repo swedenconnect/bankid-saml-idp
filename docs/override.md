@@ -167,7 +167,8 @@ public class Application {
               .initialize(
                       new OpenSAMLSecurityDefaultsConfig(new SwedishEidSecurityConfiguration()),
                       new OpenSAMLSecurityExtensionConfig());
-    } catch (Exception e) {
+    } 
+    catch (final Exception e) {
       throw new RuntimeException(e);
     }
     SpringApplication.run(Application.class, args);

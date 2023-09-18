@@ -13,26 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.api;
 
-import lombok.AllArgsConstructor;
-import se.swedenconnect.bankid.idp.authn.error.UserErrorProperties;
+import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
+import se.swedenconnect.bankid.idp.config.UiProperties.UserErrorProperties;
+
 /**
+ * Supplies customer information.
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @Component
-@AllArgsConstructor
 public class CustomerContactInformationFactory {
 
   private final UserErrorProperties properties;
 
+  /**
+   * Constructor.
+   *
+   * @param properties
+   */
+  public CustomerContactInformationFactory(final UserErrorProperties properties) {
+    this.properties = Objects.requireNonNull(properties, "properties must not be null");
+  }
+
   public CustomerContactInformation getContactInformation() {
-    if (properties.getShowContactInformation()) {
-      return new CustomerContactInformation(properties.getContactEmail(), true);
+    if (this.properties.isShowContactInformation()) {
+      return new CustomerContactInformation(this.properties.getContactEmail(), true);
     }
     return new CustomerContactInformation("", false);
   }

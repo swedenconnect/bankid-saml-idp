@@ -15,12 +15,14 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.PENDING;
 import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.FAILED;
+import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.PENDING;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,9 +34,9 @@ import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
 public class StatusCodeFactory {
 
-  private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
-
   private static final List<StatusResolver> RESOLVES = new ArrayList<>() {
+    private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
+
     {
       add(new StatusResolver("rfa1", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus()) && !c.getShowQr()));
       add(new StatusResolver("rfa3", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.CANCELLED.equals(c.getCollectResponse().getErrorCode())));

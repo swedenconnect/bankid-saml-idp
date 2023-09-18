@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.core.io.ClassPathResource;
@@ -34,10 +33,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
-import se.swedenconnect.bankid.idp.authn.DisplayText;
+import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
+import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
 import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
@@ -61,7 +61,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
   /**
    * The root certificate of the BankID server TLS credential. Defaults to
-   * {@code classpath:trust/bankid-trust-prod.crt}.
+   * "classpath:trust/bankid-trust-prod.crt".
    */
   @Getter
   @Setter
@@ -76,7 +76,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private boolean builtInFrontend = true;
 
   /**
-   * Should be set to {@code true} if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
+   * Should be set to 'true' if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used.
    */
   @Getter
   @Setter
@@ -104,6 +104,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final HealthConfiguration health = new HealthConfiguration();
 
   /**
+   * Session module configuration.
+   */
+  @NestedConfigurationProperty
+  @Getter
+  private final SessionConfiguration session = new SessionConfiguration();
+
+  /**
    * Configuration for audit support.
    */
   @NestedConfigurationProperty
@@ -111,11 +118,11 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final AuditConfiguration audit = new AuditConfiguration();
 
   /**
-   * Default text(s) to display during authentication/signing.
+   * Configuration concerning the BankID IdP UI (including texts displayed in the BankID app).
    */
   @NestedConfigurationProperty
   @Getter
-  private final UserMessageConfiguration userMessageDefaults = new UserMessageConfiguration();
+  private final UiProperties ui = new UiProperties();
 
   /**
    * The relying parties handled by this IdP.
@@ -151,11 +158,9 @@ public class BankIdConfigurationProperties implements InitializingBean {
     this.authn.afterPropertiesSet();
     this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
+    this.session.afterPropertiesSet();
     this.audit.afterPropertiesSet();
-
-    this.userMessageDefaults.afterPropertiesSet();
-    Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
-        "bankid.user-message-defaults.fallback-sign-text must be assigned");
+    this.ui.afterPropertiesSet();
 
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingPartyConfiguration rp : this.relyingParties) {
@@ -164,10 +169,14 @@ public class BankIdConfigurationProperties implements InitializingBean {
       final RelyingPartyConfiguration.RpUserMessage msg = rp.getUserMessage();
 
       if (msg.getFallbackSignText() == null) {
-        msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
+        Assert.notNull(this.ui.getUserMessageDefaults().getFallbackSignText(),
+            "bankid.user-message-defaults.fallback-sign-text must be assigned");
+
+        msg.setFallbackSignText(this.ui.getUserMessageDefaults().getFallbackSignText());
       }
-      if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()) {
-        msg.setLoginText(this.userMessageDefaults.getLoginText());
+      if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()
+          && this.ui.getUserMessageDefaults().getLoginText() != null) {
+        msg.setLoginText(this.ui.getUserMessageDefaults().getLoginText());
       }
     }
   }
@@ -179,12 +188,12 @@ public class BankIdConfigurationProperties implements InitializingBean {
   public static final class QrCodeConfiguration implements InitializingBean {
 
     /**
-     * The height and width in pixels of the QR code. Defaults to {@link AbstractQRGenerator#DEFAULT_SIZE}.
+     * The height and width in pixels of the QR code.
      */
     private Integer size;
 
     /**
-     * The image format for the generated QR code. Defaults to {@link QRGenerator.ImageFormat#PNG}.
+     * The image format for the generated QR code.
      */
     private QRGenerator.ImageFormat imageFormat;
 
@@ -202,39 +211,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
         log.info("bankid.qr-code.image-format was not assigned, defaulting to {}", this.imageFormat);
       }
     }
-  }
-
-  /**
-   * Texts to display during authentication and signature.
-   */
-  public static class UserMessageConfiguration implements InitializingBean {
-
-    /**
-     * Text to display when authenticating.
-     */
-    @Getter
-    @Setter
-    private DisplayText loginText;
-
-    /**
-     * If no {@code SignMessage} extension was received in the {@code AuthnRequest} message, this text will be
-     * displayed.
-     */
-    @Getter
-    @Setter
-    private DisplayText fallbackSignText;
-
-    /** {@inheritDoc} */
-    @Override
-    public void afterPropertiesSet() throws Exception {
-      if (this.loginText != null) {
-        Assert.hasText(this.loginText.getText(), "Missing text field for login-text");
-      }
-      if (this.fallbackSignText != null) {
-        Assert.hasText(this.fallbackSignText.getText(), "Missing text field for fallback-sign-text");
-      }
-    }
-
   }
 
   /**
@@ -274,9 +250,21 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private RpUserMessage userMessage;
 
+    /**
+     * The UI info for a Relying Party is normally extracted from the SAML metadata, but there are cases where you may
+     * want to manually configure these data elements (for example if the metadata does not contain this information, or
+     * you simply want to override it). This element holds this information.
+     */
     @Getter
     @Setter
-    private EntityRequirement requirement;
+    private RelyingPartyUiInfo uiInfo;
+
+    /**
+     * Specific BankID requirements for this Relying Party.
+     */
+    @Getter
+    @Setter
+    private BankIdRequirement bankidRequirements;
 
     /**
      * {@inheritDoc}
@@ -312,11 +300,11 @@ public class BankIdConfigurationProperties implements InitializingBean {
     /**
      * For configuring user messages per RP.
      */
-    public static class RpUserMessage extends UserMessageConfiguration {
+    public static class RpUserMessage extends UiProperties.UserMessageProperties {
 
       /**
        * If the default user message login text has been assigned, and a specific RP wishes to not use login messages it
-       * should set this flag to {@code false} (and not assign {@code login-text}).
+       * should set this flag to 'false' (and not assign 'login-text').
        */
       @Getter
       @Setter
@@ -375,8 +363,13 @@ public class BankIdConfigurationProperties implements InitializingBean {
       if (!StringUtils.hasText(this.authnPath)) {
         this.authnPath = BankIdAuthenticationController.AUTHN_PATH;
       }
-      Assert.hasText(this.resumePath, "bankid.authn.resume-path must be set");
-      Assert.notEmpty(this.supportedLoas, "At least one URI must be assigned to bankid.authn.supported-loas");
+      if (!StringUtils.hasText(this.resumePath)) {
+        this.resumePath = "/resume";
+      }
+      if (this.supportedLoas.isEmpty()) {
+        this.supportedLoas.add(LevelOfAssuranceUris.AUTHN_CONTEXT_URI_UNCERTIFIED_LOA3);
+        log.info("bankid.authn.supported-loas has not been assigned, defaulting to {}", this.supportedLoas);
+      }
     }
 
   }
@@ -411,21 +404,44 @@ public class BankIdConfigurationProperties implements InitializingBean {
   }
 
   /**
+   * Session handling configuration.
+   */
+  public static class SessionConfiguration implements InitializingBean {
+
+    /**
+     * The session module to use. Supported values are "memory" and "redis". Set to other value if you extend the BankID
+     * IdP with your own session handling.
+     */
+    @Getter
+    @Setter
+    private String module;
+
+    /** {@inheritDoc} */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (!StringUtils.hasText(this.module)) {
+        this.module = "memory";
+      }
+    }
+
+  }
+
+  /**
    * Audit logging configuration.
    */
   public static class AuditConfiguration implements InitializingBean {
 
     /**
-     * The type of {@link AuditEventRepository} that should be used. Possible values are: {@code memory} for an
-     * in-memory repository, {@code redislist} for a Redis list implementation, {@code redistimeseries} for a Redis time
-     * series implementation or {@code other} if you extend the BankID IdP with your own implementation.
+     * The type of AuditEventRepository that should be used. Possible values are: "memory" for an in-memory repository,
+     * "redislist" for a Redis list implementation, "redistimeseries" for a Redis time series implementation or another
+     * value if you extend the BankID IdP with your own implementation.
      */
     @Getter
     @Setter
     private String repository;
 
     /**
-     * If assigned, the audit events will not only be stored according to the {@code repository} but also be written to
+     * If assigned, the audit events will not only be stored according to the "repository" but also be written to
      * the given log file. If set, a complete path must be given.
      */
     @Getter
@@ -433,8 +449,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
     private String logFile;
 
     /**
-     * The supported events that will be logged to the given repository (and possibly the file). The default
-     * is {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
+     * The supported events that will be logged to the given repository (and possibly the file). The default is
+     * {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
      */
     @Getter
     private List<String> supportedEvents = new ArrayList<>();
