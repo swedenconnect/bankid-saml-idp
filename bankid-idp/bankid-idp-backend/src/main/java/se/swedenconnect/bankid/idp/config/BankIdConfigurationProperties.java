@@ -34,7 +34,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
-import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
@@ -113,11 +112,11 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private final AuditConfiguration audit = new AuditConfiguration();
 
   /**
-   * Default text(s) to display during authentication/signing.
+   * Configuration concerning the BankID IdP UI (including texts displayed in the BankID app).
    */
   @NestedConfigurationProperty
   @Getter
-  private final UserMessageConfiguration userMessageDefaults = new UserMessageConfiguration();
+  private final UiProperties ui = new UiProperties();
 
   /**
    * The relying parties handled by this IdP.
@@ -154,7 +153,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
     this.audit.afterPropertiesSet();
-    this.userMessageDefaults.afterPropertiesSet();
+    this.ui.afterPropertiesSet();
 
     Assert.notEmpty(this.relyingParties, "bankid.relying-parties must contain at least one RP");
     for (final RelyingPartyConfiguration rp : this.relyingParties) {
@@ -163,14 +162,14 @@ public class BankIdConfigurationProperties implements InitializingBean {
       final RelyingPartyConfiguration.RpUserMessage msg = rp.getUserMessage();
 
       if (msg.getFallbackSignText() == null) {
-        Assert.notNull(this.userMessageDefaults.getFallbackSignText(),
+        Assert.notNull(this.ui.getUserMessageDefaults().getFallbackSignText(),
             "bankid.user-message-defaults.fallback-sign-text must be assigned");
 
-        msg.setFallbackSignText(this.userMessageDefaults.getFallbackSignText());
+        msg.setFallbackSignText(this.ui.getUserMessageDefaults().getFallbackSignText());
       }
       if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()
-          && this.userMessageDefaults.getLoginText() != null) {
-        msg.setLoginText(this.userMessageDefaults.getLoginText());
+          && this.ui.getUserMessageDefaults().getLoginText() != null) {
+        msg.setLoginText(this.ui.getUserMessageDefaults().getLoginText());
       }
     }
   }
@@ -205,39 +204,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
         log.info("bankid.qr-code.image-format was not assigned, defaulting to {}", this.imageFormat);
       }
     }
-  }
-
-  /**
-   * Texts to display during authentication and signature.
-   */
-  public static class UserMessageConfiguration implements InitializingBean {
-
-    /**
-     * Text to display when authenticating.
-     */
-    @Getter
-    @Setter
-    private DisplayText loginText;
-
-    /**
-     * If no {@code SignMessage} extension was received in the {@code AuthnRequest} message, this text will be
-     * displayed.
-     */
-    @Getter
-    @Setter
-    private DisplayText fallbackSignText;
-
-    /** {@inheritDoc} */
-    @Override
-    public void afterPropertiesSet() throws Exception {
-      if (this.loginText != null) {
-        Assert.hasText(this.loginText.getText(), "Missing text field for login-text");
-      }
-      if (this.fallbackSignText != null) {
-        Assert.hasText(this.fallbackSignText.getText(), "Missing text field for fallback-sign-text");
-      }
-    }
-
   }
 
   /**
@@ -327,7 +293,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
     /**
      * For configuring user messages per RP.
      */
-    public static class RpUserMessage extends UserMessageConfiguration {
+    public static class RpUserMessage extends UiProperties.UserMessageProperties {
 
       /**
        * If the default user message login text has been assigned, and a specific RP wishes to not use login messages it

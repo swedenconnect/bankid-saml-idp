@@ -112,6 +112,16 @@ public class BankIdConfiguration {
   }
 
   /**
+   * Gets the {@link UiProperties.UserErrorProperties} bean.
+   *
+   * @return {@link UiProperties.UserErrorProperties} bean
+   */
+  @Bean
+  UiProperties.UserErrorProperties userErrorProperties() {
+    return this.properties.getUi().getUserError();
+  }
+
+  /**
    * Creates the {@link QRGenerator} to use when generating QR code images.
    *
    * @return a {@link QRGenerator}

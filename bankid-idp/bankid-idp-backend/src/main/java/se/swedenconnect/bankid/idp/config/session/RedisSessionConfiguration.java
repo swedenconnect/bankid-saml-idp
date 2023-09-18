@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.config.session;
 
+import java.io.IOException;
+
 import org.redisson.api.RedissonClient;
 import org.redisson.config.SingleServerConfig;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
@@ -25,64 +27,69 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
 import se.swedenconnect.bankid.idp.authn.session.RedisSessionDao;
 import se.swedenconnect.bankid.idp.authn.session.SessionDao;
-import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
-import se.swedenconnect.bankid.idp.config.RedisSecurityProperties;
+import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
+import se.swedenconnect.bankid.idp.config.RedisTlsProperties;
 import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
 
-import java.io.IOException;
-
+/**
+ * Redis session security configuration.
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @Configuration
 @ConditionalOnProperty(value = "session.module", havingValue = "redis")
-@Import({RedissonAutoConfiguration.class, RedisAutoConfiguration.class})
+@Import({ RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
 @EnableRedisHttpSession
 public class RedisSessionConfiguration {
-  private final ResourceLoader loader = new DefaultResourceLoader();
 
   @Bean
-  @ConfigurationProperties(prefix = "spring.redis.tls")
-  public RedisSecurityProperties redisSecurityProperties() {
-    return new RedisSecurityProperties();
+  @ConfigurationProperties(prefix = "spring.redis.ssl-ext")
+  RedisTlsProperties redisTlsProperties() {
+    return new RedisTlsProperties();
   }
+
   @Bean
-  public RedissonAutoConfigurationCustomizer sslCustomizer(final RedisSecurityProperties properties) {
-    final Resource keystore = loader.getResource(properties.getP12KeyStorePath());
+  @ConditionalOnProperty(value = "spring.redis.ssl", havingValue = "true", matchIfMissing = false)
+  RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties) {
     return c -> {
       try {
-        final SingleServerConfig singleServerConfig = c.useSingleServer()
-            .setSslKeystore(keystore.getURL())
-            .setSslKeystorePassword(properties.getP12KeyStorePassword());
-        singleServerConfig.setSslEnableEndpointIdentification(properties.getEnableHostnameVerification());
-        if (properties.getEnableHostnameVerification()) {
-          final Resource truststore = loader.getResource(properties.getP12TrustStorePath());
-          singleServerConfig
-              .setSslTruststore(truststore.getURL())
-              .setSslTruststorePassword(properties.getP12TrustStorePassword());
+        final SingleServerConfig config = c.useSingleServer();
+        config.setSslEnableEndpointIdentification(tlsProperties.isEnableHostnameVerification());
+        if (tlsProperties.getCredential() != null) {
+          config
+            .setSslKeystore(tlsProperties.getCredential().getResource().getURL())
+            .setSslKeystorePassword(tlsProperties.getCredential().getPassword());
         }
-      } catch (final IOException e) {
+        if (tlsProperties.getTrust() != null) {
+          config
+            .setSslTruststore(tlsProperties.getTrust().getResource().getURL())
+            .setSslTruststorePassword(tlsProperties.getTrust().getPassword());
+        }
+      }
+      catch (final IOException e) {
         throw new RuntimeException(e);
       }
     };
   }
 
   @Bean
-  public TryLockRepository repository(final RedissonClient client) {
+  TryLockRepository repository(final RedissonClient client) {
     return new RedisTryLockRepository(client);
   }
 
   @Bean
-  public SessionDao redisSessionDao(final RedissonClient client) {
+  SessionDao redisSessionDao(final RedissonClient client) {
     return new RedisSessionDao(client);
   }
 
   @Bean
-  public RedisReplayChecker redisReplayChecker(final RedissonClient client) {
+  RedisReplayChecker redisReplayChecker(final RedissonClient client) {
     return new RedisReplayChecker(client);
   }
 }

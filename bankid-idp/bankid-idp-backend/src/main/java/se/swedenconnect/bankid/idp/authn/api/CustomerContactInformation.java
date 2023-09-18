@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.config;
-
+package se.swedenconnect.bankid.idp.authn.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Customer contact information.
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class RedisSecurityProperties {
-  private String p12KeyStorePath;
-  private String p12KeyStorePassword;
-  private String p12TrustStorePath;
-  private String p12TrustStorePassword;
-  private Boolean enableHostnameVerification;
+public class CustomerContactInformation {
+
+  /** The email address. */
+  private String email;
+
+  /** Should we display information (about an error)? */
+  private Boolean displayInformation;
 }

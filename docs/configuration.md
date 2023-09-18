@@ -33,7 +33,7 @@ comprise of configuration for the BankID integration and integration against the
 | `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
 | `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
 | `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
-| `bankid.`<br />`user-message-defaults.*` | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
+| `bankid.ui.*` | Configuration concerning the BankID IdP UI (including texts displayed in the BankID app). See [UI Configuration](#ui-configuration) below. | [UiProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#ui-configuration) |
 | `bankid.`<br />`relying-parties[].*` | A list of configuration elements for each Relying Party that is allowed to communicate with the BankID SAML IdP. See [Relying Party Configuration](#relying-party-configuration) below. | [RelyingPartyConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
 
 
@@ -85,8 +85,16 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 | `log-file` | If assigned, the audit events will not only be stored according to the `repository` setting, but also be written to the given log file. If set, a complete path must be given. | String | - |
 | `supported-events[]` | The supported events that will be logged to the given repository (and possibly the file). | List of strings | All events listed in [BankID Audit Events](https://docs.swedenconnect.se/bankid-saml-idp/logging.html#bankid-audit-events) and [SAML Audit Events](https://docs.swedenconnect.se/bankid-saml-idp/logging.html#saml-audit-events). |
 
+<a name="ui-configuration"></a>
+### UI Configuration
+
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `user-message-defaults.*` | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
+| `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
+
 <a name="default-user-messages-configuration"></a>
-### Default User Messages Configuration
+#### Default User Messages Configuration
 
 Each Relying Party can be configured with both login texts to use during login, and also fallback texts
 to use if no sign message was received in the SAML request. However, an IdP supporting many RP:s may 
@@ -95,9 +103,10 @@ RP.
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
-| `login-text.*` | The text to display in the BankID app when the user is authenticating. See [Relying Party Configuration](#relying-party-configuration) below for how to set a text that is specific for a specific RP. | `DisplayText` (see below) | - |
-| `fallback-sign-text.*` | If no `SignMessage` was received in the SAML `AuthnRequest` message, and no specific text is set for an RP (see [Relying Party Configuration](#relying-party-configuration) below), this text will be displayed in the BankID app during a BankID signature operation. | `DisplayText` (see below) | - |
+| `login-text.*` | The text to display in the BankID app when the user is authenticating. See [Relying Party Configuration](#relying-party-configuration) below for how to set a text that is specific for a specific RP. | [DisplayText](#display-text) | - |
+| `fallback-sign-text.*` | If no `SignMessage` was received in the SAML `AuthnRequest` message, and no specific text is set for an RP (see [Relying Party Configuration](#relying-party-configuration) below), this text will be displayed in the BankID app during a BankID signature operation. | [DisplayText](#display-text) | - |
 
+<a name="display-text"></a>
 ##### DisplayText
 
 | Property | Description | Type | Default value |
@@ -105,18 +114,32 @@ RP.
 | `text` | The text string. | String | - |
 | `format` | The format on the above text string. Can be either `plain_text` or `simple_markdown_v1` (see https://www.bankid.com/utvecklare/guider/formatera-text) | String | `plain_text` |
 
-##### Example
+<a name="user-error-configuration"></a>
+#### User Error Configuration
 
-```
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `contact-email` | E-mail address to use in the UI. For example to report errors. | String | - |
+| `show-contact-information` | Predicate that tells whether contact information should be displayed in the UI. | Boolean | `false` |
+| `show-trace-id` | Whether an ID should be displayed for the user when an error has occurred. Using this ID, the user can contact user support. | Boolean | `false` |
+
+#### Example
+
+```yaml
 bankid:
   ...
-  user-message-defaults:
-    fallback-sign-text:
-      text: "I hereby sign the text that was displayed on the previous page."
-      format: plain-text
-    login-text:
-      text: "*Note!*\n\nNever login using your BankID when someone is asking you to do this over the phone"
-      format: simple-markdown-v1
+  ui:
+    user-message-defaults:
+      fallback-sign-text:
+        text: "I hereby sign the text that was displayed on the previous page."
+        format: plain-text
+      login-text:
+        text: "*Note!*\n\nNever login using your BankID when someone is asking you to do this over the phone"
+        format: simple-markdown-v1
+    user-error:
+      contact-email: support@example.com
+      show-contact-information: true
+      show-trace-id: true
       
 ```
 
@@ -177,41 +200,54 @@ Also see [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/bl
 <a name="spring-boot-configuration"></a>
 ## Spring Boot Configuration
 
+> TODO: Intro
+
 <a name="redis-configuration"></a>
 ### Redis Configuration
 
 > TODO
 
-# Configuring session / lock management
+<a name="redis-ssltls-configuration-extension"></a>
+#### Redis SSL/TLS Configuration Extension
 
-## Module Selection
+In order to configure the TLS connection against the Redis server regarding:
 
-### Redis (recommended)
+- CLient TLS authentication, and/or,
+- Specific TLS trust, and/or,
+- Verification of TLS server hostname
 
-We have configured a customizer that extends the spring redis configuration to simplify TLS configuration
+we have extended Spring Boot's Redis configuration under the key `spring.redis.ssl-ext` with 
+the following configuration settings:
 
-Application.yml
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `credential.resource` | The path to the `KeyStore` holding the client TLS credential (private key and certificate). | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
+| `credential.password` | The password to unlock the above `KeyStore`. <br />**Note:** Due to Spring's poor handling of SSL/TLS in general there is no way of having separate passwords for the store itself and the key entries of the `KeyStore`. | String | - |
+| `trust.resource` | The path to the `KeyStore` holding the trusted certificates for verifying the server certificate in the SSL/TLS handshake. If not assigned, the system defaults are used. | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
+| `trust.password` | The password to unlock the trust `KeyStore`. If this `KeyStore` does not have a password, no setting should be supplied. | - |
+| `enable-hostname-verification` | Should we verify the the peer's hostname as part of the SSL/TLS handshake? | Boolean | `true` |
+
+The settings will be active if `spring.redis.ssl` is set to `true`.
+
+**Example:**
+
 ```yaml
-session:
-  module: redis # Select module
 spring:
   redis:
-    host: host for redis instance
-    port: port for redis instance
-    password: password for redis instance
+    ...
     ssl: true 
-    tls: # Configuration Extension
-      p12KeyStorePath: path for keystore
-      p12KeyStorePassword: password for keystore
-      p12TrustStorePath: path for truststore
-      p12TrustStorePassword: password for truststore
-      enableHostnameVerification: true # If you want to verify certificate hostname or not
+    ssl-ext:
+    ssl-ext:
+      enable-hostname-verification: true
+      credential:
+        resource: classpath:local/redis/redis.p12
+        password: changeit
+      trust:
+        resource: classpath:local/redis/trust.p12
+        password: changeit    
 ```
-### In memory (Not recommended for production)
-```yaml
-session:
-  module: memory
-```
+
+
 
 ### Implement your own module
 

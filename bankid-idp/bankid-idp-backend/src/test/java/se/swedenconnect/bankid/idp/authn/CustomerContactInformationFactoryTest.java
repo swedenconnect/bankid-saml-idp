@@ -18,6 +18,9 @@ package se.swedenconnect.bankid.idp.authn;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import se.swedenconnect.bankid.idp.authn.api.CustomerContactInformation;
+import se.swedenconnect.bankid.idp.authn.api.CustomerContactInformationFactory;
+
 class CustomerContactInformationFactoryTest {
 
   @Test

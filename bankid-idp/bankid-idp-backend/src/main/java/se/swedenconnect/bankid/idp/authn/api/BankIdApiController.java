@@ -30,8 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
-import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
-import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
