@@ -31,7 +31,7 @@ services:
       - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks
       - SERVER_PORT=8445
       - SERVER_FORWARDHEADERSSTRATEGY=native
-      - BANKID_BUILTINFRONTEND_DISABLE=true
+      - BANKID_BUILT_IN_FRONTEND=false
       - BANKID_AUTHN_AUTHNPATH=/
     depends_on:
       - redisstack

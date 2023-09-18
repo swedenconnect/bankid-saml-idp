@@ -15,44 +15,68 @@
  */
 package se.swedenconnect.bankid.idp.audit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Objects;
+
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
-import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
+
 /**
- * Configuration for setting up the audit event repositories
+ * Configuration for setting up the audit event repositories.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @Configuration
+@EnableConfigurationProperties(BankIdConfigurationProperties.class)
 public class AuditRepositoryConfiguration {
 
-  @Bean
-  @ConditionalOnProperty(value = "bankid.audit.module", havingValue = "memory", matchIfMissing = false)
-  public AuditEventRepository inMemoryAuditRepository() {
-    return new InMemoryAuditEventRepository();
-  }
+  /**
+   * Audit configuration properties.
+   */
+  private final BankIdConfigurationProperties.AuditConfiguration config;
 
-
-  @Bean
-  @ConditionalOnProperty(value = "bankid.audit.module", havingValue = "redislist", matchIfMissing = false)
-  public AuditEventRepository redisListAuditRepository(final RedissonClient client, final AuditEventMapper mapper) {
-    return new ListAuditRepository(client, mapper);
-  }
-
-  @Bean
-  @ConditionalOnProperty(value = "bankid.audit.module", havingValue = "redistimeseries", matchIfMissing = true)
-  public AuditEventRepository redisTimeSeriesAuditStrategy(final RedissonClient client, final AuditEventMapper mapper) {
-    return new TimeSeriesAuditRepository(client, mapper);
+  /**
+   * Constructor.
+   *
+   * @param properties the BankID configuration properties
+   */
+  public AuditRepositoryConfiguration(final BankIdConfigurationProperties properties) {
+    this.config = Objects.requireNonNull(properties, "properties must not be null").getAudit();
   }
 
   @Bean
-  public AuditEventMapper auditEventMapper(final ObjectMapper mapper) {
+  @ConditionalOnProperty(value = "bankid.audit.repository", havingValue = "memory", matchIfMissing = true)
+  AuditEventRepository inMemoryAuditRepository(final AuditEventMapper mapper) throws IOException {
+    return new MemoryBasedAuditEventRepository(this.config.getLogFile(), mapper, this.config.getSupportedEvents());
+  }
+
+  @Bean
+  @ConditionalOnProperty(value = "bankid.audit.repository", havingValue = "redislist", matchIfMissing = false)
+  AuditEventRepository redisListAuditRepository(final RedissonClient client, final AuditEventMapper mapper)
+      throws IOException {
+    return new RedisListAuditEventRepository(client, this.config.getLogFile(), mapper,
+        this.config.getSupportedEvents());
+  }
+
+  @Bean
+  @ConditionalOnProperty(value = "bankid.audit.repository", havingValue = "redistimeseries", matchIfMissing = false)
+  AuditEventRepository redisTimeSeriesAuditStrategy(final RedissonClient client, final AuditEventMapper mapper)
+      throws IOException {
+    return new RedisTimeSeriesAuditEventRepository(client, this.config.getLogFile(), mapper,
+        this.config.getSupportedEvents());
+  }
+
+  @Bean
+  AuditEventMapper auditEventMapper(final ObjectMapper mapper) {
     return new AuditEventMapper(mapper);
   }
 }

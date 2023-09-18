@@ -32,16 +32,12 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformation;
 import se.swedenconnect.bankid.idp.authn.CustomerContactInformationFactory;
-import se.swedenconnect.bankid.idp.authn.SelectedDeviceInformation;
-import se.swedenconnect.bankid.idp.authn.SpInformation;
-import se.swedenconnect.bankid.idp.authn.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
 import se.swedenconnect.bankid.idp.authn.api.overrides.FrontendOverrideResponse;
 import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
-import se.swedenconnect.bankid.idp.authn.error.BankIdException;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
@@ -54,6 +50,7 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -140,8 +137,10 @@ public class BankIdApiController {
           .state(state)
           .build();
       return this.service.poll(pollRequest)
-          .onErrorResume(e -> e instanceof BankIdServerException, e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIdException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIdServerException,
+              e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
+          .onErrorResume(e -> e instanceof BankIDException,
+              e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
@@ -208,7 +207,7 @@ public class BankIdApiController {
    */
   @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<SpInformation> spInformation(final HttpServletRequest request) {
-    return Mono.just(SpInformationFactory.getSpInformation(request));
+    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo()));
   }
 
   /**

@@ -15,10 +15,12 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
+import com.beust.ah.A;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,6 +40,9 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
+    if(Objects.nonNull(data.getErrorCode())) {
+      return new ApiResponse(ApiResponse.Status.ERROR, "", "", data.getMessageCode());
+    }
     String qrCode = "";
     // Only generate qr code when it has not been scanned and should be displayed
     if (showQr && Optional.ofNullable(data.getStatus()).map(ProgressStatus.OUTSTANDING_TRANSACTION::equals)
@@ -62,7 +67,6 @@ public class ApiResponseFactory {
   }
 
   private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
-
     return switch (sessionData.getStatus()) {
       case OUTSTANDING_TRANSACTION:
         yield ApiResponse.Status.NOT_STARTED;

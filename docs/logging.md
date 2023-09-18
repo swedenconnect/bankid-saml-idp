@@ -1,126 +1,174 @@
 ![Logo](images/sweden-connect.png)
 
-# Event Logging
+# Audit Event Logging
 
-The BankID SAML IdP application produces event logs using the Spring Boot Actuator.
+This page describes the audit event logging feature of the BankID IdP.
 
-## Persisting
-Audit events can be persisted with redis time series (preferred) OR redis list 
+<a name="audit-configuration"></a>
+## Audit Configuration
 
-They can be accessed at `https://yourdomain:8444/actuator/auditevents`
-### Configuration
-> bankid.audit.module="redistimeseries"
+The [Configuration of the BankID SAML IdP](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html) has a section about [Audit Logging Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#audit-logging-configuration). This chapter describes this
+configuration in more detail.
 
-OR
-> bankid.audit.module=redislist
+The setting `bankid.audit.repository` should be set to any of the following values:
 
-## Events
+- `memory` - An in-memory audit event repository is used. The events can be accessed via Spring Boot Actuator's `auditevents` endpoint. Using the defaults from [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) this URL would then be `https://<yourdomain>:8444/actuator/auditevents`. This is the default if no setting is provided.
 
-This section lists all audit events that are produced.
+- `redislist` - Events are persisted using a Redis List. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisListAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/RedisListAuditEventRepository.java) for details.
+
+- `redistimeseries` - Events are persisted using the Redis Time series-feature. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisTimeSeriesAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/RedisTimeSeriesAuditEventRepository.java) for details.
+
+- `other` - This setting should be assigned if you extend the BankID SAML IdP and wants to provide a audit repository of your own. See [Providing a Custom Audit Event Repository](#providing-a-custom-audit-event-repository) below.
+
+By assigning the setting `bankid.audit.log-file` the BankID IdP Auditing feature will also write audit logs to file. Each line in this file will contain an audit event in JSON format.
+
+> The log file feature will use a rolling date handler, meaning that for each day a new log file is created and the previous log file is renamed to `<logfile>-<date>.log`.
+
+Finally, using the `bankid.audit.supported-events` setting it is also possible to exclude certain events from being stored/written. See all events below.
+
+<a name="providing-a-custom-audit-event-repository"></a>
+## Providing a Custom Audit Event Repository
+
+If you extend the BankID SAML IdP you can provide your own implementation of the audit event repository. For example, you may want to store audit events in a database.
+
+Your custom implementation should extend the [AbstractBankIdAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/AbstractBankIdAuditEventRepository.java) class if you want to keep the support for
+file logging and filtering of events. If that is not relevant for you, you may instead implement Spring's 
+[AuditEventRepository](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/audit/AuditEventRepository.html).
+
+Next, you need a Spring configuration class to create your bean. The example below illustrates this class:
+
+```
+@Configuration
+@EnableConfigurationProperties(BankIdConfigurationProperties.class)
+public class CustomAuditRepositoryConfiguration {
+
+  private final BankIdConfigurationProperties.AuditConfiguration config;
+
+  public CustomAuditRepositoryConfiguration(final BankIdConfigurationProperties properties) {
+    this.config = Objects.requireNonNull(properties, "properties must not be null").getAudit();
+  }
+
+  @Bean
+  @ConditionalOnProperty(value = "bankid.audit.repository", havingValue = "other", matchIfMissing = false)
+  AuditEventRepository customAuditRepository(final AuditEventMapper mapper) throws IOException {
+    return new MyCustomAuditEventRepository(this.config.getLogFile(), mapper,
+      this.config.getSupportedEvents());
+  }
+
+}
+
+```
+
+Finally, don't forget to set `bankid.audit.repository` to `other` to activate your extension.
+
+<a name="bankid-audit-events"></a>
+## BankID Audit Events
+
+This section lists all audit events that are produced by the BankID IdP.
+
+Common properties for all type of event are the following:
+
+- `type` - The type of the audit entry, see below.
+
+- `timestamp` - The time at which the event occurred.
+
+- `principal` - The "owner" of the entry. This will always the SAML entityID of the Service Provider that requested authentication.
+
+- `data` - Auditing data that is specific to the type of audit event. However, the following fields will always be present:
+
+ - `rp` - The name of the Relying Party.
+
+  - `sp-entity-id` - The "owner" of the entry. This will always the SAML entityID of the Service Provider that requested authentication.
+  
+ - `authn-request-id` - The ID of the authentication request that is being processed (`AuthnRequest`).
+ 
+ - `operation` - The type of operation. Possible values are `auth` and `sign`.
 
 ### Received Request
 
-A request for authentication or signing was received. Note that this event is published before
-any communication with the BankID server is initiated.
+**Type:** `BANKID_RECEIVED_REQUEST`
 
-**Parameters:**
+**Description:** A request for authentication or signing was received. Note that this event is
+published before any communication with the BankID server is initiated.
 
-| Parameter   | Description                                                   |
-|:------------|:--------------------------------------------------------------|
-| `type`      | `BANKID_RECEIVED_REQUEST`                                     |
-| `operation` | The type of operation. Possible values are `auth` and `sign`. |
-| `rp`        | The name of the Relying Party.                                |
-| `entityId`  | The SAML entityID of the SAML SP that sent the request.       |
-| `samlId`    | The ID of the SAML authentication request message.            |
-| `timestamp` | The timestamp.                                                |
+**Additional Parameters:** No additional parameters other than those described above.
 
 ### Initiated Operation
 
-The BankID operation has been initiated, i.e., the underlying BankID server has been invoked.
+**Type:** `BANKID_INIT`
 
-**Parameters:**
+**Description:** The BankID operation has been initiated, i.e., the underlying BankID server has been invoked.
 
-| Parameter   | Description                                                   |
-|:------------|:--------------------------------------------------------------|
-| `type`      | `BANKID_INIT`                                                 |
-| `operation` | The type of operation. Possible values are `auth` and `sign`. |
-| `rp`        | The name of the Relying Party.                                |
-| `entityId`  | The SAML entityID of the SAML SP that sent the request.       |
-| `samlId`    | The ID of the SAML authentication request message.            |
-| `orderRef`  | The BankID order reference.                                   |
-| `timestamp` | The timestamp.                                                |
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference. |
 
 ### Authentication Completed
 
-An BankID authentication operation has been successfully completed.
+**Type:** `BANKID_AUTH_COMPLETE`
 
-**Parameters:**
+**Description:** An BankID authentication operation has been successfully completed.
 
-| Parameter   | Description                                                              |
-|:------------|:-------------------------------------------------------------------------|
-| `type`      | `BANKID_AUTH_COMPLETE`                                                   |
-| `operation` | The type of operation. Will always be `auth`.                            |
-| `rp`        | The name of the Relying Party.                                           |
-| `entityId`  | The SAML entityID of the SAML SP that sent the request.                  |
-| `samlId`    | The ID of the SAML authentication request message.                       |
-| `orderRef`  | The BankID order reference.                                              |
-| `userId`    | The Swedish personal identity number of the user that was authenticated. |
-| `timestamp` | The timestamp.                                                           |
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference. |
+| `user.personal-number` | The Swedish personal identity number of the user that was authenticated. |
+| `user.name` | The full name of the user that was authenticated. |
+| `user.device.ip-address` | The IP address of the user's device holding the BankID. |
+| `user.device.uhi` | The Unique Hardware Identifier for the user's device holding the BankID. |
+
 
 ### Signing Completed
 
-An BankID signature operation has been successfully completed.
+**Type:** `BANKID_SIGN_COMPLETE`
 
-**Parameters:**
+**Description:** An BankID signature operation has been successfully completed.
 
-| Parameter   | Description                                                                  |
-|:------------|:-----------------------------------------------------------------------------|
-| `type`      | `BANKID_SIGN_COMPLETE`                                                       |
-| `operation` | The type of operation. Will always be `sign`.                                |
-| `rp`        | The name of the Relying Party.                                               |
-| `entityId`  | The SAML entityID of the SAML SP that sent the request.                      |
-| `samlId`    | The ID of the SAML authentication request message.                           |
-| `orderRef`  | The BankID order reference.                                                  |
-| `userId`    | The Swedish personal identity number of the user that performed the signing. |
-| `timestamp` | The timestamp.                                                               |
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference. |
+| `user.personal-number` | The Swedish personal identity number of the user that was authenticated. |
+| `user.name` | The full name of the user that was authenticated. |
+| `user.device.ip-address` | The IP address of the user's device holding the BankID. |
+| `user.device.uhi` | The Unique Hardware Identifier for the user's device holding the BankID. |
+
 
 ### Operation cancelled
 
-An operation that was started was cancelled by the user.
+**Type:** `BANKID_CANCEL`
 
-**Parameters:**
+**Description:** An operation that was started was cancelled by the user.
 
-| Parameter   | Description                                                   |
-|:------------|:--------------------------------------------------------------|
-| `type`      | `BANKID_CANCEL`                                               |
-| `operation` | The type of operation. Possible values are `auth` and `sign`. |
-| `rp`        | The name of the Relying Party.                                |
-| `entityId`  | The SAML entityID of the SAML SP that sent the request.       |
-| `samlId`    | The ID of the SAML authentication request message.            |
-| `orderRef`  | The BankID order reference.                                   |
-| `timestamp` | The timestamp.                                                |
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference. |
 
 ### Erroneous Operation
 
-An error occurred when processing a BankID request.
+**Type:** `BANKID_ERROR`
 
-**Parameters:**
+**Description:** An error occurred when processing a BankID request.
 
-| Parameter          | Description                                                                               |
-|:-------------------|:------------------------------------------------------------------------------------------|
-| `type`             | `BANKID_ERROR`                                                                            |
-| `operation`        | The type of operation. Possible values are `auth` and `sign`.                             |
-| `rp`               | The name of the Relying Party. If not known, a value of `unknown` is used.                |
-| `entityId`         | The SAML entityID of the SAML SP that sent the request. If not known, `unknown` is used.  |
-| `samlId`           | The ID of the SAML authentication request message.                                        |
-| `orderRef`         | The BankID order reference. If operation has not been fully initiated, `not-set` is used. |
-| `errorCode`        | The code for the error.                                                                   |
-| `errorDescription` | A textual description of the error.                                                       |
-| `timestamp`        | The timestamp.                                                                            |
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference (if known). |
+| `error-code` | The code for the error. | 
+| `error-description` | A textual description of the error (if available). |
 
 -----
 
-## Inherited events (SAML)
+<a name="saml-audit-events"></a>
+## SAML Audit Events
 
 This section lists all audit events that come from the saml-identity-provider dependency.
 
@@ -135,13 +183,13 @@ All audit events will contain the following fields:
 
 - `timestamp` - The timestamp of when the audit event entry was created.
 
-- `principal` - The "owner" of the entry. This will always the the SAML entityID of the Service
+- `principal` - The "owner" of the entry. This will always the SAML entityID of the Service
   Provider that requested authentication.
 
 - `data` - Auditing data that is specific to the type of audit event. However, the following fields
   will always be present:
 
-    - `sp-entity-id` - The "owner" of the entry. This will always the the SAML entityID of the Service Provider that
+    - `sp-entity-id` - The "owner" of the entry. This will always the SAML entityID of the Service Provider that
       requested authentication. If not available, `unknown` is used.
 
     - `authn-request-id` - The ID of the authentication request that is being processed (`AuthnRequest`). If not

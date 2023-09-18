@@ -13,18 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.api;
 
 import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Represents information about an SP for display in the UI.
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SelectedDeviceInformation {
+public class SpInformation {
 
-  public boolean isSign;
+  /**
+   * A mapping between language codes and display names.
+   */
+  private Map<String, String> displayNames = new HashMap<>();
 
-  public String device;
+  /**
+   * The URL for the SP's logotype.
+   */
+  private String imageUrl;
+
 }

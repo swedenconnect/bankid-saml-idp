@@ -32,7 +32,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
-import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingParty;
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.security.credential.PkiCredential;
 
 /**
@@ -124,7 +124,7 @@ public class RpCertificateHealthIndicatorTest {
   private static BankIdConfigurationProperties buildProps(final Rp... rps) throws Exception {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
     for (final Rp rp : rps) {
-      final RelyingParty relyingParty = Mockito.mock(RelyingParty.class);
+      final RelyingPartyConfiguration relyingParty = Mockito.mock(RelyingPartyConfiguration.class);
       Mockito.when(relyingParty.getId()).thenReturn(rp.id());
 
       final X509Certificate cert = Mockito.mock(X509Certificate.class);

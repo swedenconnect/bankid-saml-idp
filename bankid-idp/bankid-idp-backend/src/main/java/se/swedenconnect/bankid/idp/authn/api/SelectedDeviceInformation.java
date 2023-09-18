@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.bankid.idp.authn;
+package se.swedenconnect.bankid.idp.authn.api;
 
 import lombok.AllArgsConstructor;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.HashMap;
-import java.util.Map;
+import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 
 /**
+ * Contains information about a previously made user selection of device.
  *
  * @author Martin Lindström
  * @author Felix Hellman
@@ -31,10 +29,15 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SpInformation {
+public class SelectedDeviceInformation {
 
-  // language -> name
-  private Map<String, String> displayNames = new HashMap<>();
+  /**
+   * Is the current BankID operation a sign operation?
+   */
+  public boolean isSign;
 
-  private String imageUrl;
+  /**
+   * The selected device. The string representation of the {@link PreviousDeviceSelection} enum.
+   */
+  public String device;
 }
