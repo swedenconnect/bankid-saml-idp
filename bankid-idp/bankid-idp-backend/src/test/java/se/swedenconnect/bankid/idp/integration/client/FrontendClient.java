@@ -118,7 +118,7 @@ public class FrontendClient {
     Assertions.assertFalse(cookies.isEmpty());
     frontendClient.session = cookies.get(0).split(";")[0].split("=")[1];
     List<String> xsrfCookie = client.get().uri("https://localhost:" + 8443 + "/idp/api/sp")
-        .header("BANKIDSESSION", frontendClient.session)
+        .cookie("BANKIDSESSION", frontendClient.session)
         .exchange()
         .block()
         .headers()
