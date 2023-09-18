@@ -40,7 +40,6 @@ import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
-import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -142,9 +141,13 @@ public class BankIdApiController {
     }
   }
 
+  /**
+   * Gets the {@link FrontendOverrideResponse} telling the front-end about customizations.
+   * @return {@link FrontendOverrideResponse}
+   */
   @GetMapping("/api/overrides")
   public Mono<FrontendOverrideResponse> getFrontendOverrides() {
-    return Mono.just(overrides.generateOverrides());
+    return Mono.just(this.overrides.generateOverrides());
   }
 
   /**
