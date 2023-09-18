@@ -1,3 +1,18 @@
+export type LangObject = {
+  [key: string]: string | LangObject;
+};
+
+export type Messages = {
+  en: LangObject;
+  sv: LangObject;
+};
+
+export type MessageOverride = {
+  en: string;
+  sv: string;
+  code: string;
+};
+
 const enum ApiResponseStatusEnum {
   NOT_STARTED,
   IN_PROGRESS,

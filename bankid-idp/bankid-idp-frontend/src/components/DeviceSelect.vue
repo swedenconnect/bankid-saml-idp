@@ -47,16 +47,17 @@
     width: 100%;
     margin: 12px auto;
     padding: 20px 28px;
-    border: 1px solid #d8d8d8;
-    border-radius: 3px;
+    border: 1px solid var(--btn-border-color);
+    border-radius: var(--btn-border-radius);
     font-size: 16px;
     cursor: pointer;
-    background-color: #f7f7f7;
+    color: var(--btn-fg-color);
+    background-color: var(--btn-bg-color);
   }
 
   .device-button::after {
     padding: 3px;
-    border: solid black;
+    border: solid var(--btn-fg-color);
     border-width: 0 3px 3px 0;
     content: '';
     transform: rotate(-45deg);

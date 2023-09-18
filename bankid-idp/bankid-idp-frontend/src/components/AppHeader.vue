@@ -20,8 +20,8 @@
 
 <style scoped>
   header {
-    background: #fff;
-    box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
+    background: var(--header-bg-color);
+    box-shadow: var(--header-shadow);
   }
 
   .top-logo-container {

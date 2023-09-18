@@ -12,8 +12,9 @@
 
 <style scoped>
   .status {
-    background: beige;
-    border: 1px solid black;
+    background: var(--warning-bg-color);
+    border: 1px solid var(--warning-border-color);
+    color: var(--warning-fg-color);
     padding: 1em;
     margin-bottom: 1em;
   }

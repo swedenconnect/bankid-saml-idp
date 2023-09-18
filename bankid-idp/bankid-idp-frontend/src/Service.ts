@@ -35,3 +35,4 @@ export const contactInformation = async (): Promise<CustomerContactInformation> 
 export const cancel = async () => await fetch(CONTEXT_PATH + '/api/cancel', requestOptions);
 export const spInformation = async (): Promise<SpInformation> => fetchData('/api/sp');
 export const selectedDevice = async (): Promise<SelectedDeviceInformation> => fetchData('/api/device');
+export const getOverrides = async () => await fetchData('/api/overrides');

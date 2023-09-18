@@ -2,6 +2,7 @@
   import { onBeforeMount, onMounted, ref } from 'vue';
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
+  import CustomContent from '@/components/CustomContent.vue';
   import QRDisplay from '@/components/QRDisplay.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
@@ -85,6 +86,8 @@
 <template>
   <div class="content-container">
     <BankIdLogo />
+    <CustomContent v-if="qrImage" position="qrcode" />
+    <CustomContent v-else position="autostart" />
     <p>{{ $t(messageCode) }}</p>
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
     <QRDisplay :image="qrImage" />
