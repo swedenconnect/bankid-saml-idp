@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
   frontend:
@@ -27,7 +27,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_REDIS_HOST=redisstack
-      - SPRING_REDIS_TLS_ENABLEHOSTNAMEVERIFICATION=false
+      - SPRING_REDIS_SSLEXT_ENABLEHOSTNAMEVERIFICATION=false
       - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks
       - SERVER_PORT=8445
       - SERVER_FORWARDHEADERSSTRATEGY=native
@@ -38,6 +38,7 @@ services:
     networks:
       - idp
   redisstack:
+     hostname: local.dev.swedenconnect.se
      image: redis/redis-stack:latest
      ports:
       - 6379:6379
