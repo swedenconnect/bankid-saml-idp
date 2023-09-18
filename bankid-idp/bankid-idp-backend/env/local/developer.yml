@@ -1,0 +1,81 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  redis:
+    host: ${REDIS_HOST:local.dev.swedenconnect.se}
+    port: ${REDIS_PORT:6379}
+    password: supersecret
+    ssl: true
+    ssl-ext:
+      enable-hostname-verification: true
+      credential:
+        resource: classpath:local/redis/redis.p12
+        password: changeit
+      trust:
+        resource: classpath:local/redis/trust.p12
+        password: changeit
+  session:
+    timeout: 15m
+server:
+  error:
+    whitelabel:
+      enabled: true
+    path: /#error
+  reactive:
+    session:
+      timeout: 15m
+
+bankid:
+  audit:
+    repository: "redistimeseries"
+    log-file: target/audit.log
+  built-in-frontend: true
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  session:
+    module: redis
+  ui:
+    user-error:
+      contact-email: contact@email.com
+      show-contact-information: true
+      show-trace-id: true
+  relying-parties:
+    - id: test-my-eid
+      entity-ids:
+        - http://sandbox.swedenconnect.se/testmyeid
+        - http://sandbox.swedenconnect.se/testmyeid-sign
+      credential:
+        name: "test-cred"
+        resource: classpath:FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: false
+        login-text:
+          text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+          format: simple-markdown-v1
+      bankid-requirements:
+        pin-code-auth: false
+        pin-code-sign: true
+
+saml:
+  idp:
+    entity-id: https://bankid.swedenconnect.se/idp/local
+    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
+    metadata-providers:
+      - location: classpath:local/local-metadata.xml
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers, auditevents
+  server:
+    port: 8444

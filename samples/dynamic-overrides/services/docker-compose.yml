@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  backend:
+    image: local.dev.swedenconnect.se/bankid-saml-idp
+    ports:
+      - 8443:8443
+    volumes:
+      - ./selfsigned/sites/java/ssl.jks:/opt/bankid-idp/ssl.jks
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    depends_on:
+      - redisstack
+    networks:
+      - idp
+  redisstack:
+    hostname: local.dev.swedenconnect.se
+    image: redis/redis-stack:latest
+    ports:
+      - 6379:6379
+      - 8001:8001
+    networks:
+      - idp
+    volumes:
+      - ../../../bankid-idp/bankid-idp-backend/src/main/resources/local/redis/:/tls
+    environment:
+      - REDIS_ARGS=--requirepass supersecret --tls-port 6379 --port 0 --tls-cert-file /tls/server.crt --tls-key-file /tls/server.key --tls-ca-cert-file /tls/ca.crt
+
+networks:
+  idp:
+    name: idp
