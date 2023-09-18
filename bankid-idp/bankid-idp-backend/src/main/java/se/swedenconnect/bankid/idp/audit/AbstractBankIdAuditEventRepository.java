@@ -48,13 +48,9 @@ public abstract class AbstractBankIdAuditEventRepository implements AuditEventRe
    * The events that we support by default.
    */
   public static List<String> DEFAULT_SUPPORTED_EVENTS = Stream.concat(
-      List.of(
-          Saml2AuditEvents.SAML2_AUDIT_REQUEST_RECEIVED,
-          Saml2AuditEvents.SAML2_AUDIT_SUCCESSFUL_RESPONSE,
-          Saml2AuditEvents.SAML2_AUDIT_ERROR_RESPONSE,
-          Saml2AuditEvents.SAML2_AUDIT_BEFORE_USER_AUTHN,
-          Saml2AuditEvents.SAML2_AUDIT_AFTER_USER_AUTHN,
-          Saml2AuditEvents.SAML2_AUDIT_UNRECOVERABLE_ERROR).stream(),
+      Arrays.stream(Saml2AuditEvents.values())
+          .map(Saml2AuditEvents::getTypeName)
+          .toList().stream(),
       Arrays.stream(BankIdAuditEventTypes.values())
           .map(BankIdAuditEventTypes::getTypeName)
           .toList().stream())
