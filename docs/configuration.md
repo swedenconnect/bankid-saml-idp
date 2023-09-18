@@ -337,6 +337,15 @@ The main takeaways is that you need to have an implementation for the following
 - SessionWriter (you can use fallback implementation for spring session, but a direct read/write implementation is recommended)
 - Spring Session Configuration
 
+## Adding your own application.yml file
+To add multiple overrides for configuration properties at the same time you can do so by supplying your own application.yml file.
+This file will override the base application.yml (so both will be loaded)
+
+To load an external file simply supply the application with the following environment variable
+```shell
+SPRING_CONFIG_IMPORT=/path/to/your/application.yml
+```
+
 -----
 
 Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
