@@ -64,4 +64,8 @@ public class BankIdApiMock {
     server.stubFor(post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
     server.stubFor(post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference()))).willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(collectJson)));
   }
+
+  public static void mockCancel(OrderResponse orderResponse) {
+    server.stubFor(post("/cancel").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference()))));
+  }
 }

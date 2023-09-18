@@ -168,8 +168,7 @@ public class BankIdApiController {
   @PostMapping("/api/cancel")
   public Mono<Void> cancelRequest(final HttpServletRequest request) {
     final BankIdSessionState state = this.sessionReader.loadSessionData(request);
-    final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
-    if (Objects.nonNull(bankIdSessionData)) {
+    if (Objects.nonNull(state) && Objects.nonNull(state.getBankIdSessionData())) {
       final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
       final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
       return this.service.cancel(request, state, relyingParty);

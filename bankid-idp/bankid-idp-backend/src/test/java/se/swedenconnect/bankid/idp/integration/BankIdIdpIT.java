@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -84,11 +85,28 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
   }
 
   @Test
+  @WithSamlUser(isSign = true)
+  void userCanSign(FrontendClient client) throws JsonProcessingException {
+    OrderResponse orderResponse = BankIdResponseFactory.start();
+    BankIdApiMock.mockSign(orderResponse);
+    ApiResponse polled = client.poll(true).block();
+    Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
+    BankIdApiMock.completeCollect(orderResponse);
+    ApiResponse completed = client.poll(true).block();
+    Assertions.assertEquals("COMPLETE", completed.getStatus().name());
+    String complete = client.complete();
+    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", complete);
+  }
+
+  @Test
   @WithSamlUser
   void userCanCancelSession(FrontendClient client) {
     OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
-    client.poll(true);
+    BankIdApiMock.mockCancel(orderResponse);
+    ApiResponse polled = client.poll(true).block();
+    Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
+    client.cancelApi().block();
     String cancel = client.cancel();
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));

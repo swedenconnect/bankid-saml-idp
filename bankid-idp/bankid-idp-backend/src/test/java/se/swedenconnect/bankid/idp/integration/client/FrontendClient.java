@@ -3,6 +3,7 @@ package se.swedenconnect.bankid.idp.integration.client;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
@@ -32,8 +34,11 @@ import se.swedenconnect.spring.saml.idp.settings.EndpointSettings;
 
 import javax.servlet.ServletContext;
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class FrontendClient {
   private final WebClient client;
@@ -48,22 +53,32 @@ public class FrontendClient {
   }
 
   public Mono<ApiResponse> poll(boolean qr) {
-    WebClient.RequestBodySpec uri = client.post()
-    .uri(uriBuilder -> {
+    Consumer<UriBuilder> customizer = c -> c.queryParam("qr", qr);
+    return exchangeApi(withPath(client.post(), "/idp/api/poll", customizer), ApiResponse.class);
+  }
+
+  public Mono<Void> cancelApi() {
+    WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = client.post();
+    return exchangeApi(withPath(requestHeadersUriSpec, "/idp/api/cancel", c -> {}), Void.class);
+  }
+
+  @NotNull
+  private WebClient.RequestHeadersSpec<?> withPath(WebClient.RequestHeadersUriSpec<?> spec, String path, Consumer<UriBuilder> c) {
+    Function<UriBuilder, URI> uriBuilderURIFunction = (uriBuilder) -> {
       uriBuilder.scheme("https");
       uriBuilder.port(8443);
       uriBuilder.host("local.dev.swedenconnect.se");
-      uriBuilder.path("/idp/api/poll");
-      if (qr) {
-        uriBuilder.queryParam("qr", qr);
-      }
+      uriBuilder.path(path);
+      c.accept(uriBuilder);
       return uriBuilder.build();
-    });
-    return uri
-        .cookie("BANKIDSESSION", session)
-        .cookie("XSRF-TOKEN", xsrfToken)
-        .header("X-XSRF-TOKEN", xsrfToken)
-        .header("Access-Control-Allow-Credentials", "true")
+    };
+    WebClient.RequestHeadersSpec<?> uri = spec.uri(uriBuilderURIFunction);
+    return withSecurityHeaders(uri);
+  }
+
+  @NotNull
+  private static <T> Mono<T> exchangeApi(WebClient.RequestHeadersSpec<?> request, Class<T> tClass) {
+    return request
         .exchangeToMono(f -> {
           if (f.statusCode().value() == 429) {
             return Mono.error(new CannotAcquireLockException("Resource is busy"));
@@ -71,8 +86,17 @@ public class FrontendClient {
           if (!f.statusCode().is2xxSuccessful()) {
             return Mono.error(new IllegalStateException("Wrong status code code:" + f.statusCode().value()));
           }
-          return f.bodyToMono(ApiResponse.class);
+          return f.bodyToMono(tClass);
         });
+  }
+
+  @NotNull
+  private WebClient.RequestHeadersSpec<?> withSecurityHeaders(WebClient.RequestHeadersSpec<?> uri) {
+    return uri
+        .cookie("BANKIDSESSION", session)
+        .cookie("XSRF-TOKEN", xsrfToken)
+        .header("X-XSRF-TOKEN", xsrfToken)
+        .header("Access-Control-Allow-Credentials", "true");
   }
 
   public static FrontendClient init(WebClient client, TestSp testSp, boolean sign) throws Exception {
