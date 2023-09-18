@@ -7,8 +7,10 @@ services:
       - 8443:8443
     volumes:
       - ./selfsigned/sites/java/ssl.jks:/opt/bankid-idp/ssl.jks
+      - ./overrides/:/opt/overrides
     environment:
       - SPRING_PROFILES_ACTIVE=local
+      - BANKID_OVERRIDE_DIRECTORYPATH=/opt/overrides
     depends_on:
       - redisstack
     networks:
