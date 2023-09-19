@@ -82,7 +82,7 @@ public class BankIdSessionDataListener {
    */
   @EventListener
   public void handleOrderResponse(final OrderResponseEvent event) {
-    log.info("Order response event was published {} for session {}",
+    log.debug("Order response event was published {} for session {}",
         event.getResponse(), event.getRequest().getSession().getId());
 
     final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getPollRequest(), event.getResponse());
@@ -99,7 +99,7 @@ public class BankIdSessionDataListener {
   public void handleCollectResponse(final CollectResponseEvent event) {
     final HttpSession session = event.getRequest().getRequest().getSession();
 
-    log.info("Collect response event was published {} for session {}", event.getCollectResponse(), session.getId());
+    log.debug("Collect response event was published {} for session {}", event.getCollectResponse(), session.getId());
 
     final BankIdSessionData previous =
         this.reader.loadSessionData(event.getRequest().getRequest()).getBankIdSessionData();
