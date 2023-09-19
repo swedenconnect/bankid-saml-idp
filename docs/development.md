@@ -56,7 +56,9 @@ and send authentication requests.
 
 To start the BankID IdP-application with the "local" profile the following environment variables
 should be set to load the relevant properties.
+
 ```bash
+BANKID_INSTALL_DIR=<root directory where you checked out the BankID repository>
 SPRING_CONFIG_IMPORT=bankid-idp/env/local/developer.yml
 SPRING_PROFILES_ACTIVE=local
 ```

@@ -27,7 +27,7 @@ bankid:
       directory-path: "/my/path/to/overrides"
 ```
 
-> Example files are available in the [overrides](https://github.com/swedenconnect/bankid-saml-idp/tree/main/bankid-idp/src/main/resources/local/overrides) directory.
+> Example files are available in the [overrides](https://github.com/swedenconnect/bankid-saml-idp/tree/main/bankid-idp/env/local/overrides) directory.
 
 <a name="css-overrides"></a>
 #### CSS Overrides

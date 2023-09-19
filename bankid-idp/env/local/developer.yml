@@ -10,13 +10,14 @@ spring:
     ssl-ext:
       enable-hostname-verification: true
       credential:
-        resource: file:bankid-idp/bankid-idp-backend/env/local/redis/certificates/redis.p12
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
         password: changeit
       trust:
-        resource: file:bankid-idp/bankid-idp-backend/env/local/redis/certificates/trust.p12
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
         password: changeit
   session:
     timeout: 15m
+    
 server:
   error:
     whitelabel:
@@ -25,11 +26,24 @@ server:
   reactive:
     session:
       timeout: 15m
+      
+management:
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers, auditevents
+  server:
+    port: 8444      
 
 bankid:
   audit:
     repository: "redistimeseries"
-    log-file: target/audit.log
+    log-file: ${BANKID_INSTALL_DIR}/bankid-idp/target/audit.log
   built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
@@ -47,6 +61,8 @@ bankid:
       login-text:
         text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
+    override:
+      directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
   relying-parties:
     - id: test-my-eid
       entity-ids:
@@ -54,7 +70,7 @@ bankid:
         - http://sandbox.swedenconnect.se/testmyeid-sign
       credential:
         name: "test-cred"
-        resource: file:bankid-idp/bankid-idp-backend/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
         alias: "1"
         password: "qwerty123"
         type: "PKCS12"
@@ -72,32 +88,21 @@ saml:
     entity-id: https://bankid.swedenconnect.se/idp/local
     base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
     metadata-providers:
-      - location: file:bankid-idp/bankid-idp-backend/env/local/metadata/local-metadata.xml
+      - location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/metadata/local-metadata.xml
     credentials:
       sign:
-        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
         alias: sign
         password: secret
         type: JKS
       encrypt:
-        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
         alias: encrypt
         password: secret
         type: JKS
       metadata-sign:
-        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
         alias: metadata
         password: secret
         type: JKS
-management:
-  endpoint:
-    health:
-      show-details: always
-    info:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health, metrics, prometheus, loggers, auditevents
-  server:
-    port: 8444
+                    
