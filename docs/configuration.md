@@ -255,6 +255,21 @@ management:
         include: health, metrics, prometheus, loggers
 ```
 
+<a name="tomcat-configuration-extension"></a>
+### Tomcat Configuration Extension
+
+Most of Tomcat's behaviour can be configured using [Spring Boot's configuration properties](https://www.baeldung.com/spring-boot-configure-tomcat), but there is no way of setting up the Tomcat AJP
+protocol using Spring Boot's settings. Therefore, we add the following configuration properties:
+
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `tomcat.ajp.enabled` | Is the Tomcat AJP protocol enabled? | Boolean | `false` |
+| `tomcat.ajp.port` | The Tomcat AJP port. | Integer | `8009` |
+| `tomcat.ajp.secret` | The Tomcat AJP secret/password. | String | - |
+| `tomcat.ajp.secret-required` | Is AJP secret required? | Boolean | `false` |
+
+> Needless to say. The above settings are only relevant if you use the Tomcat AJP protocol for your service.
+
 <a name="redis-configuration"></a>
 ### Redis Configuration
 
