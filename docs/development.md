@@ -30,6 +30,13 @@ In this mode the service will require two dependencies:
 When the Redis instance has been started you should be able to start the BankID IdP-application with the "local" profile active. Next, start the [Test-SP](#saml-service-provider-for-local-test-and-development)
 and send authentication requests.
 
+To start the BankID IdP-application with the "local" profile the following environment variables should be set to load the relevant properties.
+```bash
+SPRING_CONFIG_IMPORT=bankid-idp/bankid-idp-backend/env/local/developer.yml
+SPRING_PROFILES_ACTIVE=local
+```
+
+
 :exclamation: Don't you have a test-BankID installed on your device? See [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html).
 
 <a name="saml-service-provider-for-local-test-and-development"></a>
