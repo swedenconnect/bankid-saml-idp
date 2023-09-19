@@ -72,7 +72,7 @@ bankid:
   # The base URL for the BankID API. For test, the value is https://appapi2.test.bankid.com/rp/v6.0
   #
   service-url: https://appapi2.bankid.com/rp/v6.0
-  
+
   # SAML authentication settings
   #        
   authn:

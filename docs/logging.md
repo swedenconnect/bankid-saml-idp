@@ -2,6 +2,8 @@
 
 # Audit Event Logging
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 This page describes the audit event logging feature of the BankID IdP.
 
 <a name="audit-configuration"></a>
@@ -12,11 +14,11 @@ configuration in more detail.
 
 The setting `bankid.audit.repository` should be set to any of the following values:
 
-- `memory` - An in-memory audit event repository is used. The events can be accessed via Spring Boot Actuator's `auditevents` endpoint. Using the defaults from [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) this URL would then be `https://<yourdomain>:8444/actuator/auditevents`. This is the default if no setting is provided.
+- `memory` - An in-memory audit event repository is used. The events can be accessed via Spring Boot Actuator's `auditevents` endpoint. Using the defaults from [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) this URL would then be `https://<yourdomain>:8444/actuator/auditevents`. This is the default if no setting is provided.
 
-- `redislist` - Events are persisted using a Redis List. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisListAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/RedisListAuditEventRepository.java) for details.
+- `redislist` - Events are persisted using a Redis List. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisListAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/audit/RedisListAuditEventRepository.java) for details.
 
-- `redistimeseries` - Events are persisted using the Redis Time series-feature. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisTimeSeriesAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/RedisTimeSeriesAuditEventRepository.java) for details.
+- `redistimeseries` - Events are persisted using the Redis Time series-feature. In order for this setting to function, Redis must also have been configured, see [Redis Configuration](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html#redis-configuration). Also see [RedisTimeSeriesAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/audit/RedisTimeSeriesAuditEventRepository.java) for details.
 
 - `other` - This setting should be assigned if you extend the BankID SAML IdP and wants to provide a audit repository of your own. See [Providing a Custom Audit Event Repository](#providing-a-custom-audit-event-repository) below.
 
@@ -31,7 +33,7 @@ Finally, using the `bankid.audit.supported-events` setting it is also possible t
 
 If you extend the BankID SAML IdP you can provide your own implementation of the audit event repository. For example, you may want to store audit events in a database.
 
-Your custom implementation should extend the [AbstractBankIdAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/audit/AbstractBankIdAuditEventRepository.java) class if you want to keep the support for
+Your custom implementation should extend the [AbstractBankIdAuditEventRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/audit/AbstractBankIdAuditEventRepository.java) class if you want to keep the support for
 file logging and filtering of events. If that is not relevant for you, you may instead implement Spring's 
 [AuditEventRepository](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/audit/AuditEventRepository.html).
 

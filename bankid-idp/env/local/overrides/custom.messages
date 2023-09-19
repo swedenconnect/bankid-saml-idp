@@ -1,0 +1,16 @@
+[
+  {
+    "code": "custom.devel-version.title",
+    "text": {
+      "sv": "Notera",
+      "en": "Note"
+    }
+  },
+  {
+    "code" : "custom.devel-version.text",
+    "text": {
+      "sv": "Detta är en lokal utvecklingsversion av BankID IdP:n",
+      "en": "This is a local development version of the BankID IdP"
+    }
+  }
+]

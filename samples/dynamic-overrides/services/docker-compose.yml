@@ -10,7 +10,7 @@ services:
       - ./overrides/:/opt/overrides
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - BANKID_OVERRIDE_DIRECTORYPATH=/opt/overrides
+      - BANKID_UI_OVERRIDE_DIRECTORYPATH=/opt/overrides
     depends_on:
       - redisstack
     networks:

@@ -2,7 +2,7 @@
 
 # Configuration of the BankID SAML IdP
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
 -----
 
@@ -15,7 +15,7 @@ logging levels and so on are configured. Read more about this at [https://docs.s
 
 - BankID configuration. This is the BankID-specific configuration used by the BankID SAML IdP. See below for all possible settings.
 
-Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) file for an example of how to configure the service.
+Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) file for an example of how to configure the service.
 
 <a name="bankid-application-configuration"></a>
 ## BankID Application Configuration
@@ -29,13 +29,13 @@ comprise of configuration for the BankID integration and integration against the
 | `bankid.`<br />`server-root-certificate` | The root certificate of the BankID server TLS credential. | A `Resource` pointing at an X.509 certificate. | `classpath:trust/bankid-trust-prod.crt` if `bankid.test-mode` is `false` (production setup) and `classpath:trust/bankid-trust-test.crt` if `bankid.test-mode` is `true` (BankID test environment). |
 | `bankid.test-mode` | Should be set to `true` if the BankID IdP is running in "test mode", i.e., if the test BankID RP API is used. | `Boolean` | `false` |
 | `bankid.`<br />`built-in-frontend` | Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller redirects calls made from the underlying SAML IdP library to our frontend start page. | `Boolean` | `true` |
-| `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | [IdpConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
-| `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
-| `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
+| `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | [IdpConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
+| `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
+| `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
 | `bankid.session.module` | Configuration for which session module that should be active. Supported values are `memory` and `redis`. Set to other value if you extend the BankID IdP with your own session handling. | String | `memory` |
-| `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
-| `bankid.ui.*` | Configuration concerning the BankID IdP UI (including texts displayed in the BankID app). See [UI Configuration](#ui-configuration) below. | [UiProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#ui-configuration) |
-| `bankid.`<br />`relying-parties[].*` | A list of configuration elements for each Relying Party that is allowed to communicate with the BankID SAML IdP. See [Relying Party Configuration](#relying-party-configuration) below. | [RelyingPartyConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
+| `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
+| `bankid.ui.*` | Configuration concerning the BankID IdP UI (including texts displayed in the BankID app). See [UI Configuration](#ui-configuration) below. | [UiProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#ui-configuration) |
+| `bankid.`<br />`relying-parties[].*` | A list of configuration elements for each Relying Party that is allowed to communicate with the BankID SAML IdP. See [Relying Party Configuration](#relying-party-configuration) below. | [RelyingPartyConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
 
 
 <a name="authentication-configuration"></a>
@@ -91,8 +91,8 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
-| `user-message-defaults.*` | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
-| `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
+| `user-message-defaults.*` | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
+| `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
 | `override.directory-path` | Optional path where CSS, message and content override files can be put. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
 
 <a name="default-user-messages-configuration"></a>
@@ -157,9 +157,9 @@ the ordinary SAML SP used for authentication and the Signature Service SP used f
 | `id` | The system unique ID for the Relying Party. This is will be visible in audit logs (in the `rp` field, see [Audit Event Logging](logging.html)). | String | - |
 | `entity-ids[]` | A list of SAML entityID:s that belongs to this Relying Party.<br /><br />If the IdP is in test mode (`bankid.test-mode=true`) this list may be empty, meaning that all SP:s are served. In a "real" setup, this field must be assigned with at least one entityID. | List of strings | - |
 | `credential.*` | The BankID relying party credential. See [PkiCredential](https://github.com/swedenconnect/credentials-support#generic-pkicredentialfactorybean-for-springboot-users). | [PkiCredentialConfigurationProperties](https://github.com/swedenconnect/credentials-support/blob/main/src/main/java/se/swedenconnect/security/credential/factory/PkiCredentialConfigurationProperties.java) | - |
-| `user-message.*` | Relying Party specific display text for authentication (and signature). Overrides the default text described in the [Default User Messages Configuration](#default-user-messages-configuration) section above. See [Relying Party User Message](#relying-party-user-message) below. | [RpUserMessage](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See below | 
-| `ui-info.*` | The UI info (display name and logotype URL) for a Relying Party is normally extracted from the SAML metadata, but there are cases where you may want to manually configure these data elements (for example if the metadata does not contain this information, or you simply want to override it). This element holds this information. See [Relying Party UI Info](#relying-party-ui-info) below. | [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/rp/RelyingPartyUiInfo.java) | - |
-| `bankid-requirements.*` | Specific BankID requirements for this Relying Party. See [BankID Requirements](#bankid-requirements) below. | [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdRequirement.java) | See below |
+| `user-message.*` | Relying Party specific display text for authentication (and signature). Overrides the default text described in the [Default User Messages Configuration](#default-user-messages-configuration) section above. See [Relying Party User Message](#relying-party-user-message) below. | [RpUserMessage](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See below | 
+| `ui-info.*` | The UI info (display name and logotype URL) for a Relying Party is normally extracted from the SAML metadata, but there are cases where you may want to manually configure these data elements (for example if the metadata does not contain this information, or you simply want to override it). This element holds this information. See [Relying Party UI Info](#relying-party-ui-info) below. | [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/rp/RelyingPartyUiInfo.java) | - |
+| `bankid-requirements.*` | Specific BankID requirements for this Relying Party. See [BankID Requirements](#bankid-requirements) below. | [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdRequirement.java) | See below |
 
 <a name="relying-party-user-message"></a>
 ##### Relying Party User Message
@@ -179,7 +179,7 @@ the ordinary SAML SP used for authentication and the Signature Service SP used f
 | `logotype-url` | The URL for the Relying Party logotype. | String | - |
 | `use-as-fallback` | Whether the data in this object should be used as a fallback to UI information gathered from the SAML metadata or not. If `true`, the data will only be used if data is not present in SAML metadata, and if `false`, the data from this object will have precedence over data found in SAML metadata. | Boolean | `true` |
 
-Also see [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/rp/RelyingPartyUiInfo.java).
+Also see [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/rp/RelyingPartyUiInfo.java).
 
 <a name="bankid-requirements"></a>
 ##### BankID Requirements
@@ -192,7 +192,7 @@ Also see [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/b
 | `certificate-policies[]` | Object identifiers for which policies that should be used. See [BankID integration guide](https://www.bankid.com/utvecklare/guider/teknisk-integrationsguide/graenssnittsbeskrivning/auth) | List of strings | - |
 | `card-reader` | Requirement for which type of smart card reader that is required (for BankID on card). See [BankID integration guide](https://www.bankid.com/utvecklare/guider/teknisk-integrationsguide/graenssnittsbeskrivning/auth). | String | - |
 
-Also see [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/BankIdRequirement.java).
+Also see [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdRequirement.java).
 
 <a name="saml-idp-configuration"></a>
 ## SAML IdP Configuration
@@ -202,7 +202,7 @@ a generic SAML IdP that is compatible with the [Sweden Connect eID Framework](ht
 
 All Spring configuration settings for this module are documented [here](https://docs.swedenconnect.se/saml-identity-provider/configuration.html).
 
-The [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) contains sensible defaults and you basically need to change
+The [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) contains sensible defaults and you basically need to change
 the following:
 
 - `saml.idp.entity-id` - The SAML entityID of your IdP.
@@ -221,7 +221,7 @@ The BankID SAML IdP is a Spring Boot application, and apart from the above descr
 need to supply Spring Boot configuration. See [Spring Boot Common Application Properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html) for a listing
 of available settings.
 
-Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/resources/application.yml) file for an example of how to configure the service.
+Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) file for an example of how to configure the service.
 
 <a name="management-and-supervision"></a>
 ### Management and Supervision

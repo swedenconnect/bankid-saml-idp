@@ -1,12 +1,15 @@
-[
-{
-    "sv": "Vi kommer aldrig att ringa dig",
-    "en": "We will never call you",
-    "code": "my.nocall.title"
+[ {  
+    "code": "my.nocall.title",
+    "text": {
+      "sv": "Vi kommer aldrig att ringa dig",
+      "en": "We will never call you"
+    }
   },
   {
-    "sv": "Om du har blivit uppringd av någon som utger sig för att vara oss - lägg på",
-    "en": "If you have been called by soneone claims to be us - hang up",
-    "code": "my.nocall.text"
+    "code": "my.nocall.text",
+    "text": {
+      "sv": "Om du har blivit uppringd av någon som utger sig för att vara oss - lägg på",
+      "en": "If you have been called by soneone claims to be us - hang up",
+    }
   }
 ]

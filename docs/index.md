@@ -2,7 +2,7 @@
 
 # SAML Identity Provider for BankID
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
 -----
 
@@ -41,9 +41,13 @@ See below for instructions on how to build your own BankID SAML IdP application.
 - [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html)
   - Links to relevant information about how to sign BankID contracts and how to find technical information published by BankID and Sweden Connect.
   
+- [Downloading BankID IdP Artifacts](artifacts.html)
+
 - [Development Guidelines for the SAML IdP for BankID](https://docs.swedenconnect.se/bankid-saml-idp/development.html)
 
   - Also see the [Contributing to the BankID SAML IdP](https://github.com/swedenconnect/bankid-saml-idp/blob/main/CONTRIBUTING.md) document.
+  
+- [Web Browser and Device Support](browsers.html)
   
 - [Configuration of the BankID SAML IdP](https://docs.swedenconnect.se/bankid-saml-idp/configuration.html)
 
@@ -53,18 +57,17 @@ See below for instructions on how to build your own BankID SAML IdP application.
   
   - [BankID Back-end API](https://docs.swedenconnect.se/bankid-saml-idp/idp-api.html)
 
-- Building
-  - TODO
-
 - [Making Overrides and Customizations to the Application](https://docs.swedenconnect.se/bankid-saml-idp/override.html)
 
 - [Events and Audit Logging](https://docs.swedenconnect.se/bankid-saml-idp/logging.html)
 
 - [Monitoring the Application](https://docs.swedenconnect.se/bankid-saml-idp/monitoring.html)
 
-- Deployment
+- [Samples](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples)
 
-  - TODO
+  - [How to Externalize the Frontend into a Separate Application](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/external-frontend)
+
+  - [How to Apply Overrides to the UI](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/dynamic-overrides)
 
 
 -----
