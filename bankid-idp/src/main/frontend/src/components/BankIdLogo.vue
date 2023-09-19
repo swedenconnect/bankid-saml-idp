@@ -8,7 +8,17 @@
   .bankid-logo {
     text-align: center;
   }
-  img {
-    height: 72px;
+  
+  @media (min-width: 576px) {
+    img {
+      height: 120px;
+    }
   }
+
+  @media (max-width: 576px) {
+    img {
+      height: 90px;
+    }
+  }
+  
 </style>
