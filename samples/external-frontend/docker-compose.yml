@@ -32,7 +32,7 @@ services:
       - SERVER_PORT=8445
       - SERVER_FORWARDHEADERSSTRATEGY=native
       - BANKID_BUILT_IN_FRONTEND=false
-      - BANKID_AUTHN_AUTHNPATH=/
+      - BANKID_AUTHN_AUTHN_PATH=/
     depends_on:
       - redisstack
     networks:
@@ -46,7 +46,7 @@ services:
      networks:
       - idp
      volumes:
-      - ../../bankid-idp/bankid-idp-backend/src/main/resources/local/redis/:/tls
+      - ../../bankid-idp/env/local/redis/:/tls
      environment:
       - REDIS_ARGS=--requirepass supersecret --tls-port 6379 --port 0 --tls-cert-file /tls/server.crt --tls-key-file /tls/server.key --tls-ca-cert-file /tls/ca.crt 
 

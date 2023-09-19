@@ -2,6 +2,8 @@
 
 # Monitoring the BankID IdP Application
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 The BankID IdP application uses the Spring Boot Actuator feature that enables monitoring over HTTP.
 See the [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.monitoring) for details.
 

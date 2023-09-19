@@ -35,7 +35,7 @@ include in the resulting response (see below).
 | `429`  | Too many attempts - resource busy. Parallel requests have been made for the same user, a header "Retry-After" will be present as a time for when you can retry the request again. <br/>This can also happen when a request has been blocked by the circuit breaker due to API errors towards the BankID server API.<br />This status code means that the request has been rejected before being made towards BankID's API. |
 
 
-**Response Object:** [ApiResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/ApiResponse.java)
+**Response Object:** [ApiResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/ApiResponse.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -75,7 +75,7 @@ experience to have to answer the same question twice within the same session.
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [SelectedDeviceInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/SelectedDeviceInformation.java)
+**Response Object:** [SelectedDeviceInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/SelectedDeviceInformation.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -95,7 +95,7 @@ An endpoint that delivers service, or status, information.
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [ServiceInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/ServiceInformation.java)
+**Response Object:** [ServiceInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/ServiceInformation.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -115,7 +115,7 @@ has made the current authentication request to the BankID IdP.
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [SpInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/SpInformation.java)
+**Response Object:** [SpInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/SpInformation.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -137,7 +137,7 @@ an error has occurred.
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [CustomerContactInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/CustomerContactInformation.java)
+**Response Object:** [CustomerContactInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/CustomerContactInformation.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -156,13 +156,13 @@ An endpoint that delivers UI override according to [Customizing the BankID IdP U
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [FrontendOverrideResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/FrontendOverrideResponse.java)
+**Response Object:** [FrontendOverrideResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/FrontendOverrideResponse.java)
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `messages` | List of [MessageOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/MessageOverride.java) | Message overrides according to [Message Overrides](override.html#message-overrides). |
-| `css` | List of [CssOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/CssOverride.java) | CSS overrides according to [CSS Overrides](override.html#css-overrides). |
-| `content` | List of [ContentOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/ContentOverride.java) | Content overrides according to [Content Overrides](override.html#content-overrides). |
+| `messages` | List of [MessageOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/MessageOverride.java) | Message overrides according to [Message Overrides](override.html#message-overrides). |
+| `css` | List of [CssOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/CssOverride.java) | CSS overrides according to [CSS Overrides](override.html#css-overrides). |
+| `content` | List of [ContentOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/ContentOverride.java) | Content overrides according to [Content Overrides](override.html#content-overrides). |
 
 <a name="views"></a>
 ## Views

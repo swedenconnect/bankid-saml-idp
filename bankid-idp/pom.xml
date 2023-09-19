@@ -55,8 +55,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>    
     <node.version>v18.12.1</node.version>
-    
-    <idp.build.type>with-frontend</idp.build.type>
   </properties>
 
   <dependencyManagement>

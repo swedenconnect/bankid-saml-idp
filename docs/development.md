@@ -21,7 +21,7 @@ The source for the project is located at [https://github.com/swedenconnect/banki
 ## Building the Source
 
 If you want to deploy a BankID IdP and don't have to make any changes apart from configuration 
-customizations of the UI (see [Changing the BankID IdP UI](override.html#changing-the-bankid-idp-ui)),
+customizations of the UI (see [Customizing the BankID IdP UI](override.html#customizing-the-bankid-idp-ui)),
 you don't have to build the BankID source. Instead, you can just download the [BankID jar from Maven
 Central](artifacts.html).
 
@@ -82,7 +82,7 @@ Click the "BankID (local)" option and a SAML request should be sent to the IdP.
 <a name="local-redis-instance"></a>
 ### Local Redis Instance
 
-When running with the local profile, there is a docker-compose file for Redis that works out of the box under the following path [bankid-idp-backend/env/local/redis/docker-compose.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/env/local/redis/docker-compose.yml).
+When running with the local profile, there is a docker-compose file for Redis that works out of the box under the following path [bankid-idp/env/local/redis/docker-compose.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/env/local/redis/docker-compose.yml).
 
 To start Redis, simply run:
 
