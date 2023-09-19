@@ -51,6 +51,11 @@ management:
       enabled: true
   endpoints:
     web:
+# Quarkus-style ...
+#      base-path: /q
+#      path-mapping:
+#        metrics: spring-metrics
+#        prometheus: metrics
       exposure:
         include: health, metrics, prometheus, loggers
 

@@ -14,6 +14,9 @@ The `health`-endpoint of the BankID IdP delivers information about a number of s
 IdP. If all sub-components reports the status "UP", the overall status is "UP" and everything is fine.
 However, if the status is something else, the monitoring team should act. 
 
+> **Note:** See the [Management and Supervision](configuration.html#management-and-supervision)
+section on the configuration page for how to configure the health-endpoint to fit your needs.
+
 ### Health Indicators
 
 Below follows a listing of all health indicators and the type of errors or warnings that can be
@@ -52,9 +55,9 @@ Relying Party's support.
 
 ### Example
 
-Below follows an example result of a call to the `health`-endpoint:
+Below follows an example result of a call to the `health`-endpoint (`curl -k https://<domain>:8444/actuator/health | jq`):
 
-```
+```json
 {
   "status": "UP",
   "components": {

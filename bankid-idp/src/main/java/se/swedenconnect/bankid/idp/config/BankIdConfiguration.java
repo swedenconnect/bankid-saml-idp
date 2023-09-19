@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -104,7 +105,7 @@ public class BankIdConfiguration {
             .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
                 "/**/resume")
             .permitAll()
-            .antMatchers("/actuator/**")
+            .requestMatchers(EndpointRequest.toAnyEndpoint())
             .permitAll()
             .anyRequest().denyAll());
 

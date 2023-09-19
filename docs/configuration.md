@@ -255,6 +255,26 @@ management:
         include: health, metrics, prometheus, loggers
 ```
 
+**Note:** In order to get a "Quarkus-style" for the endpoints, it is possible to re-configure the
+base path for the management server. Each endpoint may also be re-named. In the example below
+we use `/q` instead of `/actuator` to fit Quarkus needs. We also change the endpoint name for
+Spring's `metrics`-endpoint since it clashes with Quarkus' that uses `metrics` for Prometheus. 
+
+```yml
+management:
+  server:
+    port: 8444
+  ...
+  endpoints:
+    web:
+      base-path: /q
+      path-mapping:
+        metrics: springmetrics
+        prometheus: metrics
+```
+
+The health-endpoint is now exposed at `https://<your-domain>:8444/q/health`.
+
 <a name="redis-configuration"></a>
 ### Redis Configuration
 
