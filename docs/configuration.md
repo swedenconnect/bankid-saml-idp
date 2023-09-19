@@ -32,7 +32,7 @@ comprise of configuration for the BankID integration and integration against the
 | `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | [IdpConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
 | `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
 | `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
-| `bankid.session.module` | Configuration for which session module that should be active. Supported values are `memory` and `redis`. Set to other value if you extend the BankID IdP with your own session handling. | String | `memory` |
+| `bankid.session.module` | Configuration for which session module that should be active. Supported values are `memory` and `redis`. Set to other value if you extend the BankID IdP with your own session handling (see [Writing Your Own Session Handling Module](override.html#writing-your-own-session-handling-module)). | String | `memory` |
 | `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
 | `bankid.ui.*` | Configuration concerning the BankID IdP UI (including texts displayed in the BankID app). See [UI Configuration](#ui-configuration) below. | [UiProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#ui-configuration) |
 | `bankid.`<br />`relying-parties[].*` | A list of configuration elements for each Relying Party that is allowed to communicate with the BankID SAML IdP. See [Relying Party Configuration](#relying-party-configuration) below. | [RelyingPartyConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
@@ -338,24 +338,12 @@ spring:
         password: changeit    
 ```
 
+<a name="adding-your-own-application-yml-file"></a>
+## Adding Your Own application.yml File
 
-
-### Implement your own module
-
-> TODO: move
-
-You can implement your own module, if you want to be able to use something else than redis, e.g. psql, mysql
-
-To implement your own module, please see how we have configured the redis module in RedisSessionConfiguration.
-The main takeaways is that you need to have an implementation for the following
-- LockRepository
-- SessionReader (you can use fallback implementation for spring session, but a direct read/write implementation is recommended)
-- SessionWriter (you can use fallback implementation for spring session, but a direct read/write implementation is recommended)
-- Spring Session Configuration
-
-## Adding your own application.yml file
 To add multiple overrides for configuration properties at the same time you can do so by supplying your own application.yml file.
-This file will override the base application.yml (so both will be loaded)
+
+This file will override the base application.yml (both will be loaded).
 
 To load an external file simply supply the application with the following environment variable
 ```shell
