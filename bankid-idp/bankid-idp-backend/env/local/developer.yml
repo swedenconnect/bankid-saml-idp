@@ -10,10 +10,10 @@ spring:
     ssl-ext:
       enable-hostname-verification: true
       credential:
-        resource: classpath:local/redis/redis.p12
+        resource: file:bankid-idp/bankid-idp-backend/env/local/redis/certificates/redis.p12
         password: changeit
       trust:
-        resource: classpath:local/redis/trust.p12
+        resource: file:bankid-idp/bankid-idp-backend/env/local/redis/certificates/trust.p12
         password: changeit
   session:
     timeout: 15m
@@ -40,6 +40,13 @@ bankid:
       contact-email: contact@email.com
       show-contact-information: true
       show-trace-id: true
+    user-message-defaults:
+      fallback-sign-text:
+        text: "Jag skriver härmed under den information som visades på föregående sida."
+        format: plain-text
+      login-text:
+        text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+        format: simple-markdown-v1
   relying-parties:
     - id: test-my-eid
       entity-ids:
@@ -47,7 +54,7 @@ bankid:
         - http://sandbox.swedenconnect.se/testmyeid-sign
       credential:
         name: "test-cred"
-        resource: classpath:FPTestcert4_20220818.p12
+        resource: file:bankid-idp/bankid-idp-backend/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
         alias: "1"
         password: "qwerty123"
         type: "PKCS12"
@@ -65,8 +72,23 @@ saml:
     entity-id: https://bankid.swedenconnect.se/idp/local
     base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
     metadata-providers:
-      - location: classpath:local/local-metadata.xml
-
+      - location: file:bankid-idp/bankid-idp-backend/env/local/metadata/local-metadata.xml
+    credentials:
+      sign:
+        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        alias: sign
+        password: secret
+        type: JKS
+      encrypt:
+        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        alias: encrypt
+        password: secret
+        type: JKS
+      metadata-sign:
+        resource: file:bankid-idp/bankid-idp-backend/env/local/idp-credentials/idp-credentials.jks
+        alias: metadata
+        password: secret
+        type: JKS
 management:
   endpoint:
     health:

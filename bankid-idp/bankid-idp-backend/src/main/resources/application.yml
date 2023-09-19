@@ -108,7 +108,7 @@ saml:
     metadata-providers:
     - location: https://md.swedenconnect.se/role/sp.xml
       backup-location: ${BACKUP_DIR}/metadata/metadata-backup.xml
-      validation-certificate: classpath:swedenconnect/prod-metadata.txt
+      validation-certificate: classpath:swedenconnect/prod-metadata.crt
       
     # Metadata config - how should the IdP SAML metadata look like?
     # 
