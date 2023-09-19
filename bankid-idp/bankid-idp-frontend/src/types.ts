@@ -3,14 +3,12 @@ export type LangObject = {
 };
 
 export type Messages = {
-  en: LangObject;
-  sv: LangObject;
+  [lang: string]: LangObject;
 };
 
 export type MessageOverride = {
-  en: string;
-  sv: string;
   code: string;
+  text: LangObject;
 };
 
 const enum ApiResponseStatusEnum {

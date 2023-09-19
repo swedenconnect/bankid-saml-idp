@@ -223,7 +223,9 @@ bankid:
     user-error:
       contact-email: contact@email.com
       show-contact-information: true
-      show-trace-id: true        
+      show-trace-id: true
+#    override:
+#      directory-path: src/main/resources/local/overrides    
   relying-parties:
   - id: test-my-eid
     entity-ids:
