@@ -9,7 +9,7 @@
 There are three distinct parts in configuring the BankID SAML IdP:
 
 - Spring Boot configuration where features such as TLS, management ports, session handling, Redis,
-logging levels and so on are configured. Read more about this at https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html.
+logging levels and so on are configured. Read more about this at [https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html).
 
 - SAML IdP configuration. This is described in the [Spring Security SAML Identity Provider](https://github.com/swedenconnect/saml-identity-provider) repository.
 
@@ -93,6 +93,7 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 | :--- | :--- | :--- | :--- |
 | `user-message-defaults.*` | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
 | `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
+| `override.directory-path` | Optional path where CSS, message and content override files can be put. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
 
 <a name="default-user-messages-configuration"></a>
 #### Default User Messages Configuration
@@ -262,9 +263,9 @@ have to configure Redis further using the Spring Boot Redis configuration.
 
 Good resources for how to configure Redis under Spring Boot are:
 
-- https://www.baeldung.com/spring-data-redis-properties
+- [https://www.baeldung.com/spring-data-redis-properties](https://www.baeldung.com/spring-data-redis-properties)
 
-- https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+- [https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 
 Example:
 
@@ -336,6 +337,15 @@ The main takeaways is that you need to have an implementation for the following
 - SessionReader (you can use fallback implementation for spring session, but a direct read/write implementation is recommended)
 - SessionWriter (you can use fallback implementation for spring session, but a direct read/write implementation is recommended)
 - Spring Session Configuration
+
+## Adding your own application.yml file
+To add multiple overrides for configuration properties at the same time you can do so by supplying your own application.yml file.
+This file will override the base application.yml (so both will be loaded)
+
+To load an external file simply supply the application with the following environment variable
+```shell
+SPRING_CONFIG_IMPORT=/path/to/your/application.yml
+```
 
 -----
 

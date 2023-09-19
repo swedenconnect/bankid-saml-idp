@@ -1,0 +1,43 @@
+server:
+  port: 8082
+
+spring:
+  config:
+    activate:
+      on-profile: sandbox
+
+tomcat:
+  ajp:
+    enabled: true
+    secret-required: true
+    # secret is not set here ...
+    port: 8012
+
+bankid:
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  test-mode: true
+  # Only one RP. This serves all SAML SP:s ...
+  relying-parties:
+    - id: "test-rp"
+      credential:
+        name: "test-cred"
+        resource: file:bankid-idp/bankid-idp-backend/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: true
+
+saml:
+  idp:
+    entity-id: https://sandbox.swedenconnect.se/bankid/idp
+    base-url: https://sandbox.swedenconnect.se/bankid/idp
+
+
+logging:
+  level:
+    se:
+      swedenconnect:
+        spring:
+          saml: DEBUG

@@ -1,6 +1,7 @@
 package se.swedenconnect.bankid.idp.integration;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.*;
@@ -10,7 +11,7 @@ import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCateg
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles({"local", "integrationtest"})
+@ActiveProfiles({"integrationtest"})
 @ExtendWith({AuthenticatedClientResolver.class})
 public class BankIdIdpIntegrationSetup extends TestContainerSetup {
   public static final TestSp testSp;

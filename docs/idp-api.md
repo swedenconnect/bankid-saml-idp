@@ -144,6 +144,26 @@ an error has occurred.
 | `email` | String | The email address that should be displayed in the UI for customer support/contact. |
 | `displayInformation` | Boolean | Whether the UI should display contact information. |
 
+<a name="ui-overrides"></a>
+### UI Overrides (customizations)
+An endpoint that delivers UI override according to [Customizing the BankID IdP UI](override.html#customizing-the-bankid-idp-ui).
+
+**Path:** `api/overrides`
+
+**Method:** GET
+
+**Request Parameters:** None
+
+**Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
+
+**Response Object:** [FrontendOverrideResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/FrontendOverrideResponse.java)
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `messages` | List of [MessageOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/MessageOverride.java) | Message overrides according to [Message Overrides](override.html#message-overrides). |
+| `css` | List of [CssOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/CssOverride.java) | CSS overrides according to [CSS Overrides](override.html#css-overrides). |
+| `content` | List of [ContentOverride](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/bankid-idp-backend/src/main/java/se/swedenconnect/bankid/idp/authn/api/overrides/ContentOverride.java) | Content overrides according to [Content Overrides](override.html#content-overrides). |
+
 <a name="views"></a>
 ## Views
 
