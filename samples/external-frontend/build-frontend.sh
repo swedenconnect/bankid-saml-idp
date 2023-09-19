@@ -5,9 +5,9 @@
 # We choose to copy since we are in the same git repository
 # We recommend you  to do a spare-checkout on tagged releases
 mkdir frontend/
-cp -r ../../bankid-idp/bankid-idp-frontend/ frontend/
+cp -r ../../bankid-idp/bankid-idp-backend/src/main/frontend frontend/
 # We make a minor edit to index.html to verify we do not get served the frontend from backend
-sed -i '' -e 's/BankId-Idp/Externalized-BankId-Frontend/g' frontend/index.html
+sed -i '' -e 's/BankID/Externalized-BankID-Frontend/g' frontend/index.html
 # 2. Build
 cd frontend/
 rm -rf node_modules

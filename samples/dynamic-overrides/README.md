@@ -10,7 +10,7 @@ sh build-backend.sh
 
 Then we will use an example deployment specified under the folder `services/`
 
-We use a property named `BANKID_OVERRIDE_DIRECTORYPATH` to allow overrides to be configured at runtime (startup)
+We use a property named `BANKID_UI_OVERRIDE_DIRECTORYPATH` to allow overrides to be configured at runtime (startup)
 Please see (docs/override.md)[docs/override.md] for more information regarding overrides
 
 To make the overrides available for our docker container we use a volume mount of our overrides
@@ -21,12 +21,12 @@ With the example overrides, we will make the whole page pink and define a new me
 
 #### Without Overrides
 ```yml
-      #- BANKID_OVERRIDE_DIRECTORYPATH=/opt/overrides #Disabled
+      #- BANKID_UI_OVERRIDE_DIRECTORYPATH=/opt/overrides #Disabled
 ```
 ![Before](before.png)
 #### With Overrides
 ```yml
-      - BANKID_OVERRIDE_DIRECTORYPATH=/opt/overrides #Enabled
+      - BANKID_UI_OVERRIDE_DIRECTORYPATH=/opt/overrides #Enabled
 ```
 ![After](after.png)
 

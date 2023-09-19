@@ -52,7 +52,9 @@
   </developers>
 
   <modules>
+    <!--
     <module>bankid-idp-frontend</module>
+    -->
     <module>bankid-idp-backend</module>
   </modules>
 

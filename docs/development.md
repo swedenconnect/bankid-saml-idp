@@ -14,8 +14,32 @@ expected that you are familiar with these frameworks before starting development
 <a name="obtaining-the-bankid-idp-source"></a>
 ## Obtaining the BankID IdP Source
 
-The source for the project is located at https://github.com/swedenconnect/bankid-saml-idp and
-you are free to clone the repository or create a [fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
+The source for the project is located at [https://github.com/swedenconnect/bankid-saml-idp](https://github.com/swedenconnect/bankid-saml-idp) and you are free to clone the repository or create a 
+[fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
+
+<a name="building-the-source"></a>
+## Building the Source
+
+If you want to deploy a BankID IdP and don't have to make any changes apart from configuration 
+customizations of the UI (see [Changing the BankID IdP UI](override.html#changing-the-bankid-idp-ui)),
+you don't have to build the BankID source. Instead, you can just download the [BankID jar from Maven
+Central](artifacts.html).
+
+> Note: Before you build you must ensure that you have Java, Maven and npm installed on your machine.
+
+To build the BankID IdP with a built-in frontend application:
+
+```bash
+cd my-install-dir
+mvn clean package
+```
+
+To build the BankID IdP without a built-in frontend application:
+
+```bash
+cd my-install-dir
+mvn clean package -Dbackend-only
+```
 
 <a name="running-the-service-locally"></a>
 ## Running the Service Locally
@@ -30,7 +54,7 @@ In this mode the service will require two dependencies:
 When the Redis instance has been started you should be able to start the BankID IdP-application with the "local" profile active. Next, start the [Test-SP](#saml-service-provider-for-local-test-and-development)
 and send authentication requests.
 
-:exclamation: Don't you have a test-BankID installed on your device? See [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html).
+> Don't you have a test-BankID installed on your device? See [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html).
 
 <a name="saml-service-provider-for-local-test-and-development"></a>
 ### SAML Service Provider for Local Test and Development
@@ -56,7 +80,7 @@ When running with the local profile, there is a docker-compose file for Redis th
 To start Redis, simply run:
 
 ```
-> docker compose -f ${CODE_ROOT}/bankid-idp-backend/env/local/redis/docker-compose.yml up
+> docker compose -f ${CODE_ROOT}/bankid-idp/env/local/redis/docker-compose.yml up
 ```
 
 <a name="using-docker"></a>
@@ -67,7 +91,7 @@ To start Redis, simply run:
 ```bash
 export DOCKER_REPO=yourdockerrepo:port
 mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:build
+mvn -f bankid-idp/bankid-idp jib:build
 ```
 
 **Building, local Docker image only:**
@@ -75,34 +99,8 @@ mvn -f bankid-idp/bankid-idp-backend jib:build
 ```bash
 export DOCKER_REPO=local
 mvn clean install
-mvn -f bankid-idp/bankid-idp-backend jib:dockerBuild
+mvn -f bankid-idp/bankid-idp jib:dockerBuild
 ```
-
-## Device Support
-[Usage statistics][1]
-
-> TODO: move
-
-| OS       | Browser          | Supported |
-|----------|------------------|-----------|
-| iOS      | Safari           | 🟡        |
-| Windows  | Chrome           | ✅         |
-| Android  | Chrome           | 🟡        |
-| Windows  | Edge             | ✅         |
-| macOS    | Safari           | ✅         |
-| macOS    | Chrome           | ✅         |
-| ChromeOS | Chrome           | ❌         |
-| Windows  | Firefox          | ✅         |
-| Android  | Samsung Internet | 🟡        |
-
-| Legend | Description                                   |
-|--------|-----------------------------------------------|
-| ✅      | Supported and works by default                |
-| 🟡     | Supported but requires device detection       |
-| ❌      | Might work but will not be tested for support |
-
-[1]: https://analytics.usa.gov/data/ "OS & browser (combined)"
-
 
 -----
 

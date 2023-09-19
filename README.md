@@ -2,13 +2,11 @@
 
 # SAML Identity Provider for BankID
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
-This repository comprises of a SAML Identity Provider (IdP) for BankID. 
+A SAML Identity Provider for BankID. 
 
 -----
-
-> NOTE: Development of the SAML IdP for BankID is work in progress. Feel free to follow the progress. Use the [Issues](https://github.com/swedenconnect/bankid-saml-idp/issues)-section for any questions or suggestions.
 
 ## About
 
@@ -26,12 +24,6 @@ Visit the [BankID SAML IdP Documentation](https://docs.swedenconnect.se/bankid-s
 to customize, extend, and build and deploy the application.
 
 You may also want to read the [Sweden Connect eID Framework](https://docs.swedenconnect.se/technical-framework/) specifications and [BankID Development Guides](https://www.bankid.com/utvecklare/guider).
-
-## Downloading Artifacts
-
-The BankID SAML IdP artifacts are published to [Maven Central](https://central.sonatype.com/).
-
-> TODO: include details
 
 ## Contributing
 

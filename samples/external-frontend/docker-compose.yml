@@ -27,7 +27,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_REDIS_HOST=redisstack
-      - SPRING_REDIS_SSLEXT_ENABLEHOSTNAMEVERIFICATION=false
+      - SPRING_REDIS_SSL_EXT_ENABLE_HOSTNAME_VERIFICATION=false
       - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks
       - SERVER_PORT=8445
       - SERVER_FORWARDHEADERSSTRATEGY=native

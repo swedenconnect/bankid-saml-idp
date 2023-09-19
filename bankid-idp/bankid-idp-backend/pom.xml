@@ -53,7 +53,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>17</java.version>
+    <java.version>17</java.version>    
+    <node.version>v18.12.1</node.version>
+    
+    <idp.build.type>with-frontend</idp.build.type>
   </properties>
 
   <dependencyManagement>
@@ -81,14 +84,12 @@
       <groupId>com.google.zxing</groupId>
       <artifactId>core</artifactId>
       <version>${zxing.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>${zxing.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -259,22 +260,7 @@
   <build>
 
     <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <delimiters>
-            <delimiter>@</delimiter>
-          </delimiters>
-          <nonFilteredFileExtensions>
-            <nonFilteredFileExtension>jks</nonFilteredFileExtension>
-            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
-        </configuration>
-      </plugin>
-
+            
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -340,5 +326,131 @@
     </testResources>
 
   </build>
+  
+  <profiles>
+    
+    <profile>
+      <id>with-frontend</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!backend-only</name>
+        </property>
+      </activation>
+      
+      <build>
+        <plugins>
+          
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.12.1</version>
+            <configuration>
+              <workingDirectory>src/main/frontend</workingDirectory>
+              <installDirectory>src/main/frontend</installDirectory>
+            </configuration>        
+            <executions>
+              <execution>
+                <id>install node and npm</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>${node.version}</nodeVersion>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm run build</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>copy-resource-templates</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/templates/</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/frontend/dist</directory>
+                      <includes>
+                        <include>index.html</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-resources-assets</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/static/assets/</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/frontend/dist/assets/</directory>
+                      <includes>
+                        <include>**/*.*</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+    
+          
+        </plugins>
+      </build>
+      
+    </profile>
+    
+    <!--
+      Build backend only: mvn clean install -Dbackend-only 
+    -->
+    <profile>
+      
+      <id>backend-only-profile</id>
+      <activation>
+        <property>
+          <name>backend-only</name>
+        </property>
+      </activation>
+      
+      <build>
+        <finalName>bankid-idp-backend-${project.version}</finalName>
+      </build>
 
+    </profile>
+    
+  </profiles>
+  
 </project>

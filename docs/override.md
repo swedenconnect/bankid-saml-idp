@@ -10,7 +10,6 @@ BankID IdP. Changes may be [changing the BankID IdP UI](#changing-the-bankid-idp
 or changed, features.
 
 <a name="changing-the-bankid-idp-ui"></a>
-
 ## Changing the BankID IdP UI
 
 ### CSS, message and content Overrides
