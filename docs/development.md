@@ -14,7 +14,7 @@ expected that you are familiar with these frameworks before starting development
 <a name="obtaining-the-bankid-idp-source"></a>
 ## Obtaining the BankID IdP Source
 
-The source for the project is located at https://github.com/swedenconnect/bankid-saml-idp and
+The source for the project is located at [https://github.com/swedenconnect/bankid-saml-idp](https://github.com/swedenconnect/bankid-saml-idp) and
 you are free to clone the repository or create a [fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
 
 <a name="running-the-service-locally"></a>

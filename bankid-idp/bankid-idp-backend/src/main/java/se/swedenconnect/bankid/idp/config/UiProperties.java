@@ -44,6 +44,13 @@ public class UiProperties implements InitializingBean {
   @Setter
   private UserErrorProperties userError;
 
+  /**
+   * BankID UI overrides. See https://docs.swedenconnect.se/bankid-saml-idp/override.html.
+   */
+  @Getter
+  @Setter
+  private OverrideProperties override;
+
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {

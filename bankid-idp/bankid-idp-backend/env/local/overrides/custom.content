@@ -1,7 +1,7 @@
 [
     {
-        "title":"my.nocall.title",
-        "text":"my.nocall.text",
+        "title":"custom.devel-version.title",
+        "text":"custom.devel-version.text",
         "position":"ABOVE",
         "type":"INFO"
     }
