@@ -23,14 +23,14 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 
 /**
  * Interface for writing to the BankID session.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public interface BankIdSessionWriter {
 
   /**
-   * Saves {@link BankidSessionData} to repository. Overwrites data if order reference is the same.
+   * Saves {@link BankIdSessionData} to repository. Overwrites data if order reference is the same.
    *
    * @param request to determine session key
    * @param data to be saved

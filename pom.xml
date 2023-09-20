@@ -434,14 +434,6 @@
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-
       <!-- run mvn jacoco:report -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -468,19 +460,6 @@
 
       <build>
         <plugins>
-
-          <plugin>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>delombok</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
 
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -520,9 +499,6 @@
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <sourcepath>target/generated-sources/delombok</sourcepath>
-            </configuration>
           </plugin>
 
           <plugin>
@@ -554,14 +530,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <configuration>
-              <skip>false</skip>
-            </configuration>
           </plugin>
 
         </plugins>
