@@ -194,6 +194,14 @@ Also see [RelyingPartyUiInfo](https://github.com/swedenconnect/bankid-saml-idp/b
 
 Also see [BankIdRequirement](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdRequirement.java).
 
+<a name="configuring-a-http-proxy"></a>
+## Configuring a HTTP Proxy
+
+The BankID IdP uses the system settings for HTTP proxies. Therefore there are no specific configuration
+for HTTP proxies. 
+
+If you require a HTTP Proxy follow the steps in [Java Networking and Proxies](https://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html).
+
 <a name="saml-idp-configuration"></a>
 ## SAML IdP Configuration
 
