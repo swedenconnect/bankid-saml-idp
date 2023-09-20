@@ -122,8 +122,11 @@ To show an informational alert box on top of the main content using the custom m
   }
 ]
 ```
+Please note that each content-element will become a paragraph.
 
-You can also include links in the alert boxes
+
+You can also include links in the alert boxes.
+If the content element contains a "link" element, the "text" element will be used as the link text.
 ```json
 [
   {

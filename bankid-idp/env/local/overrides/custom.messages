@@ -16,8 +16,8 @@
   {
     "code": "custom.devel.link.text",
     "text": {
-      "sv": "Skaffa Test BankID",
-      "en": "Get Test BankID"
+      "sv": "Skaffa BankID för test",
+      "en": "Get BankID for test"
     }
   }
 ]
