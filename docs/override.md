@@ -211,10 +211,6 @@ public class Application {
 
 ```
 
-#### Example Repository
-
-> TODO Create Example Repository
-
 ### Configure Maven Plugin
 
 Also configure the Spring Boot Maven plugin so that the new backend application's main class
@@ -250,6 +246,35 @@ is found:
     ....
 
 ```
+
+<a name="writing-your-own-session-handling-module"></a>
+### Writing Your Own Session Handling Module
+
+The BankID IdP offers two session handling modules: `memory` and `redis`. By extending the
+BankID IdP Backend application you can write your own module, for example session handling using 
+MySQL.
+
+To implement your own module, study how we have configured the Redis module in the
+[RedisSessionConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/session/RedisSessionConfiguration.java) class.
+
+You need to supply implementations for the following interfaces:
+
+- [TryLockRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/concurrency/TryLockRepository.java) - Locking repository responsible for providing locks by key.
+
+- [SessionDao](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/session/SessionDao.java) - Interface defining session reader and writer. You can use [ServletSessionDao](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/session/ServletSessionDao.java) and use 
+[Spring Session](https://spring.io/projects/spring-session), but a direct read/write implementation is
+recommended.
+
+- [MessageReplayChecker](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/replay/MessageReplayChecker.java) - A message replay checker
+that is used to protect from replay attacks against the SAML IdP. It is recommended to extend the
+[AbstractMessageReplayChecker](https://github.com/swedenconnect/saml-identity-provider/blob/main/saml-identity-provider/src/main/java/se/swedenconnect/spring/saml/idp/authnrequest/validation/AbstractMessageReplayChecker.java) class.
+
+Furthermore, the [Spring Security SAML Identity Provider](https://github.com/swedenconnect/saml-identity-provider) library, on which the BankID IdP is built, writes and reads session data using the Servlet API
+(i.e., gets the `HttpSession` from the `HttpServletRequest`). Therefore, you need to use/configure [Spring Session](https://spring.io/projects/spring-session) using a Spring Session module corresponding to your
+choice of implementation (for example Spring Session JDBC).
+
+Finally, when you have written your session module, you need to activate it. This is done by
+assigning the configuration setting `bankid.session.module` to the name of your module (for example `mysql`).
 
 ---
 
