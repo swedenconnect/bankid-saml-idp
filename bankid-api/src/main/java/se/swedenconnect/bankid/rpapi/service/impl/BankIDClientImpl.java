@@ -125,7 +125,7 @@ public class BankIDClientImpl implements BankIDClient {
         new AuthnRequest(request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData());
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
     try {
-      log.info("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
+      log.debug("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
     }
     catch (final JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -140,10 +140,10 @@ public class BankIDClientImpl implements BankIDClient {
           .onRawStatus(StatusCodePredicates.serverError(), BankIdErrorBodyExtractors.serverErrorBodyExtractor())
           .bodyToMono(OrderResponse.class)
           .map(m -> {
-            log.info("{}: authenticate. response: [{}]", this.identifier, m.toString());
+            log.debug("{}: authenticate. response: [{}]", this.identifier, m.toString());
             return m;
           })
-          .doOnError(e -> log.error("Error in request to bankid: " + request.toString(), e));
+          .doOnError(e -> log.info("Error in request to bankid: " + request.toString(), e));
     }
     catch (final WebClientResponseException e) {
       log.info("{}: authenticate. Error during auth-call - {} - {} - {}",
@@ -210,7 +210,7 @@ public class BankIDClientImpl implements BankIDClient {
         .bodyValue(request)
         .retrieve()
         .bodyToMono(Void.class)
-        .doOnSuccess(n -> log.info("{}: cancel. Order {} successfully cancelled", this.identifier, orderReference))
+        .doOnSuccess(n -> log.debug("{}: cancel. Order {} successfully cancelled", this.identifier, orderReference))
         .doOnError(e -> {
           if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: cancel. Error during cancel-call - {} - {} - {}",
@@ -239,7 +239,7 @@ public class BankIDClientImpl implements BankIDClient {
   @Override
   public Mono<? extends CollectResponse> collect(final String orderReference) throws BankIDException {
     Assert.hasText(orderReference, "'orderReference' must not be null or empty");
-    log.info("{}: collect: Request for collecting order {}", this.identifier, orderReference);
+    log.debug("{}: collect: Request for collecting order {}", this.identifier, orderReference);
 
     final OrderRefRequest request = new OrderRefRequest(orderReference);
     final WebClient.ResponseSpec retrieve = this.webClient.post()
@@ -249,7 +249,7 @@ public class BankIDClientImpl implements BankIDClient {
     return retrieve
         .onRawStatus(s -> s >= 400, this::defaultErrorHandler)
         .bodyToMono(CollectResponse.class)
-        .doOnSuccess(c -> log.info("{}: collect. response: [{}]", this.identifier, c.toString()))
+        .doOnSuccess(c -> log.debug("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
           if (e instanceof final WebClientResponseException webClientResponseException) {
             log.info("{}: collect. Error during collect-call - {} - {} - {}",
