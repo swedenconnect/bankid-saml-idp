@@ -15,10 +15,14 @@
  */
 package se.swedenconnect.bankid.idp.config.session;
 
+import java.time.Duration;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.session.ServletSessionDao;
 import se.swedenconnect.bankid.idp.authn.session.SessionDao;
@@ -37,6 +41,13 @@ import se.swedenconnect.opensaml.saml2.response.replay.InMemoryReplayChecker;
 @ConditionalOnProperty(value = "bankid.session.module", havingValue = "memory", matchIfMissing = true)
 public class InMemorySessionConfiguration {
 
+  /**
+   * The replay TTL.
+   */
+  @Setter
+  @Value("${saml.idp.replay-ttl:PT5M}")
+  private Duration replayTtl;
+
   // This is meant for development, can cause issues if deployed in a production environment
   @Bean
   TryLockRepository inMemoryLockRepository() {
@@ -52,7 +63,9 @@ public class InMemorySessionConfiguration {
 
   @Bean
   InMemoryReplayChecker inMemoryReplayChecker() {
-    return new InMemoryReplayChecker();
+    final InMemoryReplayChecker checker = new InMemoryReplayChecker();
+    checker.setReplayCacheExpiration(this.replayTtl.toMillis());
+    return checker;
   }
 
 }

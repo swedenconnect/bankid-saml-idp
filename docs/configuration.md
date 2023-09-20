@@ -213,6 +213,11 @@ the following:
 
 - `saml.idp.metadata.*` - SAML metadata for your IdP.
 
+The BankID IdP also extends this configuration with the following setting:
+
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `saml.idp.replay-ttl` | The time-to-live for items handled by the [MessageReplayChecker](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/replay/MessageReplayChecker.java) | Duration | 5 minutes |
 
 <a name="spring-boot-configuration"></a>
 ## Spring Boot Configuration

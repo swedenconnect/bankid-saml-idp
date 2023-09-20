@@ -59,7 +59,7 @@ should be set to load the relevant properties.
 
 ```bash
 BANKID_INSTALL_DIR=<root directory where you checked out the BankID repository>
-SPRING_CONFIG_IMPORT=bankid-idp/env/local/developer.yml
+SPRING_CONFIG_IMPORT=${BANKID_INSTALL_DIR}/bankid-idp/env/local/developer.yml
 SPRING_PROFILES_ACTIVE=local
 ```
 
