@@ -239,7 +239,7 @@ public class BankIdConfiguration {
   }
 
   @Bean
-  public FilterRegistrationBean<OncePerRequestFilter> errorHandlerFilterRegistration(ErrorhandlerFilter filter) {
+  FilterRegistrationBean<OncePerRequestFilter> errorHandlerFilterRegistration(final ErrorhandlerFilter filter) {
     FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");

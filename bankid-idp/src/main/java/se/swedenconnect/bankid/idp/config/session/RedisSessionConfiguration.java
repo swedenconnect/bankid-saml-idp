@@ -16,11 +16,13 @@
 package se.swedenconnect.bankid.idp.config.session;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import org.redisson.api.RedissonClient;
 import org.redisson.config.SingleServerConfig;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.session.RedisSessionDao;
 import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
@@ -47,6 +50,13 @@ import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
 @Import({ RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
 @EnableRedisHttpSession
 public class RedisSessionConfiguration {
+
+  /**
+   * The replay TTL.
+   */
+  @Setter
+  @Value("${saml.idp.replay-ttl:PT5M}")
+  private Duration replayTtl;
 
   @Bean
   @ConfigurationProperties(prefix = "spring.redis.ssl-ext")
@@ -90,6 +100,8 @@ public class RedisSessionConfiguration {
 
   @Bean
   RedisReplayChecker redisReplayChecker(final RedissonClient client) {
-    return new RedisReplayChecker(client);
+    final RedisReplayChecker checker = new RedisReplayChecker(client);
+    checker.setReplayCacheExpiration(this.replayTtl);
+    return checker;
   }
 }
