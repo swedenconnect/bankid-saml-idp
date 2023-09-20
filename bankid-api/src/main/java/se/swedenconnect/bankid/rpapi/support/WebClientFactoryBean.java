@@ -179,7 +179,9 @@ public class WebClientFactoryBean extends AbstractFactoryBean<WebClient> {
         .trustManager(X509Utils.decodeCertificate(this.trustedRoot))
         .build();
 
-    final HttpClient client = HttpClient.create().secure(spec -> spec.sslContext(sslContext));
+    final HttpClient client = HttpClient.create()
+        .proxyWithSystemProperties()
+        .secure(spec -> spec.sslContext(sslContext));
     final ClientHttpConnector connector = new ReactorClientHttpConnector(client);
 
     final WebClient.Builder builder = Optional.ofNullable(this.webClientBuilder)
