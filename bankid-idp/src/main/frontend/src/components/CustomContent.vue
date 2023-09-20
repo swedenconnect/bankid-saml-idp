@@ -14,7 +14,11 @@
 <template>
   <div v-if="matchingContent" :class="matchingContent.type.toLowerCase()">
     <h3>{{ $t(matchingContent.title) }}</h3>
-    <p>{{ $t(matchingContent.text) }}</p>
+      <span v-for="(item, index) in matchingContent.content">
+        <a v-if="item.link" :href=item.link >{{ $t(item.text) }}</a>
+        <p v-else>{{ $t(item.text) }}</p>
+      </span>
+    <div> <!-- Empty --> </div>
   </div>
 </template>
 
