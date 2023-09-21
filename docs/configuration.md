@@ -373,7 +373,7 @@ spring:
 ```
 
 <a name="adding-your-own-application-yml-file"></a>
-## Adding Your Own application.yml File
+### Adding Your Own application.yml File
 
 To add multiple overrides for configuration properties at the same time you can do so by supplying your own application.yml file.
 
@@ -383,6 +383,24 @@ To load an external file simply supply the application with the following enviro
 ```shell
 SPRING_CONFIG_IMPORT=/path/to/your/application.yml
 ```
+
+<a name="logging-configuration"></a>
+### Logging Configuration
+
+To enable json logs, run the application with the `jsonlog` profile
+
+Configure either by application.yml or environment variable
+
+#### application.yml
+```yml
+spring:
+  profiles:
+    active: jsonlog
+```
+
+#### env
+`SPRING_PROFILES_ACTIVE=jsonlog`
+
 
 -----
 
