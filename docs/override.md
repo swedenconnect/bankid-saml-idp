@@ -14,6 +14,20 @@ or changed, features.
 <a name="customizing-the-bankid-idp-ui"></a>
 ## Customizing the BankID IdP UI
 
+### Adding Your Logotype
+
+The header will always display the relaying party logotype. 
+You can add the logotype of your organization to the footer by pointing out your own .svg file.
+
+
+**Note that the logotype must in SVG-format.**
+```yaml
+bankid:
+  ...
+  ui: 
+    override:
+      svg-logo: "path/to/my/logo.svg"
+```
 ### CSS, Message and Content Overrides
 
 Enable customization of the BankID's UI by creating override files (see below), placing them in a

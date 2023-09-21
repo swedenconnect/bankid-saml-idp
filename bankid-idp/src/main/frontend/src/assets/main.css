@@ -20,6 +20,12 @@
   --warning-border-color: #000;
 }
 
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+
 html,
 body {
   background-color: var(--bg-color);

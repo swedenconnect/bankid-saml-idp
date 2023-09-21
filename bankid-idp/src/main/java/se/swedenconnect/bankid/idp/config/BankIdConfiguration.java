@@ -102,7 +102,7 @@ public class BankIdConfiguration {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
+            .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
                 "/**/resume")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
