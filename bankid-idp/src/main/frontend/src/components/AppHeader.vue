@@ -25,6 +25,7 @@
   }
 
   .top-logo-container {
+    box-sizing: content-box;
     padding: 20px;
   }
 
