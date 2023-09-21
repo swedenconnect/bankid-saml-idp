@@ -26,10 +26,10 @@
   <div class="content-container">
     <CustomContent position="deviceselect" />
     <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
-    <BankIdLogo />
     <h2>BankID</h2>
     <p>{{ $t('bankid.msg.rfa20') }}</p>
     <DeviceSelect />
+    <BankIdLogo />
   </div>
 
   <div class="return">

@@ -85,7 +85,6 @@
 
 <template>
   <div class="content-container">
-    <BankIdLogo />
     <CustomContent v-if="qrImage" position="qrcode" />
     <CustomContent v-else position="autostart" />
     <p>{{ $t(messageCode) }}</p>
@@ -94,6 +93,7 @@
     <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
+    <BankIdLogo />
   </div>
   <div class="return">
     <button
