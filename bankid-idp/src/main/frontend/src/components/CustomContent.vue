@@ -12,32 +12,34 @@
 </script>
 
 <template>
-  <div v-if="matchingContent" :class="matchingContent.type.toLowerCase()">
+  <aside v-if="matchingContent" :class="matchingContent.type.toLowerCase()">
     <h3>{{ $t(matchingContent.title) }}</h3>
-      <span v-for="(item, index) in matchingContent.content">
-        <a v-if="item.link" :href=item.link >{{ $t(item.text) }}</a>
-        <p v-else>{{ $t(item.text) }}</p>
-      </span>
-    <div> <!-- Empty --> </div>
-  </div>
+    <p v-for="item in matchingContent.content" :key="item.text">
+      <a v-if="item.link" :href="item.link">{{ $t(item.text) }}</a>
+      <span v-else>{{ $t(item.text) }}</span>
+    </p>
+  </aside>
 </template>
 
 <style scoped>
-  div {
+  aside {
     padding: 0 1em;
     margin: 1em 0;
   }
-  div.info {
+  aside.info {
     background-color: var(--info-bg-color);
     color: var(--info-fg-color);
     border: 1px solid var(--info-border-color);
   }
-  div.warning {
+  aside.warning {
     background-color: var(--warning-bg-color);
     color: var(--warning-fg-color);
     border: 1px solid var(--warning-border-color);
   }
   h3 {
     margin-bottom: 0;
+  }
+  a {
+    font-size: 1em;
   }
 </style>
