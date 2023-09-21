@@ -63,7 +63,7 @@ bankid:
         format: simple-markdown-v1
     override:
       directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
-      svgLogo: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+      svg-logo: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
   relying-parties:
     - id: test-my-eid
       entity-ids:
