@@ -9,8 +9,15 @@
   {
     "code" : "custom.devel-version.text",
     "text": {
-      "sv": "Detta är en lokal utvecklingsversion av BankID IdP:n",
-      "en": "This is a local development version of the BankID IdP"
+      "sv": "Detta är en lokal utvecklingsversion av BankID IdP:n och du behöver ett BankID för test för att kunna använda den",
+      "en": "This is a local development version of the BankID IdP and you will need a BankID for test in order to use it"
+    }
+  },
+  {
+    "code": "custom.devel.link.text",
+    "text": {
+      "sv": "Skaffa BankID för test",
+      "en": "Get BankID for test"
     }
   }
 ]

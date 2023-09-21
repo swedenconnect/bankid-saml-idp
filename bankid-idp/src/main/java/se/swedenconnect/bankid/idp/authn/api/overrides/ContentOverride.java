@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.api.overrides;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -71,13 +72,6 @@ public class ContentOverride {
   private String title;
 
   /**
-   * The message code for the text that should appear in the alert box.
-   */
-  @Getter
-  @Setter
-  private String text;
-
-  /**
    * The type of alert box.
    */
   @Getter
@@ -91,6 +85,9 @@ public class ContentOverride {
   @Setter
   private Position position;
 
+  @Getter
+  @Setter
+  private List<ContentEntry> content;
   /**
    * Default constructor.
    */
@@ -101,19 +98,22 @@ public class ContentOverride {
    * Constructor.
    *
    * @param title the message code for the title of the alert box
-   * @param text the message code for the text that should appear in the alert box
+   * @param content list of messages that may include an optional link
    * @param type the type of alert box
    * @param position the position of the alert box
    */
-  public ContentOverride(final String title, final String text, final Type type, final Position position) {
+  public ContentOverride(final String title, final List<ContentEntry> content, final Type type, final Position position) {
     this.title = Optional.ofNullable(title)
         .filter(StringUtils::hasText)
-        .orElseThrow(() -> new IllegalArgumentException("title must be set"));
-    this.text = Optional.ofNullable(text)
-        .filter(StringUtils::hasText)
-        .orElseThrow(() -> new IllegalArgumentException("text must be set"));
-    this.type = Objects.requireNonNull(type, "type must be set");
-    this.position = Objects.requireNonNull(position, "position must be set");
+        .orElseThrow(() -> new IllegalArgumentException("Title must be set"));
+    this.content = Optional.ofNullable(content)
+            .orElseThrow(() -> new IllegalArgumentException("Content must be set"));
+    boolean textSet = this.content.stream().allMatch(c -> Objects.nonNull(c.getText()));
+    if (!textSet) {
+      throw new IllegalArgumentException("Text must be set for every entry");
+    }
+    this.type = Objects.requireNonNull(type, "Type must be set");
+    this.position = Objects.requireNonNull(position, "Position must be set");
   }
 
 }

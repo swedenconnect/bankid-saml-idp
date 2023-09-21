@@ -110,12 +110,39 @@ To show an informational alert box on top of the main content using the custom m
 
 ```json
 [
-    {
-        "title":"my.nocall.title",
-        "text":"my.nocall.text",
-        "position":"ABOVE",
-        "type":"INFO"
-    }
+  {
+    "title": "my.nocall.title",
+    "content": [
+      {
+        "text": "my.nocall.text"
+      }
+    ],
+    "position": "ABOVE",
+    "type": "INFO"
+  }
+]
+```
+Please note that each content-element will become a paragraph.
+
+
+You can also include links in the alert boxes.
+If the content element contains a "link" element, the "text" element will be used as the link text.
+```json
+[
+  {
+    "title": "custom.devel-version.title",
+    "content": [
+      {
+        "text": "custom.devel-version.text"
+      },
+      {
+        "text": "custom.devel.link.text",
+        "link": "https://www.bankid.com/utvecklare/test/skaffa-testbankid/test-bankid-get"
+      }
+    ],
+    "position": "ABOVE",
+    "type": "INFO"
+  }
 ]
 ```
 
