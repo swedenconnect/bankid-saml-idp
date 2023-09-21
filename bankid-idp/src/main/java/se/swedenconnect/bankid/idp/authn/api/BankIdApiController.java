@@ -152,6 +152,12 @@ public class BankIdApiController {
     return Mono.just(this.overrides.generateOverrides());
   }
 
+  /**
+   * Gets Svg Logo of Service Provider
+   * If no override Logo has been set, default swedenconnect logo will be displayed
+   * @return svg image as bytes
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
   @GetMapping(value = "/logo.svg", produces = "image/svg+xml")
   public @ResponseBody byte[] getIcon() throws IOException {
     return overrides.getLogo();

@@ -61,7 +61,7 @@ public class OverrideService {
    * Gets the default sweden-connect logotype if no override logotype has been set
    * If an override logotype has been set then load the override instead
    * @return A logotype as byte array
-   * @throws IOException
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
    */
   public byte[] getLogo() throws IOException {
     if (Objects.nonNull(properties.getSvgLogo())) {
