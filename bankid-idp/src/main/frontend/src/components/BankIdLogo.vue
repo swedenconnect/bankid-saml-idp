@@ -6,9 +6,10 @@
 
 <style scoped>
   .bankid-logo {
+    margin-top: 2em;
     text-align: center;
   }
-  
+
   @media (min-width: 576px) {
     img {
       height: 120px;
@@ -20,5 +21,4 @@
       height: 90px;
     }
   }
-  
 </style>
