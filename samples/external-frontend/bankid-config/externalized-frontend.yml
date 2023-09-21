@@ -1,0 +1,108 @@
+spring:
+  redis:
+    host: ${REDIS_HOST:redisstack}
+    port: ${REDIS_PORT:6379}
+    password: supersecret
+    ssl: true
+    ssl-ext:
+      enable-hostname-verification: false
+      credential:
+        resource: file:/opt/bankid-idp/redis.p12
+        password: changeit
+      trust:
+        resource: file:/opt/bankid-idp/trust.p12
+        password: changeit
+  session:
+    timeout: 15m
+    
+server:
+  port: 8445
+  forward-headers-strategy: native
+  ssl:
+    keystore: /opt/bankid-idp/ssl.jks
+  error:
+    whitelabel:
+      enabled: true
+    path: /#error
+  reactive:
+    session:
+      timeout: 15m
+      
+management:
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus, loggers, auditevents
+  server:
+    port: 8444      
+
+bankid:
+  authn:
+    authn-path: /
+  audit:
+    repository: "redistimeseries"
+    log-file: /opt/bankid-idp/audit.log
+  built-in-frontend: false
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  session:
+    module: redis
+  ui:
+    user-error:
+      contact-email: contact@email.com
+      show-contact-information: true
+      show-trace-id: true
+    user-message-defaults:
+      fallback-sign-text:
+        text: "Jag skriver härmed under den information som visades på föregående sida."
+        format: plain-text
+      login-text:
+        text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+        format: simple-markdown-v1
+  relying-parties:
+    - id: test-my-eid
+      entity-ids:
+        - http://sandbox.swedenconnect.se/testmyeid
+        - http://sandbox.swedenconnect.se/testmyeid-sign
+      credential:
+        name: "test-cred"
+        resource: file:/opt/bankid-idp/FPTestcert4_20220818.p12
+        alias: "1"
+        password: "qwerty123"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: false
+        login-text:
+          text: "Jag loggar härmed in till tjänsten Testa ditt eID.\n\n*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+          format: simple-markdown-v1
+      bankid-requirements:
+        pin-code-auth: false
+        pin-code-sign: true
+
+saml:
+  idp:
+    entity-id: https://bankid.swedenconnect.se/idp/local
+    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
+    metadata-providers:
+      - location: file:/opt/bankid-idp/local-metadata.xml
+    credentials:
+      sign:
+        resource: file:/opt/bankid-idp/idp-credentials.jks
+        alias: sign
+        password: secret
+        type: JKS
+      encrypt:
+        resource: file:/opt/bankid-idp/idp-credentials.jks
+        alias: encrypt
+        password: secret
+        type: JKS
+      metadata-sign:
+        resource: file:/opt/bankid-idp/idp-credentials.jks
+        alias: metadata
+        password: secret
+        type: JKS

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   frontend:
-    image: nginx
+    image: nginx:latest
     depends_on:
       - backend
     networks: 
@@ -21,18 +21,11 @@ services:
   backend:
     image: local.dev.swedenconnect.se/bankid-saml-idp
     ports:
-      - 8445:8445
+      - "8445:8445"
     volumes:
-      - ./selfsigned/sites/java/ssl.jks:/opt/bankid-idp/ssl.jks
+      - ./bankid-config:/opt/bankid-idp/
     environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_REDIS_HOST=redisstack
-      - SPRING_REDIS_SSL_EXT_ENABLE_HOSTNAME_VERIFICATION=false
-      - SERVER_SSL_KEYSTORE=/opt/bankid-idp/ssl.jks
-      - SERVER_PORT=8445
-      - SERVER_FORWARDHEADERSSTRATEGY=native
-      - BANKID_BUILT_IN_FRONTEND=false
-      - BANKID_AUTHN_AUTHN_PATH=/
+      - SPRING_CONFIG_IMPORT=/opt/bankid-idp/externalized-frontend.yml
     depends_on:
       - redisstack
     networks:
@@ -41,12 +34,12 @@ services:
      hostname: local.dev.swedenconnect.se
      image: redis/redis-stack:latest
      ports:
-      - 6379:6379
-      - 8001:8001
+      - "6379:6379"
+      - "8001:8001"
      networks:
       - idp
      volumes:
-      - ../../bankid-idp/env/local/redis/:/tls
+      - ../../bankid-idp/env/local/redis/certificates/:/tls
      environment:
       - REDIS_ARGS=--requirepass supersecret --tls-port 6379 --port 0 --tls-cert-file /tls/server.crt --tls-key-file /tls/server.key --tls-ca-cert-file /tls/ca.crt 
 
