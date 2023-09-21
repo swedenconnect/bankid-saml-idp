@@ -31,8 +31,8 @@ import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
  * {@code ErrorhandlerFilter} handles errors that do not originate from a controller e.g. another filter handles
  * exceptions thrown by {@link BankIdAuthenticationProvider}.
  *
- * @see {@link BankIdAuthenticationProvider}
- * 
+ * @see BankIdAuthenticationProvider
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -46,7 +46,7 @@ public class ErrorhandlerFilter extends OncePerRequestFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param userErrorRouteFactory creates redirect views and links to be used by error handlers
    */
   public ErrorhandlerFilter(final UserErrorRouteFactory userErrorRouteFactory) {

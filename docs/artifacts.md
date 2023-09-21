@@ -33,6 +33,18 @@ The BankID IdP artifacts are published to [Maven Central](https://central.sonaty
 
 > This is typically used if you supply your own frontend application.
 
+**BankID IdP Frontend distribution:**
+```xml
+<dependency>
+  <groupId>se.swedenconnect.bankid</groupId>
+  <artifactId>bankid-idp-frontend</artifactId>
+  <version>${bankid.idp.version}</version>
+  <type>zip</type>
+</dependency>
+```
+
+> Used in projects where you need to modify the frontend code.
+
 **BankID Relying Party API Implementation:**
 
 ```xml

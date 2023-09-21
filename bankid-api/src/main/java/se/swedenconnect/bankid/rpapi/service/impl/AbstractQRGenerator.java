@@ -31,7 +31,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.util.Assert;
 
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
-import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
@@ -70,9 +69,8 @@ public abstract class AbstractQRGenerator implements QRGenerator {
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
    * @param orderTime the instant when the result from an
-   *          {@link BankIDClient#authenticate(String, String, se.swedenconnect.bankid.rpapi.service.UserVisibleData, se.swedenconnect.bankid.rpapi.types.Requirement)}
-   *          or a {@link BankIDClient#sign(String, String, DataToSign, se.swedenconnect.bankid.rpapi.types.Requirement)} call
-   *          was received
+   *          {@link BankIDClient#authenticate(se.swedenconnect.bankid.rpapi.service.AuthenticateRequest)} or
+   *          {@link BankIDClient#sign(se.swedenconnect.bankid.rpapi.service.SignatureRequest)} call was received
    * @return the QR data
    * @throws IOException for errors calculating the code
    */
@@ -130,8 +128,10 @@ public abstract class AbstractQRGenerator implements QRGenerator {
       final Instant orderTime, final int size, final ImageFormat format) {
     try {
       final byte[] imageBytes = this.generateAnimatedQRCodeImage(qrStartToken, qrStartSecret, orderTime, size, format);
-      return String.format("data:image/%s;base64, %s", format.getImageFormatName().toLowerCase(), Base64.getEncoder().encodeToString(imageBytes));
-    } catch (IOException e) {
+      return String.format("data:image/%s;base64, %s", format.getImageFormatName().toLowerCase(),
+          Base64.getEncoder().encodeToString(imageBytes));
+    }
+    catch (IOException e) {
       throw new UncheckedIOException(e);
     }
 

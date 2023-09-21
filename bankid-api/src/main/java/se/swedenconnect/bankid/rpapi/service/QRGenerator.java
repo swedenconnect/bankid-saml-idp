@@ -26,7 +26,7 @@ import se.swedenconnect.bankid.rpapi.types.OrderResponse;
  * Section 4.1 of the BankID Relying Party Guidelines describes how to generate a static QR code based on an auto start
  * token and how to present it for the user, and section 4.2 describes how to generate an "animated" code.
  * </p>
- * 
+ *
  * @author Martin Lindström
  */
 public interface QRGenerator {
@@ -36,7 +36,7 @@ public interface QRGenerator {
    * <p>
    * The auto start token will be used to build an URI according to section 4.1 of the BankID Relying Party Guidelines.
    * </p>
-   * 
+   *
    * @param autoStartToken the BankID autostart token
    * @param size the width and height of the generated QR code (in pixels)
    * @param format the format for the generated QR code
@@ -49,7 +49,7 @@ public interface QRGenerator {
 
   /**
    * Generates a (static) QR code image using default settings for size and the image format.
-   * 
+   *
    * @param autoStartToken the BankID autostart token
    * @return an byte array representing the generated QR code
    * @throws IOException for errors during generation
@@ -62,35 +62,30 @@ public interface QRGenerator {
    * <p>
    * The QR-code will be build according to section 4.2 of the BankID Relying Party Guidelines.
    * </p>
-   * 
+   *
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
-   * @param orderTime the instant when the result from an
-   *          {@link BankIDClient#authenticate(String, String, se.swedenconnect.bankid.rpapi.types.Requirement)} or a
-   *          {@link BankIDClient#sign(String, String, DataToSign, se.swedenconnect.bankid.rpapi.types.Requirement)}
-   *          call was received
+   * @param orderTime the instant when the result from an {@link BankIDClient#authenticate(AuthenticateRequest)} or
+   *          {@link BankIDClient#sign(SignatureRequest)} call was received
    * @param size the width and height of the generated QR code (in pixels)
    * @param format the format for the generated QR code
    * @return an byte array representing the generated QR code
    * @throws IOException for errors during generation
-   * @see #generateAnimatedQRCodeImage(String, String, int)
+   * @see #generateAnimatedQRCodeImage(String, String, Instant)
    */
   byte[] generateAnimatedQRCodeImage(final String qrStartToken, final String qrStartSecret, final Instant orderTime,
       final int size, final ImageFormat format) throws IOException;
 
   /**
    * Generates an "animated" QR code image using default settings for size and the image format.
-   * 
+   *
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
-   * @param orderTime the instant when the result from an
-   *          {@link BankIDClient#authenticate(String, String, UserVisibleData, se.swedenconnect.bankid.rpapi.types.Requirement)}
-   *          or a
-   *          {@link BankIDClient#sign(String, String, DataToSign, se.swedenconnect.bankid.rpapi.types.Requirement)}
-   *          call was received
+   * @param orderTime the instant when the result from an {@link BankIDClient#authenticate(AuthenticateRequest)} or a
+   *          {@link BankIDClient#sign(SignatureRequest)} call was received
    * @return an byte array representing the generated QR code
    * @throws IOException for errors during generation
-   * @see #generateAnimatedQRCodeImage(String, String, int, int, ImageFormat)
+   * @see #generateAnimatedQRCodeImage(String, String, Instant, int, ImageFormat)
    */
   byte[] generateAnimatedQRCodeImage(final String qrStartToken, final String qrStartSecret, final Instant orderTime)
       throws IOException;
@@ -100,25 +95,25 @@ public interface QRGenerator {
    * <p>
    * For example:
    * </p>
-   * 
+   *
    * <pre>
    * {@code data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
    * AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
    * 9TXL0Y4OHwAAAABJRU5ErkJggg==
    * }
    * </pre>
-   * 
+   *
    * <p>
    * The image may then be directly inserted in HTML code as:
    * </p>
-   * 
+   *
    * <pre>
    * {@code <img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
    * AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
    * 9TXL0Y4OHwAAAABJRU5ErkJggg==" scale="0">
    * }
    * </pre>
-   * 
+   *
    * @param autoStartToken the BankID autostart token
    * @param size the width and height of the generated QR code (in pixels)
    * @param format the format for the generated QR code
@@ -131,7 +126,7 @@ public interface QRGenerator {
 
   /**
    * Generates a (static) QR code image as a Base64 encoded image using default settings for size and the image format.
-   * 
+   *
    * @param autoStartToken the BankID autostart token
    * @return the base64 encoded image
    * @throws IOException for errors during generation
@@ -144,36 +139,34 @@ public interface QRGenerator {
    * <p>
    * For example:
    * </p>
-   * 
+   *
    * <pre>
    * {@code data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
    * AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
    * 9TXL0Y4OHwAAAABJRU5ErkJggg==
    * }
    * </pre>
-   * 
+   *
    * <p>
    * The image may then be directly inserted in HTML code as:
    * </p>
-   * 
+   *
    * <pre>
    * {@code <img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
    * AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
    * 9TXL0Y4OHwAAAABJRU5ErkJggg==" scale="0">
    * }
    * </pre>
-   * 
+   *
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
-   * @param orderTime the instant when the result from an
-   *          {@link BankIDClient#authenticate(String, String, se.swedenconnect.bankid.rpapi.types.Requirement)} or a
-   *          {@link BankIDClient#sign(String, String, DataToSign, se.swedenconnect.bankid.rpapi.types.Requirement)}
-   *          call was received
+   * @param orderTime the instant when the result from an {@link BankIDClient#authenticate(AuthenticateRequest)} or a
+   *          {@link BankIDClient#sign(SignatureRequest)} call was received
    * @param size the width and height of the generated QR code (in pixels)
    * @param format the format for the generated QR code
    * @return the base64 encoded image
    * @throws IOException for errors during generation
-   * @see #generateAnimatedQRCodeImage(String, String, int, int, ImageFormat)
+   * @see #generateAnimatedQRCodeImage(String, String, Instant)
    */
   String generateAnimatedQRCodeBase64Image(final String qrStartToken, final String qrStartSecret,
       final Instant orderTime, final int size, final ImageFormat format) throws IOException;
@@ -181,12 +174,12 @@ public interface QRGenerator {
   /**
    * Generates an "animated" QR code image as a Base64 encoded image using default settings for size and the image
    * format.
-   * 
+   *
    * @param qrStartToken the QR start token (see {@link OrderResponse#getQrStartToken()})
    * @param qrStartSecret the QR start secret (see {@link OrderResponse#getQrStartSecret()})
-   * @param noSeconds the number of seconds since the response from auth or sign was returned
+   * @param orderTime the instant when the order was received
    * @return the base64 encoded image
-   * @see #generateAnimatedQRCodeBase64Image(String, String, int, int, ImageFormat)
+   * @see #generateAnimatedQRCodeBase64Image(String, String, Instant, int, ImageFormat)
    */
   String generateAnimatedQRCodeBase64Image(final String qrStartToken, final String qrStartSecret,
       final Instant orderTime);
@@ -199,7 +192,7 @@ public interface QRGenerator {
 
     /**
      * Returns the image format in text format.
-     * 
+     *
      * @return the image format
      */
     public String getImageFormatName() {
@@ -208,7 +201,7 @@ public interface QRGenerator {
 
     /**
      * Parses an image format string into an {@code ImageFormat} instance.
-     * 
+     *
      * @param formatName the string to parse
      * @return an ImageFormat or null if there is no matching format
      */
@@ -223,7 +216,7 @@ public interface QRGenerator {
 
     /**
      * Hidden constructor.
-     * 
+     *
      * @param imageFormatName the image format name
      */
     private ImageFormat(final String imageFormatName) {

@@ -402,17 +402,21 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <doclint>all,-missing</doclint>
-          <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
-          <additionalJOptions>
-            <additionalJOption>-Xdoclint:all</additionalJOption>
-            <additionalJOption>-Xdoclint:-missing</additionalJOption>
-          </additionalJOptions>
+          <doctitle>BankID SAML Identity Provider - ${project.version}</doctitle>
+          <windowtitle>BankID SAML IdP - ${project.version}</windowtitle>
           <links>
             <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+            <link>https://docs.spring.io/spring-boot/docs/current/api/</link>
             <link>https://docs.swedenconnect.se/credentials-support/apidoc/</link>
+            <link>https://docs.swedenconnect.se/saml-identity-provider/apidoc/</link>
+            <link>https://docs.swedenconnect.se/opensaml-addons/apidoc/</link>
+            <link>https://javadoc.io/doc/org.redisson/redisson/3.23.5/</link>
+            <link>https://www.javadoc.io/doc/javax.servlet/javax.servlet-api/3.1.0/</link>
+            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.15.2/</link>
+            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.15.2/</link>
           </links>
           <detectJavaApiLink>true</detectJavaApiLink>
-        </configuration>
+        </configuration>        
       </plugin>
 
       <plugin>
@@ -432,14 +436,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
       </plugin>
 
       <!-- run mvn jacoco:report -->
@@ -468,19 +464,6 @@
 
       <build>
         <plugins>
-
-          <plugin>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>delombok</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
 
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -520,9 +503,6 @@
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <sourcepath>target/generated-sources/delombok</sourcepath>
-            </configuration>
           </plugin>
 
           <plugin>
@@ -554,14 +534,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <configuration>
-              <skip>false</skip>
-            </configuration>
           </plugin>
 
         </plugins>
