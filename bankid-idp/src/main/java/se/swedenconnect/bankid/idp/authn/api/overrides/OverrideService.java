@@ -15,21 +15,34 @@
  */
 package se.swedenconnect.bankid.idp.authn.api.overrides;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
+import se.swedenconnect.bankid.idp.config.OverrideProperties;
 
-@AllArgsConstructor
 public class OverrideService {
 
   private final List<Supplier<CssOverride>> cssOverrideSuppliers;
   private final List<Supplier<MessageOverride>> messageOverrideSuppliers;
   private final List<Supplier<ContentOverride>> contentOverrideSuppliers;
-
+  private final OverrideProperties properties;
   private final OverrideFileLoader fileLoader;
+
+  public OverrideService(List<Supplier<CssOverride>> cssOverrideSuppliers, List<Supplier<MessageOverride>> messageOverrideSuppliers, List<Supplier<ContentOverride>> contentOverrideSuppliers, OverrideProperties properties, OverrideFileLoader fileLoader) {
+    this.cssOverrideSuppliers = cssOverrideSuppliers;
+    this.messageOverrideSuppliers = messageOverrideSuppliers;
+    this.contentOverrideSuppliers = contentOverrideSuppliers;
+    this.properties = properties;
+    this.fileLoader = fileLoader;
+  }
 
   public FrontendOverrideResponse generateOverrides() {
     List<CssOverride> cssOverrides = Stream.concat(getOverrides(cssOverrideSuppliers), fileLoader.getCssOverrides().stream()).toList();
@@ -44,4 +57,19 @@ public class OverrideService {
         .filter(Objects::nonNull);
   }
 
+  /**
+   * Gets the default sweden-connect logotype if no override logotype has been set
+   * If an override logotype has been set then load the override instead
+   * @return A logotype as byte array
+   * @throws IOException
+   */
+  public byte[] getLogo() throws IOException {
+    if (Objects.nonNull(properties.getSvgLogo())) {
+      InputStream in = new FileInputStream(properties.getSvgLogo().getFile());
+      return IOUtils.toByteArray(in);
+    }
+    ClassPathResource classPathResource = new ClassPathResource("static/images/logo-notext.svg");
+    InputStream in = new FileInputStream(classPathResource.getFile());
+    return IOUtils.toByteArray(in);
+  }
 }

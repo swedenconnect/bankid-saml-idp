@@ -1,7 +1,12 @@
+<script setup lang="ts">
+
+const CONTEXT_PATH = import.meta.env.BASE_URL;
+const LOGO_PATH = CONTEXT_PATH + "/logo.svg";
+</script>
 <template>
   <footer class="main-width">
     <p class="copyright">{{ $t('bankid.msg.copyright') }}</p>
-    <img height="16" src="@/assets/logo-notext.svg" alt="Logo" />
+    <img height="16" :src=LOGO_PATH alt="Logo"/>
   </footer>
 </template>
 

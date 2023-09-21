@@ -56,8 +56,9 @@ public class OverrideConfiguration {
   OverrideService overrideService(final OverrideFileLoader fileLoader,
       final List<Supplier<CssOverride>> cssOverrides,
       final List<Supplier<MessageOverride>> messageOverrides,
-      final List<Supplier<ContentOverride>> contentOverrides) {
-    return new OverrideService(cssOverrides, messageOverrides, contentOverrides, fileLoader);
+      final List<Supplier<ContentOverride>> contentOverrides,
+      final BankIdConfigurationProperties properties) {
+    return new OverrideService(cssOverrides, messageOverrides, contentOverrides,properties.getUi().getOverride(), fileLoader);
   }
 
   @Bean
