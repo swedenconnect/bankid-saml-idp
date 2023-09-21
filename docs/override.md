@@ -48,7 +48,7 @@ bankid:
 
 Put your custom CSS in a `.css` file in the override directory specified above.
 
-Most things like colours and borders can be overridden by using the CSS variables found in [main.css](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/frontend/src/assets/main.css):
+Most things like colours and borders can be overridden by using the CSS variables found in [main.css](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-frontend/src/assets/main.css):
 
 ```css
 :root {
@@ -70,7 +70,7 @@ To override any CSS without the need for `!important` attributes, start your sel
 
 Put your custom messages in a `.messages` file in the override directory specified above.
 
-To override an already existing text, look in [messages.js](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/frontend/src/locale/messages.js) and use the path to the message you want to change.
+To override an already existing text, look in [messages.js](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-frontend/src/locale/messages.js) and use the path to the message you want to change.
 
 For example, to override the copyright message in the footer:
 
