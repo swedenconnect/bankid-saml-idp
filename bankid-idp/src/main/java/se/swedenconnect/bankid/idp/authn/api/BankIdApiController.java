@@ -223,8 +223,7 @@ public class BankIdApiController {
 
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-
-    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
+    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty, overrides.showSpMessage()));
   }
 
   /**

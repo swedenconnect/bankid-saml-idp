@@ -72,4 +72,8 @@ public class OverrideService {
     InputStream in = new FileInputStream(classPathResource.getFile());
     return IOUtils.toByteArray(in);
   }
+
+  public boolean showSpMessage() {
+    return properties.getShowSpMessage();
+  }
 }

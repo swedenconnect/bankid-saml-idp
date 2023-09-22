@@ -40,4 +40,11 @@ public class OverrideProperties {
   @Getter
   @Setter
   private Resource svgLogo;
+
+  /**
+   * Enables an extra informational message about SP in device select view
+   */
+  @Getter
+  @Setter
+  private Boolean showSpMessage;
 }

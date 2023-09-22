@@ -37,12 +37,13 @@ public class SpInformationFactory {
   /**
    * Obtains the information for the current SP information.
    *
-   * @param uiInfo the SP UI info
-   * @param relyingParty the RP data
+   * @param uiInfo        the SP UI info
+   * @param relyingParty  the RP data
+   * @param showSpMessage display SP message on SelectDeviceView
    * @return a {@link SpInformation}
    */
   public static SpInformation getSpInformation(
-      final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty) {
+          final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty, final boolean showSpMessage) {
 
     final RelyingPartyUiInfo rpUiInfo = relyingParty.getUiInfo();
 
@@ -67,7 +68,7 @@ public class SpInformationFactory {
         logoUrl = getImageUrl(uiInfo);
       }
 
-      return new SpInformation(displayNames, logoUrl);
+      return new SpInformation(displayNames, logoUrl, showSpMessage);
     }
 
     displayNames.putAll(uiInfo.getDisplayNames());
@@ -86,7 +87,7 @@ public class SpInformationFactory {
       }
     }
 
-    return new SpInformation(displayNames, logoUrl);
+    return new SpInformation(displayNames, logoUrl, showSpMessage);
   }
 
   private static String getImageUrl(final Saml2ServiceProviderUiInfo uiInfo) {

@@ -64,6 +64,7 @@ bankid:
     override:
       directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
       svg-logo: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+      show-sp-message: true
   relying-parties:
     - id: test-my-eid
       entity-ids:

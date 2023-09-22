@@ -48,6 +48,7 @@ export interface CustomerContactInformation {
 export interface SpInformation {
   displayNames: { [language: string]: string };
   imageUrl: string;
+  showSpMessage: boolean;
 }
 
 export interface SelectedDeviceInformation {
