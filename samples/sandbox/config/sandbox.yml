@@ -35,8 +35,9 @@ bankid:
   service-url: https://appapi2.test.bankid.com/rp/v6.0
   test-mode: true
   ui:
+    provider-svg-logotype: file:/opt/bankid-idp/config/logo-notext.svg
     override:
-      directoryPath: "/opt/bankid-idp/config/overrides/"
+      directory-path: "/opt/bankid-idp/config/overrides/"
     user-error:
       contact-email: contact@email.com
       show-contact-information: false

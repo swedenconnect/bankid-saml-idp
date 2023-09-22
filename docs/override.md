@@ -16,18 +16,20 @@ or changed, features.
 
 ### Adding Your Logotype
 
-The header will always display the relaying party logotype. 
-You can add the logotype of your organization to the footer by pointing out your own .svg file.
+The UI header will display the Relaying Party logotype. This logotype is read from the SAML
+metadata entry of the connecting party, and can also be configured statically (see [Relying Party Configuration](configuration.html#relying-party-configuration)).
 
+It is also possible to add the providing organization's logotype in the UI footer (to the left
+of the copyright statement). 
 
-**Note that the logotype must in SVG-format.**
 ```yaml
 bankid:
   ...
   ui: 
-    override:
-      svg-logo: "path/to/my/logo.svg"
+    provider-svg-logotype: "file:/path/to/my/logo.svg"
 ```
+
+**Note:** This logotype must in SVG-format.
 
 ### CSS, Message and Content Overrides
 

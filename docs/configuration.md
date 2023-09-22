@@ -91,14 +91,14 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 | Property | Description | Type  | Default value |
 | :--- | :--- | :--- | :--- |
 | `user-message-defaults.*`  | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
+| `provider-svg-logotype` | The icon/logotype to be displayed in UI footer. This logotype should be the logotype for the provider of the service (as opposed for the logotype displayed in the left upper corner which is the logotype for the calling SP). The logotype must be in SVG format. If no logotype is assigned, the UI footer will hold no logotype. | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
 | `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
 | `override.directory-path` | Optional path where CSS, message and content override files can be put. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
-| `override.svg-logo` | Optional path to SVG logotype to be included in the UI footer. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
 | `show-sp-message` | Enables an extra informational message in the UI about which SP that ordered authentication/signature. The SP display name will be read from the SAML metadata (can be overridden in RP configuration). | Boolean | `false` |
 
-**Note:** A BankID that is "generic", meaning that it serves Service Providers from different organizations, 
-should enable the `show-sp-message` setting to provide textual information about the Service Provider
-that requested authentication/signing.
+**Note:** A BankID that is "generic", meaning that it serves Service Providers from different
+organizations,  should enable the `show-sp-message` setting to provide textual information about the
+Service Provider that requested authentication/signing.
 
 <a name="default-user-messages-configuration"></a>
 #### Default User Messages Configuration

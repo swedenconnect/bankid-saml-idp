@@ -91,8 +91,8 @@ public class BankIdApiController {
   /** Service for generating overrides for front-end content */
   private final OverrideService overrides;
 
-  /** Generates SP information for the UI. */
-  private final SpInformationFactory spInformation;
+  /** Provides UI information to the frontend. */
+  private final UiInformationProvider uiInformation;
 
   /**
    * Gets information about the selected device.
@@ -158,14 +158,15 @@ public class BankIdApiController {
   }
 
   /**
-   * Gets Svg Logo of Service Provider If no override Logo has been set, default swedenconnect logo will be displayed
+   * Gets the provider logotype to be displayed.
    *
-   * @return svg image as bytes
+   * @return SVG image as bytes
    * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
    */
   @GetMapping(value = "/logo.svg", produces = "image/svg+xml")
-  public @ResponseBody byte[] getIcon() throws IOException {
-    return overrides.getLogo();
+  @ResponseBody
+  public byte[] getProviderLogotype() throws IOException {
+    return this.uiInformation.getProviderLogo();
   }
 
   /**
@@ -228,7 +229,7 @@ public class BankIdApiController {
 
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-    return Mono.just(this.spInformation.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
+    return Mono.just(this.uiInformation.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
   }
 
   /**

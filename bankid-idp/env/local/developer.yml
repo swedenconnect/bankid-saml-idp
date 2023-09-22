@@ -50,6 +50,8 @@ bankid:
   session:
     module: redis
   ui:
+    provider-svg-logotype: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+    show-sp-message: true
     user-error:
       contact-email: contact@email.com
       show-contact-information: true
@@ -63,8 +65,7 @@ bankid:
         format: simple-markdown-v1
     override:
       directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
-      svg-logo: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
-      show-sp-message: true
+
   relying-parties:
     - id: test-my-eid
       entity-ids:
