@@ -15,18 +15,19 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,8 +88,11 @@ public class BankIdApiController {
   /** Factory for handling customer contacts in the UI. */
   private final CustomerContactInformationFactory customerContactInformationFactory;
 
-  /** Service for generating overrides for front-end content*/
+  /** Service for generating overrides for front-end content */
   private final OverrideService overrides;
+
+  /** Generates SP information for the UI. */
+  private final SpInformationFactory spInformation;
 
   /**
    * Gets information about the selected device.
@@ -145,6 +149,7 @@ public class BankIdApiController {
 
   /**
    * Gets the {@link FrontendOverrideResponse} telling the front-end about customizations.
+   *
    * @return {@link FrontendOverrideResponse}
    */
   @GetMapping("/api/overrides")
@@ -153,8 +158,8 @@ public class BankIdApiController {
   }
 
   /**
-   * Gets Svg Logo of Service Provider
-   * If no override Logo has been set, default swedenconnect logo will be displayed
+   * Gets Svg Logo of Service Provider If no override Logo has been set, default swedenconnect logo will be displayed
+   *
    * @return svg image as bytes
    * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
    */
@@ -223,7 +228,7 @@ public class BankIdApiController {
 
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-    return Mono.just(SpInformationFactory.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty, overrides.showSpMessage()));
+    return Mono.just(this.spInformation.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
   }
 
   /**

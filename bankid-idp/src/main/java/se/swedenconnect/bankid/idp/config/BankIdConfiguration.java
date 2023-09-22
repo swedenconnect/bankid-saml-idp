@@ -39,6 +39,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
+import se.swedenconnect.bankid.idp.authn.api.SpInformationFactory;
 import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.bankid.idp.rp.DefaultRelyingPartyRepository;
@@ -102,7 +103,8 @@ public class BankIdConfiguration {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**", "/api/**",
+            .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
+                "/api/**",
                 "/**/resume")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
@@ -236,6 +238,16 @@ public class BankIdConfiguration {
   @Bean
   ThymeleafResponsePage responsePage(final SpringTemplateEngine templateEngine) {
     return new ThymeleafResponsePage(templateEngine, "post-response.html");
+  }
+
+  /**
+   * Creates the bean for providing SP information to the frontend.
+   *
+   * @return a {@link SpInformationFactory}
+   */
+  @Bean
+  SpInformationFactory spInformationFactory() {
+    return new SpInformationFactory(this.properties.getUi().isShowSpMessage());
   }
 
   @Bean

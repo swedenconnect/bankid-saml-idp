@@ -51,6 +51,14 @@ public class UiProperties implements InitializingBean {
   @Setter
   private OverrideProperties override;
 
+  /**
+   * Enables an extra informational message about which SP that ordered authentication/signature in rge device select
+   * view. The SP display name will be read from the SAML metadata (can be overridden in RP configuration).
+   */
+  @Getter
+  @Setter
+  private boolean showSpMessage = false;
+
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {

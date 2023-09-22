@@ -27,23 +27,33 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2ServiceProviderUiInfo;
 
 /**
- * Helper class for delivering SP information.
+ * Bean for delivering SP information.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 public class SpInformationFactory {
 
+  private final boolean showSpMessage;
+
+  /**
+   * Constructor.
+   *
+   * @param showSpMessage whether SP info should be displayed in UI
+   */
+  public SpInformationFactory(final boolean showSpMessage) {
+    this.showSpMessage = showSpMessage;
+  }
+
   /**
    * Obtains the information for the current SP information.
    *
-   * @param uiInfo        the SP UI info
-   * @param relyingParty  the RP data
-   * @param showSpMessage display SP message on SelectDeviceView
+   * @param uiInfo the SP UI info
+   * @param relyingParty the RP data
    * @return a {@link SpInformation}
    */
-  public static SpInformation getSpInformation(
-          final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty, final boolean showSpMessage) {
+  public SpInformation getSpInformation(
+      final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty) {
 
     final RelyingPartyUiInfo rpUiInfo = relyingParty.getUiInfo();
 
@@ -68,7 +78,7 @@ public class SpInformationFactory {
         logoUrl = getImageUrl(uiInfo);
       }
 
-      return new SpInformation(displayNames, logoUrl, showSpMessage);
+      return new SpInformation(displayNames, logoUrl, this.showSpMessage);
     }
 
     displayNames.putAll(uiInfo.getDisplayNames());
@@ -87,7 +97,7 @@ public class SpInformationFactory {
       }
     }
 
-    return new SpInformation(displayNames, logoUrl, showSpMessage);
+    return new SpInformation(displayNames, logoUrl, this.showSpMessage);
   }
 
   private static String getImageUrl(final Saml2ServiceProviderUiInfo uiInfo) {
@@ -113,4 +123,5 @@ public class SpInformationFactory {
       return false;
     };
   }
+
 }

@@ -15,9 +15,10 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import org.springframework.core.io.Resource;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.core.io.Resource;
 
 /**
  * Configuration properties for UI overrides.
@@ -35,16 +36,10 @@ public class OverrideProperties {
   private String directoryPath;
 
   /**
-   * Path to the icon to be displayed in footer
+   * Path to the icon to be displayed in UI footer.
    */
   @Getter
   @Setter
   private Resource svgLogo;
 
-  /**
-   * Enables an extra informational message about SP in device select view
-   */
-  @Getter
-  @Setter
-  private Boolean showSpMessage;
 }

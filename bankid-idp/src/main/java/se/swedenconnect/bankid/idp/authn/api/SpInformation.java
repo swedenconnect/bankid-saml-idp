@@ -45,7 +45,7 @@ public class SpInformation {
   private String imageUrl;
 
   /**
-   * Boolean to inform frontend if SP message should be displayed in DeviceSelectView
+   * Boolean to inform frontend if SP message should be displayed in DeviceSelectView.
    */
   private Boolean showSpMessage;
 
