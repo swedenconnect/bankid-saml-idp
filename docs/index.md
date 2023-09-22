@@ -71,6 +71,8 @@ See below for instructions on how to build your own BankID SAML IdP application.
   
   - [How the BankID IdP is Deployed in Sweden Connect Sandbox](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/sandbox)
 
+- [Adding Your BankID IdP to Sweden Connect](join-sweden-connect.html)
+
 
 -----
 

@@ -53,8 +53,7 @@ of the [Spring Security SAML Identity Provider](https://github.com/swedenconnect
 | `entity-categories[]` | A list of the SAML entity categories that this IdP supports/declares. Read more about entity categories at [Entity Categories for the Swedish eID Framework](https://docs.swedenconnect.se/technical-framework/latest/06_-_Entity_Categories_for_the_Swedish_eID_Framework.html). | List of strings | - |
 
 > **\[1\]:** BankID as a eID provider is certified according to LoA 3 (tillitsnivå 3), but unless
-the actual BankID IdP has been certified according to LoA 3 the "uncertified-loa3" URI should be used. Read 
-more at https://www.digg.se/digitala-tjanster/e-legitimering/e-legitimering-for-dig-som-leverantor/idp-leverantor. If your IdP has been audited and certified according to LoA 3, the URI `http://id.elegnamnden.se/loa/1.0/loa3` should be used.
+the actual BankID IdP has been certified according to LoA 3 the "uncertified-loa3" URI should be used. Read more at [https://www.digg.se/digitala-tjanster/e-legitimering/e-legitimering-for-dig-som-leverantor/idp-leverantor](https://www.digg.se/digitala-tjanster/e-legitimering/e-legitimering-for-dig-som-leverantor/idp-leverantor). If your IdP has been audited and certified according to LoA 3, the URI `http://id.elegnamnden.se/loa/1.0/loa3` should be used.
 
 <a name="qr-code-generation-configuration"></a>
 ### QR Code Generation Configuration
