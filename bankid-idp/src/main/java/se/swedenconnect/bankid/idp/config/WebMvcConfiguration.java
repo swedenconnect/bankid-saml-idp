@@ -28,7 +28,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 /**
  * Web MVC configuration.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -37,15 +37,13 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   /**
    * Constructor.
-   * 
-   * @param ui the UI configuration
    */
   public WebMvcConfiguration() {
   }
 
   /**
    * Creates a {@link LocaleResolver} for resolving which language to use in the UI.
-   * 
+   *
    * @param contextPath the servlet context path
    * @return a {@link LocaleResolver}
    */
@@ -60,7 +58,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   /**
    * Creates a {@link LocaleChangeInterceptor} for changing the locale based on a request parameter name.
-   * 
+   *
    * @return a {@link LocaleChangeInterceptor}
    */
   @Bean

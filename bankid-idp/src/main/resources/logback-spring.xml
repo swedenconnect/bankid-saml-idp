@@ -1,17 +1,19 @@
 <configuration>
-
     <springProfile name="!jsonlog">
-        <include resource="org/springframework/boot/logging/logback/base.xml" />
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
 
     <springProfile name="jsonlog">
         <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>${CONSOLE_LOG_THRESHOLD}</level>
+            </filter>
         </appender>
 
-        <root level="INFO">
-            <appender-ref ref="jsonConsoleAppender" />
+        <root>
+            <appender-ref ref="jsonConsoleAppender"/>
         </root>
     </springProfile>
-
 </configuration>

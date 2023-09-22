@@ -23,7 +23,7 @@ used within the [Sweden Connect Federation](https://www.swedenconnect.se).
 
 An organization wishing to use the open source BankID-IdP basically takes the following steps:
 
-- Make front-end changes to get an UI look and feel of the service that corresponds with the
+- Make frontend changes to get an UI look and feel of the service that corresponds with the
 organization's requirements.
 
 - Possibly make some back-end changes regarding specific issues (for example to have supervision

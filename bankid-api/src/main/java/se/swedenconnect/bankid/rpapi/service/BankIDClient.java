@@ -19,12 +19,11 @@ import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
-import se.swedenconnect.bankid.rpapi.types.Requirement;
 import se.swedenconnect.bankid.rpapi.types.UserCancelException;
 
 /**
  * An interface that declares the methods for a BankID Relying Party (client).
- * 
+ *
  * @author Martin Lindström
  */
 public interface BankIDClient {
@@ -32,33 +31,38 @@ public interface BankIDClient {
   /**
    * The unique identifier for this client. This is mainly important when we use more than one client, for example if we
    * implement an IdP that serves several relying parties, and each RP has a client of its own.
-   * 
+   *
    * @return the unique identifier
    */
   String getIdentifier();
 
   /**
    * Initiates an authentication operation.
-   * 
+   *
    * @param request the authentication request parameters
    * @return an {@link OrderResponse}
    */
   Mono<OrderResponse> authenticate(final AuthenticateRequest request);
 
+  /**
+   * Initiates a signature operation.
+   *
+   * @param request the signature request parameters
+   * @return an {@link OrderResponse}
+   */
   Mono<OrderResponse> sign(final SignatureRequest request);
 
   /**
    * Cancels an ongoing order.
-   * 
+   *
    * @param orderReference the order reference
    * @throws BankIDException for errors
    */
   Mono<Void> cancel(final String orderReference);
 
   /**
-   * Collects the result from {@link #authenticate(String, String, Requirement)} or
-   * {@link #sign(String, String, DataToSign, Requirement)}.
-   * 
+   * Collects the result from {@link #authenticate(AuthenticateRequest)} or {@link #sign(SignatureRequest)}.
+   *
    * @param orderReference the unique order reference
    * @return a collect response object
    * @throws UserCancelException if the user cancels the operation
@@ -68,7 +72,7 @@ public interface BankIDClient {
 
   /**
    * Returns the QR generator that should be used to generate QR codes.
-   * 
+   *
    * @return a {@link QRGenerator} or {@code null} if no QR code generator has been configured
    */
   QRGenerator getQRGenerator();
