@@ -68,6 +68,8 @@ See below for instructions on how to build your own BankID SAML IdP application.
   - [How to Externalize the Frontend into a Separate Application](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/external-frontend)
 
   - [How to Apply Overrides to the UI](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/dynamic-overrides)
+  
+  - [How the BankID IdP is Deployed in Sweden Connect Sandbox](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/sandbox)
 
 
 -----
