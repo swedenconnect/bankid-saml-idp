@@ -399,7 +399,7 @@ spring:
 ```
 
 #### env
-`SPRING_PROFILES_ACTIVE=jsonlog`
+`SPRING_PROFILES_ACTIVE=jsonlog, ... ,`
 
 
 -----
