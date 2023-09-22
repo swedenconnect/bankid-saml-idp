@@ -1,0 +1,91 @@
+server:
+  port: 8082
+
+spring:
+  config:
+    activate:
+      on-profile: sandbox
+  redis:
+    host: redis.bankididp.sandbox}
+    port: 6379
+    password: REDACTED
+    ssl: true
+    ssl-ext:
+      enable-hostname-verification: true
+      credential:
+        resource: file:/opt/bankid-idp/config/redis/redis.p12
+        password: REDACTED
+      trust:
+        resource: file:/opt/bankid-idp/config/redis/trust.p12
+        password: REDACTED
+tomcat:
+  ajp:
+    enabled: true
+    secret-required: true
+    secret: REDACTED
+    port: 8012
+
+bankid:
+  session:
+    module: redis
+  audit:
+    repository: "redistimeseries"
+    log-file: ${BANKID_INSTALL_DIR}/bankid-idp/target/audit.log
+  server-root-certificate: classpath:bankid-trust-test.crt
+  service-url: https://appapi2.test.bankid.com/rp/v6.0
+  test-mode: true
+  ui:
+    override:
+      directoryPath: "/opt/bankid-idp/config/overrides/"
+    user-error:
+      contact-email: contact@email.com
+      show-contact-information: false
+      show-trace-id: true
+    user-message-defaults:
+      fallback-sign-text:
+        text: "Jag skriver härmed under den information som visades på föregående sida."
+        format: plain-text
+      login-text:
+        text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
+        format: simple-markdown-v1
+  relying-parties:
+    - id: "test-rp"
+      credential:
+        name: "test-cred"
+        resource: file:/opt/bankid-idp/config/testcertificate.p12
+        alias: "ALIAS"
+        password: "REDACTED"
+        type: "PKCS12"
+      user-message:
+        inherit-default-login-text: true
+
+saml:
+  idp:
+    entity-id: https://sandbox.swedenconnect.se/bankid/idp
+    base-url: https://sandbox.swedenconnect.se/bankid/idp
+    metadata-providers:
+      - location: https://eid.svelegtest.se/metadata/mdx/role/sp.xml
+        backup-location: ${BACKUP_DIR}/metadata/metadata-backup.xml
+        validation-certificate: file:/opt/bankid-idp/config/certificates/sandbox-metadata.crt
+    credentials:
+      sign:
+        resource: file:/opt/bankid-idp/config/idp-keystore.jks
+        alias: SIGNALIAS
+        password: REDACTED
+        type: JKS
+      encrypt:
+        resource: file:/opt/bankid-idp/config/idp-keystore.jks
+        alias: ENCRYPTALIAS
+        password: REDACTED
+        type: JKS
+      metadata-sign:
+        resource: file:/opt/bankid-idp/config/idp-keystore.jks
+        alias: METADATAALIAS
+        password: REDACTED
+        type: JKS
+logging:
+  level:
+    se:
+      swedenconnect:
+        spring:
+          saml: DEBUG
