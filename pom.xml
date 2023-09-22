@@ -83,6 +83,7 @@
 
   <modules>
     <module>bankid-api</module>
+    <module>bankid-frontend</module>
     <module>bankid-idp</module>
   </modules>
 

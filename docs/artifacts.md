@@ -31,7 +31,7 @@ The BankID IdP artifacts are published to [Maven Central](https://central.sonaty
 </dependency>
 ```
 
-> This is typically used if you supply your own frontend application.
+> This is typically used if you supply your own frontend application, see [Extending the BankID Backend Application](https://docs.swedenconnect.se/bankid-saml-idp/override.html#extending-the-bankid-backend-application).
 
 **BankID IdP Frontend distribution:**
 ```xml
@@ -43,7 +43,7 @@ The BankID IdP artifacts are published to [Maven Central](https://central.sonaty
 </dependency>
 ```
 
-> Used in projects where you need to modify the frontend code.
+> Used in projects where you need to modify the frontend code beyond [customizations](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui).
 
 **BankID Relying Party API Implementation:**
 

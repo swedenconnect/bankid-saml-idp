@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>bankid-idp-frontend</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>se.swedenconnect.bankid</groupId>
+    <artifactId>saml-bankid-idp-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <name>Sweden Connect :: BankID :: SAML Identity Provider :: Frontend Distribution</name>
+  <description>BankID SAML Identity Provider Frontend Distribution</description>
+  <url>https://docs.swedenconnect.se/bankid-saml-idp</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</connection>
+    <developerConnection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</developerConnection>
+    <url>https://github.com/swedenconnect/bankid-saml-idp/tree/master</url>
+  </scm>
+
+  <organization>
+    <name>Sweden Connect</name>
+    <url>https://www.swedenconnect.se</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Martin Lindström</name>
+      <email>martin@idsec.se</email>
+      <organization>IDsec Solutions AB</organization>
+      <organizationUrl>https://www.idsec.se</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Felix Hellman</name>
+      <email>felix@idsec.se</email>
+      <organization>Helagon AB</organization>
+      <organizationUrl>https://www.idsec.se</organizationUrl>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <node.version>v18.12.1</node.version>
+  </properties>
+
+  <build>
+
+    <plugins>
+      
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>dist</directory>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>      
+      
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.12.1</version>
+        <configuration>
+          <workingDirectory>${project.basedir}</workingDirectory>
+        </configuration>        
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.6.0</version>
+          <configuration>
+            <descriptors>
+              <descriptor>${project.basedir}/dist-assembly.xml</descriptor>
+            </descriptors>
+            <finalName>${project.artifactId}-${project.version}</finalName>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>                
+        <executions>
+          <execution>
+            <id>build-zip</id>            
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+            
+    </plugins>
+
+  </build>
+  
+  <!--
+  <profiles>
+    
+    <profile>
+      <id>with-frontend</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!backend-only</name>
+        </property>
+      </activation>
+      
+      <build>
+        <plugins>
+          
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.12.1</version>
+            <configuration>
+              <workingDirectory>src/main/frontend</workingDirectory>
+              <installDirectory>src/main/frontend</installDirectory>
+            </configuration>        
+            <executions>
+              <execution>
+                <id>install node and npm</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>${node.version}</nodeVersion>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm run build</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>copy-resource-templates</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/templates/</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/frontend/dist</directory>
+                      <includes>
+                        <include>index.html</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-resources-assets</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/static/assets/</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/frontend/dist/assets/</directory>
+                      <includes>
+                        <include>**/*.*</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+    
+          
+        </plugins>
+      </build>
+      
+    </profile>
+    
+    <profile>
+      
+      <id>backend-only-profile</id>
+      <activation>
+        <property>
+          <name>backend-only</name>
+        </property>
+      </activation>
+      
+      <build>
+        <finalName>bankid-idp-backend-${project.version}</finalName>
+      </build>
+
+    </profile>
+    
+  </profiles>
+-->  
+</project>
