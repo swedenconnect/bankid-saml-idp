@@ -6,8 +6,8 @@
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { status } from '@/Service';
-  import type {SelectedDeviceInformation, SpInformation} from "@/types";
-  import {useI18n} from "vue-i18n";
+  import type { SelectedDeviceInformation, SpInformation } from '@/types';
+  import { useI18n } from 'vue-i18n';
 
   const displayServiceMessage = ref(false);
 
@@ -22,21 +22,20 @@
 
   const { locale } = useI18n();
 
-
   const getSpName = () => {
-    return  props.spInfo ? props.spInfo.displayNames[locale.value] : ''
-  }
+    return props.spInfo ? props.spInfo.displayNames[locale.value] : '';
+  };
 
   const getSpMessage = () => {
     if (props.deviceData ? props.deviceData.isSign : false) {
-      return "bankid.msg.rp-sign";
+      return 'bankid.msg.rp-sign';
     }
-    return "bankid.msg.rp-auth";
-  }
+    return 'bankid.msg.rp-auth';
+  };
 
   const showSpMessage = () => {
     return props.spInfo ? props.spInfo?.showSpMessage : false;
-  }
+  };
 
   onBeforeMount(() => {
     status().then((s) => {
@@ -52,9 +51,9 @@
     <CustomContent position="deviceselect" />
     <StatusMessage message="bankid.msg.error.service" v-if="displayServiceMessage" />
     <h2>BankID</h2>
-    <p v-if="showSpMessage()"> {{ getSpName() + " " + $t(getSpMessage()) }} </p>
+    <p v-if="showSpMessage()">{{ getSpName() + ' ' + $t(getSpMessage()) }}</p>
     <p>{{ $t('bankid.msg.rfa20') }}</p>
-    <DeviceSelect :sp-info="spInfo"/>
+    <DeviceSelect :sp-info="spInfo" />
     <BankIdLogo />
   </div>
 

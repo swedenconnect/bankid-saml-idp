@@ -4,7 +4,7 @@
   import AppHeader from '@/components/AppHeader.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import LocaleChanger from '@/components/LocaleChanger.vue';
-  import {selectedDevice, spInformation} from '@/Service';
+  import { selectedDevice, spInformation } from '@/Service';
   import type { SpInformation, SelectedDeviceInformation } from '@/types';
 
   const spInfo = ref<SpInformation | null>(null);
