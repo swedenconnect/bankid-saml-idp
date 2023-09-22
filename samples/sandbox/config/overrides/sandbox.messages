@@ -1,0 +1,23 @@
+[
+  {
+    "code": "sandbox.version.title",
+    "text": {
+      "sv": "BankID Test",
+      "en": "BankID Test"
+    }
+  },
+  {
+    "code" : "sandbox.version.text",
+    "text": {
+      "sv": "Detta är en testtjänst och du behöver ett BankID för test för att kunna använda den.",
+      "en": "This is a test service and you will need a BankID for test in order to use it."
+    }
+  },
+  {
+    "code": "sandbox.version.link",
+    "text": {
+      "sv": "Läs mer om hur jag skaffar ett BankID för test.",
+      "en": "Learn how to configure BankID for test."
+    }
+  }
+]

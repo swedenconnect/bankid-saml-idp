@@ -1,0 +1,16 @@
+[
+    {
+        "title":"sandbox.version.title",
+        "content": [
+          {
+            "text":"sandbox.version.text"
+          },
+          {
+            "text":"sandbox.version.link",
+            "link":"https://www.bankid.com/utvecklare/test/skaffa-testbankid"
+          }
+        ],
+        "position":"ABOVE",
+        "type":"INFO"
+    }
+]
