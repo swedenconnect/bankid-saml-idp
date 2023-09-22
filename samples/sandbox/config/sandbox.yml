@@ -6,7 +6,7 @@ spring:
     activate:
       on-profile: sandbox
   redis:
-    host: redis.bankididp.sandbox}
+    host: redis.bankididp.sandbox
     port: 6379
     password: REDACTED
     ssl: true

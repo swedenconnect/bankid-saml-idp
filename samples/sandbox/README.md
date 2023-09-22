@@ -1,5 +1,5 @@
 # Sweden Connect Sandbox Config
-In this sample we will explore how deploy and run the BankID-IdP Application in Sweden Connect, Sandbox environment.
+In this sample we will explore how we deploy and run the BankID-IdP Application in Sweden Connect sandbox environment.
 
 The following files are excluded from the example, but they are ordinarily located at the `./config` directory
 * idp-keystore.jks
