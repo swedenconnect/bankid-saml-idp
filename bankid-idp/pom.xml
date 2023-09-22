@@ -55,6 +55,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>    
     <node.version>v18.12.1</node.version>
+    <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
   </properties>
 
   <dependencyManagement>
@@ -207,6 +208,12 @@
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-micrometer</artifactId>
       <version>2.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>${logstash-logback-encoder.version}</version>
     </dependency>
 
     <!-- Test -->
