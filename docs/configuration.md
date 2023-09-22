@@ -15,7 +15,7 @@ logging levels and so on are configured. Read more about this at [https://docs.s
 
 - BankID configuration. This is the BankID-specific configuration used by the BankID SAML IdP. See below for all possible settings.
 
-Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) file for an example of how to configure the service.
+Also check the [application.yml](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/resources/application.yml) or [sandbox.yml](https://github.com/swedenconnect/bankid-saml-idp/tree/main/samples/sandbox/config) files for an examples of how to configure the service.
 
 <a name="bankid-application-configuration"></a>
 ## BankID Application Configuration
@@ -387,20 +387,23 @@ SPRING_CONFIG_IMPORT=/path/to/your/application.yml
 <a name="logging-configuration"></a>
 ### Logging Configuration
 
-To enable json logs, run the application with the `jsonlog` profile
+See [Spring Boot Logging](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/html/howto-logging.html) for general configuration about Spring Boot Logging.
 
-Configure either by application.yml or environment variable
+Also, the BankID IdP extends these settings with the following:
 
-#### application.yml
+To enable JSON logs, run the application with the `jsonlog` profile.
+
+Configure this either by settings in the application.yml or by setting environment variable.
+
+**application.yml:**
+
 ```yml
 spring:
   profiles:
     active: jsonlog
 ```
 
-#### env
-`SPRING_PROFILES_ACTIVE=jsonlog, ... ,`
-
+**Environment variable:** `SPRING_PROFILES_ACTIVE=jsonlog, ...`
 
 -----
 
