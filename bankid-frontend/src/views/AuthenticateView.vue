@@ -3,7 +3,7 @@
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
-  import QRDisplay from '@/components/QRDisplay.vue';
+  import QrDisplay from '@/components/QrDisplay.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
   import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
@@ -89,7 +89,7 @@
     <CustomContent v-else position="autostart" />
     <p>{{ $t(messageCode) }}</p>
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
-    <QRDisplay :image="qrImage" />
+    <QrDisplay :image="qrImage" />
     <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
