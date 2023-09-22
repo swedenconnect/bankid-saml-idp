@@ -435,11 +435,15 @@ SPRING_CONFIG_IMPORT=/path/to/your/application.yml
 
 ### Logging Configuration
 
-To enable json logs, run the application with the `jsonlog` profile
+See [Spring Boot Logging](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/html/howto-logging.html) for general configuration about Spring Boot Logging.
 
-Configure either by application.yml or environment variable
+Also, the BankID IdP extends these settings with the following:
 
-#### application.yml
+To enable JSON logs, run the application with the `jsonlog` profile.
+
+Configure this either by settings in the application.yml or by setting environment variable.
+
+**application.yml:**
 
 ```yml
 spring:
@@ -447,13 +451,8 @@ spring:
     active: jsonlog
 ```
 
-#### env
-
-`SPRING_PROFILES_ACTIVE=jsonlog, ... ,`
-
+**Environment variable:** `SPRING_PROFILES_ACTIVE=jsonlog, ...`
 
 -----
 
-Copyright &copy;
-2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed
-under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
