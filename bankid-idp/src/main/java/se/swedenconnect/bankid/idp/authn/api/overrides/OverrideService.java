@@ -23,11 +23,17 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import lombok.AllArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
+
 import se.swedenconnect.bankid.idp.config.OverrideProperties;
 
+/**
+ * Bean handling UI overrides.
+ *
+ * @author Martin Lindström
+ * @author Felix Hellman
+ */
 public class OverrideService {
 
   private final List<Supplier<CssOverride>> cssOverrideSuppliers;
@@ -36,7 +42,10 @@ public class OverrideService {
   private final OverrideProperties properties;
   private final OverrideFileLoader fileLoader;
 
-  public OverrideService(List<Supplier<CssOverride>> cssOverrideSuppliers, List<Supplier<MessageOverride>> messageOverrideSuppliers, List<Supplier<ContentOverride>> contentOverrideSuppliers, OverrideProperties properties, OverrideFileLoader fileLoader) {
+  public OverrideService(List<Supplier<CssOverride>> cssOverrideSuppliers,
+      List<Supplier<MessageOverride>> messageOverrideSuppliers,
+      List<Supplier<ContentOverride>> contentOverrideSuppliers, OverrideProperties properties,
+      OverrideFileLoader fileLoader) {
     this.cssOverrideSuppliers = cssOverrideSuppliers;
     this.messageOverrideSuppliers = messageOverrideSuppliers;
     this.contentOverrideSuppliers = contentOverrideSuppliers;
@@ -45,9 +54,12 @@ public class OverrideService {
   }
 
   public FrontendOverrideResponse generateOverrides() {
-    List<CssOverride> cssOverrides = Stream.concat(getOverrides(cssOverrideSuppliers), fileLoader.getCssOverrides().stream()).toList();
-    List<MessageOverride> messageOverrides = Stream.concat(getOverrides(messageOverrideSuppliers), fileLoader.getMessageOverrides().stream()).toList();
-    List<ContentOverride> contentOverrides = Stream.concat(getOverrides(contentOverrideSuppliers), fileLoader.getContentOverrides().stream()).toList();
+    List<CssOverride> cssOverrides =
+        Stream.concat(getOverrides(cssOverrideSuppliers), fileLoader.getCssOverrides().stream()).toList();
+    List<MessageOverride> messageOverrides =
+        Stream.concat(getOverrides(messageOverrideSuppliers), fileLoader.getMessageOverrides().stream()).toList();
+    List<ContentOverride> contentOverrides =
+        Stream.concat(getOverrides(contentOverrideSuppliers), fileLoader.getContentOverrides().stream()).toList();
     return new FrontendOverrideResponse(messageOverrides, cssOverrides, contentOverrides);
   }
 
@@ -58,9 +70,10 @@ public class OverrideService {
   }
 
   /**
-   * Gets the default sweden-connect logotype if no override logotype has been set
-   * If an override logotype has been set then load the override instead
-   * @return A logotype as byte array
+   * Gets the default Sweden Connect logotype if no override logotype has been set If an override logotype has been set
+   * then load the override instead.
+   *
+   * @return a logotype as byte array
    * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
    */
   public byte[] getLogo() throws IOException {
@@ -72,4 +85,5 @@ public class OverrideService {
     InputStream in = new FileInputStream(classPathResource.getFile());
     return IOUtils.toByteArray(in);
   }
+
 }

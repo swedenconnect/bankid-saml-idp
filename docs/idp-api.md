@@ -117,11 +117,11 @@ has made the current authentication request to the BankID IdP.
 
 **Response Object:** [SpInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/SpInformation.java)
 
-| Field | Type | Description |
-| :--- | :--- | :--- |
+| Field | Type                                                   | Description                                                            |
+| :--- |:---|:---|
 | `displayNames` | Map holding pairs of language codes and display names. | Contains display names for the SP in the languages declared by the SP. |
 | `imageUrl` | String | URL to the SP logotype. |
-
+| `showSpMessage` | Boolean | Is true if additional SP message should be displayed in DeviceSelectView. |
 
 <a name="contact-information"></a>
 ### Contact Information

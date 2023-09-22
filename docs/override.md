@@ -28,6 +28,7 @@ bankid:
     override:
       svg-logo: "path/to/my/logo.svg"
 ```
+
 ### CSS, Message and Content Overrides
 
 Enable customization of the BankID's UI by creating override files (see below), placing them in a
