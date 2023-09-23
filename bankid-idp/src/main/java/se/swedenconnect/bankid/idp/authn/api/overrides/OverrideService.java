@@ -15,16 +15,10 @@
  */
 package se.swedenconnect.bankid.idp.authn.api.overrides;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.ClassPathResource;
 
 import se.swedenconnect.bankid.idp.config.OverrideProperties;
 
@@ -39,7 +33,6 @@ public class OverrideService {
   private final List<Supplier<CssOverride>> cssOverrideSuppliers;
   private final List<Supplier<MessageOverride>> messageOverrideSuppliers;
   private final List<Supplier<ContentOverride>> contentOverrideSuppliers;
-  private final OverrideProperties properties;
   private final OverrideFileLoader fileLoader;
 
   public OverrideService(List<Supplier<CssOverride>> cssOverrideSuppliers,
@@ -49,7 +42,6 @@ public class OverrideService {
     this.cssOverrideSuppliers = cssOverrideSuppliers;
     this.messageOverrideSuppliers = messageOverrideSuppliers;
     this.contentOverrideSuppliers = contentOverrideSuppliers;
-    this.properties = properties;
     this.fileLoader = fileLoader;
   }
 
@@ -67,23 +59,6 @@ public class OverrideService {
     return overrides.stream()
         .map(Supplier::get)
         .filter(Objects::nonNull);
-  }
-
-  /**
-   * Gets the default Sweden Connect logotype if no override logotype has been set If an override logotype has been set
-   * then load the override instead.
-   *
-   * @return a logotype as byte array
-   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
-   */
-  public byte[] getLogo() throws IOException {
-    if (Objects.nonNull(properties.getSvgLogo())) {
-      InputStream in = new FileInputStream(properties.getSvgLogo().getFile());
-      return IOUtils.toByteArray(in);
-    }
-    ClassPathResource classPathResource = new ClassPathResource("static/images/logo-notext.svg");
-    InputStream in = new FileInputStream(classPathResource.getFile());
-    return IOUtils.toByteArray(in);
   }
 
 }

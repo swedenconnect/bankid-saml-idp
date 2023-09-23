@@ -16,6 +16,7 @@
 package se.swedenconnect.bankid.idp.config;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import lombok.Getter;
@@ -38,6 +39,16 @@ public class UiProperties implements InitializingBean {
   private UserMessageProperties userMessageDefaults;
 
   /**
+   * Path to the icon/logotype to be displayed in UI footer. This logotype should be the logotype
+   * for the provider of the service (as opposed for the logotype displayed in the left upper corner
+   * which is the logotype for the calling SP). The logotype must be in SVG format.
+   * If no logotype is assigned, the UI footer will hold no logotype.
+   */
+  @Getter
+  @Setter
+  private Resource providerSvgLogotype;
+
+  /**
    * UI properties for how to display errors for the user.
    */
   @Getter
@@ -52,7 +63,7 @@ public class UiProperties implements InitializingBean {
   private OverrideProperties override;
 
   /**
-   * Enables an extra informational message about which SP that ordered authentication/signature in rge device select
+   * Enables an extra informational message about which SP that ordered authentication/signature in the device select
    * view. The SP display name will be read from the SAML metadata (can be overridden in RP configuration).
    */
   @Getter
