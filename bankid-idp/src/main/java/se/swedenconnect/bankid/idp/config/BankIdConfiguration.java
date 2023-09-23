@@ -104,8 +104,7 @@ public class BankIdConfiguration {
         .authorizeHttpRequests((authorize) -> authorize
             .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
             .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
-                "/api/**",
-                "/**/resume")
+                "/css/**", "/api/**", "/**/resume")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
             .permitAll()
