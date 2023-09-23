@@ -1,0 +1,152 @@
+/* Note: This CSS is only used in the Thymeleaf templates. Frontend has the "real" CSS. */
+
+html,
+body {
+  background-color: #F5F5F5;
+  font-family: "Open Sans", sans-serif;
+}
+
+hr {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+a {
+  color: #000000;
+  text-decoration: underline;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.top-logo {
+  padding: 19px 0;
+}
+
+@media (min-width: 576px) {
+  .top-logo-dim {
+    height: 60px;
+    width: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-logo-dim {
+    height: 40px;
+    width: auto;
+  }
+}
+
+.lang {
+  padding-top: 29px;
+  padding-bottom: 24px;
+  padding-left: 15px;
+  padding-right: 15px;
+  display: block;
+}
+
+.content-container {
+  background: #FFFFFF;
+  padding: 29px;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.content-heading {
+  padding-bottom: 27px;
+}
+
+.content-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.content-heading h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.content-heading-text {
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.btn-link {
+  font-weight: inherit;
+  background-color: transparent;
+
+  color: #000000;
+  text-decoration: underline;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.section {
+  margin-top: 20px;
+}
+
+.noscripthide {
+  display: none;
+}
+
+.error h2 {
+  font-size: 24px;
+  line-height: 26px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.error p {
+  margin-top: 6px;
+}
+
+.error p:last-child {
+  margin-bottom: 0;
+}
+
+.header {
+  background-color: #fff;
+  -webkit-box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -3px 10px 0 rgba(0, 0, 0, 0.5);
+}
+
+.tablet-up {
+  display: none;
+}
+
+@media (min-width: 576px) {
+  .container {
+    width: 620px;
+  }
+
+  .tablet-up {
+    display: block;
+  }
+
+  .tablet-down {
+    display: none;
+  }
+}
+
+/* Return */
+
+.return {
+  padding: 23px;
+  border-bottom: 1px solid #D0CACA;
+}
+
+/* Helpers */
+
+.full-width {
+  margin-left: -29px;
+  margin-right: -29px;
+}
+
+.hide {
+  display: none;
+}
