@@ -56,6 +56,7 @@ export const messages = {
                 "contact": "If this is a recurring error please contact support",
                 "error-page-close": "Please close this web browser window when you are done",
                 "copyright": "Copyright © Service provided by Sweden Connect",
+                "accessibility-link": "Accessibility report",
                 error: {
                     "timeout": "The time for starting a new operation has expired. Please try again.",
                     "service": "This service is currently experiencing some issues, please try again later",
@@ -123,6 +124,7 @@ export const messages = {
                 "contact": "Om detta är ett återkommande problem så kontakta support via e-post",
                 "error-page-close": "Vänligen stäng sidan när du är klar",
                 "copyright": "Copyright © Tjänsten levereras av Sweden Connect",
+                "accessibility-link": "Tillgänglighetsredogörelse",
                 error: {
                     "timeout": "Det tog för lång tid att starta en operation. Vänligen tryck på Fortsätt och försök igen.",
                     "service": "Just nu har vi driftstörningar, försök igen senare",

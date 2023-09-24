@@ -49,6 +49,23 @@ public class UiProperties implements InitializingBean {
   private Resource providerSvgLogotype;
 
   /**
+   * Enables an extra informational message about which SP that ordered authentication/signature in the device select
+   * view. The SP display name will be read from the SAML metadata (can be overridden in RP configuration).
+   */
+  @Getter
+  @Setter
+  private boolean showSpMessage = false;
+
+  /**
+   * Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport)
+   * of their web site. By assigning this setting with a link, this link will be included in the device
+   * selection view of the UI.
+   */
+  @Getter
+  @Setter
+  private String accessibilityReportLink;
+
+  /**
    * UI properties for how to display errors for the user.
    */
   @Getter
@@ -61,14 +78,6 @@ public class UiProperties implements InitializingBean {
   @Getter
   @Setter
   private OverrideProperties override;
-
-  /**
-   * Enables an extra informational message about which SP that ordered authentication/signature in the device select
-   * view. The SP display name will be read from the SAML metadata (can be overridden in RP configuration).
-   */
-  @Getter
-  @Setter
-  private boolean showSpMessage = false;
 
   /** {@inheritDoc} */
   @Override
