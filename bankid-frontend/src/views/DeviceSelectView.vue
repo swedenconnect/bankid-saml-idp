@@ -7,12 +7,12 @@
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { status } from '@/Service';
-  import type { SelectedDeviceInformation, SpInformation } from '@/types';
+  import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
   const displayServiceMessage = ref(false);
 
   const props = defineProps<{
-    spInfo: SpInformation | null;
+    uiInfo: UiInformation | null;
     deviceData: SelectedDeviceInformation | null;
   }>();
 
@@ -23,7 +23,7 @@
   const { locale } = useI18n();
 
   const getSpName = () => {
-    return props.spInfo ? props.spInfo.displayNames[locale.value] : '';
+    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.displayNames[locale.value] : '';
   };
 
   const getSpMessage = () => {
@@ -34,7 +34,7 @@
   };
 
   const showSpMessage = () => {
-    return props.spInfo ? props.spInfo?.showSpMessage : false;
+    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.showSpMessage : false;
   };
 
   onBeforeMount(() => {
