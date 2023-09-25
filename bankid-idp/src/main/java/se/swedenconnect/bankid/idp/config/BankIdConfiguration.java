@@ -34,7 +34,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
@@ -226,17 +225,6 @@ public class BankIdConfiguration {
             });
           });
     };
-  }
-
-  /**
-   * A response page using Thymeleaf to post the response.
-   *
-   * @param templateEngine the template engine
-   * @return a {@link ThymeleafResponsePage}
-   */
-  @Bean
-  ThymeleafResponsePage responsePage(final SpringTemplateEngine templateEngine) {
-    return new ThymeleafResponsePage(templateEngine, "post-response.html");
   }
 
   /**
