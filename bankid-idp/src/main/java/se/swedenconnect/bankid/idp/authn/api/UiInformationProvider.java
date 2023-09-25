@@ -52,6 +52,20 @@ public class UiInformationProvider {
   }
 
   /**
+   * Gets the UI information to display.
+   *
+   * @param uiInfo the SP UI info
+   * @param relyingParty the RP data
+   * @return an {@link UiInformation}
+   */
+  public UiInformation getUiInformation(final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty) {
+    return UiInformation.builder()
+        .sp(this.getSpInformation(uiInfo, relyingParty))
+        .displayQrHelp(this.uiProperties.isDisplayQrHelp())
+        .build();
+  }
+
+  /**
    * Gets the provider logotype to display in the UI footer.
    *
    * @return a logotype as byte array
@@ -144,6 +158,5 @@ public class UiInformationProvider {
       return false;
     };
   }
-
 
 }

@@ -65,6 +65,7 @@ bankid:
         format: simple-markdown-v1
     override:
       directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
+    display-qr-help: false
 
   relying-parties:
     - id: test-my-eid

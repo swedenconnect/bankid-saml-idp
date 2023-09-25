@@ -4,8 +4,8 @@ import type {
   CustomerContactInformation,
   RetryResponse,
   SelectedDeviceInformation,
-  SpInformation,
   Status,
+  UiInformation,
 } from './types';
 
 const CONTEXT_PATH = import.meta.env.BASE_URL;
@@ -33,6 +33,6 @@ const fetchData = async (endpoint: string): Promise<any> => (await fetch(CONTEXT
 export const status = async (): Promise<Status> => fetchData('/api/status');
 export const contactInformation = async (): Promise<CustomerContactInformation> => fetchData('/api/contact');
 export const cancel = async () => await fetch(CONTEXT_PATH + '/api/cancel', requestOptions);
-export const spInformation = async (): Promise<SpInformation> => fetchData('/api/sp');
+export const uiInformation = async (): Promise<UiInformation> => fetchData('/api/ui');
 export const selectedDevice = async (): Promise<SelectedDeviceInformation> => fetchData('/api/device');
 export const getOverrides = async () => await fetchData('/api/overrides');

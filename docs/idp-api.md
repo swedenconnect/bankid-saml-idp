@@ -101,13 +101,14 @@ An endpoint that delivers service, or status, information.
 | :--- | :--- | :--- |
 | `status` | String | `OK` for no problems and `ISSUES` if the BankID IdP has encountered issues. |
 
-<a name="relying-party-information"></a>
-### Relying Party Information
+<a name="ui-information"></a>
+### UI Information
 
 An endpoint that delivers information about the Relying Party, or SAML Service Provider, that 
-has made the current authentication request to the BankID IdP.
+has made the current authentication request to the BankID IdP as well as other configurable UI
+settings.
 
-**Path:** `/api/sp`
+**Path:** `/api/ui`
 
 **Method:** GET
 
@@ -115,13 +116,14 @@ has made the current authentication request to the BankID IdP.
 
 **Response Status Codes:** `200` for a successfully executed call and `500` for internal errors.
 
-**Response Object:** [SpInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/SpInformation.java)
+**Response Object:** [UiInformation](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/api/UiInformation.java)
 
-| Field | Type                                                   | Description                                                            |
+| Field | Type | Description |
 | :--- |:---|:---|
-| `displayNames` | Map holding pairs of language codes and display names. | Contains display names for the SP in the languages declared by the SP. |
-| `imageUrl` | String | URL to the SP logotype. |
-| `showSpMessage` | Boolean | Is true if additional SP message should be displayed in DeviceSelectView. |
+| `sp.display-names.*` | Map holding pairs of language codes and display names. | Contains display names for the SP in the languages declared by the SP. |
+| `sp.image-url` | String | URL to the SP logotype. |
+| `sp.show-sp-message` | Boolean | Is `true` if additional SP message should be displayed in DeviceSelectView. |
+| `display-qr-help` | Boolean | If `true`, the extra help texts should be display for how to scan a QR code. |
 
 <a name="contact-information"></a>
 ### Contact Information

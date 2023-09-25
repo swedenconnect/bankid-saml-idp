@@ -95,6 +95,7 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 | `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
 | `override.directory-path` | Optional path where CSS, message and content override files can be put. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
 | `show-sp-message` | Enables an extra informational message in the UI about which SP that ordered authentication/signature. The SP display name will be read from the SAML metadata (can be overridden in RP configuration). | Boolean | `false` |
+| `display-qr-help` | Tells whether extra help texts in the UI should be displayed helping the user to understand how to scan the QR code. | Boolean | `false` |
 
 **Note:** A BankID that is "generic", meaning that it serves Service Providers from different
 organizations,  should enable the `show-sp-message` setting to provide textual information about the
