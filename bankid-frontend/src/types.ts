@@ -54,6 +54,7 @@ export interface SpInformation {
 export interface UiInformation {
   sp: SpInformation;
   displayQrHelp: boolean;
+  accessibilityReportLink: string | null;
 }
 
 export interface SelectedDeviceInformation {

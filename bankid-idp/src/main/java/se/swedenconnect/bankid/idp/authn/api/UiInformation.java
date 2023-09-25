@@ -44,4 +44,10 @@ public class UiInformation {
   @Builder.Default
   private boolean displayQrHelp = false;
 
+  /**
+   * Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport)
+   * of their web site. If this property is assigned, the UI will display this link at the bottom of the page.
+   */
+  private String accessibilityReportLink;
+
 }
