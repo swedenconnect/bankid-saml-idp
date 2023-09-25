@@ -62,6 +62,7 @@ public class UiInformationProvider {
     return UiInformation.builder()
         .sp(this.getSpInformation(uiInfo, relyingParty))
         .displayQrHelp(this.uiProperties.isDisplayQrHelp())
+        .accessibilityReportLink(this.uiProperties.getAccessibilityReportLink())
         .build();
   }
 
