@@ -37,14 +37,7 @@ public class UserErrorRouteFactory {
 
   /** The properties that determines what to display in the error UI view. */
   private final UiProperties.UserErrorProperties properties;
-
-  /**
-   * The context path.
-   */
-  @Setter
-  @Value("${server.servlet.context-path:/}")
-  private String contextPath;
-
+  
   /**
    * Error message enum.
    */
