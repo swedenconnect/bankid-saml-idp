@@ -21,7 +21,12 @@ settings.
 are not packaged in the sample (for security reasons). Also, all secret values have been changed to
 `REDACTED`.
 
-### Redis
+
+## Overrides
+In the sandbox environment we add a prompt on how to get and install BankID for Test.
+We define what to show in [sandbox.content](config/overrides/sandbox.content) and message definitions with translations in [sandbox.messages](config/overrides/sandbox.messages)
+
+## Redis
 
 We configure Redis similarly to the [Local Development Profile](https://docs.swedenconnect.se/bankid-saml-idp/development.html#local-redis-instance).
 

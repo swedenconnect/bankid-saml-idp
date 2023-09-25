@@ -19,6 +19,8 @@ export const messages = {
         },
         "bankid": {
             "msg": {
+                "rp-auth": "has requested that you authenticate.",
+                "rp-sign": "has requested your signature.",
                 "rfa1": "Start your BankID app.",
                 "rfa2": "The BankID app is not installed. Please contact your Internet bank.",
                 "rfa3": "Action cancelled. Please try again.",
@@ -90,6 +92,8 @@ export const messages = {
         },
         "bankid": {
             "msg": {
+                "rp-auth": "har begärt att du legitmerar dig.",
+                "rp-sign": "har begärt din underskrift.",
                 "rfa1": "Starta BankID-appen.",
                 "rfa2": "Du har inte BankID-appen installerad. Kontakta din internetbank.",
                 "rfa3": "Åtgärden avbruten. Försök igen.",

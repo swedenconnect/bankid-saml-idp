@@ -15,34 +15,55 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
+import se.swedenconnect.bankid.idp.config.UiProperties;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2ServiceProviderUiInfo;
 
 /**
- * Bean for delivering SP information.
+ * Bean providing UI information for consumption by the frontend.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class SpInformationFactory {
+public class UiInformationProvider {
 
-  private final boolean showSpMessage;
+  /** The UI properties. */
+  private final UiProperties uiProperties;
 
   /**
    * Constructor.
    *
-   * @param showSpMessage whether SP info should be displayed in UI
+   * @param uiProperties the UI properties
    */
-  public SpInformationFactory(final boolean showSpMessage) {
-    this.showSpMessage = showSpMessage;
+  public UiInformationProvider(final UiProperties uiProperties) {
+    this.uiProperties = uiProperties;
+  }
+
+  /**
+   * Gets the provider logotype to display in the UI footer.
+   *
+   * @return a logotype as byte array
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  public byte[] getProviderLogo() throws IOException {
+    if (Objects.nonNull(this.uiProperties.getProviderSvgLogotype())) {
+      return IOUtils.toByteArray(this.uiProperties.getProviderSvgLogotype().getInputStream());
+    }
+    // Otherwise. Deliver an invisible SVG ...
+    final ClassPathResource classPathResource = new ClassPathResource("static/images/transparent.svg");
+    return IOUtils.toByteArray(classPathResource.getInputStream());
   }
 
   /**
@@ -78,7 +99,7 @@ public class SpInformationFactory {
         logoUrl = getImageUrl(uiInfo);
       }
 
-      return new SpInformation(displayNames, logoUrl, this.showSpMessage);
+      return new SpInformation(displayNames, logoUrl, this.uiProperties.isShowSpMessage());
     }
 
     displayNames.putAll(uiInfo.getDisplayNames());
@@ -97,7 +118,7 @@ public class SpInformationFactory {
       }
     }
 
-    return new SpInformation(displayNames, logoUrl, this.showSpMessage);
+    return new SpInformation(displayNames, logoUrl, this.uiProperties.isShowSpMessage());
   }
 
   private static String getImageUrl(final Saml2ServiceProviderUiInfo uiInfo) {
@@ -123,5 +144,6 @@ public class SpInformationFactory {
       return false;
     };
   }
+
 
 }
