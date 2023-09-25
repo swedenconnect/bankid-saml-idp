@@ -4,24 +4,24 @@
   import AppHeader from '@/components/AppHeader.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import LocaleChanger from '@/components/LocaleChanger.vue';
-  import { selectedDevice, spInformation } from '@/Service';
-  import type { SpInformation, SelectedDeviceInformation } from '@/types';
+  import { selectedDevice, uiInformation } from '@/Service';
+  import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
-  const spInfo = ref<SpInformation | null>(null);
+  const uiInfo = ref<UiInformation | null>(null);
   const device = ref<SelectedDeviceInformation | null>(null);
 
   onMounted(async () => {
-    spInfo.value = await spInformation();
+    uiInfo.value = await uiInformation();
     device.value = await selectedDevice();
   });
 </script>
 
 <template>
-  <AppHeader :sp-info="spInfo" />
+  <AppHeader :sp-info="uiInfo ? uiInfo.sp : null" />
   <LocaleChanger />
   <main class="main-width">
     <CustomContent position="above" />
-    <RouterView :sp-info="spInfo" :deviceData="device" />
+    <RouterView :ui-info="uiInfo" :deviceData="device" />
     <CustomContent position="below" />
   </main>
   <AppFooter />

@@ -201,7 +201,11 @@ public class BankIdService {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
       return this.init(request)
-          .map(orderResponse -> BankIdSessionData.of(request, orderResponse));
+          .map(orderResponse -> BankIdSessionData.of(request, orderResponse))
+              .flatMap(b -> request.getRelyingPartyData().getClient().collect(b.getOrderReference())
+                      .map(c -> {
+                        return BankIdSessionData.of(state.getBankIdSessionData(), c);
+                      }));
     }
     else {
       return Mono.just(bankIdSessionData);

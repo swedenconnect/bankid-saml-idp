@@ -7,7 +7,7 @@
   import QrInstructions from '@/components/QrInstructions.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
-  import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
+  import type { ApiResponse, ApiResponseStatus, RetryResponse, UiInformation } from '@/types';
 
   const qrImage = ref('');
   const token = ref('');
@@ -15,10 +15,13 @@
   const responseStatus = ref<ApiResponseStatus | null>(null);
 
   const props = defineProps<{
+    uiInfo: UiInformation | null;
     otherDevice: boolean;
   }>();
 
-  const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2');
+  const showQrInstructions = computed(
+    () => messageCode.value === 'bankid.msg.ext2' && props.uiInfo && props.uiInfo.displayQrHelp,
+  );
 
   function isApiResponse(obj: any): obj is ApiResponse {
     return obj && 'status' in obj;

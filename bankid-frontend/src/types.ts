@@ -51,6 +51,11 @@ export interface SpInformation {
   showSpMessage: boolean;
 }
 
+export interface UiInformation {
+  sp: SpInformation;
+  displayQrHelp: boolean;
+}
+
 export interface SelectedDeviceInformation {
   isSign: boolean;
   device: string;

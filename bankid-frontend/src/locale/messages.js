@@ -93,7 +93,7 @@ export const messages = {
         },
         "bankid": {
             "msg": {
-                "rp-auth": "har begärt att du legitmerar dig.",
+                "rp-auth": "har begärt att du legitimerar dig.",
                 "rp-sign": "har begärt din underskrift.",
                 "rfa1": "Starta BankID-appen.",
                 "rfa2": "Du har inte BankID-appen installerad. Kontakta din internetbank.",

@@ -1,18 +1,18 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
   import StatusMessage from '@/components/StatusMessage.vue';
   import { PATHS } from '@/Redirects';
   import { status } from '@/Service';
-  import type { SelectedDeviceInformation, SpInformation } from '@/types';
-  import { useI18n } from 'vue-i18n';
+  import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
   const displayServiceMessage = ref(false);
 
   const props = defineProps<{
-    spInfo: SpInformation | null;
+    uiInfo: UiInformation | null;
     deviceData: SelectedDeviceInformation | null;
   }>();
 
@@ -23,7 +23,7 @@
   const { locale } = useI18n();
 
   const getSpName = () => {
-    return props.spInfo ? props.spInfo.displayNames[locale.value] : '';
+    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.displayNames[locale.value] : '';
   };
 
   const getSpMessage = () => {
@@ -34,7 +34,7 @@
   };
 
   const showSpMessage = () => {
-    return props.spInfo ? props.spInfo?.showSpMessage : false;
+    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.showSpMessage : false;
   };
 
   onBeforeMount(() => {
@@ -53,7 +53,7 @@
     <h2>BankID</h2>
     <p v-if="showSpMessage()">{{ getSpName() + ' ' + $t(getSpMessage()) }}</p>
     <p>{{ $t('bankid.msg.rfa20') }}</p>
-    <DeviceSelect :sp-info="spInfo" />
+    <DeviceSelect />
     <BankIdLogo />
   </div>
 
