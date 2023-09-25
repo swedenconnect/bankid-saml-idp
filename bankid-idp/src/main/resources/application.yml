@@ -91,6 +91,8 @@ bankid:
     - http://id.elegnamnden.se/sprop/1.0/mobile-auth
     - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
     authn-path: "/bankid"
+  
+  # Also see UI settings ...
     
 #
 # The SAML IdP configuration

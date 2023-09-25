@@ -125,6 +125,7 @@ settings.
 | `sp.showSpMessage` | Boolean | Is `true` if additional SP message should be displayed in DeviceSelectView. |
 | `display-qr-help` | Boolean | If `true`, the extra help texts should be display for how to scan a QR code. |
 | `accessibilityReportLink` | String | Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport) of their web site. If this property is assigned, the UI will display this link at the bottom of the page. |
+| `providerName` | Map of strings | The name of the provider of the service delivered as a map where keys are language codes and values the name(s). If `null`, elements that this information should be displayed should not be included in the UI. | 
 
 <a name="contact-information"></a>
 ### Contact Information

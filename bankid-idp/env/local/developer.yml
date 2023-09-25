@@ -50,7 +50,11 @@ bankid:
   session:
     module: redis
   ui:
-    provider-svg-logotype: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+    provider:
+      svg-logotype: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+      name:
+        sv: "Sweden Connect"
+        en: "Sweden Connect"
     show-sp-message: true
     user-error:
       contact-email: contact@email.com
@@ -109,4 +113,34 @@ saml:
         alias: metadata
         password: secret
         type: JKS
-                    
+    metadata:
+      ui-info:
+        display-names:
+          en: BankID
+          sv: BankID
+        descriptions:
+          en: BankID Identity Provider (Local)
+          sv: BankID legitimeringstjänst (Local)
+        logotypes:
+        - path: /images/BankID_logo.svg
+          height: 171
+          width: 20
+      organization:
+        names:
+          en: "Sweden Connect" 
+          sv: "Sweden Connect"
+        display-names:
+          en: "Sweden Connect" 
+          sv: "Sweden Connect"
+        urls:
+          en: https://www.swedenconnect.se/en
+          sv: https://www.swedenconnect.se
+      contact-persons:
+        technical:
+          company: "Sweden Connect"
+          email-addresses:
+          - operations@swedenconnect.se
+        support:
+          company: "Sweden Connect"
+          email-addresses:
+          - operations@swedenconnect.se        
