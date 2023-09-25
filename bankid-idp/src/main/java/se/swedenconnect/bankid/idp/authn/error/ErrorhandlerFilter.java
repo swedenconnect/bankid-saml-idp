@@ -62,8 +62,7 @@ public class ErrorhandlerFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
     }
     catch (final RuntimeException e) {
-
-      response.sendRedirect(this.userErrorRouteFactory.getRedirect(request, e));
+      response.sendRedirect(this.userErrorRouteFactory.getRedirect(e));
     }
   }
 }

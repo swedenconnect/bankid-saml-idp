@@ -107,6 +107,7 @@ public class BankIdAuthenticationProvider extends AbstractUserRedirectAuthentica
         AttributeConstants.ATTRIBUTE_NAME_PERSONAL_IDENTITY_NUMBER,
         this.getAuthnContextUri(bankIdToken),
         Instant.now(), authnData.getCompletionData().getDevice().getIpAddress());
+
     final Saml2UserAuthentication saml2UserAuthentication = new Saml2UserAuthentication(userDetails);
     if (SecurityContextHolder.getContext().getAuthentication() instanceof final Saml2UserAuthenticationInputToken saml
         && saml.getAuthnRequirements().getSignatureMessageExtension() != null) {
