@@ -53,7 +53,7 @@
     <h2>BankID</h2>
     <p v-if="showSpMessage()">{{ getSpName() + ' ' + $t(getSpMessage()) }}</p>
     <p>{{ $t('bankid.msg.rfa20') }}</p>
-    <DeviceSelect :sp-info="spInfo" />
+    <DeviceSelect />
     <BankIdLogo />
   </div>
 
