@@ -122,7 +122,7 @@ settings.
 | :--- |:---|:---|
 | `sp.displayNames.*` | Map holding pairs of language codes and display names. | Contains display names for the SP in the languages declared by the SP. |
 | `sp.imageUrl` | String | URL to the SP logotype. |
-| `sp.showSp;essage` | Boolean | Is `true` if additional SP message should be displayed in DeviceSelectView. |
+| `sp.showSpMessage` | Boolean | Is `true` if additional SP message should be displayed in DeviceSelectView. |
 | `display-qr-help` | Boolean | If `true`, the extra help texts should be display for how to scan a QR code. |
 | `accessibilityReportLink` | String | Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport) of their web site. If this property is assigned, the UI will display this link at the bottom of the page. |
 
