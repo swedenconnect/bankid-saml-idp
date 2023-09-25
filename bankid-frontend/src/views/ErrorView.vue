@@ -39,7 +39,7 @@
 
 <template>
   <div class="content-container">
-    <h2>Bankid</h2>
+    <h2>BankID</h2>
     <StatusMessage :message="getErrorMessage()" />
     <p v-if="displayEmail && contactEmail">{{ $t('bankid.msg.contact') }}</p>
     <p v-if="displayEmail && contactEmail">Email: {{ contactEmail }}</p>
