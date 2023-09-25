@@ -219,17 +219,18 @@ public class BankIdApiController {
   }
 
   /**
-   * API method for delivering SP display information.
+   * API method for delivering UI display information.
    *
    * @param request the HTTP servlet request
-   * @return SP information
+   * @return UI information
    */
-  @GetMapping(value = "/api/sp", produces = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<SpInformation> spInformation(final HttpServletRequest request) {
+  @GetMapping(value = "api/ui", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<UiInformation> uiInformation(final HttpServletRequest request) {
 
     final Saml2UserAuthenticationInputToken authnInputToken = this.getInputToken(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(authnInputToken.getAuthnRequestToken().getEntityId());
-    return Mono.just(this.uiInformation.getSpInformation(this.getInputToken(request).getUiInfo(), relyingParty));
+
+    return Mono.just(this.uiInformation.getUiInformation(this.getInputToken(request).getUiInfo(), relyingParty));
   }
 
   /**
