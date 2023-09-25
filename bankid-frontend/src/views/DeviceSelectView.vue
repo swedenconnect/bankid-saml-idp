@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import DeviceSelect from '@/components/DeviceSelect.vue';
@@ -7,7 +8,6 @@
   import { PATHS } from '@/Redirects';
   import { status } from '@/Service';
   import type { SelectedDeviceInformation, SpInformation } from '@/types';
-  import { useI18n } from 'vue-i18n';
 
   const displayServiceMessage = ref(false);
 
