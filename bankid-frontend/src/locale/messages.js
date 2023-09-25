@@ -63,6 +63,12 @@ export const messages = {
                     "unknown": "Something went wrong. Please try again later.",
                     "sign": "Signature is invalid. Please try again later.",
                     "server": "The underlying BankID service has responded with errors, please try again later"
+                },
+                "qr-instructions": {
+                    "qr1": "Start the BankID app",
+                    "qr2": "Press the QR code button in the BankID app",
+                    "qr3": "Allow the BankID app to use your camera",
+                    "qr4": "Point the camera at the QR code displayed here",
                 }
             }
         }
@@ -131,6 +137,12 @@ export const messages = {
                     "unknown": "Någonting har gått fel, försök igen senare",
                     "sign": "Signaturen är inte korrekt, försök igen senare",
                     "server": "Den underliggande tjänsten svarar med fel, försök igen senare"
+                },
+                "qr-instructions": {
+                    "qr1": "Starta BankID-appen",
+                    "qr2": "Tryck på QR-kodsknappen i BankID-appen",
+                    "qr3": "Ge BankID-appen tillåtelse att använda kameran",
+                    "qr4": "Rikta kameran mot QR-koden som visas här",
                 }
             }
         }

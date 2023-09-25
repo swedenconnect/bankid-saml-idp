@@ -39,10 +39,9 @@ public class UiProperties implements InitializingBean {
   private UserMessageProperties userMessageDefaults;
 
   /**
-   * Path to the icon/logotype to be displayed in UI footer. This logotype should be the logotype
-   * for the provider of the service (as opposed for the logotype displayed in the left upper corner
-   * which is the logotype for the calling SP). The logotype must be in SVG format.
-   * If no logotype is assigned, the UI footer will hold no logotype.
+   * Path to the icon/logotype to be displayed in UI footer. This logotype should be the logotype for the provider of
+   * the service (as opposed for the logotype displayed in the left upper corner which is the logotype for the calling
+   * SP). The logotype must be in SVG format. If no logotype is assigned, the UI footer will hold no logotype.
    */
   @Getter
   @Setter
@@ -78,6 +77,14 @@ public class UiProperties implements InitializingBean {
   @Getter
   @Setter
   private OverrideProperties override;
+
+  /**
+   * Tells whether extra help texts in the UI should be displayed helping the user to understand how to scan the QR
+   * code.
+   */
+  @Getter
+  @Setter
+  private boolean displayQrHelp = false;
 
   /** {@inheritDoc} */
   @Override

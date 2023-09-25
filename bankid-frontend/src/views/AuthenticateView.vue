@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import { onBeforeMount, onMounted, ref } from 'vue';
+  import { computed, onBeforeMount, onMounted, ref } from 'vue';
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
-  import QRDisplay from '@/components/QRDisplay.vue';
+  import QrDisplay from '@/components/QrDisplay.vue';
+  import QrInstructions from '@/components/QrInstructions.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, poll } from '@/Service';
   import type { ApiResponse, ApiResponseStatus, RetryResponse } from '@/types';
@@ -16,6 +17,8 @@
   const props = defineProps<{
     otherDevice: boolean;
   }>();
+
+  const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2');
 
   function isApiResponse(obj: any): obj is ApiResponse {
     return obj && 'status' in obj;
@@ -87,9 +90,10 @@
   <div class="content-container">
     <CustomContent v-if="qrImage" position="qrcode" />
     <CustomContent v-else position="autostart" />
-    <p>{{ $t(messageCode) }}</p>
+    <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
+    <QrInstructions v-else />
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
-    <QRDisplay :image="qrImage" />
+    <QrDisplay :image="qrImage" />
     <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
