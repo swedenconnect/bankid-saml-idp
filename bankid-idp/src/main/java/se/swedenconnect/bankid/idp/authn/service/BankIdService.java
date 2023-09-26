@@ -145,10 +145,13 @@ public class BankIdService {
     this.eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest)
         .publish();
     return this.init(pollRequest)
-        .map(b -> BankIdSessionData.of(pollRequest, b))
-        .flatMap(b -> pollRequest.getRelyingPartyData().getClient().collect(b.getOrderReference())
-            .map(c -> ApiResponseFactory.create(BankIdSessionData.of(b, c),
-                pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr())));
+        .map(orderResponse -> BankIdSessionData.of(pollRequest, orderResponse))
+        .flatMap(sessionData -> pollRequest.getRelyingPartyData().getClient().collect(sessionData.getOrderReference())
+            .map(collectResponse -> {
+              eventPublisher.collectResponse(pollRequest, collectResponse).publish();
+              return ApiResponseFactory.create(BankIdSessionData.of(sessionData, collectResponse),
+                  pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr());
+            }));
   }
 
   /**
@@ -193,19 +196,18 @@ public class BankIdService {
    * @param request the {@link PollRequest}
    * @return a {@link BankIdSessionData}
    */
-  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request,
-      final BankIdSessionData bankIdSessionData) {
-    final BankIdSessionState state = request.getState();
+  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request, final BankIdSessionData bankIdSessionData) {
     if (bankIdSessionData.getStartFailed()) {
-      if (Duration.between(state.getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
+      if (Duration.between(request.getState().getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
       return this.init(request)
           .map(orderResponse -> BankIdSessionData.of(request, orderResponse))
-              .flatMap(b -> request.getRelyingPartyData().getClient().collect(b.getOrderReference())
-                      .map(c -> {
-                        return BankIdSessionData.of(state.getBankIdSessionData(), c);
-                      }));
+          .flatMap(updatedSessionData -> request.getRelyingPartyData().getClient().collect(updatedSessionData.getOrderReference())
+              .map(collectResponse -> {
+                eventPublisher.collectResponse(request, collectResponse).publish();
+                return BankIdSessionData.of(updatedSessionData, collectResponse);
+              }));
     }
     else {
       return Mono.just(bankIdSessionData);

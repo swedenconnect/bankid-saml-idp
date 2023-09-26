@@ -60,6 +60,8 @@ class BankIdServiceTest {
     CollectResponse collectResponse = BankIdResponseFixture.createStartFailed(initialCollect);
     Mockito.when(client.collect(any())).thenAnswer(a -> {
       return Mono.just(collectResponse);
+    }).thenAnswer(a -> {
+      return Mono.just(BankIdResponseFixture.createInitial(expectedSecondSession));
     });
     BankIdResponseFixture.update(sessionState, collectResponse);
 
@@ -67,7 +69,7 @@ class BankIdServiceTest {
     // ---
     ApiResponse response3 = service.poll(BankIdResponseFixture.createPollrequest(client, sessionState)).block();
     Mockito.verify(client, times(2)).authenticate(any());
-    Mockito.verify(client, times(3)).collect(any());
+    Mockito.verify(client, times(4)).collect(any());
     Assertions.assertNotNull(response3);
     Assertions.assertEquals(response3.getAutoStartToken(), expectedSecondSession.getAutoStartToken());
   }
