@@ -18,7 +18,7 @@
 <template>
   <footer class="main-width">
     <img class="logo" :src="LOGO_PATH" alt="Logo" />
-    <p class="copyright">{{ $t('bankid.msg.copyright', { provider: getProviderName() }) }}</p>
+    <p v-if="props.providerName" class="copyright">{{ $t('bankid.msg.copyright', { provider: getProviderName() }) }}</p>
     <p v-if="props.accessibilityLink" class="accessibility-link">
       <a :href="props.accessibilityLink">{{ $t('bankid.msg.accessibility-link') }}</a>
     </p>
