@@ -7,7 +7,7 @@
 <template>
   <div v-if="props.image" class="qr-code">
     <div class="corner-frame">
-      <img width="300" height="300" :src="props.image" alt="QR Code" />
+      <img width="200" height="200" :src="props.image" alt="QR Code" />
     </div>
   </div>
 </template>
