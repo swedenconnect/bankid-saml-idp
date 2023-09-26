@@ -17,21 +17,15 @@ package se.swedenconnect.bankid.idp.authn;
 
 import static se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController.AUTHN_PATH;
 
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.print.attribute.standard.Media;
-import java.awt.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * If we are running in "standalone" mode, i.e., if we are using the built in Vue frontend app, this controller

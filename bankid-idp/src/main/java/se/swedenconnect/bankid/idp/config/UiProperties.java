@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -39,13 +41,11 @@ public class UiProperties implements InitializingBean {
   private UserMessageProperties userMessageDefaults;
 
   /**
-   * Path to the icon/logotype to be displayed in UI footer. This logotype should be the logotype for the provider of
-   * the service (as opposed for the logotype displayed in the left upper corner which is the logotype for the calling
-   * SP). The logotype must be in SVG format. If no logotype is assigned, the UI footer will hold no logotype.
+   * Settings for the application/service provider.
    */
   @Getter
   @Setter
-  private Resource providerSvgLogotype;
+  private ApplicationProviderProperties provider;
 
   /**
    * Enables an extra informational message about which SP that ordered authentication/signature in the device select
@@ -56,9 +56,9 @@ public class UiProperties implements InitializingBean {
   private boolean showSpMessage = false;
 
   /**
-   * Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport)
-   * of their web site. By assigning this setting with a link, this link will be included in the device
-   * selection view of the UI.
+   * Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport) of
+   * their web site. By assigning this setting with a link, this link will be included in the device selection view of
+   * the UI.
    */
   @Getter
   @Setter
@@ -155,6 +155,31 @@ public class UiProperties implements InitializingBean {
     @Getter
     @Setter
     private boolean showTraceId = false;
+
+  }
+
+  /**
+   * Configuration properties for the application/service provider.
+   */
+  public static class ApplicationProviderProperties {
+
+    /**
+     * Path to the icon/logotype to be displayed in UI footer. This logotype should be the logotype for the provider of
+     * the service (as opposed for the logotype displayed in the left upper corner which is the logotype for the calling
+     * SP). The logotype must be in SVG format. If no logotype is assigned, the UI footer will hold no logotype.
+     */
+    @Getter
+    @Setter
+    private Resource svgLogotype;
+
+    /**
+     * The name for the provider as a map where the keys are language codes and the values the name in respective
+     * language. This name will primarily be used at the bottom of the page in the copyright statement, but may later by
+     * used in other UI places as well.
+     */
+    @Getter
+    @Setter
+    private Map<String, String> name;
 
   }
 

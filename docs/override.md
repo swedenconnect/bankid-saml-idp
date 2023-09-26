@@ -75,15 +75,15 @@ Put your custom messages in a `.messages` file in the override directory specifi
 
 To override an already existing text, look in [messages.js](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-frontend/src/locale/messages.js) and use the path to the message you want to change.
 
-For example, to override the copyright message in the footer:
+For example, to override the text where the user is asked to scan the QR code:
 
 ```json
 [
   {
-    "code": "bankid.msg.copyright",
+    "code": "bankid.msg.ext2",
     "text": {
-      "sv": "Copyright © Tjänsten tillhandahålls av XYZ-myndigheten",
-      "en": "Copyright © Service provided by the XYZ authority"
+      "sv": "Starta BankID-appen och läs av QR-koden. Vi är ledsna att vi stör ditt instagramande!",
+      "en": "Start the BankID app and scan the QR code. Sorry to interrupt your Instagramming!"
     }
   }
 ]

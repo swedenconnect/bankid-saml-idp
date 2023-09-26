@@ -51,7 +51,6 @@ import se.swedenconnect.bankid.rpapi.service.impl.ZxingQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
-import se.swedenconnect.spring.saml.idp.response.ThymeleafResponsePage;
 
 /**
  * BankID IdP configuration.

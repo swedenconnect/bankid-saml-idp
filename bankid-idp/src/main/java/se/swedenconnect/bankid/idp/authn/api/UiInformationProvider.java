@@ -18,12 +18,12 @@ package se.swedenconnect.bankid.idp.authn.api;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import se.swedenconnect.bankid.idp.config.UiProperties;
@@ -63,6 +63,9 @@ public class UiInformationProvider {
         .sp(this.getSpInformation(uiInfo, relyingParty))
         .displayQrHelp(this.uiProperties.isDisplayQrHelp())
         .accessibilityReportLink(this.uiProperties.getAccessibilityReportLink())
+        .providerName(Optional.ofNullable(this.uiProperties.getProvider())
+            .map(UiProperties.ApplicationProviderProperties::getName)
+            .orElse(null))
         .build();
   }
 
@@ -73,12 +76,13 @@ public class UiInformationProvider {
    * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
    */
   public byte[] getProviderLogo() throws IOException {
-    if (Objects.nonNull(this.uiProperties.getProviderSvgLogotype())) {
-      return IOUtils.toByteArray(this.uiProperties.getProviderSvgLogotype().getInputStream());
-    }
-    // Otherwise. Deliver an invisible SVG ...
-    final ClassPathResource classPathResource = new ClassPathResource("static/images/transparent.svg");
-    return IOUtils.toByteArray(classPathResource.getInputStream());
+
+    Resource logoResource = Optional.ofNullable(this.uiProperties.getProvider())
+        .map(UiProperties.ApplicationProviderProperties::getSvgLogotype)
+        // Otherwise. Deliver an invisible SVG ...
+        .orElseGet(() -> new ClassPathResource("static/images/transparent.svg"));
+
+    return IOUtils.toByteArray(logoResource.getInputStream());
   }
 
   /**
