@@ -129,8 +129,8 @@ public class BankIdConfiguration {
   @Bean
   QRGenerator qrGenerator() {
     final ZxingQRGenerator generator = new ZxingQRGenerator();
-    generator.setDefaultSize(this.properties.getQrCode().getSize());
-    generator.setDefaultImageFormat(this.properties.getQrCode().getImageFormat());
+    generator.setDefaultSize(this.properties.getUi().getQrCode().getSize());
+    generator.setDefaultImageFormat(this.properties.getUi().getQrCode().getImageFormat());
     return generator;
   }
 

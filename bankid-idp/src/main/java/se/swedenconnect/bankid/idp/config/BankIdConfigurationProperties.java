@@ -27,15 +27,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
-import se.swedenconnect.bankid.rpapi.service.QRGenerator;
-import se.swedenconnect.bankid.rpapi.service.impl.AbstractQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
 import se.swedenconnect.security.credential.PkiCredential;
@@ -88,13 +85,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
   @NestedConfigurationProperty
   @Getter
   private final IdpConfiguration authn = new IdpConfiguration();
-
-  /**
-   * QR code generation configuration.
-   */
-  @NestedConfigurationProperty
-  @Getter
-  private final QrCodeConfiguration qrCode = new QrCodeConfiguration();
 
   /**
    * Configuration for health endpoints.
@@ -156,7 +146,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
           ((ClassPathResource) this.serverRootCertificate).getPath());
     }
     this.authn.afterPropertiesSet();
-    this.qrCode.afterPropertiesSet();
     this.health.afterPropertiesSet();
     this.session.afterPropertiesSet();
     this.audit.afterPropertiesSet();
@@ -177,38 +166,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
       if (msg.getLoginText() == null && msg.isInheritDefaultLoginText()
           && this.ui.getUserMessageDefaults().getLoginText() != null) {
         msg.setLoginText(this.ui.getUserMessageDefaults().getLoginText());
-      }
-    }
-  }
-
-  /**
-   * QR code configuration.
-   */
-  @Data
-  public static final class QrCodeConfiguration implements InitializingBean {
-
-    /**
-     * The height and width in pixels of the QR code.
-     */
-    private Integer size;
-
-    /**
-     * The image format for the generated QR code.
-     */
-    private QRGenerator.ImageFormat imageFormat;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void afterPropertiesSet() throws Exception {
-      if (this.size == null) {
-        this.size = AbstractQRGenerator.DEFAULT_SIZE;
-        log.info("bankid.qr-code.size was not assigned, defaulting to {}", this.size);
-      }
-      if (this.imageFormat == null) {
-        this.imageFormat = QRGenerator.ImageFormat.PNG;
-        log.info("bankid.qr-code.image-format was not assigned, defaulting to {}", this.imageFormat);
       }
     }
   }

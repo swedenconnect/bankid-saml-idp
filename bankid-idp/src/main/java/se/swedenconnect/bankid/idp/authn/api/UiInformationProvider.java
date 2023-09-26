@@ -61,7 +61,7 @@ public class UiInformationProvider {
   public UiInformation getUiInformation(final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty) {
     return UiInformation.builder()
         .sp(this.getSpInformation(uiInfo, relyingParty))
-        .displayQrHelp(this.uiProperties.isDisplayQrHelp())
+        .displayQrHelp(this.uiProperties.getQrCode().isDisplayQrHelp())
         .accessibilityReportLink(this.uiProperties.getAccessibilityReportLink())
         .providerName(Optional.ofNullable(this.uiProperties.getProvider())
             .map(UiProperties.ApplicationProviderProperties::getName)

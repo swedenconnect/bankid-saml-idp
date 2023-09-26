@@ -41,10 +41,17 @@ public class UiInformation {
   private SpInformation sp;
 
   /**
-   * Whether extra help texts about how to scan QR codes should be displayed or not.
+   * Tells whether we should display an intermediate view before displaying the QR-code. This page/view
+   * will contain extra help texts.
    */
   @Builder.Default
   private boolean displayQrHelp = false;
+
+  /**
+   * Holds the size of the QR code in pixels.
+   */
+  @Builder.Default
+  private int qrSize = 200;
 
   /**
    * Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport) of
