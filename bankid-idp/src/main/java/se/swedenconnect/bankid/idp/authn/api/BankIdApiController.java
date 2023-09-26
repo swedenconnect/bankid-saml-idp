@@ -106,9 +106,9 @@ public class BankIdApiController {
     final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
     PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
-      log.warn("Failed to find previous selected device for user");
       previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
     }
+    log.debug("Previously selected device: {}", previousDeviceSelection);
     return Mono.just(new SelectedDeviceInformation(sign, previousDeviceSelection.getValue()));
   }
 

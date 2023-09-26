@@ -40,6 +40,14 @@ management:
   server:
     port: 8444      
 
+logging:
+  level:
+    se:
+      swedenconnect:      
+        spring:
+          saml: DEBUG
+        bankid: DEBUG
+
 bankid:
   audit:
     repository: "redistimeseries"
