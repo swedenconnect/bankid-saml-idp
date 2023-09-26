@@ -55,7 +55,7 @@ export const messages = {
                 "cancel-progress": "Stopping authentication ...",
                 "contact": "If this is a recurring error please contact support.",
                 "error-page-close": "Please close this web browser window when you are done.",
-                "copyright": "Copyright © Service provided by",
+                "copyright": "Copyright © Service provided by {provider}",
                 "accessibility-link": "Accessibility report",
                 error: {
                     "timeout": "The time for starting a new operation has expired. Please try again.",
@@ -129,7 +129,7 @@ export const messages = {
                 "cancel-progress": "Avbryter ...",
                 "contact": "Om detta är ett återkommande problem så kontakta support via e-post.",
                 "error-page-close": "Stäng sidan när du är färdig.",
-                "copyright": "Copyright © Tjänsten levereras av",
+                "copyright": "Copyright © Tjänsten levereras av {provider}",
                 "accessibility-link": "Tillgänglighetsredogörelse",
                 error: {
                     "timeout": "Det tog för lång tid att starta en operation. Vänligen tryck på Fortsätt och försök igen.",

@@ -24,5 +24,8 @@
     <RouterView :ui-info="uiInfo" :deviceData="device" />
     <CustomContent position="below" />
   </main>
-  <AppFooter :accessibility-link="uiInfo ? uiInfo.accessibilityReportLink : null" />
+  <AppFooter
+    :accessibility-link="uiInfo ? uiInfo.accessibilityReportLink : null"
+    :provider-name="uiInfo ? uiInfo.providerName : null"
+  />
 </template>

@@ -1,16 +1,24 @@
 <script setup lang="ts">
+  import { useI18n } from 'vue-i18n';
+  import type { LangObject } from '@/types';
+
   const props = defineProps<{
     accessibilityLink: string | null;
+    providerName: LangObject | null;
   }>();
 
   const CONTEXT_PATH = import.meta.env.BASE_URL;
   const LOGO_PATH = CONTEXT_PATH + '/logo.svg';
+
+  const { locale } = useI18n();
+
+  const getProviderName = () => (props.providerName ? props.providerName[locale.value] : '');
 </script>
 
 <template>
   <footer class="main-width">
     <img class="logo" :src="LOGO_PATH" alt="Logo" />
-    <p class="copyright">{{ $t('bankid.msg.copyright') }}</p>
+    <p class="copyright">{{ $t('bankid.msg.copyright', { provider: getProviderName() }) }}</p>
     <p v-if="props.accessibilityLink" class="accessibility-link">
       <a :href="props.accessibilityLink">{{ $t('bankid.msg.accessibility-link') }}</a>
     </p>
