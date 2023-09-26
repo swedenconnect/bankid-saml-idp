@@ -191,7 +191,8 @@ saml:
 logging:
   level:
     se:
-      swedenconnect:
+      swedenconnect:      
         spring:
           saml: INFO
+        bankid: INFO
         
