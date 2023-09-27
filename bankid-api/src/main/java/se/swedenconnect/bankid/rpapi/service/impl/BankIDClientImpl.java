@@ -173,11 +173,8 @@ public class BankIDClientImpl implements BankIDClient {
         .uri(SIGN_PATH)
         .bodyValue(signRequest)
         .retrieve()
-        .onRawStatus(s -> s == 400, c -> {
-          return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
-            return new RuntimeException("Error to communicate with BankID API response:" + m.toString());
-          });
-        })
+        .onRawStatus(StatusCodePredicates.userError(), BankIdErrorBodyExtractors.userErrorBodyExtractor())
+        .onRawStatus(StatusCodePredicates.serverError(), BankIdErrorBodyExtractors.serverErrorBodyExtractor())
         .bodyToMono(OrderResponse.class)
         .onErrorComplete()
         .doOnError(e -> {
@@ -247,7 +244,8 @@ public class BankIDClientImpl implements BankIDClient {
         .bodyValue(request)
         .retrieve();
     return retrieve
-        .onRawStatus(s -> s >= 400, this::defaultErrorHandler)
+        .onRawStatus(StatusCodePredicates.userError(), BankIdErrorBodyExtractors.userErrorBodyExtractor())
+        .onRawStatus(StatusCodePredicates.serverError(), BankIdErrorBodyExtractors.serverErrorBodyExtractor())
         .bodyToMono(CollectResponse.class)
         .doOnSuccess(c -> log.debug("{}: collect. response: [{}]", this.identifier, c.toString()))
         .doOnError(e -> {
