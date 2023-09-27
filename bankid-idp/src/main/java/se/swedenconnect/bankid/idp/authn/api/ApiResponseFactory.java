@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 
 /**
@@ -40,7 +41,10 @@ public class ApiResponseFactory {
    */
   public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
     if(Objects.nonNull(data.getErrorCode())) {
-      return new ApiResponse(ApiResponse.Status.ERROR, "", "", data.getMessageCode());
+      if (data.getErrorCode().equals(ErrorCode.USER_CANCEL)) {
+        return createUserCancelResponse();
+      }
+      return createUserErrorResponse(data);
     }
     String qrCode = "";
     // Only generate qr code when it has not been scanned and should be displayed
@@ -50,6 +54,10 @@ public class ApiResponseFactory {
           data.getStartTime());
     }
     return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
+  }
+
+  private static ApiResponse createUserErrorResponse(BankIdSessionData data) {
+    return new ApiResponse(ApiResponse.Status.ERROR, "", "", data.getMessageCode());
   }
 
   /**
