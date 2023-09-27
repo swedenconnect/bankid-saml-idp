@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
   import AppFooter from '@/components/AppFooter.vue';
   import AppHeader from '@/components/AppHeader.vue';
   import CustomContent from '@/components/CustomContent.vue';
@@ -10,7 +10,7 @@
   const uiInfo = ref<UiInformation | null>(null);
   const device = ref<SelectedDeviceInformation | null>(null);
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     uiInfo.value = await uiInformation();
     device.value = await selectedDevice();
   });

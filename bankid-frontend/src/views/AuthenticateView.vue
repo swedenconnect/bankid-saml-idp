@@ -96,7 +96,7 @@
     <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
     <QrInstructions v-else />
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
-    <QrDisplay :image="qrImage" />
+    <QrDisplay :image="qrImage" :size="uiInfo ? uiInfo.qrSize : '200'" />
     <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
