@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import AuthenticateView from '@/views/AuthenticateView.vue';
 import DeviceSelectView from '@/views/DeviceSelectView.vue';
 import ErrorView from '@/views/ErrorView.vue';
+import QrInstructionView from '@/views/QrInstructionView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       name: 'qr',
       component: AuthenticateView,
       props: { otherDevice: true },
+    },
+    {
+      path: '/qr-instruction',
+      name: 'qr-instruction',
+      component: QrInstructionView,
     },
     {
       path: '/error/:msg/:trace?',
