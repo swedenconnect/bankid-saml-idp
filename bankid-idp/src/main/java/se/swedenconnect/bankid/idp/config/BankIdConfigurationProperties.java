@@ -77,7 +77,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
    */
   @Getter
   @Setter
-  private Duration bankIdStartRetryDuration = Duration.ofMinutes(3);
+  private Duration startRetryDuration = Duration.ofMinutes(3);
   /**
    * Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller
    * redirects calls made from the underlying SAML IdP library to our frontend start page.

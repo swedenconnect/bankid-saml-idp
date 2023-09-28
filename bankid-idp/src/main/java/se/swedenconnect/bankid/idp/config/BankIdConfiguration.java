@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -36,7 +35,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.api.UiInformationProvider;
@@ -243,7 +241,7 @@ public class BankIdConfiguration {
 
   @Bean
   BankIdService bankIdService(BankIdEventPublisher publisher, CircuitBreaker circuitBreaker, BankIdRequestFactory factory, BankIdConfigurationProperties properties) {
-    return new BankIdService(publisher, circuitBreaker, factory,  properties.getBankIdStartRetryDuration());
+    return new BankIdService(publisher, circuitBreaker, factory,  properties.getStartRetryDuration());
   }
 
 }
