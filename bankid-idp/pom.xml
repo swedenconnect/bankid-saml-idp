@@ -60,6 +60,7 @@
 
   <dependencyManagement>
     <dependencies>
+      
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
@@ -67,7 +68,16 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
+      <!-- Will be removed when we have cleaned up deps -->
+      <dependency>
+        <groupId>se.swedenconnect.opensaml</groupId>
+        <artifactId>opensaml-security-ext</artifactId>
+        <version>3.1.2</version>
+      </dependency>
+      
     </dependencies>
+        
   </dependencyManagement>
 
   <dependencies>
@@ -75,7 +85,7 @@
     <dependency>
       <groupId>se.swedenconnect.bankid</groupId>
       <artifactId>bankid-rp-api</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- QR support -->
