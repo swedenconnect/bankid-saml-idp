@@ -2,7 +2,11 @@
   import { onBeforeMount, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { shallSelectDeviceAutomatically } from '@/AutoStartLinkFactory';
-  import { selectedDevice } from '@/Service';
+  import type { SelectedDeviceInformation } from '@/types';
+
+  const props = defineProps<{
+    deviceData: SelectedDeviceInformation | null;
+  }>();
 
   const router = useRouter();
 
@@ -16,12 +20,11 @@
     }
   });
 
-  onBeforeMount(async () => {
-    const r = await selectedDevice();
-    if (r['isSign']) {
-      if (r['device'] === 'this') {
+  onBeforeMount(() => {
+    if (props.deviceData && props.deviceData.isSign) {
+      if (props.deviceData.device === 'this') {
         authenticate('auto');
-      } else if (r['device'] === 'other') {
+      } else if (props.deviceData.device === 'other') {
         authenticate('qr');
       }
     }
