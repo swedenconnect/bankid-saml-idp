@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,6 +41,9 @@ import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.api.UiInformationProvider;
 import se.swedenconnect.bankid.idp.authn.error.ErrorhandlerFilter;
+import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
+import se.swedenconnect.bankid.idp.authn.service.BankIdRequestFactory;
+import se.swedenconnect.bankid.idp.authn.service.BankIdService;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.bankid.idp.rp.DefaultRelyingPartyRepository;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -61,13 +65,6 @@ import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 @Configuration
 @EnableConfigurationProperties(BankIdConfigurationProperties.class)
 public class BankIdConfiguration {
-
-  /**
-   * The context path.
-   */
-  @Setter
-  @Value("${server.servlet.context-path:/}")
-  private String contextPath;
 
   /**
    * BankID configuration properties.
@@ -242,6 +239,11 @@ public class BankIdConfiguration {
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
     return registration;
+  }
+
+  @Bean
+  BankIdService bankIdService(BankIdEventPublisher publisher, CircuitBreaker circuitBreaker, BankIdRequestFactory factory, BankIdConfigurationProperties properties) {
+    return new BankIdService(publisher, circuitBreaker, factory,  properties.getBankIdStartRetryDuration());
   }
 
 }

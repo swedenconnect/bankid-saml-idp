@@ -35,6 +35,7 @@ import se.swedenconnect.bankid.idp.authn.error.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
+import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
@@ -47,7 +48,6 @@ import se.swedenconnect.bankid.rpapi.types.OrderResponse;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@Service
 public class BankIdService {
 
   /** The BankID event publisher. */
@@ -59,18 +59,23 @@ public class BankIdService {
   /** For generating requests to the BankID server. */
   private final BankIdRequestFactory requestFactory;
 
+  /** Duration to allow retry session start */
+  private final Duration bankIdStartRetryDuration;
+
   /**
    * Constructor.
    *
    * @param eventPublisher the BankID event publisher
    * @param circuitBreaker the circuit breaker (for resilliance)
    * @param requestFactory for generating requests to the BankID server
+   * @param bankIdStartRetryDuration Duration to allow retry session start
    */
   public BankIdService(final BankIdEventPublisher eventPublisher, final CircuitBreaker circuitBreaker,
-      final BankIdRequestFactory requestFactory) {
+      final BankIdRequestFactory requestFactory, Duration bankIdStartRetryDuration) {
     this.eventPublisher = Objects.requireNonNull(eventPublisher, "eventPublisher must not be null");
     this.circuitBreaker = Objects.requireNonNull(circuitBreaker, "circuitBreaker must not be null");
     this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(BankIdRequestFactory::new);
+    this.bankIdStartRetryDuration = Objects.requireNonNull(bankIdStartRetryDuration);
   }
 
   /**
@@ -198,7 +203,9 @@ public class BankIdService {
    */
   private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request, final BankIdSessionData bankIdSessionData) {
     if (bankIdSessionData.getStartFailed()) {
-      if (Duration.between(request.getState().getInitialOrderTime(), Instant.now()).toMinutes() >= 3) {
+      Instant initialOrderTime = request.getState().getInitialOrderTime();
+      Instant now = Instant.now();
+      if (initialOrderTime.isBefore(now) && initialOrderTime.plus(bankIdStartRetryDuration).isBefore(now)) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
       return this.init(request)

@@ -87,6 +87,12 @@
   onMounted(() => {
     polling();
   });
+
+  const retry = () => {
+    cancel().then(r => {
+      polling();
+    });
+  };
 </script>
 
 <template>
@@ -97,9 +103,14 @@
     <QrInstructions v-else />
     <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
     <QrDisplay :image="qrImage" />
-    <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
-      <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-    </button>
+    <div class="error-buttons" v-if="showContinueErrorButton()">
+      <button class="error-button" @click="retry">
+        <span>{{ $t('bankid.msg.btn-retry') }}</span>
+      </button>
+      <button class="error-button" @click="acceptError">
+        <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
+      </button>
+    </div>
     <BankIdLogo />
   </div>
   <div class="return">
@@ -115,3 +126,28 @@
     </button>
   </div>
 </template>
+
+<style scoped>
+.error-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 12px auto;
+  padding: 20px 28px;
+  border: 1px solid var(--btn-border-color);
+  border-radius: var(--btn-border-radius);
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--btn-fg-color);
+  background-color: var(--btn-bg-color);
+}
+
+.error-button::after {
+  padding: 3px;
+  border: solid var(--btn-fg-color);
+  border-width: 0 3px 3px 0;
+  content: '';
+  transform: rotate(-45deg);
+}
+</style>

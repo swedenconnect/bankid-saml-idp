@@ -68,6 +68,17 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private Resource serverRootCertificate;
 
   /**
+   * Duration from initial request to allow restart of BankID-Session
+   * The BankID-Session will enter the state "startFailed" if no client application connects within 30 seconds.
+   * If the current time is between start and start + bankIdStartRetryDuration we will silently start a new session.
+   * If the current time is outside this duration the user will be presented with an error.
+   * The duration will only be checked on startFailed i.e. every 30 seconds.
+   * If you want to disable silent retries set the duration to something lower than 30 seconds. E.g. 0 seconds.
+   */
+  @Getter
+  @Setter
+  private Duration bankIdStartRetryDuration = Duration.ofMinutes(3);
+  /**
    * Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller
    * redirects calls made from the underlying SAML IdP library to our frontend start page.
    */
