@@ -1,6 +1,9 @@
+import type { Ref } from 'vue';
 import { getXSRFCookie } from '@/cookies';
+import { PATHS } from './Redirects';
 import type {
   ApiResponse,
+  ApiResponseStatus,
   CustomerContactInformation,
   RetryResponse,
   SelectedDeviceInformation,
@@ -27,6 +30,56 @@ export async function poll(showQr: boolean) {
   }
   return data;
 }
+
+function isApiResponse(obj: any): obj is ApiResponse {
+  return obj && 'status' in obj;
+}
+
+function isRetryResponse(obj: any): obj is RetryResponse {
+  return obj && 'retry' in obj;
+}
+
+export const polling = (
+  otherDevice: boolean,
+  qrImage: Ref<string>,
+  token: Ref<string>,
+  messageCode: Ref<string>,
+  responseStatus: Ref<ApiResponseStatus | null>,
+) => {
+  poll(otherDevice).then((response) => {
+    if (isApiResponse(response)) {
+      responseStatus.value = response.status;
+      if (response.qrCode !== '') {
+        qrImage.value = response.qrCode;
+      }
+      if (response.status !== 'NOT_STARTED') {
+        qrImage.value = '';
+      }
+      token.value = response.autoStartToken;
+      messageCode.value = response.messageCode;
+
+      if (response.status === 'COMPLETE') {
+        window.location.href = PATHS.COMPLETE;
+      } else if (response.status === 'CANCEL') {
+        window.location.href = PATHS.CANCEL;
+      } else if (response.status === 'ERROR') {
+        qrImage.value = '';
+      }
+    }
+    if (isRetryResponse(response) && response.retry === true) {
+      /* Time is defined in seconds and setTimeout is in milliseconds */
+      window.setTimeout(
+        () => polling(otherDevice, qrImage, token, messageCode, responseStatus),
+        parseInt(response.time) * 1000,
+      );
+    } else if (
+      isRetryResponse(response) ||
+      (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
+    ) {
+      window.setTimeout(() => polling(otherDevice, qrImage, token, messageCode, responseStatus), 500);
+    }
+  });
+};
 
 const fetchData = async (endpoint: string): Promise<any> => (await fetch(CONTEXT_PATH + endpoint)).json();
 
