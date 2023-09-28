@@ -3,7 +3,6 @@ import { UAParser } from 'ua-parser-js';
 export function createLink(userAgent: string, token: string, location: string) {
   const uap = new UAParser(userAgent);
   const ua = uap.getResult();
-  console.log(JSON.stringify(ua));
   switch (getType(ua)) {
     case 'iphone-phone':
       if (ua.browser.name === 'Mobile Safari' || ua.browser.name === 'Safari') {
@@ -39,7 +38,6 @@ export function shallSelectDeviceAutomatically(userAgent: string) {
 }
 
 export function getType(ua: UAParser.IResult) {
-  console.log("UA RESULT: " + JSON.stringify(ua));
   if (ua.device.type === undefined) {
     return 'desktop';
   }
