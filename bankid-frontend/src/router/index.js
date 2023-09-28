@@ -24,18 +24,6 @@ const router = createRouter({
       props: { otherDevice: true },
     },
     {
-      path: '/signsame',
-      name: 'sign-same',
-      component: AuthenticateView,
-      props: { otherDevice: false },
-    },
-    {
-      path: '/signother',
-      name: 'sign-other',
-      component: AuthenticateView,
-      props: { otherDevice: true },
-    },
-    {
       path: '/error/:msg/:trace?',
       name: 'error',
       component: ErrorView,

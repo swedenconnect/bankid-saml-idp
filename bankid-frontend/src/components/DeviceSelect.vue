@@ -20,9 +20,9 @@
     const r = await selectedDevice();
     if (r['isSign']) {
       if (r['device'] === 'this') {
-        authenticate('sign-same');
+        authenticate('auto');
       } else if (r['device'] === 'other') {
-        authenticate('sign-other');
+        authenticate('qr');
       }
     }
   });
