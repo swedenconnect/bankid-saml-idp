@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,10 +35,11 @@ public class SelectedDeviceInformation {
   /**
    * Is the current BankID operation a sign operation?
    */
-  public boolean isSign;
+  @JsonProperty("isSign")
+  private boolean isSign;
 
   /**
    * The selected device. The string representation of the {@link PreviousDeviceSelection} enum.
    */
-  public String device;
+  private String device;
 }
