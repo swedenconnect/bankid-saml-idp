@@ -16,7 +16,7 @@ const testArguments = [
     userAgent:
       'Mozilla/5.0 (Linux; Android 12; SM-S906N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36',
     device: 'android-phone',
-    link: 'bankid:///?autostarttoken=token&redirect=https://location.se',
+    link: 'https://app.bankid.com/?autostarttoken=token&redirect=https://location.se',
     automaticDeviceSelect: true,
   },
   {
@@ -24,15 +24,22 @@ const testArguments = [
     userAgent:
       'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1',
     device: 'iphone-phone',
-    link: 'bankid:///?autostarttoken=token&redirect=https://location.se',
+    link: 'https://app.bankid.com/?autostarttoken=token&redirect=https://location.se',
     automaticDeviceSelect: true,
   },
+  {
+    name: 'iphone-16-3-1-mobile-safari',
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1',
+    device: 'iphone-phone',
+    link: 'https://app.bankid.com/?autostarttoken=token&redirect=https://location.se',
+    automaticDeviceSelect: true
+  }
 ];
 
 test('Parameterized Test : Device Detection : Link Creation', () => {
   testArguments.forEach((arg) => {
-    const appLink = createLink(arg['userAgent'], 'token', 'location.se');
-    expect(appLink, 'Link was not same as expected actual:' + appLink + ' expected:' + arg['link']).toBe(arg['link']);
+    const appLink = createLink(arg['userAgent'], 'token', 'https://location.se');
+    expect(appLink, 'Test Failure for:' + arg['name'] + ' Link was not same as expected actual:' + appLink + ' expected:' + arg['link']).toBe(arg['link']);
   });
 });
 test('Parameterized Test : Device Detection : Start Automatically', () => {
@@ -40,7 +47,7 @@ test('Parameterized Test : Device Detection : Start Automatically', () => {
     const automaticDeviceSelected = shallSelectDeviceAutomatically(arg['userAgent']);
     expect(
       automaticDeviceSelected,
-      'Automatic start was not same as expected actual:' +
+      'Test Failure for:' + arg['name'] + ' Automatic start was not same as expected actual:' +
         automaticDeviceSelected +
         ' expected:' +
         arg['automaticDeviceSelect'],
