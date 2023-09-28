@@ -3,16 +3,15 @@ import { UAParser } from 'ua-parser-js';
 export function createLink(userAgent: string, token: string, location: string) {
   const uap = new UAParser(userAgent);
   const ua = uap.getResult();
-
   switch (getType(ua)) {
     case 'iphone-phone':
       if (ua.browser.name === 'Mobile Safari' || ua.browser.name === 'Safari') {
-        getMobileRedirect(token, location);
+        return getMobileRedirect(token, location);
       }
       // Unsupported browser on iphone
       return getDefaultRedirect(token);
     case 'android-phone':
-      getMobileRedirect(token, location);
+      return getMobileRedirect(token, location);
   }
   return getDefaultRedirect(token);
 }
