@@ -13,11 +13,14 @@
   const token = ref('');
   const messageCode = ref('');
   const responseStatus = ref<ApiResponseStatus | null>(null);
+  const hideAutoStart = ref(false);
 
   const props = defineProps<{
     uiInfo: UiInformation | null;
     otherDevice: boolean;
   }>();
+
+
 
   const showQrInstructions = computed(
     () => messageCode.value === 'bankid.msg.ext2' && props.uiInfo && props.uiInfo.displayQrHelp,
@@ -41,6 +44,7 @@
         if (response.status !== 'NOT_STARTED') {
           qrImage.value = '';
         }
+        hideAutoStart.value = response.status !== 'NOT_STARTED';
         token.value = response.autoStartToken;
         messageCode.value = response.messageCode;
 
@@ -95,7 +99,7 @@
     <CustomContent v-else position="autostart" />
     <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
     <QrInstructions v-else />
-    <AutoStart v-if="!otherDevice && !showContinueErrorButton()" :autoStartToken="token" />
+    <AutoStart v-if="!otherDevice && !showContinueErrorButton() && !hideAutoStart" :autoStartToken="token" />
     <QrDisplay :image="qrImage" />
     <button class="btn-default" v-if="showContinueErrorButton()" @click="acceptError">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>

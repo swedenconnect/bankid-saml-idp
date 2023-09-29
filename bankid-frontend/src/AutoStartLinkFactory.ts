@@ -21,7 +21,7 @@ function getDefaultRedirect(token: string) {
 }
 
 function getMobileRedirect(token: string, location: string) {
-  return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location;
+  return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location + "#anchor";
 }
 
 export function shallSelectDeviceAutomatically(userAgent: string) {
