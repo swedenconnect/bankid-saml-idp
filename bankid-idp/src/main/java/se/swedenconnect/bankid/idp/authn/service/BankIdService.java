@@ -22,8 +22,6 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.stereotype.Service;
-
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import reactor.core.publisher.Mono;
@@ -35,7 +33,6 @@ import se.swedenconnect.bankid.idp.authn.error.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
-import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
@@ -68,7 +65,7 @@ public class BankIdService {
    * @param eventPublisher the BankID event publisher
    * @param circuitBreaker the circuit breaker (for resilliance)
    * @param requestFactory for generating requests to the BankID server
-   * @param bankIdStartRetryDuration Duration to allow retry session start
+   * @param bankIdStartRetryDuration duration to allow retry session start
    */
   public BankIdService(final BankIdEventPublisher eventPublisher, final CircuitBreaker circuitBreaker,
       final BankIdRequestFactory requestFactory, Duration bankIdStartRetryDuration) {
