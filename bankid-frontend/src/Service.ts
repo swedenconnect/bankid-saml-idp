@@ -64,8 +64,6 @@ export const polling = (
         window.location.href = PATHS.COMPLETE;
       } else if (response.status === 'CANCEL') {
         window.location.href = PATHS.CANCEL;
-      } else if (response.status === 'ERROR') {
-        qrImage.value = '';
       }
     }
     if (isRetryResponse(response) && response.retry === true) {
