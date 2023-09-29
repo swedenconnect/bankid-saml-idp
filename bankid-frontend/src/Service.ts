@@ -42,6 +42,7 @@ function isRetryResponse(obj: any): obj is RetryResponse {
 export const polling = (
   otherDevice: boolean,
   qrImage: Ref<string>,
+  hideAutoStart: Ref<boolean>,
   token: Ref<string>,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | null>,
@@ -55,6 +56,7 @@ export const polling = (
       if (response.status !== 'NOT_STARTED') {
         qrImage.value = '';
       }
+      hideAutoStart.value = response.status !== 'NOT_STARTED';
       token.value = response.autoStartToken;
       messageCode.value = response.messageCode;
 
@@ -69,14 +71,14 @@ export const polling = (
     if (isRetryResponse(response) && response.retry === true) {
       /* Time is defined in seconds and setTimeout is in milliseconds */
       window.setTimeout(
-        () => polling(otherDevice, qrImage, token, messageCode, responseStatus),
+        () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus),
         parseInt(response.time) * 1000,
       );
     } else if (
       isRetryResponse(response) ||
       (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
     ) {
-      window.setTimeout(() => polling(otherDevice, qrImage, token, messageCode, responseStatus), 500);
+      window.setTimeout(() => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus), 500);
     }
   });
 };

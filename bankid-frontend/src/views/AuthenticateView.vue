@@ -6,8 +6,8 @@
   import QrDisplay from '@/components/QrDisplay.vue';
   import QrInstructions from '@/components/QrInstructions.vue';
   import { PATHS } from '@/Redirects';
-  import { cancel, poll } from '@/Service';
-  import type { ApiResponse, ApiResponseStatus, RetryResponse, UiInformation } from '@/types';
+  import { cancel, polling } from '@/Service';
+  import type { ApiResponseStatus, UiInformation } from '@/types';
 
   const qrImage = ref('');
   const token = ref('');
@@ -20,53 +20,9 @@
     otherDevice: boolean;
   }>();
 
-
-
   const showQrInstructions = computed(
     () => messageCode.value === 'bankid.msg.ext2' && props.uiInfo && props.uiInfo.displayQrHelp,
   );
-
-  function isApiResponse(obj: any): obj is ApiResponse {
-    return obj && 'status' in obj;
-  }
-
-  function isRetryResponse(obj: any): obj is RetryResponse {
-    return obj && 'retry' in obj;
-  }
-
-  const polling = () => {
-    poll(props.otherDevice).then((response) => {
-      if (isApiResponse(response)) {
-        responseStatus.value = response.status;
-        if (response.qrCode !== '') {
-          qrImage.value = response.qrCode;
-        }
-        if (response.status !== 'NOT_STARTED') {
-          qrImage.value = '';
-        }
-        hideAutoStart.value = response.status !== 'NOT_STARTED';
-        token.value = response.autoStartToken;
-        messageCode.value = response.messageCode;
-
-        if (response.status === 'COMPLETE') {
-          window.location.href = PATHS.COMPLETE;
-        } else if (response.status === 'CANCEL') {
-          window.location.href = PATHS.CANCEL;
-        } else if (response.status === 'ERROR') {
-          qrImage.value = '';
-        }
-      }
-      if (isRetryResponse(response) && response.retry === true) {
-        /* Time is defined in seconds and setTimeout is in milliseconds */
-        window.setTimeout(() => polling(), parseInt(response.time) * 1000);
-      } else if (
-        isRetryResponse(response) ||
-        (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
-      ) {
-        window.setTimeout(() => polling(), 500);
-      }
-    });
-  };
 
   const cancelRequest = async () => {
     await cancel();
@@ -82,6 +38,10 @@
     return responseStatus.value === 'ERROR';
   };
 
+  const startPolling = () => {
+    polling(props.otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus);
+  };
+
   onBeforeMount(() => {
     if (!props.otherDevice) {
       messageCode.value = 'bankid.msg.rfa13';
@@ -89,12 +49,12 @@
   });
 
   onMounted(() => {
-    polling();
+    startPolling();
   });
 
   const retry = () => {
     cancel().then((r) => {
-      polling();
+      startPolling();
     });
   };
 </script>
