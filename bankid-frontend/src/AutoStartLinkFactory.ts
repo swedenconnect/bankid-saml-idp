@@ -8,6 +8,9 @@ export function createLink(userAgent: string, token: string, location: string) {
       if (ua.browser.name === 'Mobile Safari' || ua.browser.name === 'Safari') {
         return getMobileRedirect(token, location);
       }
+      if (ua.browser.name === 'Chrome') {
+        return getIphoneRedirect(token, location, ua.browser.name);
+      }
       // Unsupported browser on iphone
       return getDefaultRedirect(token);
     case 'android-phone':
@@ -50,4 +53,20 @@ export function getType(ua: UAParser.IResult) {
     }
   }
   return 'unknown';
+}
+
+function getIphoneRedirect(token: string, location: string, browser: string) {
+  let appLink = getIphoneAppLink(browser);
+  if (appLink !== "missing") {
+    return getMobileRedirect(token, appLink).replace("#anchor", "");
+  }
+  // Fallback to let the user switch app
+  return getDefaultRedirect(token);
+}
+
+function getIphoneAppLink(browser: string) {
+  if (browser === 'Chrome') {
+    return "googlechromes://";
+  }
+  return "missing";
 }

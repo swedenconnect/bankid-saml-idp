@@ -7,23 +7,25 @@
 -----
 
 <a name="device-support"></a>
+
 ## Device Support
 
-Currently we check [https://analytics.usa.gov/data/](https://analytics.usa.gov/data/) for which 
+Currently we check [https://analytics.usa.gov/data/](https://analytics.usa.gov/data/) for which
 OS/Browser that combinations are the most common.
 
-This is strictly not a bad source since it is updated daily but is not representative of Swedish OS/Browser usages towards public sector websites, thus, such a source if updated daily should be preferred over the current one.
+This is strictly not a bad source since it is updated daily but is not representative of Swedish OS/Browser usages
+towards public sector websites, thus, such a source if updated daily should be preferred over the current one.
 
-
-| OS       | Browser          | Supported |
-|----------|------------------|-----------|
-| iOS      | Safari           | 🟡        |
-| Windows  | Chrome           | ✅        |
-| Android  | Chrome           | 🟡        |
-| Windows  | Edge             | ✅        |
-| macOS    | Safari           | ✅        |
-| macOS    | Chrome           | ✅        |
-| ChromeOS | Chrome           | ❌        |
+| OS       | Browser | Supported |
+|----------|---------|-----------|
+| iOS      | Safari  | 🟡        |
+| iOS      | Chrome  | 🟡        |
+| Windows  | Chrome  | ✅        |
+| Android  | Chrome  | 🟡        |
+| Windows  | Edge    | ✅        |
+| macOS    | Safari  | ✅        |
+| macOS    | Chrome  | ✅        |
+| ChromeOS | Chrome  | ❌        |
 | Windows  | Firefox          | ✅        |
 | Android  | Samsung Internet | 🟡        |
 
