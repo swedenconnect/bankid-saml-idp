@@ -33,6 +33,13 @@ const testArguments = [
     device: 'iphone-phone',
     link: 'https://app.bankid.com/?autostarttoken=token&redirect=https://location.se#anchor',
     automaticDeviceSelect: true
+  },
+  {
+    name: 'iphone-16-3-1-mobile-chrome',
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.117 Mobile/15E148 Safari/604.1',
+    device: 'iphone-phone',
+    link: 'https://app.bankid.com/?autostarttoken=token&redirect=googlechromes://',
+    automaticDeviceSelect: true
   }
 ];
 
