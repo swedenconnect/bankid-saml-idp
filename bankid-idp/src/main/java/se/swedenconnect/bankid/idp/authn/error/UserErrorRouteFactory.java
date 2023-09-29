@@ -17,14 +17,12 @@ package se.swedenconnect.bankid.idp.authn.error;
 
 import java.util.UUID;
 
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
 import se.swedenconnect.bankid.idp.config.UiProperties;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Creates redirect views and links to be used by error handlers.
@@ -37,7 +35,7 @@ public class UserErrorRouteFactory {
 
   /** The properties that determines what to display in the error UI view. */
   private final UiProperties.UserErrorProperties properties;
-  
+
   /**
    * Error message enum.
    */
