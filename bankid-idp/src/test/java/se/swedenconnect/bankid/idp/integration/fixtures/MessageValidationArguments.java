@@ -34,7 +34,7 @@ public class MessageValidationArguments {
             false
         ),
         Arguments.of(
-            "bankid.msg.rfa6",
+            "bankid.msg.error.userCancel",
             false,
             BankIdResponseFactory.createCombined(c -> c.hintCode(ErrorCode.USER_CANCEL.getValue()).status(CollectResponse.Status.FAILED)),
             false

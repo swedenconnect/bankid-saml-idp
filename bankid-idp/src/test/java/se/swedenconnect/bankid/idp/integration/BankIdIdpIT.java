@@ -111,7 +111,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
     ApiResponse poll = client.poll(true).block();
-    Assertions.assertEquals("ERROR", poll.getStatus().name());
+    Assertions.assertEquals("CANCEL", poll.getStatus().name());
   }
 
   @Test

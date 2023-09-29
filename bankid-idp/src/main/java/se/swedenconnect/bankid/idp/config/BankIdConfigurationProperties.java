@@ -60,8 +60,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private String serviceUrl;
 
   /**
-   * The root certificate of the BankID server TLS credential. Defaults to
-   * "classpath:trust/bankid-trust-prod.crt".
+   * The root certificate of the BankID server TLS credential. Defaults to "classpath:trust/bankid-trust-prod.crt".
    */
   @Getter
   @Setter
@@ -81,6 +80,23 @@ public class BankIdConfigurationProperties implements InitializingBean {
   @Getter
   @Setter
   private boolean testMode = false;
+
+  /**
+   * Duration from initial request to allow restart of the BankID session.
+   * <p>
+   * In practice this setting has effect on the time the user has to scan a QR-code, or to start his or her app.
+   * </p>
+   * <p>
+   * The BankID session will enter the state "startFailed" if no client application connects within 30 seconds. If the
+   * current time is between start and start + startRetryDuration the application will silently start a new
+   * session. If the current time is outside this duration the user will be presented with an error. The duration will
+   * only be checked on startFailed i.e. every 30 seconds. If you want to disable silent retries set the duration to
+   * something lower than 30 seconds, e.g., 0 seconds.
+   * </p>
+   */
+  @Getter
+  @Setter
+  private Duration startRetryDuration = Duration.ofMinutes(3);
 
   /**
    * IdP Authentication configuration.
@@ -441,8 +457,8 @@ public class BankIdConfigurationProperties implements InitializingBean {
     private String repository;
 
     /**
-     * If assigned, the audit events will not only be stored according to the "repository" but also be written to
-     * the given log file. If set, a complete path must be given.
+     * If assigned, the audit events will not only be stored according to the "repository" but also be written to the
+     * given log file. If set, a complete path must be given.
      */
     @Getter
     @Setter

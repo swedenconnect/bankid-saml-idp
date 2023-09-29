@@ -22,6 +22,8 @@ import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
+import java.time.Duration;
+
 
 class BankIdServiceTest {
   @Test
@@ -29,7 +31,7 @@ class BankIdServiceTest {
     ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
     CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
     when(circuitBreaker.tryAcquirePermission()).thenReturn(true);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker, new BankIdRequestFactory());
+    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker, new BankIdRequestFactory(), Duration.ofMinutes(3));
     BankIDClient client = Mockito.mock(BankIDClient.class);
     OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
     OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
@@ -79,7 +81,7 @@ class BankIdServiceTest {
     ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
     CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
     when(circuitBreaker.tryAcquirePermission()).thenReturn(true);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker, new BankIdRequestFactory());
+    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker, new BankIdRequestFactory(), Duration.ofMinutes(3));
     BankIDClient client = Mockito.mock(BankIDClient.class);
     OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
     OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
@@ -119,7 +121,7 @@ class BankIdServiceTest {
     CircuitBreakerConfig config = resilienceConfiguration.circuitBreakerConfig();
     CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
     CircuitBreaker circuitBreaker = resilienceConfiguration.circuitBreaker(registry);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(Mockito.mock(ApplicationEventPublisher.class)), circuitBreaker, new BankIdRequestFactory());
+    BankIdService service = new BankIdService(new BankIdEventPublisher(Mockito.mock(ApplicationEventPublisher.class)), circuitBreaker, new BankIdRequestFactory(), Duration.ofMinutes(3));
 
     BankIDClient client = Mockito.mock(BankIDClient.class);
     when(client.collect(any())).thenReturn(Mono.error(new BankIdServerException("")));
