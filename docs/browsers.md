@@ -7,17 +7,19 @@
 -----
 
 <a name="device-support"></a>
+
 ## Device Support
 
-Currently we check [https://analytics.usa.gov/data/](https://analytics.usa.gov/data/) for which 
+Currently we check [https://analytics.usa.gov/data/](https://analytics.usa.gov/data/) for which
 OS/Browser that combinations are the most common.
 
-This is strictly not a bad source since it is updated daily but is not representative of Swedish OS/Browser usages towards public sector websites, thus, such a source if updated daily should be preferred over the current one.
+This is strictly not a bad source since it is updated daily but is not representative of Swedish OS/Browser usages
+towards public sector websites, thus, such a source if updated daily should be preferred over the current one.
 
-
-| OS       | Browser          | Supported |
-|----------|------------------|-----------|
-| iOS      | Safari           | 🟡        |
+| OS       | Browser | Supported |
+|----------|---------|-----------|
+| iOS      | Safari  | 🟡        |
+| iOS      | Chrome  | 🟡        |
 | Windows  | Chrome           | ✅        |
 | Android  | Chrome           | 🟡        |
 | Windows  | Edge             | ✅        |
@@ -35,4 +37,6 @@ This is strictly not a bad source since it is updated daily but is not represent
 
 -----
 
-Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy;
+2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed
+under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
