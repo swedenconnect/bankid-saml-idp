@@ -20,12 +20,12 @@ towards public sector websites, thus, such a source if updated daily should be p
 |----------|---------|-----------|
 | iOS      | Safari  | 🟡        |
 | iOS      | Chrome  | 🟡        |
-| Windows  | Chrome           | ✅        |
-| Android  | Chrome           | 🟡        |
-| Windows  | Edge             | ✅        |
-| macOS    | Safari           | ✅        |
-| macOS    | Chrome           | ✅        |
-| ChromeOS | Chrome           | ❌        |
+| Windows  | Chrome  | ✅        |
+| Android  | Chrome  | 🟡        |
+| Windows  | Edge    | ✅        |
+| macOS    | Safari  | ✅        |
+| macOS    | Chrome  | ✅        |
+| ChromeOS | Chrome  | ❌        |
 | Windows  | Firefox          | ✅        |
 | Android  | Samsung Internet | 🟡        |
 
@@ -37,6 +37,4 @@ towards public sector websites, thus, such a source if updated daily should be p
 
 -----
 
-Copyright &copy;
-2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed
-under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
