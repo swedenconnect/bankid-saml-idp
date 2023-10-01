@@ -20,9 +20,7 @@
     otherDevice: boolean;
   }>();
 
-  const showQrInstructions = computed(
-    () => messageCode.value === 'bankid.msg.ext2' && props.uiInfo && props.uiInfo.displayQrHelp,
-  );
+  const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2' && props.uiInfo?.displayQrHelp);
 
   const cancelRequest = async () => {
     await cancel();
