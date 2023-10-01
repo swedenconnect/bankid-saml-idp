@@ -7,15 +7,15 @@
   import router from '@/router';
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
-  const qrDialog = ref<HTMLDialogElement | null>(null);
+  const qrDialog = ref<HTMLDialogElement>();
 
   const props = defineProps<{
-    uiInfo: UiInformation | null;
-    deviceData: SelectedDeviceInformation | null;
+    uiInfo?: UiInformation;
+    deviceData?: SelectedDeviceInformation;
   }>();
 
   const openQrDialog = () => {
-    if (qrDialog.value) {
+    if (qrDialog?.value) {
       qrDialog.value.showModal();
     }
   };

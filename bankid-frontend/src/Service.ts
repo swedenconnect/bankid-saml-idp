@@ -45,7 +45,7 @@ export const polling = (
   hideAutoStart: Ref<boolean>,
   token: Ref<string>,
   messageCode: Ref<string>,
-  responseStatus: Ref<ApiResponseStatus | null>,
+  responseStatus: Ref<ApiResponseStatus | undefined>,
 ) => {
   poll(otherDevice).then((response) => {
     if (isApiResponse(response)) {

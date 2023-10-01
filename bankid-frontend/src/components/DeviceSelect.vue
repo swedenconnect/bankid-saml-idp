@@ -5,7 +5,7 @@
   import type { SelectedDeviceInformation } from '@/types';
 
   const props = defineProps<{
-    deviceData: SelectedDeviceInformation | null;
+    deviceData?: SelectedDeviceInformation;
   }>();
 
   const router = useRouter();

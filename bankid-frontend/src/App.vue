@@ -7,8 +7,8 @@
   import { selectedDevice, uiInformation } from '@/Service';
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
-  const uiInfo = ref<UiInformation | null>(null);
-  const device = ref<SelectedDeviceInformation | null>(null);
+  const uiInfo = ref<UiInformation>();
+  const device = ref<SelectedDeviceInformation>();
 
   onBeforeMount(async () => {
     uiInfo.value = await uiInformation();
@@ -17,15 +17,12 @@
 </script>
 
 <template>
-  <AppHeader :sp-info="uiInfo ? uiInfo.sp : null" />
+  <AppHeader :sp-info="uiInfo?.sp" />
   <LocaleChanger />
   <main class="main-width">
     <CustomContent position="above" />
     <RouterView :ui-info="uiInfo" :deviceData="device" />
     <CustomContent position="below" />
   </main>
-  <AppFooter
-    :accessibility-link="uiInfo ? uiInfo.accessibilityReportLink : null"
-    :provider-name="uiInfo ? uiInfo.providerName : null"
-  />
+  <AppFooter :accessibility-link="uiInfo?.accessibilityReportLink ?? ''" :provider-name="uiInfo?.providerName" />
 </template>

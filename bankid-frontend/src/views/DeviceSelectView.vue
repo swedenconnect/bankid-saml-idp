@@ -12,8 +12,8 @@
   const displayServiceMessage = ref(false);
 
   const props = defineProps<{
-    uiInfo: UiInformation | null;
-    deviceData: SelectedDeviceInformation | null;
+    uiInfo?: UiInformation;
+    deviceData?: SelectedDeviceInformation;
   }>();
 
   const cancelSelection = () => {
@@ -23,7 +23,7 @@
   const { locale } = useI18n();
 
   const getSpName = () => {
-    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.displayNames[locale.value] : '';
+    return props.uiInfo?.sp.displayNames[locale.value] || '';
   };
 
   const getSpMessage = () => {
@@ -34,7 +34,7 @@
   };
 
   const showSpMessage = () => {
-    return props.uiInfo && props.uiInfo.sp ? props.uiInfo.sp.showSpMessage : false;
+    return props.uiInfo?.sp.showSpMessage;
   };
 
   onBeforeMount(() => {

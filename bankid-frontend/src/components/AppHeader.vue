@@ -3,10 +3,10 @@
   import type { SpInformation } from '@/types';
 
   const props = defineProps<{
-    spInfo: SpInformation | null;
+    spInfo?: SpInformation;
   }>();
 
-  const getImage = computed(() => (props.spInfo ? props.spInfo.imageUrl : ''));
+  const getImage = computed(() => props.spInfo?.imageUrl ?? '');
 </script>
 
 <template>

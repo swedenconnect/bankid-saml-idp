@@ -3,8 +3,8 @@
   import type { LangObject } from '@/types';
 
   const props = defineProps<{
-    accessibilityLink: string | null;
-    providerName: LangObject | null;
+    accessibilityLink: string;
+    providerName?: LangObject;
   }>();
 
   const CONTEXT_PATH = import.meta.env.BASE_URL;
@@ -12,7 +12,7 @@
 
   const { locale } = useI18n();
 
-  const getProviderName = () => (props.providerName ? props.providerName[locale.value] : '');
+  const getProviderName = () => props.providerName?.[locale.value] ?? '';
 </script>
 
 <template>
