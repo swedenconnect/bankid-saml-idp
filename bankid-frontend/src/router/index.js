@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import AuthenticateView from '@/views/AuthenticateView.vue';
+import AutoStartView from '@/views/AutoStartView.vue';
 import DeviceSelectView from '@/views/DeviceSelectView.vue';
 import ErrorView from '@/views/ErrorView.vue';
 import QrInstructionView from '@/views/QrInstructionView.vue';
@@ -15,17 +15,11 @@ const router = createRouter({
     {
       path: '/auto',
       name: 'auto',
-      component: AuthenticateView,
+      component: AutoStartView,
       props: { otherDevice: false },
     },
     {
       path: '/qr',
-      name: 'qr',
-      component: AuthenticateView,
-      props: { otherDevice: true },
-    },
-    {
-      path: '/qr-instruction',
       name: 'qr-instruction',
       component: QrInstructionView,
     },
