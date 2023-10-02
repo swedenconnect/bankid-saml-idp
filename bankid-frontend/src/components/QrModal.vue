@@ -4,6 +4,7 @@
   import { cancel, polling } from '@/Service';
   import type { ApiResponseStatus, UiInformation } from '@/types';
   import CustomContent from './CustomContent.vue';
+  import ErrorButtons from './ErrorButtons.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
 
@@ -20,7 +21,7 @@
   const cancelRetry = ref(false);
 
   const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2');
-  const showContinueErrorButton = computed(() => responseStatus.value === 'ERROR');
+  const showErrorButtons = computed(() => responseStatus.value === 'ERROR');
 
   const closeDialog = () => {
     emit('close');
@@ -53,23 +54,6 @@
   <CustomContent position="qrcode" />
   <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
   <QrInstructions v-else />
-  <div class="buttons" v-if="showContinueErrorButton">
-    <button class="btn-default" @click="acceptError">
-      <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-    </button>
-    <button class="btn-default" @click="retry">
-      <span>{{ $t('bankid.msg.btn-retry') }}</span>
-    </button>
-  </div>
+  <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
   <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
 </template>
-
-<style scoped>
-  .buttons {
-    display: flex;
-    gap: 1em;
-  }
-  .buttons .btn-default {
-    flex: 1;
-  }
-</style>

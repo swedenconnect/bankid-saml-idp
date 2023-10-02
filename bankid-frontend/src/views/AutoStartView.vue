@@ -3,6 +3,7 @@
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
+  import ErrorButtons from '@/components/ErrorButtons.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, polling } from '@/Service';
   import type { ApiResponseStatus } from '@/types';
@@ -13,7 +14,7 @@
   const responseStatus = ref<ApiResponseStatus>();
   const hideAutoStart = ref(false);
 
-  const showContinueErrorButton = computed(() => responseStatus.value === 'ERROR');
+  const showErrorButtons = computed(() => responseStatus.value === 'ERROR');
 
   const cancelRequest = async () => {
     await cancel();
@@ -44,37 +45,13 @@
   <div class="content-container">
     <CustomContent position="autostart" />
     <p>{{ $t(messageCode) }}</p>
-    <AutoStart v-if="!showContinueErrorButton && !hideAutoStart" :autoStartToken="token" />
-    <div class="buttons" v-if="showContinueErrorButton">
-      <button class="btn-default" @click="acceptError">
-        <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
-      </button>
-      <button class="btn-default" @click="retry">
-        <span>{{ $t('bankid.msg.btn-retry') }}</span>
-      </button>
-    </div>
+    <AutoStart v-if="!showErrorButtons && !hideAutoStart" :autoStartToken="token" />
+    <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
     <BankIdLogo />
   </div>
   <div class="return">
-    <button
-      v-if="!showContinueErrorButton"
-      @click="cancelRequest"
-      class="btn-link"
-      type="submit"
-      name="action"
-      value="cancel"
-    >
+    <button v-if="!showErrorButtons" @click="cancelRequest" class="btn-link" type="submit" name="action" value="cancel">
       <span>{{ $t('bankid.msg.btn-cancel') }}</span>
     </button>
   </div>
 </template>
-
-<style scoped>
-  .buttons {
-    display: flex;
-    gap: 1em;
-  }
-  .buttons .btn-default {
-    flex: 1;
-  }
-</style>
