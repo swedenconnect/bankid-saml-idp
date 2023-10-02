@@ -5,10 +5,9 @@
   import CustomContent from '@/components/CustomContent.vue';
   import ErrorButtons from '@/components/ErrorButtons.vue';
   import { PATHS } from '@/Redirects';
-  import { cancel, polling } from '@/Service';
+  import { cancel, pollingAutoStart } from '@/Service';
   import type { ApiResponseStatus } from '@/types';
 
-  const qrImage = ref('');
   const token = ref('');
   const messageCode = ref('bankid.msg.rfa13');
   const responseStatus = ref<ApiResponseStatus>();
@@ -27,7 +26,7 @@
   };
 
   const startPolling = () => {
-    polling(false, qrImage, hideAutoStart, token, messageCode, responseStatus);
+    pollingAutoStart(hideAutoStart, token, messageCode, responseStatus);
   };
 
   onMounted(() => {

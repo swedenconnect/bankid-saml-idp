@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
   import { PATHS } from '@/Redirects';
-  import { cancel, polling } from '@/Service';
+  import { cancel, pollingQr } from '@/Service';
   import type { ApiResponseStatus, UiInformation } from '@/types';
   import CustomContent from './CustomContent.vue';
   import ErrorButtons from './ErrorButtons.vue';
@@ -15,8 +15,6 @@
 
   const qrDialog = ref<HTMLDialogElement>();
   const qrImage = ref('');
-  const hideAutoStart = ref(false); // Enbart för auto
-  const token = ref(''); // Enbart för auto
   const messageCode = ref('');
   const responseStatus = ref<ApiResponseStatus>();
   const cancelRetry = ref(false);
@@ -34,7 +32,7 @@
 
   const startPolling = () => {
     cancelRetry.value = false;
-    polling(true, qrImage, hideAutoStart, token, messageCode, responseStatus, cancelRetry);
+    pollingQr(qrImage, messageCode, responseStatus, cancelRetry);
   };
 
   const acceptError = async () => {

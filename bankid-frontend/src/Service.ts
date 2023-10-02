@@ -39,52 +39,100 @@ function isRetryResponse(obj: any): obj is RetryResponse {
   return obj && 'retry' in obj;
 }
 
-export const polling = (
-  otherDevice: boolean,
+export const pollingQr = (
   qrImage: Ref<string>,
+  messageCode: Ref<string>,
+  responseStatus: Ref<ApiResponseStatus | undefined>,
+  cancelRetry?: Ref<boolean>,
+) => {
+  const pollFunction = () => poll(true);
+  pollFunction().then((response) => {
+    handleResponse(response, pollFunction, qrImage, null, null, messageCode, responseStatus, cancelRetry);
+  });
+};
+
+export const pollingAutoStart = (
   hideAutoStart: Ref<boolean>,
   token: Ref<string>,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | undefined>,
   cancelRetry?: Ref<boolean>,
 ) => {
-  poll(otherDevice).then((response) => {
-    if (isApiResponse(response)) {
-      responseStatus.value = response.status;
-      if (response.qrCode !== '') {
-        qrImage.value = response.qrCode;
-      }
-      if (response.status !== 'NOT_STARTED') {
+  const pollFunction = () => poll(false);
+  pollFunction().then((response) => {
+    handleResponse(response, pollFunction, null, hideAutoStart, token, messageCode, responseStatus, cancelRetry);
+  });
+};
+
+const handleResponse = (
+  response: ApiResponse | RetryResponse,
+  pollFunction: () => Promise<ApiResponse | RetryResponse>,
+  qrImage: Ref<string> | null,
+  hideAutoStart: Ref<boolean> | null,
+  token: Ref<string> | null,
+  messageCode: Ref<string>,
+  responseStatus: Ref<ApiResponseStatus | undefined>,
+  cancelRetry?: Ref<boolean>,
+) => {
+  if (isApiResponse(response)) {
+    responseStatus.value = response.status;
+
+    if (qrImage && response.qrCode !== '') {
+      qrImage.value = response.qrCode;
+    }
+
+    if (response.status !== 'NOT_STARTED') {
+      if (qrImage) {
         qrImage.value = '';
       }
-      hideAutoStart.value = response.status !== 'NOT_STARTED';
-      token.value = response.autoStartToken;
-      messageCode.value = response.messageCode;
+      if (hideAutoStart) {
+        hideAutoStart.value = true;
+      }
+    }
 
-      if (response.status === 'COMPLETE') {
-        window.location.href = PATHS.COMPLETE;
-      } else if (response.status === 'CANCEL') {
-        window.location.href = PATHS.CANCEL;
-      }
+    if (token) {
+      token.value = response.autoStartToken;
     }
-    if (!cancelRetry?.value) {
-      if (isRetryResponse(response) && response.retry === true) {
-        /* Time is defined in seconds and setTimeout is in milliseconds */
-        window.setTimeout(
-          () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus, cancelRetry),
-          parseInt(response.time) * 1000,
-        );
-      } else if (
-        isRetryResponse(response) ||
-        (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
-      ) {
-        window.setTimeout(
-          () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus, cancelRetry),
-          500,
-        );
-      }
+
+    messageCode.value = response.messageCode;
+
+    if (response.status === 'COMPLETE') {
+      window.location.href = PATHS.COMPLETE;
+    } else if (response.status === 'CANCEL') {
+      window.location.href = PATHS.CANCEL;
     }
-  });
+  }
+
+  if (!cancelRetry?.value) {
+    let timeout = 0;
+    if (isRetryResponse(response) && response.retry === true) {
+      /* Time is defined in seconds and setTimeout is in milliseconds */
+      timeout = parseInt(response.time) * 1000;
+    } else if (
+      isRetryResponse(response) ||
+      (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
+    ) {
+      timeout = 500;
+    }
+    if (timeout > 0) {
+      window.setTimeout(
+        () =>
+          pollFunction().then((response) =>
+            handleResponse(
+              response,
+              pollFunction,
+              qrImage,
+              hideAutoStart,
+              token,
+              messageCode,
+              responseStatus,
+              cancelRetry,
+            ),
+          ),
+        timeout,
+      );
+    }
+  }
 };
 
 const fetchData = async (endpoint: string): Promise<any> => (await fetch(CONTEXT_PATH + endpoint)).json();
