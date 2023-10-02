@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, watchEffect } from 'vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import QrInstructions from '@/components/QrInstructions.vue';
@@ -10,11 +10,20 @@
 
   const qrDialog = ref<HTMLDialogElement>();
   const isQrDialogOpen = ref(false);
+  const skipQrInfo = ref<boolean>(localStorage.getItem('skipQrInfo') === 'true');
 
   const props = defineProps<{
     uiInfo?: UiInformation;
     deviceData?: SelectedDeviceInformation;
   }>();
+
+  watchEffect(() => {
+    if (skipQrInfo.value) {
+      localStorage.setItem('skipQrInfo', 'true');
+    } else {
+      localStorage.removeItem('skipQrInfo');
+    }
+  });
 
   const openQr = () => {
     isQrDialogOpen.value = true;
@@ -43,6 +52,7 @@
     <p>Skulle tiden ta slut kan du prova igen.</p>
     <div class="buttons">
       <button @click="openQr" class="btn-default">Visa QR-kod</button>
+      <label><input type="checkbox" v-model="skipQrInfo" />Visa QR-koden direkt nästa gång</label>
       <button @click="openThisDevice" class="btn-link">Öppna BankID på den här enheten</button>
     </div>
     <BankIdLogo />
@@ -69,5 +79,10 @@
   .buttons button {
     font-size: 1em;
     width: fit-content;
+  }
+  .buttons label {
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
   }
 </style>

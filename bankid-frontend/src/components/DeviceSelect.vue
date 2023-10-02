@@ -7,6 +7,7 @@
 
   const qrDialog = ref<HTMLDialogElement>();
   const isQrDialogOpen = ref(false);
+  const skipQrInfo = ref<boolean>(localStorage.getItem('skipQrInfo') === 'true');
 
   const props = defineProps<{
     uiInfo?: UiInformation;
@@ -19,7 +20,8 @@
     router.push({ name: pushLocation });
   };
 
-  const openQr = () => (props.uiInfo?.displayQrHelp ? authenticate('qr-instruction') : openQrDialog());
+  const openQr = () =>
+    props.uiInfo?.displayQrHelp && !skipQrInfo.value ? authenticate('qr-instruction') : openQrDialog();
   const openQrDialog = () => {
     isQrDialogOpen.value = true;
     qrDialog.value?.showModal();
