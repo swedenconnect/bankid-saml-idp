@@ -52,8 +52,8 @@
 <template>
   <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
   <CustomContent position="qrcode" />
-  <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
-  <QrInstructions v-else />
+  <QrInstructions v-if="showQrInstructions" />
+  <p v-else>{{ $t(messageCode) }}</p>
   <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
   <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
 </template>
