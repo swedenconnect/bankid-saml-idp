@@ -21,6 +21,7 @@
   }>();
 
   const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2' && props.uiInfo?.displayQrHelp);
+  const showContinueErrorButton = computed(() => responseStatus.value === 'ERROR');
 
   const cancelRequest = async () => {
     await cancel();
@@ -30,10 +31,6 @@
   const acceptError = async () => {
     await cancel();
     window.location.href = PATHS.ERROR;
-  };
-
-  const showContinueErrorButton = () => {
-    return responseStatus.value === 'ERROR';
   };
 
   const startPolling = () => {
@@ -63,9 +60,9 @@
     <CustomContent v-else position="autostart" />
     <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
     <QrInstructions v-else />
-    <AutoStart v-if="!otherDevice && !showContinueErrorButton() && !hideAutoStart" :autoStartToken="token" />
+    <AutoStart v-if="!otherDevice && !showContinueErrorButton && !hideAutoStart" :autoStartToken="token" />
     <QrDisplay :image="qrImage" :size="uiInfo?.qrSize" />
-    <div class="buttons" v-if="showContinueErrorButton()">
+    <div class="buttons" v-if="showContinueErrorButton">
       <button class="btn-default" @click="acceptError">
         <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
       </button>
@@ -77,7 +74,7 @@
   </div>
   <div class="return">
     <button
-      v-if="!showContinueErrorButton()"
+      v-if="!showContinueErrorButton"
       @click="cancelRequest"
       class="btn-link"
       type="submit"
