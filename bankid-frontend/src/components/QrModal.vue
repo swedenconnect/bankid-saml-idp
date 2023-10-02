@@ -3,6 +3,7 @@
   import { PATHS } from '@/Redirects';
   import { cancel, polling } from '@/Service';
   import type { ApiResponseStatus, UiInformation } from '@/types';
+  import CustomContent from './CustomContent.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
 
@@ -49,6 +50,7 @@
 
 <template>
   <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
+  <CustomContent position="qrcode" />
   <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
   <QrInstructions v-else />
   <div class="buttons" v-if="showContinueErrorButton">

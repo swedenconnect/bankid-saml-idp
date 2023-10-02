@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
+  import CustomContent from '@/components/CustomContent.vue';
   import QrInstructions from '@/components/QrInstructions.vue';
   import QrModal from '@/components/QrModal.vue';
   import { PATHS } from '@/Redirects';
@@ -33,6 +34,7 @@
 
 <template>
   <div class="content-container">
+    <CustomContent position="qrcode" />
     <h2>BankID med QR-kod</h2>
     <p>
       Efter att du tryckt på knappen nedan för att visa QR-koden har du X minuter på dig att följa dessa instruktioner:
