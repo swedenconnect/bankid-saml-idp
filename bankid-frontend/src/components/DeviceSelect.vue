@@ -1,10 +1,15 @@
 <script setup lang="ts">
-  import { onBeforeMount, onMounted } from 'vue';
+  import { onBeforeMount, onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { shallSelectDeviceAutomatically } from '@/AutoStartLinkFactory';
-  import type { SelectedDeviceInformation } from '@/types';
+  import QrModal from '@/components/QrModal.vue';
+  import type { SelectedDeviceInformation, UiInformation } from '@/types';
+
+  const qrDialog = ref<HTMLDialogElement>();
+  const isQrDialogOpen = ref(false);
 
   const props = defineProps<{
+    uiInfo?: UiInformation;
     deviceData?: SelectedDeviceInformation;
   }>();
 
@@ -12,6 +17,16 @@
 
   const authenticate = (pushLocation: string) => {
     router.push({ name: pushLocation });
+  };
+
+  const openQr = () => (props.uiInfo?.displayQrHelp ? authenticate('qr-instruction') : openQrDialog());
+  const openQrDialog = () => {
+    isQrDialogOpen.value = true;
+    qrDialog.value?.showModal();
+  };
+  const closeQr = () => {
+    isQrDialogOpen.value = false;
+    qrDialog.value?.close();
   };
 
   onMounted(() => {
@@ -36,10 +51,14 @@
     <button class="device-button" @click="authenticate('auto')">
       {{ $t('bankid.msg.btn-this') }}
     </button>
-    <button class="device-button" @click="authenticate('qr')">
+    <button class="device-button" @click="openQr">
       {{ $t('bankid.msg.btn-other') }}
     </button>
   </div>
+
+  <dialog ref="qrDialog">
+    <QrModal v-if="isQrDialogOpen" :ui-info="props.uiInfo" @close="closeQr" />
+  </dialog>
 </template>
 
 <style scoped>

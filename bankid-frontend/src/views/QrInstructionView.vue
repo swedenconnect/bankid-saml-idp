@@ -8,16 +8,20 @@
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
   const qrDialog = ref<HTMLDialogElement>();
+  const isQrDialogOpen = ref(false);
 
   const props = defineProps<{
     uiInfo?: UiInformation;
     deviceData?: SelectedDeviceInformation;
   }>();
 
-  const openQrDialog = () => {
-    if (qrDialog?.value) {
-      qrDialog.value.showModal();
-    }
+  const openQr = () => {
+    isQrDialogOpen.value = true;
+    qrDialog.value?.showModal();
+  };
+  const closeQr = () => {
+    isQrDialogOpen.value = false;
+    qrDialog.value?.close();
   };
 
   const openThisDevice = () => router.push({ name: 'auto' });
@@ -36,7 +40,7 @@
     <QrInstructions />
     <p>Skulle tiden ta slut kan du prova igen.</p>
     <div class="buttons">
-      <button @click="openQrDialog" class="btn-default">Visa QR-kod</button>
+      <button @click="openQr" class="btn-default">Visa QR-kod</button>
       <button @click="openThisDevice" class="btn-link">Öppna BankID på den här enheten</button>
     </div>
     <BankIdLogo />
@@ -49,7 +53,7 @@
   </div>
 
   <dialog ref="qrDialog">
-    <QrModal image="https://qrdemo.uxa.se/qr-code-animated.gif" size="200" />
+    <QrModal v-if="isQrDialogOpen" :ui-info="props.uiInfo" @close="closeQr" />
   </dialog>
 </template>
 

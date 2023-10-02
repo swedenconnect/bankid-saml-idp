@@ -46,6 +46,7 @@ export const polling = (
   token: Ref<string>,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | undefined>,
+  cancelRetry?: Ref<boolean>,
 ) => {
   poll(otherDevice).then((response) => {
     if (isApiResponse(response)) {
@@ -66,17 +67,22 @@ export const polling = (
         window.location.href = PATHS.CANCEL;
       }
     }
-    if (isRetryResponse(response) && response.retry === true) {
-      /* Time is defined in seconds and setTimeout is in milliseconds */
-      window.setTimeout(
-        () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus),
-        parseInt(response.time) * 1000,
-      );
-    } else if (
-      isRetryResponse(response) ||
-      (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
-    ) {
-      window.setTimeout(() => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus), 500);
+    if (!cancelRetry?.value) {
+      if (isRetryResponse(response) && response.retry === true) {
+        /* Time is defined in seconds and setTimeout is in milliseconds */
+        window.setTimeout(
+          () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus, cancelRetry),
+          parseInt(response.time) * 1000,
+        );
+      } else if (
+        isRetryResponse(response) ||
+        (isApiResponse(response) && (response.status === 'NOT_STARTED' || response.status === 'IN_PROGRESS'))
+      ) {
+        window.setTimeout(
+          () => polling(otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus, cancelRetry),
+          500,
+        );
+      }
     }
   });
 };

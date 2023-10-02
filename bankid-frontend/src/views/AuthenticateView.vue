@@ -48,7 +48,7 @@
   });
 
   const retry = () => {
-    cancel().then((r) => {
+    cancel().then(() => {
       startPolling();
     });
   };
