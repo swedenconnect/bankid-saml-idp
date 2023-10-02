@@ -8,8 +8,7 @@
   import router from '@/router';
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
-  const qrDialog = ref<HTMLDialogElement>();
-  const isQrDialogOpen = ref(false);
+  const showQrModal = ref(false);
   const skipQrInfo = ref<boolean>(localStorage.getItem('skipQrInfo') === 'true');
 
   const props = defineProps<{
@@ -25,13 +24,8 @@
     }
   });
 
-  const openQr = () => {
-    isQrDialogOpen.value = true;
-    qrDialog.value?.showModal();
-  };
-  const closeQr = () => {
-    isQrDialogOpen.value = false;
-    qrDialog.value?.close();
+  const toggleQrModal = () => {
+    showQrModal.value = !showQrModal.value;
   };
 
   const openThisDevice = () => router.push({ name: 'auto' });
@@ -49,7 +43,7 @@
     <QrInstructions />
     <p>{{ $t('bankid.msg.qr.time-retry') }}</p>
     <div class="buttons">
-      <button @click="openQr" class="btn-default">{{ $t('bankid.msg.qr.show-qr') }}</button>
+      <button @click="toggleQrModal" class="btn-default">{{ $t('bankid.msg.qr.show-qr') }}</button>
       <label><input type="checkbox" v-model="skipQrInfo" />{{ $t('bankid.msg.qr.checkbox') }}</label>
       <button @click="openThisDevice" class="btn-link">{{ $t('bankid.msg.qr.this-device') }}</button>
     </div>
@@ -62,9 +56,7 @@
     </button>
   </div>
 
-  <dialog ref="qrDialog">
-    <QrModal v-if="isQrDialogOpen" :ui-info="props.uiInfo" @close="closeQr" />
-  </dialog>
+  <QrModal v-if="showQrModal" :ui-info="props.uiInfo" @close="toggleQrModal" />
 </template>
 
 <style scoped>

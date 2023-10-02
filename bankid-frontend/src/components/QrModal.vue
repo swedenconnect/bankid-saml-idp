@@ -13,6 +13,7 @@
   }>();
   const emit = defineEmits(['close']);
 
+  const qrDialog = ref<HTMLDialogElement>();
   const qrImage = ref('');
   const hideAutoStart = ref(false); // Enbart för auto
   const token = ref(''); // Enbart för auto
@@ -24,6 +25,9 @@
   const showErrorButtons = computed(() => responseStatus.value === 'ERROR');
 
   const closeDialog = () => {
+    qrDialog.value?.close();
+  };
+  const closeModal = () => {
     emit('close');
     cancelRetry.value = true;
   };
@@ -46,14 +50,17 @@
 
   onMounted(() => {
     startPolling();
+    qrDialog.value?.showModal();
   });
 </script>
 
 <template>
-  <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
-  <CustomContent position="qrcode" />
-  <QrInstructions v-if="showQrInstructions" />
-  <p v-else>{{ $t(messageCode) }}</p>
-  <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
-  <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
+  <dialog ref="qrDialog" @close="closeModal">
+    <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
+    <CustomContent position="qrcode" />
+    <QrInstructions v-if="showQrInstructions" />
+    <p v-else>{{ $t(messageCode) }}</p>
+    <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
+    <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
+  </dialog>
 </template>
