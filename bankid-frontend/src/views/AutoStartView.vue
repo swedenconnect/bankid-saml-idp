@@ -1,26 +1,18 @@
 <script setup lang="ts">
-  import { computed, onBeforeMount, onMounted, ref } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import AutoStart from '@/components/AutoStart.vue';
   import BankIdLogo from '@/components/BankIdLogo.vue';
   import CustomContent from '@/components/CustomContent.vue';
-  import QrDisplay from '@/components/QrDisplay.vue';
-  import QrInstructions from '@/components/QrInstructions.vue';
   import { PATHS } from '@/Redirects';
   import { cancel, polling } from '@/Service';
-  import type { ApiResponseStatus, UiInformation } from '@/types';
+  import type { ApiResponseStatus } from '@/types';
 
   const qrImage = ref('');
   const token = ref('');
-  const messageCode = ref('');
+  const messageCode = ref('bankid.msg.rfa13');
   const responseStatus = ref<ApiResponseStatus>();
   const hideAutoStart = ref(false);
 
-  const props = defineProps<{
-    uiInfo?: UiInformation;
-    otherDevice: boolean;
-  }>();
-
-  const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2' && props.uiInfo?.displayQrHelp);
   const showContinueErrorButton = computed(() => responseStatus.value === 'ERROR');
 
   const cancelRequest = async () => {
@@ -34,14 +26,8 @@
   };
 
   const startPolling = () => {
-    polling(props.otherDevice, qrImage, hideAutoStart, token, messageCode, responseStatus);
+    polling(false, qrImage, hideAutoStart, token, messageCode, responseStatus);
   };
-
-  onBeforeMount(() => {
-    if (!props.otherDevice) {
-      messageCode.value = 'bankid.msg.rfa13';
-    }
-  });
 
   onMounted(() => {
     startPolling();
@@ -56,12 +42,9 @@
 
 <template>
   <div class="content-container">
-    <CustomContent v-if="qrImage" position="qrcode" />
-    <CustomContent v-else position="autostart" />
-    <p v-if="!showQrInstructions">{{ $t(messageCode) }}</p>
-    <QrInstructions v-else />
-    <AutoStart v-if="!otherDevice && !showContinueErrorButton && !hideAutoStart" :autoStartToken="token" />
-    <QrDisplay :image="qrImage" :size="uiInfo?.qrSize" />
+    <CustomContent position="autostart" />
+    <p>{{ $t(messageCode) }}</p>
+    <AutoStart v-if="!showContinueErrorButton && !hideAutoStart" :autoStartToken="token" />
     <div class="buttons" v-if="showContinueErrorButton">
       <button class="btn-default" @click="acceptError">
         <span>{{ $t('bankid.msg.btn-error-continue') }}</span>

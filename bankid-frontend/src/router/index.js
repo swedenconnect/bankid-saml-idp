@@ -16,7 +16,6 @@ const router = createRouter({
       path: '/auto',
       name: 'auto',
       component: AutoStartView,
-      props: { otherDevice: false },
     },
     {
       path: '/qr',
