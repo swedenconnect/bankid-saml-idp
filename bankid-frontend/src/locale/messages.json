@@ -73,7 +73,14 @@
             "qr3": "Allow the BankID app to use your camera",
             "qr4": "Point the camera at the QR code displayed here",
             "qr5": "Follow the instructions in the app"
-          }
+          },
+          "title": "BankID with QR code",
+          "time-info": "After pressing the button below to show the QR code, you have {minutes} minutes to scan the QR code:",
+          "time-retry": "If the time should run out, you can try again.",
+          "show-qr": "Show QR code",
+          "checkbox": "Show the QR code directly next time",
+          "this-device": "Open BankID on this device",
+          "close": "Close"
         }
       }
     }
@@ -152,7 +159,14 @@
             "qr3": "Ge BankID-appen tillåtelse att använda kameran",
             "qr4": "Rikta kameran mot QR-koden som visas här",
             "qr5": "Följ instruktionerna i appen"
-          }
+          },
+          "title": "BankID med QR-kod",
+          "time-info": "Efter att du tryckt på knappen nedan för att visa QR-koden har du {minutes} minuter på dig att läsa av QR-koden:",
+          "time-retry": "Skulle tiden ta slut kan du prova igen.",
+          "show-qr": "Visa QR-kod",
+          "checkbox": "Visa QR-koden direkt nästa gång",
+          "this-device": "Öppna BankID på den här enheten",
+          "close": "Stäng"
         }
       }
     }

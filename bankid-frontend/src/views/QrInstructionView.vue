@@ -44,16 +44,14 @@
 <template>
   <div class="content-container">
     <CustomContent position="qrcode" />
-    <h2>BankID med QR-kod</h2>
-    <p>
-      Efter att du tryckt på knappen nedan för att visa QR-koden har du X minuter på dig att följa dessa instruktioner:
-    </p>
+    <h2>{{ $t('bankid.msg.qr.title') }}</h2>
+    <p>{{ $t('bankid.msg.qr.time-info', { minutes: '3' }) }}</p>
     <QrInstructions />
-    <p>Skulle tiden ta slut kan du prova igen.</p>
+    <p>{{ $t('bankid.msg.qr.time-retry') }}</p>
     <div class="buttons">
-      <button @click="openQr" class="btn-default">Visa QR-kod</button>
-      <label><input type="checkbox" v-model="skipQrInfo" />Visa QR-koden direkt nästa gång</label>
-      <button @click="openThisDevice" class="btn-link">Öppna BankID på den här enheten</button>
+      <button @click="openQr" class="btn-default">{{ $t('bankid.msg.qr.show-qr') }}</button>
+      <label><input type="checkbox" v-model="skipQrInfo" />{{ $t('bankid.msg.qr.checkbox') }}</label>
+      <button @click="openThisDevice" class="btn-link">{{ $t('bankid.msg.qr.this-device') }}</button>
     </div>
     <BankIdLogo />
   </div>

@@ -61,7 +61,7 @@
       <span>{{ $t('bankid.msg.btn-retry') }}</span>
     </button>
   </div>
-  <button v-else class="btn-default" @click="closeDialog">Stäng</button>
+  <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
 </template>
 
 <style scoped>
