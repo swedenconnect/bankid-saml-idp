@@ -83,6 +83,8 @@ async function initializeApp() {
     locale = 'sv';
   }
 
+  document.querySelector('html')?.setAttribute('lang', locale);
+
   const i18n = createI18n({
     legacy: false,
     locale: locale,
