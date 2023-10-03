@@ -17,7 +17,7 @@ spring:
         password: changeit
   session:
     timeout: 15m
-    
+
 server:
   error:
     whitelabel:
@@ -26,7 +26,7 @@ server:
   reactive:
     session:
       timeout: 15m
-      
+
 management:
   endpoint:
     health:
@@ -38,12 +38,12 @@ management:
       exposure:
         include: health, metrics, prometheus, loggers, auditevents
   server:
-    port: 8444      
+    port: 8444
 
 logging:
   level:
     se:
-      swedenconnect:      
+      swedenconnect:
         spring:
           saml: DEBUG
         bankid: DEBUG
@@ -132,15 +132,15 @@ saml:
           en: BankID Identity Provider (Local)
           sv: BankID legitimeringstjänst (Local)
         logotypes:
-        - path: /images/BankID_logo.svg
-          height: 171
-          width: 20
+          - path: /images/BankID_logo.svg
+            height: 171
+            width: 20
       organization:
         names:
-          en: "Sweden Connect" 
+          en: "Sweden Connect"
           sv: "Sweden Connect"
         display-names:
-          en: "Sweden Connect" 
+          en: "Sweden Connect"
           sv: "Sweden Connect"
         urls:
           en: https://www.swedenconnect.se/en
@@ -149,8 +149,8 @@ saml:
         technical:
           company: "Sweden Connect"
           email-addresses:
-          - operations@swedenconnect.se
+            - operations@swedenconnect.se
         support:
           company: "Sweden Connect"
           email-addresses:
-          - operations@swedenconnect.se        
+            - operations@swedenconnect.se
