@@ -22,7 +22,7 @@
     --size: 50px;
     --width: 10px;
     --padding: 10px;
-    --color: #2537ff;
+    --color: var(--qr-corner-color);
 
     display: inline-block;
     padding: calc(var(--padding) + var(--width));
