@@ -76,5 +76,7 @@
     font-size: 0.8em;
     display: flex;
     align-items: center;
+    height: 2rem;
+    gap: 4px;
   }
 </style>
