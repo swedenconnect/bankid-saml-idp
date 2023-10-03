@@ -64,15 +64,16 @@ fi
 
 echo "Building BankID IdP and BankID RP API ..."
 
-mvn clean deploy -Prelease
+mvn clean install -Prelease
+mvn deploy -Prelease
 mvn nexus-staging:release -Prelease
 
-echo "Building BankID IdP without frontend ..."
-popd > /dev/null
-pushd ${SCRIPT_DIR}/../bankid-idp > /dev/null
+# echo "Building BankID IdP without frontend ..."
+# popd > /dev/null
+# pushd ${SCRIPT_DIR}/../bankid-idp > /dev/null
 
-mvn clean deploy -Prelease -Dbackend-only
-mvn nexus-staging:release -Prelease -Dbackend-only
+# mvn clean deploy -Prelease -Dbackend-only
+# mvn nexus-staging:release -Prelease -Dbackend-only
 
 popd > /dev/null
 

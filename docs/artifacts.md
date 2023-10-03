@@ -33,6 +33,14 @@ The BankID IdP artifacts are published to [Maven Central](https://central.sonaty
 
 > This is typically used if you supply your own frontend application, see [Extending the BankID Backend Application](https://docs.swedenconnect.se/bankid-saml-idp/override.html#extending-the-bankid-backend-application).
 
+**Note:** Currently, the `bankid-idp-backend` artifact is not published to Maven central. If you need
+this artifact, build it from source:
+
+```bash
+cd bankid-idp
+mvn clean install -Dbackend-only
+```
+
 **BankID IdP Frontend distribution:**
 ```xml
 <dependency>
