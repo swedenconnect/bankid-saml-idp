@@ -54,8 +54,10 @@ export interface SpInformation {
 export interface UiInformation {
   sp: SpInformation;
   displayQrHelp: boolean;
+  qrSize: string;
   accessibilityReportLink: string | null;
   providerName: LangObject;
+  qrDisplayInMinutes: bigint;
 }
 
 export interface SelectedDeviceInformation {

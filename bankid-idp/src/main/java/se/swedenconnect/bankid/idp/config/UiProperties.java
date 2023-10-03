@@ -21,9 +21,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.DisplayText;
+import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 
 /**
  * Configuration properties concerning the BankID IdP UI (including texts displayed in the BankID app).
@@ -31,6 +34,7 @@ import se.swedenconnect.bankid.idp.authn.DisplayText;
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Slf4j
 public class UiProperties implements InitializingBean {
 
   /**
@@ -46,6 +50,13 @@ public class UiProperties implements InitializingBean {
   @Getter
   @Setter
   private ApplicationProviderProperties provider;
+
+  /**
+   * QR code generation configuration.
+   */
+  @Getter
+  @Setter
+  private QrCodeConfiguration qrCode;
 
   /**
    * Enables an extra informational message about which SP that ordered authentication/signature in the device select
@@ -78,20 +89,19 @@ public class UiProperties implements InitializingBean {
   @Setter
   private OverrideProperties override;
 
-  /**
-   * Tells whether extra help texts in the UI should be displayed helping the user to understand how to scan the QR
-   * code.
-   */
-  @Getter
-  @Setter
-  private boolean displayQrHelp = false;
-
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {
     if (this.userMessageDefaults == null) {
       this.userMessageDefaults = new UserMessageProperties();
     }
+    this.userMessageDefaults.afterPropertiesSet();
+
+    if (this.qrCode == null) {
+      this.qrCode = new QrCodeConfiguration();
+    }
+    this.qrCode.afterPropertiesSet();
+
     if (this.userError == null) {
       this.userError = new UserErrorProperties();
     }
@@ -181,6 +191,44 @@ public class UiProperties implements InitializingBean {
     @Setter
     private Map<String, String> name;
 
+  }
+
+  /**
+   * QR code configuration.
+   */
+  @Data
+  public static final class QrCodeConfiguration implements InitializingBean {
+
+    /**
+     * The height and width in pixels of the QR code.
+     */
+    private Integer size;
+
+    /**
+     * The image format for the generated QR code.
+     */
+    private QRGenerator.ImageFormat imageFormat;
+
+    /**
+     * Tells whether we should display an intermediate view before displaying the QR-code. This page/view
+     * will contain extra help texts.
+     */
+    private boolean displayQrHelp = false;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      if (this.size == null) {
+        this.size = 200;
+        log.info("bankid.ui.qr-code.size was not assigned, defaulting to {}", this.size);
+      }
+      if (this.imageFormat == null) {
+        this.imageFormat = QRGenerator.ImageFormat.PNG;
+        log.info("bankid.ui.qr-code.image-format was not assigned, defaulting to {}", this.imageFormat);
+      }
+    }
   }
 
 }

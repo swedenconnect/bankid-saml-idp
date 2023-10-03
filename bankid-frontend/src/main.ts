@@ -2,9 +2,9 @@ import './assets/main.css';
 import './assets/open-sans-fonts.css';
 import { createApp } from 'vue';
 import { createI18n } from 'vue-i18n';
+import messages from '@/locale/messages.json';
 import { getOverrides } from '@/Service';
 import App from './App.vue';
-import { messages } from './locale/messages';
 import router from './router';
 import type { LangObject, MessageOverride, Messages } from './types';
 

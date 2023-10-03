@@ -1,13 +1,14 @@
 <script setup lang="ts">
   const props = defineProps<{
     image: string;
+    size?: string;
   }>();
 </script>
 
 <template>
   <div v-if="props.image" class="qr-code">
     <div class="corner-frame">
-      <img width="200" height="200" :src="props.image" alt="QR Code" />
+      <img :width="props.size || 200" :src="props.image" alt="QR Code" />
     </div>
   </div>
 </template>
@@ -21,7 +22,7 @@
     --size: 50px;
     --width: 10px;
     --padding: 10px;
-    --color: #2537ff;
+    --color: var(--qr-corner-color);
 
     display: inline-block;
     padding: calc(var(--padding) + var(--width));

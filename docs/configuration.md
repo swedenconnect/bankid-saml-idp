@@ -31,7 +31,6 @@ comprise of configuration for the BankID integration and integration against the
 | `bankid.`<br />`built-in-frontend` | Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller redirects calls made from the underlying SAML IdP library to our frontend start page. | `Boolean` | `true` |
 | `bankid.start-retry-duration`| Duration from initial request to allow restart of the BankID session.<br /><br />In practice this setting has effect on the time the user has to scan a QR-code, or to start his or her app.<br /><br />The BankID session will enter the state "startFailed" if no client application connects within 30 seconds. If the current time is between start and start + startRetryDuration the application will silently start a new session. If the current time is outside this duration the user will be presented with an error. The duration will only be checked on startFailed i.e. every 30 seconds. If you want to disable silent retries set the duration to something lower than 30 seconds, e.g., 0 seconds.  | Duration | 3 minutes |
 | `bankid.authn.*` | IdP Authentication configuration. See [Authentication Configuration](#authentication-configuration) below. | [IdpConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | - |
-| `bankid.qr-code.*` | See [QR Code Generation Configuration](#qr-code-generation-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#qr-code-generation-configuration) |
 | `bankid.health.*` | Configuration for the Spring Boot actuator Health-endpoint. See [Health Configuration](#health-configuration) below. | [HealthConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#health-configuration) |
 | `bankid.session.module` | Configuration for which session module that should be active. Supported values are `memory` and `redis`. Set to other value if you extend the BankID IdP with your own session handling (see [Writing Your Own Session Handling Module](override.html#writing-your-own-session-handling-module)). | String | `memory` |
 | `bankid.audit.*` | Audit logging configuration, see [Audit Logging Configuration](#audit-logging-configuration) below. | [AuditConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/BankIdConfigurationProperties.java) | See defaults [below](#audit-logging-configuration) |
@@ -55,16 +54,6 @@ of the [Spring Security SAML Identity Provider](https://github.com/swedenconnect
 
 > **\[1\]:** BankID as a eID provider is certified according to LoA 3 (tillitsnivå 3), but unless
 the actual BankID IdP has been certified according to LoA 3 the "uncertified-loa3" URI should be used. Read more at [https://www.digg.se/digitala-tjanster/e-legitimering/e-legitimering-for-dig-som-leverantor/idp-leverantor](https://www.digg.se/digitala-tjanster/e-legitimering/e-legitimering-for-dig-som-leverantor/idp-leverantor). If your IdP has been audited and certified according to LoA 3, the URI `http://id.elegnamnden.se/loa/1.0/loa3` should be used.
-
-<a name="qr-code-generation-configuration"></a>
-### QR Code Generation Configuration
-
-Configuration for how to generate QR codes.
-
-| Property | Description | Type | Default value |
-| :--- | :--- | :--- | :--- |
-| `size` | The size in pixels (height and width) for the generated QR codes. | Integer | `300` |
-| `image-format` | The image format for the generated QR code. Possible values are: `JPG` and `PNG`. <br /><br />**Note:** `SVG` is also a valid value, but currently not supported by the underlying QR code generator. | String | `PNG` |
 
 <a name="health-configuration"></a>
 ### Health Configuration
@@ -94,11 +83,11 @@ For more details about health- and other monitoring endpoints, see [Monitoring t
 | `user-message-defaults.*`  | Configuration for default text(s) to display during authentication/signing. See [Default User Messages Configuration](#default-user-messages-configuration) below. | [UserMessageProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | - |
 | `provider.svg-logotype` | The icon/logotype to be displayed in UI footer. This logotype should be the logotype for the provider of the service (as opposed for the logotype displayed in the left upper corner which is the logotype for the calling SP). The logotype must be in SVG format. If no logotype is assigned, the UI footer will hold no logotype. | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
 | `provider.name.*` | The name for the provider as a map where the keys are language codes and the values the name in respective language. This name will primarily be used at the bottom of the page in the copyright statement, but may (later) by used in other UI places as well. If no value is set, no copyright statement is displayed. | Map of strings | - |
+| `qr-code.*` | See [QR Code Configuration](#qr-code-configuration) below. | [QrCodeConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See defaults [below](#qr-code-configuration) |
 | `show-sp-message` | Enables an extra informational message in the UI about which SP that ordered authentication/signature. The SP display name will be read from the SAML metadata (can be overridden in RP configuration). | Boolean | `false` |
 | `accessibility-report-link` | Swedish public e-services are required to include a link to the "accessibility report" (tillgänglighetsrapport) of their web site. By assigning this setting with a link, this link will be included in the device selection view of the UI. | String | - |
 | `user-error.*` | UI properties for how to display errors for the user. See [User Error Configuration](#user-error-configuration) below. | [UserErrorProperties](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/UiProperties.java) | See [below](#user-error-configuration) |
 | `override.directory-path` | Optional path where CSS, message and content override files can be put. See [Customizing the BankID IdP UI](https://docs.swedenconnect.se/bankid-saml-idp/override.html#customizing-the-bankid-idp-ui). | String | - |
-| `display-qr-help` | Tells whether extra help texts in the UI should be displayed helping the user to understand how to scan the QR code. | Boolean | `false` |
 
 **Note:** A BankID that is "generic", meaning that it serves Service Providers from different
 organizations,  should enable the `show-sp-message` setting to provide textual information about the
@@ -124,6 +113,18 @@ RP.
 | :--- | :--- | :--- | :--- |
 | `text` | The text string. | String | - |
 | `format` | The format on the above text string. Can be either `plain_text` or `simple_markdown_v1` (see https://www.bankid.com/utvecklare/guider/formatera-text) | String | `plain_text` |
+
+<a name="qr-code-configuration"></a>
+#### QR Code Configuration
+
+Configuration for how to generate and display QR codes.
+
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| `size` | The size in pixels (height and width) for the generated and displayed QR codes. | Integer | `200` |
+| `image-format` | The image format for the generated QR code. Possible values are: `JPG` and `PNG`. <br /><br />**Note:** `SVG` is also a valid value, but currently not supported by the underlying QR code generator. | String | `PNG` |
+| `display-qr-help` | Tells whether we should display an intermediate view before displaying the QR-code. This page/view will contain extra help texts to assist the user in understanding the steps for scanning the QR code. | Boolean | `false` |
+
 
 <a name="user-error-configuration"></a>
 #### User Error Configuration

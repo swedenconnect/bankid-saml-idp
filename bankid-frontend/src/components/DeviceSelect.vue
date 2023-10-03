@@ -1,13 +1,28 @@
 <script setup lang="ts">
-  import { onBeforeMount, onMounted } from 'vue';
+  import { onBeforeMount, onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { shallSelectDeviceAutomatically } from '@/AutoStartLinkFactory';
-  import { selectedDevice } from '@/Service';
+  import QrModal from '@/components/QrModal.vue';
+  import type { SelectedDeviceInformation, UiInformation } from '@/types';
+
+  const showQrModal = ref(false);
+  const skipQrInfo = ref<boolean>(localStorage.getItem('skipQrInfo') === 'true');
+
+  const props = defineProps<{
+    uiInfo?: UiInformation;
+    deviceData?: SelectedDeviceInformation;
+  }>();
 
   const router = useRouter();
 
   const authenticate = (pushLocation: string) => {
     router.push({ name: pushLocation });
+  };
+
+  const openQr = () =>
+    props.uiInfo?.displayQrHelp && !skipQrInfo.value ? authenticate('qr-instruction') : (showQrModal.value = true);
+  const closeQr = () => {
+    showQrModal.value = false;
   };
 
   onMounted(() => {
@@ -16,13 +31,12 @@
     }
   });
 
-  onBeforeMount(async () => {
-    const r = await selectedDevice();
-    if (r['isSign']) {
-      if (r['device'] === 'this') {
-        authenticate('sign-same');
-      } else if (r['device'] === 'other') {
-        authenticate('sign-other');
+  onBeforeMount(() => {
+    if (props.deviceData && props.deviceData.isSign) {
+      if (props.deviceData.device === 'this') {
+        authenticate('auto');
+      } else if (props.deviceData.device === 'other') {
+        openQr();
       }
     }
   });
@@ -33,10 +47,12 @@
     <button class="device-button" @click="authenticate('auto')">
       {{ $t('bankid.msg.btn-this') }}
     </button>
-    <button class="device-button" @click="authenticate('qr')">
+    <button class="device-button" @click="openQr">
       {{ $t('bankid.msg.btn-other') }}
     </button>
   </div>
+
+  <QrModal v-if="showQrModal" :ui-info="props.uiInfo" @close="closeQr" />
 </template>
 
 <style scoped>
