@@ -5,6 +5,7 @@
 
   const selectLanguage = (lang: string) => {
     locale.value = lang;
+    localStorage.setItem('locale', locale.value);
   };
 </script>
 
