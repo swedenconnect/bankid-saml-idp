@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -140,34 +140,6 @@
       <artifactId>spring-boot-devtools</artifactId>
     </dependency>
     -->
-
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
-      <version>4.6.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>jquery</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>popper.js</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>popper.js</artifactId>
-      <version>1.16.1-lts</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-      <version>3.6.1</version>
-    </dependency>
 
     <dependency>
       <groupId>org.redisson</groupId>

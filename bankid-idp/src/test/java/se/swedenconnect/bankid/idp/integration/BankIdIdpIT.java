@@ -1,5 +1,24 @@
+/*
+ * Copyright 2023 Sweden Connect
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package se.swedenconnect.bankid.idp.integration;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,8 +28,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -21,11 +40,6 @@ import se.swedenconnect.bankid.idp.integration.response.OrderAndCollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.List;
-
 
 public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
@@ -109,7 +123,8 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     client.cancelApi().block();
     String cancel = client.cancel();
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
-    BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
+    BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse,
+        c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
     ApiResponse poll = client.poll(true).block();
     Assertions.assertEquals("CANCEL", poll.getStatus().name());
   }
@@ -128,12 +143,13 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
   }
 
   @ParameterizedTest
-  @MethodSource({"se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll"})
+  @MethodSource({ "se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll" })
   void testUserMessage(String expectedMessageCode, Boolean sign, OrderAndCollectResponse response, Boolean showQr) {
     FrontendClient client = AuthenticatedClientResolver.createFrontEndClient(sign);
     if (sign) {
       BankIdApiMock.mockSign(response.getOrderResponse());
-    } else {
+    }
+    else {
       BankIdApiMock.mockAuth(response.getOrderResponse());
     }
     BankIdApiMock.nextCollect(response.getCollectResponse());

@@ -33,7 +33,8 @@ public class TestSpConstants {
 
   public static MetadataResolver createMetadataResolver(final EntityDescriptor... metadata) throws Exception {
 
-    final EntitiesDescriptor ed = (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
+    final EntitiesDescriptor ed =
+        (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
     ed.setID("_simulatedmetadata");
 
     Arrays.stream(metadata).forEach(m -> ed.getEntityDescriptors().add(m));

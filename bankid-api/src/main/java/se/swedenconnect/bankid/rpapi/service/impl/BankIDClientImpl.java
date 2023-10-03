@@ -224,6 +224,7 @@ public class BankIDClientImpl implements BankIDClient {
 
   }
 
+  @SuppressWarnings("unused")
   private Mono<? extends Throwable> defaultErrorHandler(final ClientResponse clientResponse) {
     return clientResponse.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
       return new BankIDException("Error to communicate with BankID API response:" + m.toString());
