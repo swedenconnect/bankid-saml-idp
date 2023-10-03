@@ -75,7 +75,8 @@
             "qr5": "Follow the instructions in the app"
           },
           "title": "BankID with QR code",
-          "time-info": "After pressing the button below to show the QR code, you have {minutes} minutes to scan the QR code:",
+          "time-info": "After pressing the button below to show the QR code, you have {minutes} to scan the QR code:",
+          "minutes": "30 seconds | {n} minute | {n} minutes",
           "time-retry": "If the time should run out, you can try again.",
           "show-qr": "Show QR code",
           "checkbox": "Show the QR code directly next time",
@@ -161,7 +162,8 @@
             "qr5": "Följ instruktionerna i appen"
           },
           "title": "BankID med QR-kod",
-          "time-info": "Efter att du tryckt på knappen nedan för att visa QR-koden har du {minutes} minuter på dig att läsa av QR-koden:",
+          "time-info": "Efter att du tryckt på knappen nedan för att visa QR-koden har du {minutes} på dig att läsa av QR-koden:",
+          "minutes": "30 sekunder | {n} minut | {n} minuter",
           "time-retry": "Skulle tiden ta slut kan du prova igen.",
           "show-qr": "Visa QR-kod",
           "checkbox": "Visa QR-koden direkt nästa gång",

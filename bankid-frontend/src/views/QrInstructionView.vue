@@ -39,7 +39,9 @@
   <div class="content-container">
     <CustomContent position="qrcode" />
     <h2>{{ $t('bankid.msg.qr.title') }}</h2>
-    <p>{{ $t('bankid.msg.qr.time-info', { minutes: uiInfo?.qrDisplayInMinutes }) }}</p>
+    <p>
+      {{ $t('bankid.msg.qr.time-info', { minutes: $t('bankid.msg.qr.minutes', { n: uiInfo?.qrDisplayInMinutes }) }) }}
+    </p>
     <QrInstructions />
     <p>{{ $t('bankid.msg.qr.time-retry') }}</p>
     <div class="buttons">
