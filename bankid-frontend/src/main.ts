@@ -64,9 +64,30 @@ async function initializeApp() {
     customContent = overrides.content;
   }
 
+  const ALL_LOCALES = Object.keys(messagesToBeLoaded);
+  type LocaleType = (typeof ALL_LOCALES)[number];
+
+  function isLocaleType(value: string): value is LocaleType {
+    return ALL_LOCALES.includes(value as LocaleType);
+  }
+
+  const storedLocale = localStorage.getItem('locale') ?? '';
+  const browserLocale = navigator.language.slice(0, 2);
+
+  let locale: LocaleType;
+  if (isLocaleType(storedLocale)) {
+    locale = storedLocale;
+  } else if (isLocaleType(browserLocale)) {
+    locale = browserLocale;
+  } else {
+    locale = 'sv';
+  }
+
+  document.querySelector('html')?.setAttribute('lang', locale);
+
   const i18n = createI18n({
     legacy: false,
-    locale: 'sv',
+    locale: locale,
     fallbackLocale: 'en',
     messages: messagesToBeLoaded,
   });

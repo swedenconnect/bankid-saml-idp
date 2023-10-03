@@ -5,6 +5,8 @@
 
   const selectLanguage = (lang: string) => {
     locale.value = lang;
+    document.querySelector('html')?.setAttribute('lang', locale.value);
+    localStorage.setItem('locale', locale.value);
   };
 </script>
 
