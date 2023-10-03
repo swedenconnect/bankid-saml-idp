@@ -7,6 +7,7 @@
   import ErrorButtons from './ErrorButtons.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
+  import LoadingSpinner from './LoadingSpinner.vue';
 
   const props = defineProps<{
     uiInfo?: UiInformation;
@@ -21,6 +22,9 @@
 
   const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2');
   const showErrorButtons = computed(() => responseStatus.value === 'ERROR');
+  const containerSize = computed(() => (props.uiInfo ? (parseInt(props.uiInfo.qrSize) * 2).toString() + 'px' : ''));
+  const qrSizeWithPx = computed(() => (props.uiInfo ? props.uiInfo.qrSize + 'px' : '0px'));
+  const modalMaxWidth = computed(() => `max(${qrSizeWithPx.value}, 700px)`);
 
   const closeDialog = () => {
     qrDialog.value?.close();
@@ -53,7 +57,8 @@
 </script>
 
 <template>
-  <dialog ref="qrDialog" @close="closeModal">
+  <dialog ref="qrDialog" @close="closeModal" :style="{ maxWidth: modalMaxWidth }">
+    <LoadingSpinner v-if="!messageCode" :container-size="containerSize" />
     <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
     <CustomContent position="qrcode" />
     <QrInstructions v-if="showQrInstructions" />

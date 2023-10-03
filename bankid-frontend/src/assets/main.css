@@ -18,6 +18,8 @@
   --warning-bg-color: beige;
   --warning-fg-color: #000;
   --warning-border-color: #000;
+  --loading-bg-color: #eee;
+  --loading-fg-color: blue;
   --qr-corner-color: blue;
 }
 
