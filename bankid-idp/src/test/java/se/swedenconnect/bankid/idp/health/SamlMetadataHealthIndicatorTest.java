@@ -101,11 +101,13 @@ public class SamlMetadataHealthIndicatorTest {
     Mockito.when(metadata.resolveSingle(Mockito.any())).thenAnswer(a -> {
       final CriteriaSet criteria = a.getArgument(0, CriteriaSet.class);
       final EntityIdCriterion ec =
-          criteria.stream().filter(EntityIdCriterion.class::isInstance).map(EntityIdCriterion.class::cast).findFirst().orElse(null);
+          criteria.stream().filter(EntityIdCriterion.class::isInstance).map(EntityIdCriterion.class::cast).findFirst()
+              .orElse(null);
       if (ec == null) {
         return null;
       }
-      if ("https://www.example.com/a2".equals(ec.getEntityId()) || "https://www.example.com/b2".equals(ec.getEntityId())) {
+      if ("https://www.example.com/a2".equals(ec.getEntityId())
+          || "https://www.example.com/b2".equals(ec.getEntityId())) {
         return null;
       }
       else {

@@ -21,8 +21,18 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -75,12 +85,6 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectEncrypter;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.opensaml.OpenSamlCredential;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class TestSp {
 
@@ -147,8 +151,8 @@ public class TestSp {
     final EntityAttributes entityAttributes = this.getEntityAttributes();
     final Extensions extensions = entityAttributes != null
         ? ExtensionsBuilder.builder()
-        .extension(entityAttributes)
-        .build()
+            .extension(entityAttributes)
+            .build()
         : null;
 
     return EntityDescriptorBuilder.builder()
@@ -256,12 +260,16 @@ public class TestSp {
   }
 
   public RequestBuilder generateRequest(final String idpEntityId, final AuthnRequestGenerator generator,
-                                        final AuthnRequestGeneratorContext context, final String relayState, final MockHttpSession session, int serverPort) throws Exception {
-    final RequestHttpObject<AuthnRequest> requestObject = generator.generateAuthnRequest(idpEntityId, relayState, context);
+      final AuthnRequestGeneratorContext context, final String relayState, final MockHttpSession session,
+      int serverPort) throws Exception {
+    final RequestHttpObject<AuthnRequest> requestObject =
+        generator.generateAuthnRequest(idpEntityId, relayState, context);
     this.authnRequest = requestObject.getRequest();
-    this.authnRequest.setDestination("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort));
+    this.authnRequest
+        .setDestination("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort));
     this.relayState = relayState;
-    final UriComponents components = UriComponentsBuilder.fromUriString("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort)).build();
+    final UriComponents components = UriComponentsBuilder
+        .fromUriString("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort)).build();
     MockHttpServletRequestBuilder builder;
 
     if ("GET".equals(requestObject.getMethod())) {
@@ -295,7 +303,7 @@ public class TestSp {
   }
 
   public AuthnRequestGenerator createAuthnRequestGenerator(final PkiCredential credential,
-                                                           final EntityDescriptor idpMetadata) throws Exception {
+      final EntityDescriptor idpMetadata) throws Exception {
 
     final SwedishEidAuthnRequestGenerator generator = new SwedishEidAuthnRequestGenerator(getEntityId(),
         Optional.ofNullable(credential)
@@ -313,10 +321,12 @@ public class TestSp {
     org.w3c.dom.Element marshall = OpenSamlTestBase.marshall(this.getSpMetadata());
     try (FileOutputStream output = new FileOutputStream(getFilePath())) {
       writeXml(marshall.getOwnerDocument(), output);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
+
   private void writeXml(org.w3c.dom.Document doc, OutputStream output) throws TransformerException {
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
     Transformer transformer = transformerFactory.newTransformer();
@@ -336,7 +346,10 @@ public class TestSp {
   public String getAuthFilePath() {
     return new File("").getAbsolutePath() + "/src/test/resources/sp-metadata.xml";
   }
-  public String getSignFilePath() {return new File("").getAbsolutePath() + "/src/test/resources/sp-sign-metadata.xml";}
+
+  public String getSignFilePath() {
+    return new File("").getAbsolutePath() + "/src/test/resources/sp-sign-metadata.xml";
+  }
 
   public String getResourcePath() {
     if (signMode) {

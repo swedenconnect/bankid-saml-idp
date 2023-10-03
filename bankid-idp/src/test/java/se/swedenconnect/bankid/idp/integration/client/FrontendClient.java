@@ -1,8 +1,29 @@
+/*
+ * Copyright 2023 Sweden Connect
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package se.swedenconnect.bankid.idp.integration.client;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import javax.servlet.ServletContext;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
@@ -22,6 +43,10 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
+
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
@@ -31,14 +56,6 @@ import se.swedenconnect.bankid.idp.integration.TestSpConstants;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGenerator;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGeneratorContext;
 import se.swedenconnect.spring.saml.idp.settings.EndpointSettings;
-
-import javax.servlet.ServletContext;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class FrontendClient {
   private final WebClient client;
@@ -59,11 +76,13 @@ public class FrontendClient {
 
   public Mono<Void> cancelApi() {
     WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec = client.post();
-    return exchangeApi(withPath(requestHeadersUriSpec, "/idp/api/cancel", c -> {}), Void.class);
+    return exchangeApi(withPath(requestHeadersUriSpec, "/idp/api/cancel", c -> {
+    }), Void.class);
   }
 
   @NotNull
-  private WebClient.RequestHeadersSpec<?> withPath(WebClient.RequestHeadersUriSpec<?> spec, String path, Consumer<UriBuilder> c) {
+  private WebClient.RequestHeadersSpec<?> withPath(WebClient.RequestHeadersUriSpec<?> spec, String path,
+      Consumer<UriBuilder> c) {
     Function<UriBuilder, URI> uriBuilderURIFunction = (uriBuilder) -> {
       uriBuilder.scheme("https");
       uriBuilder.port(8443);
@@ -99,12 +118,14 @@ public class FrontendClient {
         .header("Access-Control-Allow-Credentials", "true");
   }
 
+  @SuppressWarnings("deprecation")
   public static FrontendClient init(WebClient client, TestSp testSp, boolean sign) throws Exception {
     final EntityDescriptor spMetadata = testSp.getSpMetadata();
     final EntityDescriptor idpMetadata = getIdpMetadata();
     RoleDescriptor roleDescriptor = idpMetadata.getRoleDescriptors().get(0);
     List<SingleSignOnService> singleSignOnServices = ((IDPSSODescriptorImpl) roleDescriptor).getSingleSignOnServices();
-    Optional<SingleSignOnService> first = singleSignOnServices.stream().filter(s -> s.getBinding().contains("HTTP-Redirect")).findFirst();
+    Optional<SingleSignOnService> first =
+        singleSignOnServices.stream().filter(s -> s.getBinding().contains("HTTP-Redirect")).findFirst();
     first.ifPresent(singleSignOnServices::remove);
     singleSignOnServices.get(0).setLocation(singleSignOnServices.get(0).getLocation().replace(":0", ":8443"));
     MetadataResolver simulatedResolver = TestSpConstants.createMetadataResolver(spMetadata, idpMetadata);
@@ -115,7 +136,8 @@ public class FrontendClient {
     final AuthnRequestGeneratorContext context = SAMLContexts.getContext(sign, idpMetadata.getEntityID());
 
     MockHttpSession session = new MockHttpSession();
-    RequestBuilder request = testSp.generateRequest("https://bankid.swedenconnect.se/idp", generator, context, "s01e01", session, 8443);
+    RequestBuilder request =
+        testSp.generateRequest("https://bankid.swedenconnect.se/idp", generator, context, "s01e01", session, 8443);
     MockHttpServletRequest authRequest = request.buildRequest(Mockito.mock(ServletContext.class));
     String samlRequest = authRequest.getParameter("SAMLRequest");
     SslContext sslContext = SslContextBuilder
@@ -124,6 +146,7 @@ public class FrontendClient {
         .build();
     HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
     WebClient initClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
+
     ClientResponse block = initClient.post()
         .uri(uriBuilder -> {
           uriBuilder.scheme("https");
@@ -151,6 +174,7 @@ public class FrontendClient {
     return frontendClient;
   }
 
+  @SuppressWarnings("deprecation")
   public static EntityDescriptor getIdpMetadata() throws Exception {
     SslContext sslContext = SslContextBuilder
         .forClient()
@@ -158,7 +182,9 @@ public class FrontendClient {
         .build();
     HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
     WebClient client = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
-    byte[] result = client.get().uri("https://local.dev.swedenconnect.se:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT).exchange()
+    byte[] result = client.get()
+        .uri("https://local.dev.swedenconnect.se:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT)
+        .exchange()
         .flatMap(response -> response.bodyToMono(ByteArrayResource.class))
         .map(ByteArrayResource::getByteArray)
         .block();
@@ -190,7 +216,7 @@ public class FrontendClient {
     return block.get(0);
   }
 
-  public String cancel () {
+  public String cancel() {
     List<String> location = client.get()
         .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/cancel")
         .cookie("BANKIDSESSION", session)

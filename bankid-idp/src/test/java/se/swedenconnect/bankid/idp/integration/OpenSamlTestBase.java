@@ -1,4 +1,3 @@
-package se.swedenconnect.bankid.idp.integration;
 /*
  * Copyright 2023 Sweden Connect
  *
@@ -14,8 +13,10 @@ package se.swedenconnect.bankid.idp.integration;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package se.swedenconnect.bankid.idp.integration;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import java.io.InputStream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -24,12 +25,12 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
+
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
 import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
 import se.swedenconnect.opensaml.xmlsec.config.DefaultSecurityConfiguration;
-
-import java.io.InputStream;
 
 /**
  * Abstract base class that initializes OpenSAML for test classes.
@@ -56,9 +57,9 @@ public abstract class OpenSamlTestBase {
    *
    * @param inputStream the input stream of the XML resource
    * @param targetClass the required class
-   * @param <T>         the type
+   * @param <T> the type
    * @return an {@code XMLObject} of the given type
-   * @throws XMLParserException     for XML parsing errors
+   * @throws XMLParserException for XML parsing errors
    * @throws UnmarshallingException for unmarshalling errors
    */
   public static <T extends XMLObject> T unmarshall(final InputStream inputStream, final Class<T> targetClass)
@@ -70,7 +71,7 @@ public abstract class OpenSamlTestBase {
   /**
    * Marshalls the supplied XML object into a DOM {@link Element}.
    *
-   * @param <T>    the type
+   * @param <T> the type
    * @param object the object to marahll
    * @return a DOM {@link Element}
    * @throws MarshallingException for marshalling errors
