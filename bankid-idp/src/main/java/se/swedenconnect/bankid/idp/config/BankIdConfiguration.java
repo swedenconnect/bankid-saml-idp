@@ -228,7 +228,7 @@ public class BankIdConfiguration {
    */
   @Bean
   UiInformationProvider uiInformationProvider() {
-    return new UiInformationProvider(this.properties.getUi());
+    return new UiInformationProvider(this.properties.getUi(), this.properties.getStartRetryDuration().toMinutes());
   }
 
   @Bean

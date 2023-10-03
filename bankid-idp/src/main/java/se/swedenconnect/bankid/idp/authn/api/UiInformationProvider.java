@@ -42,13 +42,18 @@ public class UiInformationProvider {
   /** The UI properties. */
   private final UiProperties uiProperties;
 
+  /** Total duration that a user has to start the BankID Authentication */
+  private final long startRetryDuration;
+
   /**
    * Constructor.
    *
    * @param uiProperties the UI properties
+   * @param startRetryDuration number of minutes to inform user that qr code will be displayed
    */
-  public UiInformationProvider(final UiProperties uiProperties) {
+  public UiInformationProvider(final UiProperties uiProperties, long startRetryDuration) {
     this.uiProperties = uiProperties;
+    this.startRetryDuration = startRetryDuration;
   }
 
   /**
@@ -60,6 +65,7 @@ public class UiInformationProvider {
    */
   public UiInformation getUiInformation(final Saml2ServiceProviderUiInfo uiInfo, final RelyingPartyData relyingParty) {
     return UiInformation.builder()
+        .qrDisplayInMinutes(startRetryDuration)
         .sp(this.getSpInformation(uiInfo, relyingParty))
         .displayQrHelp(this.uiProperties.getQrCode().isDisplayQrHelp())
         .accessibilityReportLink(this.uiProperties.getAccessibilityReportLink())

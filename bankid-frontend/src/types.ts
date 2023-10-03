@@ -57,6 +57,7 @@ export interface UiInformation {
   qrSize: string;
   accessibilityReportLink: string | null;
   providerName: LangObject;
+  qrDisplayInMinutes: bigint;
 }
 
 export interface SelectedDeviceInformation {

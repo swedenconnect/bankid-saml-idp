@@ -65,4 +65,10 @@ public class UiInformation {
    */
   private Map<String, String> providerName;
 
+  /**
+   * Number of minutes that the qr code will be displayed
+   * This number will only be visible if displayQrHelp is true
+   */
+  private Long qrDisplayInMinutes;
+
 }

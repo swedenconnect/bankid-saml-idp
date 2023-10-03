@@ -49,6 +49,7 @@ logging:
         bankid: DEBUG
 
 bankid:
+  start-retry-duration: "PT2M"
   audit:
     repository: "redistimeseries"
     log-file: ${BANKID_INSTALL_DIR}/bankid-idp/target/audit.log
@@ -77,7 +78,8 @@ bankid:
         format: simple-markdown-v1
     override:
       directory-path: ${BANKID_INSTALL_DIR}/bankid-idp/env/local/overrides
-    display-qr-help: false
+    qr-code:
+      display-qr-help: true
 
   relying-parties:
     - id: test-my-eid
