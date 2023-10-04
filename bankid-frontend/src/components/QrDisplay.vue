@@ -72,6 +72,7 @@
 
 <style scoped>
   .qr-code {
+    --qr-margin: 20px;
     text-align: center;
   }
   img {
@@ -89,12 +90,12 @@
       margin: 0;
     }
     .qr-code {
-      padding: 20px 0;
+      padding: var(--qr-margin) 0;
     }
   }
   @media (max-width: 200px) or (max-height: 575px) {
     .qr-code {
-      padding: 0 0 20px;
+      padding: 0 0 var(--qr-margin);
     }
   }
 
