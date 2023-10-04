@@ -81,6 +81,7 @@
           "show-qr": "Show QR code",
           "checkbox": "Show the QR code directly next time",
           "this-device": "Open BankID on this device",
+          "not-visible": "The QR code is not fully visible",
           "close": "Close"
         }
       }
@@ -168,6 +169,7 @@
           "show-qr": "Visa QR-kod",
           "checkbox": "Visa QR-koden direkt nästa gång",
           "this-device": "Öppna BankID på den här enheten",
+          "not-visible": "The QR code is not fully visible",
           "close": "Stäng"
         }
       }

@@ -59,7 +59,7 @@
 <template>
   <dialog ref="qrDialog" @close="closeModal" :style="{ maxWidth: modalMaxWidth }">
     <LoadingSpinner v-if="!messageCode" :container-size="containerSize" />
-    <QrDisplay :image="qrImage" :size="props.uiInfo?.qrSize" />
+    <QrDisplay :dialog="qrDialog" :image="qrImage" :size="props.uiInfo?.qrSize" />
     <CustomContent position="qrcode" />
     <QrInstructions v-if="showQrInstructions" />
     <p v-else>{{ $t(messageCode) }}</p>
