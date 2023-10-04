@@ -58,7 +58,7 @@
 <template>
   <div v-if="props.image" class="qr-code">
     <div class="corner-frame">
-      <img ref="qrImage" :width="props.size || 200" :src="props.image" alt="QR Code" />
+      <img ref="qrImage" :width="props.size || 200" :src="props.image" :alt="$t('bankid.msg.qr.qr-code')" />
     </div>
   </div>
   <p aria-live="assertive" v-if="props.image && !isImageInViewport">{{ $t('bankid.msg.qr.not-visible') }}</p>
