@@ -80,6 +80,7 @@
       border: 2px solid black;
       max-width: 60vmin;
       max-height: 60vmin;
+      margin: 0;
     }
     .qr-code {
       padding: 20px 0;
