@@ -66,8 +66,8 @@
         tabindex="0"
       />
     </div>
+    <p aria-live="assertive" v-if="props.image && !isImageInViewport">{{ $t('bankid.msg.qr.not-visible') }}</p>
   </div>
-  <p aria-live="assertive" v-if="props.image && !isImageInViewport">{{ $t('bankid.msg.qr.not-visible') }}</p>
 </template>
 
 <style scoped>
@@ -120,5 +120,9 @@
           calc(100% - var(--size)),
         linear-gradient(#000 0 0) content-box;
     }
+  }
+  p[aria-live='assertive'] {
+    color: darkred;
+    margin: 0;
   }
 </style>
