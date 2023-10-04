@@ -69,6 +69,15 @@
 </template>
 
 <style scoped>
+  @media (max-width: 200px) or (max-height: 200px) {
+    dialog {
+      padding: 8px;
+      margin: 0 auto;
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+    }
+  }
   @media (max-width: 200px) or (max-height: 575px) {
     .small-sr-only {
       position: absolute;

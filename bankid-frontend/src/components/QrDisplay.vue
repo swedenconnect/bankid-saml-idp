@@ -66,32 +66,51 @@
 
 <style scoped>
   .qr-code {
-    padding: 20px 0;
     text-align: center;
   }
-  .corner-frame {
-    --size: 50px;
-    --width: 10px;
-    --padding: 10px;
-    --color: var(--qr-corner-color);
-
-    display: inline-block;
-    padding: calc(var(--padding) + var(--width));
-    border-radius: 20px;
-    outline: var(--width) solid var(--color);
-    outline-offset: calc(-1 * var(--width));
-    mask:
-      conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size))
-        calc(100% - var(--size)),
-      linear-gradient(#000 0 0) content-box;
-    -webkit-mask:
-      conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size))
-        calc(100% - var(--size)),
-      linear-gradient(#000 0 0) content-box;
-  }
   img {
-    border: 2px solid black;
-    max-width: 60vw;
-    max-height: 60vw;
+    max-width: calc(100vmin - 14px);
+    max-height: calc(100vmin - 14px);
+    min-width: min(100px, 100vmin);
+    min-height: min(100px, 100vmin);
+    margin: -8px;
+  }
+  @media (min-width: 200px) and (min-height: 200px) {
+    img {
+      border: 2px solid black;
+      max-width: 60vmin;
+      max-height: 60vmin;
+    }
+    .qr-code {
+      padding: 20px 0;
+    }
+  }
+  @media (max-width: 200px) or (max-height: 575px) {
+    .qr-code {
+      padding: 0 0 20px;
+    }
+  }
+
+  @media (min-width: 300px) and (min-height: 300px) {
+    .corner-frame {
+      --size: 50px;
+      --width: 10px;
+      --padding: 10px;
+      --color: var(--qr-corner-color);
+
+      display: inline-block;
+      padding: calc(var(--padding) + var(--width));
+      border-radius: 20px;
+      outline: var(--width) solid var(--color);
+      outline-offset: calc(-1 * var(--width));
+      mask:
+        conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size))
+          calc(100% - var(--size)),
+        linear-gradient(#000 0 0) content-box;
+      -webkit-mask:
+        conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size))
+          calc(100% - var(--size)),
+        linear-gradient(#000 0 0) content-box;
+    }
   }
 </style>
