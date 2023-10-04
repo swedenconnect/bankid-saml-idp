@@ -67,6 +67,7 @@
       />
     </div>
     <p aria-live="assertive" v-if="props.image && !isImageInViewport">{{ $t('bankid.msg.qr.not-visible') }}</p>
+    <p aria-live="polite" v-else-if="props.image" class="sr-only">{{ $t('bankid.msg.qr.visible') }}</p>
   </div>
 </template>
 
@@ -124,5 +125,16 @@
   p[aria-live='assertive'] {
     color: darkred;
     margin: 0;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 </style>

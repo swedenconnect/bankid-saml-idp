@@ -83,6 +83,7 @@
           "this-device": "Open BankID on this device",
           "qr-code": "QR Code",
           "not-visible": "The QR code is not fully visible",
+          "visible": "The QR code is now visible",
           "close": "Close"
         }
       }
@@ -172,6 +173,7 @@
           "this-device": "Öppna BankID på den här enheten",
           "qr-code": "QR-kod",
           "not-visible": "QR-koden är inte fullt synlig",
+          "visible": "QR-koden är nu synlig",
           "close": "Stäng"
         }
       }
