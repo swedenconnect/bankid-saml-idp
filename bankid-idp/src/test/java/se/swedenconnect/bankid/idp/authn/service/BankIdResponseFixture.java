@@ -17,10 +17,9 @@ package se.swedenconnect.bankid.idp.authn.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mockito.Mockito;
 
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;

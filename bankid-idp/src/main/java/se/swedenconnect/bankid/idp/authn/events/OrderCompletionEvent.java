@@ -15,26 +15,25 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 
 /**
  * An event for a completed order.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @AllArgsConstructor
 @Data
 public class OrderCompletionEvent {
-  
+
   /** The servlet request. */
   private final HttpServletRequest request;
-  
+
   /** The relying party. */
   private final RelyingPartyData data;
-  
+
 }

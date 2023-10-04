@@ -18,10 +18,10 @@ package se.swedenconnect.bankid.idp.authn.session;
 import java.time.Instant;
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Redis implementation of the {@link SessionDao} interface.
@@ -68,5 +68,5 @@ public class RedisSessionDao implements SessionDao {
   private RMap<Object, Object> getRedisHashForUser(final HttpServletRequest request) {
     return this.client.getMap("session:%s".formatted(request.getSession().getId()));
   }
-  
+
 }

@@ -32,8 +32,8 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 
 /**

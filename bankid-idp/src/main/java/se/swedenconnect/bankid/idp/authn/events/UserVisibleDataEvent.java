@@ -15,8 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;

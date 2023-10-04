@@ -15,8 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
@@ -64,7 +63,7 @@ public interface BankIdSessionReader {
 
   /**
    * Loads the BankID context.
-   * 
+   *
    * @param request the servlet request
    * @return a {@link BankIdContext}
    */

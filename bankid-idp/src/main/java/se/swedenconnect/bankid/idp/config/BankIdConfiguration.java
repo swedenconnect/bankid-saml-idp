@@ -92,12 +92,13 @@ public class BankIdConfiguration {
   @Order(2)
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
     http
+        .securityContext(sc -> sc.requireExplicitSave(false))
         .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests((authorize) -> authorize
-            .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
-                "/css/**", "/api/**", "/**/resume")
+            .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
+            .requestMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
+                "/css/**", "/api/**", "/resume/**")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
             .permitAll()

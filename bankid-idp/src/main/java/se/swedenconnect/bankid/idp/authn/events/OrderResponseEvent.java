@@ -15,11 +15,10 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * An event for an order (sign or auth) response.

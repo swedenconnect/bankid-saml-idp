@@ -17,13 +17,13 @@ package se.swedenconnect.bankid.rpapi;
 
 /**
  * Internal class used for serialization across library classes.
- * 
+ *
  * @author Martin Lindström
  */
 public final class LibraryVersion {
 
   private static final int MAJOR = 1;
-  private static final int MINOR = 0;
+  private static final int MINOR = 1;
   private static final int PATCH = 0;
 
   /**
@@ -33,7 +33,7 @@ public final class LibraryVersion {
 
   /**
    * Gets the version string.
-   * 
+   *
    * @return the version string
    */
   public static String getVersion() {
