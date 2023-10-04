@@ -61,9 +61,25 @@
     <LoadingSpinner v-if="!messageCode" :container-size="containerSize" />
     <QrDisplay :dialog="qrDialog" :image="qrImage" :size="props.uiInfo?.qrSize" />
     <CustomContent position="qrcode" />
-    <QrInstructions v-if="showQrInstructions" />
+    <QrInstructions v-if="showQrInstructions" class="small-sr-only" />
     <p v-else>{{ $t(messageCode) }}</p>
     <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
     <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
   </dialog>
 </template>
+
+<style scoped>
+  @media (max-width: 200px) or (max-height: 575px) {
+    .small-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  }
+</style>
