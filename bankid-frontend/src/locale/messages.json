@@ -81,6 +81,9 @@
           "show-qr": "Show QR code",
           "checkbox": "Show the QR code directly next time",
           "this-device": "Open BankID on this device",
+          "qr-code": "QR Code",
+          "not-visible": "The QR code is not fully visible and might be unscannable",
+          "visible": "The QR code is now visible and ready to be scanned",
           "close": "Close"
         }
       }
@@ -168,6 +171,9 @@
           "show-qr": "Visa QR-kod",
           "checkbox": "Visa QR-koden direkt nästa gång",
           "this-device": "Öppna BankID på den här enheten",
+          "qr-code": "QR-kod",
+          "not-visible": "QR-koden är inte fullt synlig och kanske inte går att läsa av",
+          "visible": "QR-koden är nu synlig och redo för avläsning",
           "close": "Stäng"
         }
       }
