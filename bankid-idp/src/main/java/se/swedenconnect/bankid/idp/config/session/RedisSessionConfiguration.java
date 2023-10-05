@@ -59,18 +59,23 @@ public class RedisSessionConfiguration {
   private Duration replayTtl;
 
   @Bean
-  @ConfigurationProperties(prefix = "spring.redis.ssl-ext")
+  @ConfigurationProperties(prefix = "spring.data.redis.ssl-ext")
   RedisTlsProperties redisTlsProperties() {
     return new RedisTlsProperties();
   }
 
   @Bean
-  @ConditionalOnProperty(value = "spring.redis.ssl", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(value = "spring.data.redis.ssl.enabled", havingValue = "true", matchIfMissing = false)
   RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties) {
     return c -> {
       try {
         final SingleServerConfig config = c.useSingleServer();
         config.setSslEnableEndpointIdentification(tlsProperties.isEnableHostnameVerification());
+        String rediAddress = config.getAddress();
+        if (rediAddress.contains("redis://")) {
+          // The protocol part has not been configured by spring even though we have enabled ssl
+          config.setAddress(rediAddress.replace("redis://", "rediss://"));
+        }
         if (tlsProperties.getCredential() != null) {
           config
             .setSslKeystore(tlsProperties.getCredential().getResource().getURL())

@@ -333,12 +333,14 @@ spring:
     activate:
       on-profile: local
   redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT:6379}
-    password: supersecret
-    ssl: true
-    ssl-ext:
-      <see below>
+    data:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: supersecret
+      ssl: 
+        enabled: true
+      ssl-ext:
+        <see below>
 ```
 
 <a name="redis-ssltls-configuration-extension"></a>
@@ -350,7 +352,7 @@ In order to configure the TLS connection against the Redis server regarding:
 - Specific TLS trust, and/or,
 - Verification of TLS server hostname
 
-we have extended Spring Boot's Redis configuration under the key `spring.redis.ssl-ext` with 
+we have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
 the following configuration settings:
 
 | Property | Description | Type | Default value |
@@ -361,24 +363,25 @@ the following configuration settings:
 | `trust.password` | The password to unlock the trust `KeyStore`. If this `KeyStore` does not have a password, no setting should be supplied. | - |
 | `enable-hostname-verification` | Should we verify the the peer's hostname as part of the SSL/TLS handshake? | Boolean | `true` |
 
-The settings will be active if `spring.redis.ssl` is set to `true`.
+The settings will be active if `spring.redis.data.ssl.enabled` is set to `true`.
 
 **Example:**
 
 ```yaml
 spring:
-  redis:
-    ...
-    ssl: true 
-    ssl-ext:
-    ssl-ext:
-      enable-hostname-verification: true
-      credential:
-        resource: classpath:local/redis/redis.p12
-        password: changeit
-      trust:
-        resource: classpath:local/redis/trust.p12
-        password: changeit    
+  data:
+    redis:
+      ...
+      ssl: 
+        enabled: true
+      ssl-ext:
+        enable-hostname-verification: true
+        credential:
+          resource: classpath:local/redis/redis.p12
+          password: changeit
+        trust:
+          resource: classpath:local/redis/trust.p12
+          password: changeit    
 ```
 
 <a name="adding-your-own-application-yml-file"></a>
