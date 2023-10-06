@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.bankid</groupId>
   <artifactId>saml-bankid-idp-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>Sweden Connect :: BankID :: Parent POM</name>
   <description>Parent POM for BankID SAML Identity Provider</description>
@@ -51,8 +51,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
 
-    <spring.boot.version>2.7.15</spring.boot.version>
-    <spring.version>5.3.29</spring.version>
+    <spring.boot.version>2.7.16</spring.boot.version>
+    <spring.version>5.3.30</spring.version>
     <bc.version>1.76</bc.version>
     <zxing.version>3.5.1</zxing.version>
   </properties>

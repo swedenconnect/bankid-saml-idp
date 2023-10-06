@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: Relying Party API</name>
