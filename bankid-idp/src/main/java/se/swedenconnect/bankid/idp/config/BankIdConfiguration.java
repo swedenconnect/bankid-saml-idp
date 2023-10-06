@@ -32,6 +32,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -93,8 +94,10 @@ public class BankIdConfiguration {
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
     http
         .securityContext(sc -> sc.requireExplicitSave(false))
-        .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-        .cors(Customizer.withDefaults())
+        .csrf(csrf -> {
+          csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+          csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler());
+        })
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
             .requestMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
