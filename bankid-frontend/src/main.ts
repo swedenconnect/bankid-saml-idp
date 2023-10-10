@@ -9,42 +9,20 @@ import router from './router';
 import type { LangObject, MessageOverride, Messages } from './types';
 
 function applyMessageOverrides(originalMessages: Messages, overrides: MessageOverride[]): Messages {
-  const newMessages: Messages = JSON.parse(JSON.stringify(originalMessages)); // Deep copy
-
-  // Create empty object for any new language in the overrides
-  for (const override of overrides) {
-    for (const lang in override.text) {
-      if (!newMessages[lang]) {
-        newMessages[lang] = {};
-      }
-    }
-  }
-
-  for (const override of overrides) {
-    const path = override.code.split('.');
-
-    for (const lang in override.text) {
-      let currentPart = newMessages[lang];
-
-      for (let i = 0; i < path.length; i++) {
-        const part = path[i];
-
-        if (i === path.length - 1) {
-          currentPart[part] = override.text[lang];
-        } else {
-          if (!currentPart[part]) {
-            currentPart[part] = {};
-          }
-
-          if (typeof currentPart[part] === 'object' && currentPart[part] !== null) {
-            currentPart = currentPart[part] as LangObject;
-          }
-        }
-      }
-    }
-  }
-
-  return newMessages;
+  return overrides.reduce(
+    (newMessages: Messages, override) => {
+      const path = override.code.split('.');
+      Object.keys(override.text).forEach((lang) => {
+        let currentPart = newMessages[lang] || (newMessages[lang] = {});
+        path.forEach((part, i) => {
+          if (i === path.length - 1) currentPart[part] = override.text[lang];
+          else currentPart = (currentPart[part] as LangObject) || (currentPart[part] = {});
+        });
+      });
+      return newMessages;
+    },
+    JSON.parse(JSON.stringify(originalMessages)),
+  );
 }
 
 async function initializeApp() {
