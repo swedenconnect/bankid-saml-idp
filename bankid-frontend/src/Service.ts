@@ -6,7 +6,7 @@ import type {
   ApiResponseStatus,
   CustomerContactInformation,
   RetryResponse,
-  SelectedDeviceInformation,
+  SelectedDeviceInformation, SessionExpiredResponse,
   Status,
   UiInformation,
 } from './types';
@@ -26,7 +26,9 @@ export async function poll(showQr: boolean) {
       const retryAfter = response.headers.get('Retry-After');
       return { retry: true, time: retryAfter } as RetryResponse;
     }
-    // TODO handle unexpected error
+    if (response.status === 403) {
+      return {"sessionExpired": true } as SessionExpiredResponse;
+    }
   }
   return data;
 }
@@ -37,6 +39,10 @@ function isApiResponse(obj: any): obj is ApiResponse {
 
 function isRetryResponse(obj: any): obj is RetryResponse {
   return obj && 'retry' in obj;
+}
+
+function isSessionExpiredResponse(obj: any): obj is SessionExpiredResponse {
+  return obj && 'sessionExpired' in obj;
 }
 
 export const pollingQr = (
@@ -65,8 +71,8 @@ export const pollingAutoStart = (
 };
 
 const handleResponse = (
-  response: ApiResponse | RetryResponse,
-  pollFunction: () => Promise<ApiResponse | RetryResponse>,
+  response: ApiResponse | RetryResponse | SessionExpiredResponse,
+  pollFunction: () => Promise<ApiResponse | RetryResponse | SessionExpiredResponse>,
   qrImage: Ref<string> | null,
   hideAutoStart: Ref<boolean> | null,
   token: Ref<string> | null,
@@ -74,6 +80,11 @@ const handleResponse = (
   responseStatus: Ref<ApiResponseStatus | undefined>,
   cancelRetry?: Ref<boolean>,
 ) => {
+
+  if (isSessionExpiredResponse(response) && response.sessionExpired) {
+    window.location.href = PATHS.ERROR;
+  }
+
   if (isApiResponse(response)) {
     responseStatus.value = response.status;
 
