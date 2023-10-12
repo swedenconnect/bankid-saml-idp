@@ -27,9 +27,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -156,5 +158,16 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     StepVerifier.create(client.poll(showQr))
         .expectNextMatches(a -> expectedMessageCode.equals(a.getMessageCode()))
         .verifyComplete();
+  }
+
+  @Test
+  @WithSamlUser
+  void testUserSessionExpiredWillReturn400(FrontendClient client) {
+    OrderResponse start = BankIdResponseFactory.start();
+    BankIdApiMock.mockAuth(start);
+    ApiResponse apiResponse = client.poll(false).block();
+    Assertions.assertEquals(start.getAutoStartToken(), apiResponse.getAutoStartToken());
+    clearSessions();
+    Assertions.assertThrows(HttpServerErrorException.class, () -> client.poll(false).block());
   }
 }

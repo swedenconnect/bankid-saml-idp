@@ -26,23 +26,23 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import se.swedenconnect.bankid.idp.authn.error.BankIdTraceableException;
-import se.swedenconnect.bankid.idp.authn.error.UserErrorRouteFactory;
+import se.swedenconnect.bankid.idp.authn.error.UserErrorFactory;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
 
-class UserErrorRouteFactoryTest {
+class UserErrorFactoryTest {
 
   public static final String EXPECTED_CONTEX_PATH = "/context/path";
 
   @Test
   void defaultErrorRoute() {
-    final UserErrorRouteFactory userErrorRouteFactory =
-        new UserErrorRouteFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
-    final String redirect = userErrorRouteFactory.getRedirect(getMockRequest(), new RuntimeException());
-    final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
+    final UserErrorFactory userErrorFactory =
+        new UserErrorFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
+    final String redirect = userErrorFactory.getRedirect(getMockRequest(), new RuntimeException());
+    final String redirectView = userErrorFactory.getRedirectView(new RuntimeException());
     Assertions.assertEquals("/context/path/bankid#/error/bankid.msg.error.unknown", redirect);
     Assertions.assertEquals("redirect:/bankid#/error/bankid.msg.error.unknown", redirectView);
   }
@@ -56,30 +56,30 @@ class UserErrorRouteFactoryTest {
   @ParameterizedTest
   @MethodSource("unrecoverableSaml2IpdExceptions")
   void errorRouteUnrecoverableSaml2IdpException(UnrecoverableSaml2IdpException e) {
-    final UserErrorRouteFactory userErrorRouteFactory =
-        new UserErrorRouteFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
-    final String redirect = userErrorRouteFactory.getRedirect(getMockRequest(), e);
-    final String redirectView = userErrorRouteFactory.getRedirectView(e);
+    final UserErrorFactory userErrorFactory =
+        new UserErrorFactory(UserErrorPropertiesFixture.EMPTY_PROPERTIES);
+    final String redirect = userErrorFactory.getRedirect(getMockRequest(), e);
+    final String redirectView = userErrorFactory.getRedirectView(e);
     Assertions.assertEquals("/context/path/bankid#/error/" + e.getError().getMessageCode(), redirect);
     Assertions.assertEquals("redirect:/bankid#/error/" + e.getError().getMessageCode(), redirectView);
   }
 
   @Test
   void showEmailNoTrace() {
-    final UserErrorRouteFactory userErrorRouteFactory =
-        new UserErrorRouteFactory(UserErrorPropertiesFixture.SHOW_EMAIL_NO_TRACE);
-    final String redirect = userErrorRouteFactory.getRedirect(getMockRequest(), new RuntimeException());
-    final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
+    final UserErrorFactory userErrorFactory =
+        new UserErrorFactory(UserErrorPropertiesFixture.SHOW_EMAIL_NO_TRACE);
+    final String redirect = userErrorFactory.getRedirect(getMockRequest(), new RuntimeException());
+    final String redirectView = userErrorFactory.getRedirectView(new RuntimeException());
     Assertions.assertEquals("/context/path/bankid#/error/bankid.msg.error.unknown", redirect);
     Assertions.assertEquals("redirect:/bankid#/error/bankid.msg.error.unknown", redirectView);
   }
 
   @Test
   void showEmailShowTrace() {
-    final UserErrorRouteFactory userErrorRouteFactory =
-        new UserErrorRouteFactory(UserErrorPropertiesFixture.SHOW_EMAIL_SHOW_TRACE);
-    final String redirect = userErrorRouteFactory.getRedirect(getMockRequest(),new RuntimeException());
-    final String redirectView = userErrorRouteFactory.getRedirectView(new RuntimeException());
+    final UserErrorFactory userErrorFactory =
+        new UserErrorFactory(UserErrorPropertiesFixture.SHOW_EMAIL_SHOW_TRACE);
+    final String redirect = userErrorFactory.getRedirect(getMockRequest(),new RuntimeException());
+    final String redirectView = userErrorFactory.getRedirectView(new RuntimeException());
     final String BASE_REGEX = "bankid#/error/bankid.msg.error.unknown/";
     final String UUID_REGEX = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
     assertThat(redirect, matchesPattern("/context/path/" + BASE_REGEX + UUID_REGEX));
@@ -88,12 +88,12 @@ class UserErrorRouteFactoryTest {
 
   @Test
   void showEmailShowTrace_fromException() {
-    final UserErrorRouteFactory userErrorRouteFactory =
-        new UserErrorRouteFactory(UserErrorPropertiesFixture.SHOW_EMAIL_SHOW_TRACE);
+    final UserErrorFactory userErrorFactory =
+        new UserErrorFactory(UserErrorPropertiesFixture.SHOW_EMAIL_SHOW_TRACE);
     final BankIdTraceableException ex = new BankIdTraceableException("order-ref", "Error msg");
     final String expectedId = ex.getTraceId();
-    final String redirect = userErrorRouteFactory.getRedirect(getMockRequest(), ex);
-    final String redirectView = userErrorRouteFactory.getRedirectView(ex);
+    final String redirect = userErrorFactory.getRedirect(getMockRequest(), ex);
+    final String redirectView = userErrorFactory.getRedirectView(ex);
     final String BASE_REGEX = "bankid#\\/error\\/bankid.msg.error.unknown\\/";
     assertThat(redirect, matchesPattern("/context/path/" + BASE_REGEX + expectedId));
     assertThat(redirectView, matchesPattern("redirect:/" + BASE_REGEX + expectedId));

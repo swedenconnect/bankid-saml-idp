@@ -234,6 +234,7 @@ public class BankIdConfiguration {
   @Bean
   FilterRegistrationBean<OncePerRequestFilter> errorHandlerFilterRegistration(final ErrorhandlerFilter filter) {
     FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
+    registration.setUrlPatterns(List.of("/view/**"));
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
     return registration;

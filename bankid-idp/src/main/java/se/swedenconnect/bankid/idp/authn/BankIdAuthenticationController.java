@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import lombok.AllArgsConstructor;
+import se.swedenconnect.bankid.idp.authn.annotations.ViewController;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
@@ -43,6 +44,7 @@ import se.swedenconnect.spring.saml.idp.error.Saml2ErrorStatusException;
  * @author Felix Hellman
  */
 @Controller
+@ViewController
 @AllArgsConstructor
 public class BankIdAuthenticationController extends AbstractAuthenticationController<BankIdAuthenticationProvider> {
 

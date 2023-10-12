@@ -31,7 +31,8 @@ include in the resulting response (see below).
 
 | HTTP Status Code | Description |                                                                                                                                                                                                                                                                                                                                                                                                      
 | :--- | :--- |
-| `200`  | OK |                                                                                                                                                                                                                                                                                                                                                                                                                
+| `200`  | OK |
+| `400`  | Error - Returns an alternate response to display error for user. See [UserErrorResponse](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/authn/error/UserErrorResponse.java) |
 | `429`  | Too many attempts - resource busy. Parallel requests have been made for the same user, a header "Retry-After" will be present as a time for when you can retry the request again. <br/>This can also happen when a request has been blocked by the circuit breaker due to API errors towards the BankID server API.<br />This status code means that the request has been rejected before being made towards BankID's API. |
 
 
