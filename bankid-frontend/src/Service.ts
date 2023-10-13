@@ -6,7 +6,7 @@ import type {
   ApiResponseStatus,
   CustomerContactInformation,
   RetryResponse,
-  SelectedDeviceInformation,
+  SelectedDeviceInformation, SessionExpiredResponse, UserErrorResponse,
   Status,
   UiInformation,
 } from './types';
@@ -20,15 +20,20 @@ const requestOptions: RequestInit = {
 
 export async function poll(showQr: boolean) {
   const response = await fetch(CONTEXT_PATH + '/api/poll?qr=' + showQr, requestOptions);
-  const data: ApiResponse = await response.json();
+  const data = await response.json();
   if (!response.ok) {
     if (response.status === 429) {
       const retryAfter = response.headers.get('Retry-After');
       return { retry: true, time: retryAfter } as RetryResponse;
     }
-    // TODO handle unexpected error
+    if (response.status === 403) {
+      return {"sessionExpired": true } as SessionExpiredResponse;
+    }
+    if (response.status === 400) {
+      return data as UserErrorResponse;
+    }
   }
-  return data;
+  return data as ApiResponse;
 }
 
 function isApiResponse(obj: any): obj is ApiResponse {
@@ -37,6 +42,14 @@ function isApiResponse(obj: any): obj is ApiResponse {
 
 function isRetryResponse(obj: any): obj is RetryResponse {
   return obj && 'retry' in obj;
+}
+
+function isSessionExpiredResponse(obj: any): obj is SessionExpiredResponse {
+  return obj && 'sessionExpired' in obj;
+}
+
+function isUserErrorResponse(obj: any): obj is UserErrorResponse {
+  return obj && 'errorMessage' in obj;
 }
 
 export const pollingQr = (
@@ -65,8 +78,8 @@ export const pollingAutoStart = (
 };
 
 const handleResponse = (
-  response: ApiResponse | RetryResponse,
-  pollFunction: () => Promise<ApiResponse | RetryResponse>,
+  response: ApiResponse | RetryResponse | SessionExpiredResponse | UserErrorResponse,
+  pollFunction: () => Promise<ApiResponse | RetryResponse | SessionExpiredResponse | UserErrorResponse>,
   qrImage: Ref<string> | null,
   hideAutoStart: Ref<boolean> | null,
   token: Ref<string> | null,
@@ -74,6 +87,18 @@ const handleResponse = (
   responseStatus: Ref<ApiResponseStatus | undefined>,
   cancelRetry?: Ref<boolean>,
 ) => {
+  if (isSessionExpiredResponse(response)) {
+      window.location.href = PATHS.ERROR;
+  }
+  if (isUserErrorResponse(response)) {
+    console.log("User error!");
+    let location = import.meta.env.BASE_URL + "/bankid#/error/" + response.errorMessage;
+    if (response.traceId !== "") {
+      location = location + "/" + response.traceId;
+    }
+    window.location.href = location;
+  }
+
   if (isApiResponse(response)) {
     responseStatus.value = response.status;
 

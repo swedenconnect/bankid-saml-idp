@@ -25,13 +25,13 @@ import se.swedenconnect.bankid.idp.config.UiProperties;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
- * Creates redirect views and links to be used by error handlers.
+ * Creates redirect views, links and generic api response to be used by error handlers.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @Component
-public class UserErrorRouteFactory {
+public class UserErrorFactory {
 
   /** The properties that determines what to display in the error UI view. */
   private final UiProperties.UserErrorProperties properties;
@@ -63,7 +63,7 @@ public class UserErrorRouteFactory {
    *
    * @param properties the properties that determines what to display in the error UI view
    */
-  public UserErrorRouteFactory(final UiProperties.UserErrorProperties properties) {
+  public UserErrorFactory(final UiProperties.UserErrorProperties properties) {
     this.properties = properties;
   }
 
@@ -79,7 +79,13 @@ public class UserErrorRouteFactory {
     return request.getContextPath() + "/bankid#/error/%s".formatted(this.build(errorMessage, traceId));
   }
 
-  public String getTraceId(final Exception e) {
+  public UserErrorResponse getUserError(final Exception e) {
+    final String errorMessage = getErrorMessage(e);
+    final String traceId = this.getTraceId(e);
+    return new UserErrorResponse(errorMessage, traceId);
+  }
+
+  private String getTraceId(final Exception e) {
     if (e instanceof final BankIdTraceableException traceableException) {
       return traceableException.getTraceId();
     }
