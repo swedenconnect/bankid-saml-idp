@@ -3,10 +3,12 @@ spring:
     activate:
       on-profile: integrationtest
   redis:
-    host: ${REDIS_HOST:local.dev.swedenconnect.se}
-    port: ${REDIS_PORT:6379}
-    password: supersecret
-    ssl: true
+    data:
+      host: ${REDIS_HOST:local.dev.swedenconnect.se}
+      port: ${REDIS_PORT:6379}
+      password: supersecret
+      ssl:
+        enabled: false
     ssl-ext:
       enable-hostname-verification: true
       credential:

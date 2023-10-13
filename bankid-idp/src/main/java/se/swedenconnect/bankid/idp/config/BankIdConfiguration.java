@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -95,7 +96,9 @@ public class BankIdConfiguration {
         .securityContext(sc -> sc.requireExplicitSave(false))
         .csrf(csrf -> {
           csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-          csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler());
+          CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+          requestHandler.setCsrfRequestAttributeName(null);
+          csrf.csrfTokenRequestHandler(requestHandler);
         })
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
@@ -239,6 +242,14 @@ public class BankIdConfiguration {
     FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
+    return registration;
+  }
+
+  @Bean
+  FilterRegistrationBean<OncePerRequestFilter> csrfFilterRegistration() {
+    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(new CsrfCookieFilter());
+    registration.setOrder(SecurityWebFiltersOrder.REACTOR_CONTEXT.getOrder());
+    registration.setName("CSRF_HANDLER_FILTER_REGISTRATION");
     return registration;
   }
 
