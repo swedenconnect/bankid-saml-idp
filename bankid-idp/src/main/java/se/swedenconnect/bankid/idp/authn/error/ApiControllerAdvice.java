@@ -21,31 +21,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
+import se.swedenconnect.bankid.idp.authn.annotations.ApiController;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Controller advice for error handling.
+ * Controller advice for api error handling.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@RestControllerAdvice
+@RestControllerAdvice(annotations = ApiController.class)
 @AllArgsConstructor
 @Slf4j
-public class BankidControllerAdvice {
+public class ApiControllerAdvice {
 
-  private final UserErrorRouteFactory userErrorRouteFactory;
+  private final UserErrorFactory userErrorFactory;
 
   public static final String ERROR_TECHNICAL_DIFFICULTIES_BUSY = """
       {"Error": "This service is currently experiencing some issues" }
       """;
 
+  /**
+   * Handles exception for CallNotPermitted (resilience4j)
+   * @return an error response with a randomized backoff timer for the frontend to handle
+   */
   @ExceptionHandler(value = {CallNotPermittedException.class})
-  public ResponseEntity<String> handleException(final CallNotPermittedException e) {
+  public ResponseEntity<String> handleException() {
     final int random = ThreadLocalRandom.current().nextInt(5) + 1;
     final int delay = 5 + random;
     return ResponseEntity
@@ -55,14 +59,18 @@ public class BankidControllerAdvice {
         .body(ERROR_TECHNICAL_DIFFICULTIES_BUSY);
   }
 
-  @ExceptionHandler(value = {NoHandlerFoundException.class})
-  public ModelAndView handleException(final NoHandlerFoundException e) {
-    return new ModelAndView(this.userErrorRouteFactory.getRedirectView(e));
-  }
-
+  /**
+   * Handles uncaught exceptions for /api routes
+   * @param e Uncaught exception to handle
+   * @return redirect to error view (as json)
+   */
   @ExceptionHandler(value = {Exception.class})
-  public ModelAndView defaultHandler(final Exception e) {
-    log.error("Generic exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
-    return new ModelAndView(this.userErrorRouteFactory.getRedirectView(e));
+  public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e) {
+    log.error("Generic API exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
+    UserErrorResponse userError = this.userErrorFactory.getUserError(e);
+    return ResponseEntity
+        .status(400)
+        .header("content-type", MediaType.APPLICATION_JSON_VALUE)
+        .body(userError);
   }
 }

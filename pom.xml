@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.bankid</groupId>
   <artifactId>saml-bankid-idp-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 
   <name>Sweden Connect :: BankID :: Parent POM</name>
   <description>Parent POM for BankID SAML Identity Provider</description>

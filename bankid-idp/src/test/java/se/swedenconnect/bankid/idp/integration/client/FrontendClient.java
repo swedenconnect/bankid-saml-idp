@@ -34,11 +34,14 @@ import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.saml.saml2.metadata.impl.IDPSSODescriptorImpl;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -101,6 +104,9 @@ public class FrontendClient {
         .exchangeToMono(f -> {
           if (f.statusCode().value() == 429) {
             return Mono.error(new CannotAcquireLockException("Resource is busy"));
+          }
+          if (f.statusCode().value() == 400) {
+            return Mono.error(new HttpServerErrorException(HttpStatus.BAD_REQUEST));
           }
           if (!f.statusCode().is2xxSuccessful()) {
             return Mono.error(new IllegalStateException("Wrong status code code:" + f.statusCode().value()));

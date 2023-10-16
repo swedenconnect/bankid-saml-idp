@@ -18,6 +18,9 @@ package se.swedenconnect.bankid.idp.integration;
 import java.util.List;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.RedisClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +39,9 @@ public class BankIdIdpIntegrationSetup extends TestContainerSetup {
   public static final TestSp signSp;
 
   public static final BankIdApiMock apiMock = new BankIdApiMock();
+
+  @Autowired
+  private RedissonClient client;
 
   @LocalServerPort
   public int port;
@@ -58,5 +64,9 @@ public class BankIdIdpIntegrationSetup extends TestContainerSetup {
     // testSp has a method "writeSpMetadata" use if the metadata file needs to be regenerated ...
     //registry.add("saml.idp.metadata-providers[0].location", testSp::getResourcePath);
     registry.add("saml.idp.metadata-providers[0].location", () -> "classpath:/combined-metadata.xml");
+  }
+
+  protected void clearSessions() {
+    client.getKeys().flushall();
   }
 }

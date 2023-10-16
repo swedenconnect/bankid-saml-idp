@@ -42,15 +42,15 @@ public class ErrorhandlerFilter extends OncePerRequestFilter {
   public static final String NAME = "ERROR_HANDLER_FILTER";
 
   /** Creates redirect views and links to be used by error handlers. */
-  private final UserErrorRouteFactory userErrorRouteFactory;
+  private final UserErrorFactory userErrorFactory;
 
   /**
    * Constructor.
    *
-   * @param userErrorRouteFactory creates redirect views and links to be used by error handlers
+   * @param userErrorFactory creates redirect views and links to be used by error handlers
    */
-  public ErrorhandlerFilter(final UserErrorRouteFactory userErrorRouteFactory) {
-    this.userErrorRouteFactory = userErrorRouteFactory;
+  public ErrorhandlerFilter(final UserErrorFactory userErrorFactory) {
+    this.userErrorFactory = userErrorFactory;
   }
 
   /** {@inheritDoc} */
@@ -62,8 +62,7 @@ public class ErrorhandlerFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
     }
     catch (final RuntimeException e) {
-
-      response.sendRedirect(this.userErrorRouteFactory.getRedirect(request, e));
+      response.sendRedirect(this.userErrorFactory.getRedirect(request, e));
     }
   }
 }
