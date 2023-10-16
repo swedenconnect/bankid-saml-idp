@@ -356,7 +356,7 @@
             <executions>
               <execution>
                 <id>copy-resource-templates</id>
-                <phase>package</phase>
+                <phase>prepare-package</phase>
                 <goals>
                   <goal>copy-resources</goal>
                 </goals>
@@ -374,7 +374,7 @@
               </execution>
               <execution>
                 <id>copy-resources-assets</id>
-                <phase>package</phase>
+                <phase>prepare-package</phase>
                 <goals>
                   <goal>copy-resources</goal>
                 </goals>
