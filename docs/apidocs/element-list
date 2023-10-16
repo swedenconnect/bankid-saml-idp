@@ -1,6 +1,7 @@
 se.swedenconnect.bankid.idp
 se.swedenconnect.bankid.idp.audit
 se.swedenconnect.bankid.idp.authn
+se.swedenconnect.bankid.idp.authn.annotations
 se.swedenconnect.bankid.idp.authn.api
 se.swedenconnect.bankid.idp.authn.api.overrides
 se.swedenconnect.bankid.idp.authn.context
