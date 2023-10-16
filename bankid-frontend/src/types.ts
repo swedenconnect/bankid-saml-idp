@@ -31,6 +31,16 @@ export interface RetryResponse {
   time: string;
 }
 
+export interface SessionExpiredResponse {
+  sessionExpired: boolean;
+  redirect: string;
+}
+
+export interface UserErrorResponse {
+  errorMessage: string;
+  traceId: string;
+}
+
 const enum StatusDescriptionEnum {
   OK,
   ISSUES,

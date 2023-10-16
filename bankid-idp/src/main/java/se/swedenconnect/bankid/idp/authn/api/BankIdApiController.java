@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
+import se.swedenconnect.bankid.idp.authn.annotations.ApiController;
 import se.swedenconnect.bankid.idp.authn.api.overrides.FrontendOverrideResponse;
 import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
@@ -65,6 +66,7 @@ import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
  * @author Felix Hellman
  */
 @RestController
+@ApiController
 @AllArgsConstructor
 @Slf4j
 public class BankIdApiController {
