@@ -18,19 +18,21 @@ package se.swedenconnect.bankid.idp.authn;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
+
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.authn.error.BankIdTraceableException;
 import se.swedenconnect.bankid.idp.authn.error.UserErrorFactory;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
 
 class UserErrorFactoryTest {

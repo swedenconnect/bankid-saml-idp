@@ -22,8 +22,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.servlet.ServletContext;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
@@ -50,6 +48,7 @@ import org.springframework.web.util.UriBuilder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import jakarta.servlet.ServletContext;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;

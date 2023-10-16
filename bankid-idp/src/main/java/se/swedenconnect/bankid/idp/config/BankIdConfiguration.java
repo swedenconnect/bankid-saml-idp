@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -28,13 +27,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.api.UiInformationProvider;
@@ -92,12 +93,17 @@ public class BankIdConfiguration {
   @Order(2)
   SecurityFilterChain defaultSecurityFilterChain(final HttpSecurity http) throws Exception {
     http
-        .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-        .cors(Customizer.withDefaults())
+        .securityContext(sc -> sc.requireExplicitSave(false))
+        .csrf(csrf -> {
+          csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+          CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+          requestHandler.setCsrfRequestAttributeName(null);
+          csrf.csrfTokenRequestHandler(requestHandler);
+        })
         .authorizeHttpRequests((authorize) -> authorize
-            .antMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .antMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
-                "/css/**", "/api/**", "/**/resume")
+            .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
+            .requestMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
+                "/css/**", "/api/**", "/resume/**")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
             .permitAll()
@@ -237,6 +243,14 @@ public class BankIdConfiguration {
     registration.setUrlPatterns(List.of("/view/**"));
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
+    return registration;
+  }
+
+  @Bean
+  FilterRegistrationBean<OncePerRequestFilter> csrfFilterRegistration() {
+    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(new CsrfCookieFilter());
+    registration.setOrder(SecurityWebFiltersOrder.REACTOR_CONTEXT.getOrder());
+    registration.setName("CSRF_HANDLER_FILTER_REGISTRATION");
     return registration;
   }
 

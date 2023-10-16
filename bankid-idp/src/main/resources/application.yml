@@ -58,8 +58,6 @@ management:
 #        prometheus: metrics
       exposure:
         include: health, metrics, prometheus, loggers
-
-spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
 
@@ -195,4 +193,3 @@ logging:
         spring:
           saml: INFO
         bankid: INFO
-        

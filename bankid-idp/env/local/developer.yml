@@ -2,19 +2,21 @@ spring:
   config:
     activate:
       on-profile: local
-  redis:
-    host: ${REDIS_HOST:local.dev.swedenconnect.se}
-    port: ${REDIS_PORT:6379}
-    password: supersecret
-    ssl: true
-    ssl-ext:
-      enable-hostname-verification: true
-      credential:
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
-        password: changeit
-      trust:
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
-        password: changeit
+  data:
+    redis:
+      host: local.dev.swedenconnect.se
+      port: 6379
+      password: supersecret
+      ssl:
+        enabled: true
+      ssl-ext:
+        enable-hostname-verification: true
+        credential:
+          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
+          password: changeit
+        trust:
+          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
+          password: changeit
   session:
     timeout: 15m
 

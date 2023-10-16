@@ -27,8 +27,8 @@ import org.springframework.boot.actuate.health.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 

@@ -17,12 +17,11 @@ package se.swedenconnect.bankid.idp.authn.session;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.AbortAuthEvent;

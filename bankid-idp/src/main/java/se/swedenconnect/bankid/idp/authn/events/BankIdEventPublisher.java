@@ -17,11 +17,10 @@ package se.swedenconnect.bankid.idp.authn.events;
 
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;

@@ -17,9 +17,6 @@ package se.swedenconnect.bankid.idp.integration;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +27,8 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

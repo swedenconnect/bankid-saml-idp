@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
+import java.time.Duration;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +53,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     CookieLocaleResolver resolver = new CookieLocaleResolver();
     resolver.setDefaultLocale(new Locale("en"));
     resolver.setCookiePath(contextPath);
-    resolver.setCookieMaxAge(31536000);
+    resolver.setCookieMaxAge(Duration.ofDays(365));
     return resolver;
   }
 

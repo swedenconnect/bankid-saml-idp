@@ -15,8 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +26,7 @@ import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 
 /**
  * Represents a request sent to the BankID server.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -35,22 +34,22 @@ import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 @AllArgsConstructor
 @Data
 public class PollRequest {
-  
+
   /** The HTTP servlet request. */
   private final HttpServletRequest request;
-  
+
   /** Whether QR code should be displayed. */
   private final Boolean qr;
-  
+
   /** The session state. */
   private final BankIdSessionState state;
-  
+
   /** The Relying Party. */
   private final RelyingPartyData relyingPartyData;
-  
+
   /** The data to display in the BankID app. */
   private final UserVisibleData data;
-  
+
   /** The BankID context. */
   private final BankIdContext context;
 }

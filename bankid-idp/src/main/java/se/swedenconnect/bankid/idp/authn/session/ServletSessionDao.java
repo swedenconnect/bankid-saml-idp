@@ -15,12 +15,12 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Implements the {@link SessionDao} interface using the session extracted from the {@link HttpServletRequest}.
  * If using Spring session the session objects will be distributed.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */

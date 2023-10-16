@@ -15,8 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;

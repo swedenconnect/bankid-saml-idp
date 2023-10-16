@@ -15,11 +15,11 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The Session Data Access Object interface.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -27,7 +27,7 @@ public interface SessionDao {
 
   /**
    * Writes object {@code value} under the key {@code key}.
-   * 
+   *
    * @param key the object key
    * @param value the object
    * @param request the HTTP servlet request
@@ -36,7 +36,7 @@ public interface SessionDao {
 
   /**
    * Reads the object identified by {@code key} of type {@code tClass}.
-   * 
+   *
    * @param <T> the type
    * @param key the object key
    * @param tClass the type of the object to read
@@ -47,7 +47,7 @@ public interface SessionDao {
 
   /**
    * Removes the object identified by {@code key}.
-   * 
+   *
    * @param key the object key
    * @param request the HTTP servlet request
    */

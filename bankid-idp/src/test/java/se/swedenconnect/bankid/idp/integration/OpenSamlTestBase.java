@@ -26,7 +26,7 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
 import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;

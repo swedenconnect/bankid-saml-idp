@@ -35,8 +35,9 @@ public class TestContainerSetup {
 
   @DynamicPropertySource
   static void registerContainerProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.redis.ssl", () -> false);
-    registry.add("spring.redis.host", redis::getHost);
-    registry.add("spring.redis.port", () -> redis.getMappedPort(6379));
+    registry.add("spring.data.redis.ssl.enabled", () -> false);
+    registry.add("spring.data.redis.host", redis::getHost);
+    registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
+    registry.add("spring.data.redis.password", () -> "supersecret");
   }
 }

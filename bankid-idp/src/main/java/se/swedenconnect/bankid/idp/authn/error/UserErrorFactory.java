@@ -17,10 +17,9 @@ package se.swedenconnect.bankid.idp.authn.error;
 
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.stereotype.Component;
 
+import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.config.UiProperties;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
