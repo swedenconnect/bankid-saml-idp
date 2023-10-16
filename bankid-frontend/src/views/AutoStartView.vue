@@ -35,6 +35,9 @@
 
   const retry = () => {
     cancel().then(() => {
+      hideAutoStart.value = false;
+      responseStatus.value = "NOT_STARTED";
+      token.value = "";
       startPolling();
     });
   };
