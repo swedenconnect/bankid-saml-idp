@@ -31,7 +31,7 @@
   };
   const closeModal = () => {
     emit('close');
-    cancelRetry.value = true;
+    if (showQrInstructions.value) cancelRetry.value = true;
   };
 
   const startPolling = () => {
