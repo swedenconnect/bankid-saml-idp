@@ -5,19 +5,21 @@ spring:
   config:
     activate:
       on-profile: sandbox
-  redis:
-    host: redis.bankididp.sandbox
-    port: 6379
-    password: REDACTED
-    ssl: true
-    ssl-ext:
-      enable-hostname-verification: true
-      credential:
-        resource: file:/opt/bankid-idp/config/redis/redis.p12
-        password: REDACTED
-      trust:
-        resource: file:/opt/bankid-idp/config/redis/trust.p12
-        password: REDACTED
+  data:
+    redis:
+      host: redis.bankididp.sandbox
+      port: 6379
+      password: REDACTED
+      ssl:
+        enabled: true
+      ssl-ext:
+        enable-hostname-verification: true
+        credential:
+          resource: file:/opt/bankid-idp/config/redis/redis.p12
+          password: REDACTED
+        trust:
+          resource: file:/opt/bankid-idp/config/redis/trust.p12
+          password: REDACTED
 tomcat:
   ajp:
     enabled: true
