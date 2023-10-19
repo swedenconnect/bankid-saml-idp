@@ -82,7 +82,8 @@ public class BankIdResponseFixture {
   }
 
   public static BankIdSessionState update(BankIdSessionState state, CollectResponse response) {
-    BankIdSessionData data = BankIdSessionData.of(state.getBankIdSessionData(), response);
+    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+    BankIdSessionData data = BankIdSessionData.of(bankIdSessionData, response, bankIdSessionData.getShowQr());
     state.pop();
     state.push(data);
     return state;

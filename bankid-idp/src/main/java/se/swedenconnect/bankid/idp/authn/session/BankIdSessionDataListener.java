@@ -102,7 +102,7 @@ public class BankIdSessionDataListener {
 
     final BankIdSessionData previous =
         this.reader.loadSessionData(event.getRequest().getRequest()).getBankIdSessionData();
-    this.writer.save(event.getRequest().getRequest(), BankIdSessionData.of(previous, event.getCollectResponse()));
+    this.writer.save(event.getRequest().getRequest(), BankIdSessionData.of(previous, event.getCollectResponse(), event.getRequest().getQr()));
 
     if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
       this.writer.save(event.getRequest().getRequest(), event.getCollectResponse());

@@ -40,6 +40,7 @@ import se.swedenconnect.bankid.idp.integration.client.FrontendClient;
 import se.swedenconnect.bankid.idp.integration.response.OrderAndCollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
@@ -141,6 +142,17 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
         .expectErrorMatches(e -> e instanceof CannotAcquireLockException)
         .verify();
     BankIdApiMock.resetDelay();
+  }
+
+  @Test
+  @WithSamlUser
+  void userCanChangeBetweenShowingQrCode(FrontendClient client) {
+    OrderResponse orderResponse = BankIdResponseFactory.start();
+    BankIdApiMock.mockAuth(orderResponse);
+    BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())));
+    Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
+    Assertions.assertEquals("bankid.msg.ext2", client.poll(true).block().getMessageCode());
+    Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
   }
 
   @ParameterizedTest
