@@ -15,17 +15,17 @@
  */
 package se.swedenconnect.bankid.idp.authn.error;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import se.swedenconnect.bankid.idp.authn.annotations.ApiController;
 
-import java.util.concurrent.ThreadLocalRandom;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import se.swedenconnect.bankid.idp.authn.annotations.ApiController;
 
 /**
  * Controller advice for api error handling.
