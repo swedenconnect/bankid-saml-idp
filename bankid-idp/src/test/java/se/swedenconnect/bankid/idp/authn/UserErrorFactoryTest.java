@@ -33,8 +33,6 @@ import se.swedenconnect.bankid.idp.authn.error.UserErrorFactory;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
-import java.util.stream.Stream;
-
 class UserErrorFactoryTest {
 
   public static final String EXPECTED_CONTEX_PATH = "/context/path";
