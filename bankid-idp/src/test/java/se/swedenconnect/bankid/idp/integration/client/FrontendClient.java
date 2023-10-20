@@ -52,6 +52,8 @@ import jakarta.servlet.ServletContext;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
+import se.swedenconnect.bankid.idp.authn.api.SelectedDeviceInformation;
+import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.integration.OpenSamlTestBase;
 import se.swedenconnect.bankid.idp.integration.TestSp;
 import se.swedenconnect.bankid.idp.integration.TestSpConstants;
@@ -74,6 +76,10 @@ public class FrontendClient {
   public Mono<ApiResponse> poll(boolean qr) {
     Consumer<UriBuilder> customizer = c -> c.queryParam("qr", qr);
     return exchangeApi(withPath(client.post(), "/idp/api/poll", customizer), ApiResponse.class);
+  }
+
+  public Mono<SelectedDeviceInformation> device() {
+    return exchangeApi(withPath(client.get(), "/idp/api/device", c -> {}), SelectedDeviceInformation.class);
   }
 
   public Mono<Void> cancelApi() {
