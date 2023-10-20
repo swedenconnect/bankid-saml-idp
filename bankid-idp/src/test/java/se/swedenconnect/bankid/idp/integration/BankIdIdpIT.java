@@ -15,8 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.integration;
 
-import java.util.List;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,11 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -42,6 +38,8 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
+
+import java.util.List;
 
 public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
@@ -155,8 +153,24 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
   }
 
+  @Test
+  @WithSamlUser
+  void previousSelectedDeviceIsUsedDevice(FrontendClient client) {
+    OrderResponse orderResponse = BankIdResponseFactory.start();
+    BankIdApiMock.mockAuth(orderResponse);
+    BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())));
+    Assertions.assertEquals("bankid.msg.ext2", client.poll(true).block().getMessageCode());
+    Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
+    BankIdApiMock.nextCollect(BankIdResponseFactory.complete(orderResponse));
+    ApiResponse apiResponse = client.poll(false).block();
+    Assertions.assertEquals(ApiResponse.Status.COMPLETE, apiResponse.getStatus());
+    client.complete();
+    Assertions.assertEquals("this", client.device().block().getDevice());
+  }
+
+
   @ParameterizedTest
-  @MethodSource({ "se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll" })
+  @MethodSource({"se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll"})
   void testUserMessage(String expectedMessageCode, Boolean sign, OrderAndCollectResponse response, Boolean showQr) {
     FrontendClient client = AuthenticatedClientResolver.createFrontEndClient(sign);
     if (sign) {
