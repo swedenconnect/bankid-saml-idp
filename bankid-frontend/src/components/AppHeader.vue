@@ -1,18 +1,13 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import type { SpInformation } from '@/types';
-
   const props = defineProps<{
-    spInfo?: SpInformation;
+    logo: string;
   }>();
-
-  const getImage = computed(() => props.spInfo?.imageUrl ?? '');
 </script>
 
 <template>
   <header>
     <div class="top-logo-container main-width">
-      <img v-if="getImage" class="top-logo" :src="getImage" alt="Logo" />
+      <img class="top-logo" :src="props.logo" alt="Logo" />
     </div>
   </header>
 </template>
