@@ -111,7 +111,8 @@ public class UiInformationProvider {
     String logoUrl;
 
     if (rpUiInfo != null && !rpUiInfo.isUseAsFallback()) {
-      displayNames.putAll(rpUiInfo.getDisplayName());
+      Optional.ofNullable(rpUiInfo.getDisplayName())
+        .ifPresent(m -> displayNames.putAll(m));
       logoUrl = rpUiInfo.getLogotypeUrl();
 
       // Check if there any display names from SAML metadata that aren't set in RP UI ...
