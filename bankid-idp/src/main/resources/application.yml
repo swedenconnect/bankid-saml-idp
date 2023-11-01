@@ -58,6 +58,8 @@ management:
 #        prometheus: metrics
       exposure:
         include: health, metrics, prometheus, loggers
+        
+spring:        
   messages:
     basename: messages,idp-errors/idp-error-messages
 
@@ -90,8 +92,8 @@ bankid:
     - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
     authn-path: "/bankid"
   
-  # Also see UI settings ...
-    
+  # Also see UI settings ...  
+      
 #
 # The SAML IdP configuration
 #   See https://docs.swedenconnect.se/saml-identity-provider/configuration.html
