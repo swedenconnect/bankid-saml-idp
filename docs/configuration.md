@@ -185,7 +185,7 @@ the ordinary SAML SP used for authentication and the Signature Service SP used f
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
-| `display-names` | A mapping between language codes and display names. | Map | - |
+| `display-name` | A mapping between language codes and display names. | Map | - |
 | `logotype-url` | The URL for the Relying Party logotype. | String | - |
 | `use-as-fallback` | Whether the data in this object should be used as a fallback to UI information gathered from the SAML metadata or not. If `true`, the data will only be used if data is not present in SAML metadata, and if `false`, the data from this object will have precedence over data found in SAML metadata. | Boolean | `true` |
 
