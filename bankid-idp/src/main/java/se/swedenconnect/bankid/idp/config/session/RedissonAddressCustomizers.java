@@ -23,23 +23,27 @@ import org.redisson.config.SingleServerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
  * Customizers to handle a bug where the protocol section of the address becomes non-tls when tls is enabled
  */
 public class RedissonAddressCustomizers {
-  public static Function<ClusterServersConfig, ClusterServersConfig> clusterServerCustomizer = (s) -> {
+  public static BiFunction<ClusterServersConfig, RedisClusterProperties, ClusterServersConfig> clusterServerCustomizer = (config, clusterProperties) -> {
     List<String> addresses = new ArrayList<>();
-    s.getNodeAddresses().stream().forEach(address -> {
+    config.getNodeAddresses().forEach(address -> {
       String addr = address;
       if (address.contains("redis://")) {
         addr = address.replace("redis://", "rediss://");
       }
       addresses.add(addr);
     });
-    s.setNodeAddresses(addresses);
-    return s;
+    config.setNodeAddresses(addresses);
+    Map<String, String> natTable = clusterProperties.getNatTable();
+    config.setNatMap(natTable);
+    return config;
   };
 
   public static Function<SingleServerConfig, SingleServerConfig> singleServerSslCustomizer = (s) -> {

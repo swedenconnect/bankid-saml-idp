@@ -16,9 +16,12 @@
 package se.swedenconnect.bankid.idp.config.session;
 
 import lombok.Setter;
+import org.redisson.api.NatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.BaseConfig;
+import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.Config;
+import org.redisson.misc.RedisURI;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +41,7 @@ import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * Redis session security configuration.
@@ -65,11 +69,17 @@ public class RedisSessionConfiguration {
   }
 
   @Bean
+  @ConfigurationProperties(prefix = "spring.data.redis.cluster-ext")
+  RedisClusterProperties redisClusterProperties() {
+    return new RedisClusterProperties();
+  }
+
+  @Bean
   @ConditionalOnProperty(value = "spring.data.redis.ssl.enabled", havingValue = "true", matchIfMissing = false)
-  RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties) {
+  RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties, final RedisClusterProperties clusterProperties) {
     return c -> {
       try {
-        final BaseConfig<?> config = getConfiguration(c);
+        final BaseConfig<?> config = getConfiguration(c, clusterProperties);
         config.setSslEnableEndpointIdentification(tlsProperties.isEnableHostnameVerification());
         if (tlsProperties.getCredential() != null) {
           config
@@ -87,18 +97,17 @@ public class RedisSessionConfiguration {
     };
   }
 
-  private BaseConfig<?> getConfiguration(Config config) {
-    BaseConfig<?> baseConfig = config.useSingleServer();
+  private BaseConfig<?> getConfiguration(Config config, RedisClusterProperties clusterProperties) {
     if (config.isSingleConfig()) {
       return RedissonAddressCustomizers.singleServerSslCustomizer.apply(config.useSingleServer());
     }
     if (config.isClusterConfig()) {
-      return RedissonAddressCustomizers.clusterServerCustomizer.apply(config.useClusterServers());
+      return RedissonAddressCustomizers.clusterServerCustomizer.apply(config.useClusterServers(), clusterProperties);
     }
     if (config.isSentinelConfig()) {
       throw new IllegalArgumentException("Sentinel Configuration is not implementend");
     }
-    return baseConfig;
+    throw new IllegalStateException("Could not determine configuration type");
   }
 
   @Bean

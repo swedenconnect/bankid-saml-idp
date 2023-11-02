@@ -384,6 +384,41 @@ spring:
           password: changeit    
 ```
 
+#### Redis Cluster Configuration
+
+In order to configure redis cluster we have added nat-translation for addresses so that the application knows how to reach the redis cluster if it's not located on the same network.
+This can be done under the key `spring.redis.data.cluster-ext`
+
+|  Property                           | Description                                                               | Type   | Default value |
+|:---|:---|:---|:---|
+| `spring.redis.data.cluster-ext[].*` | List of entries for nat translation, See defintion belolw                 | List   | Empty List    |
+| `from`                              | Address to translate from. e.g. "172.20.0.31:2001"                        | String |               |
+ | `to`| Address to translate to. e.g. "redis1.local.dev.swedenconnect.se:2001" | String | |
+
+** Exmaple: **
+The three redis nodes are exposed via NAT to the application on redis(1-3).local.dev.swedenconnect.se
+But internally the refer to each other as 172.20.0.3(1-3)
+When the application connects to the first node, it will reconfigure itself by reading the configuration from redis1.
+Since the application is not located on the same network the connection will the fail since those addresses are not located on the same network.
+If we add the configuration bellow we will re-map outgoing connections to the correct node.
+```yaml
+  data:
+    redis:
+      cluster:
+        nodes:
+          - redis1.local.dev.swedenconnect.se:2001
+          - redis2.local.dev.swedenconnect.se:2002
+          - redis3.local.dev.swedenconnect.se:2003
+      cluster-ext:
+        nat-translation:
+          - from: "172.20.0.31:2001"
+            to: "redis1.local.dev.swedenconnect.se:2001"
+          - from: "172.20.0.32:2002"
+            to: "redis2.local.dev.swedenconnect.se:2002"
+          - from: "172.20.0.33:2003"
+            to: "redis3.local.dev.swedenconnect.se:2003"
+```
+
 <a name="adding-your-own-application-yml-file"></a>
 ### Adding Your Own application.yml File
 
