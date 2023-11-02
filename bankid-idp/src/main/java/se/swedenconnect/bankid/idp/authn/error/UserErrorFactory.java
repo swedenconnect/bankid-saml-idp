@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import se.swedenconnect.bankid.idp.config.UiProperties;
+import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
 /**
@@ -103,6 +104,9 @@ public class UserErrorFactory {
   private static String getErrorMessage(final Exception e) {
     if (e instanceof UnrecoverableSaml2IdpException unrecoverableSaml2IdpException) {
       return unrecoverableSaml2IdpException.getError().getMessageCode();
+    }
+    if (e instanceof NoSuchRelyingPartyException) {
+      return "idp.error.notregistered";
     }
     return ErrorMessage.UNKNOWN.getMessage();
   }

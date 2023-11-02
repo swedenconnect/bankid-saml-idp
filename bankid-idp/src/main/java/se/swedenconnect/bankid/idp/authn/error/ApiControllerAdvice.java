@@ -17,6 +17,7 @@ package se.swedenconnect.bankid.idp.authn.error;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -65,7 +66,7 @@ public class ApiControllerAdvice {
    * @return redirect to error view (as json)
    */
   @ExceptionHandler(value = {Exception.class})
-  public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e) {
+  public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e, final HttpServletRequest request) {
     log.error("Generic API exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
     UserErrorResponse userError = this.userErrorFactory.getUserError(e);
     return ResponseEntity
