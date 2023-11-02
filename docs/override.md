@@ -73,7 +73,7 @@ To override any CSS without the need for `!important` attributes, start your sel
 
 Put your custom messages in a `.messages` file in the override directory specified above.
 
-To override an already existing text, look in [messages.js](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-frontend/src/locale/messages.js) and use the path to the message you want to change.
+To override an already existing text, look in [messages.json](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-frontend/src/locale/messages.json) and use the path to the message you want to change.
 
 For example, to override the text where the user is asked to scan the QR code:
 
