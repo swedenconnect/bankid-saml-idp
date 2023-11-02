@@ -66,7 +66,7 @@ public class ApiControllerAdvice {
    * @return redirect to error view (as json)
    */
   @ExceptionHandler(value = {Exception.class})
-  public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e, final HttpServletRequest request) {
+  public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e) {
     log.error("Generic API exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
     UserErrorResponse userError = this.userErrorFactory.getUserError(e);
     return ResponseEntity
