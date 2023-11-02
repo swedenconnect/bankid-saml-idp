@@ -4,30 +4,19 @@ spring:
       on-profile: local
   data:
     redis:
-      cluster:
-        nodes:
-          - redis1.local.dev.swedenconnect.se:2001
-          - redis2.local.dev.swedenconnect.se:2002
-          - redis3.local.dev.swedenconnect.se:2003
+      host: local.dev.swedenconnect.se
+      port: 6379
       password: supersecret
       ssl:
         enabled: true
       ssl-ext:
         enable-hostname-verification: true
         credential:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/redis.p12
+          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
           password: changeit
         trust:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/trust.p12
+          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
           password: changeit
-      cluster-ext:
-        nat-translation:
-          - from: "172.20.0.31:2001"
-            to: "redis1.local.dev.swedenconnect.se:2001"
-          - from: "172.20.0.32:2002"
-            to: "redis2.local.dev.swedenconnect.se:2002"
-          - from: "172.20.0.33:2003"
-            to: "redis3.local.dev.swedenconnect.se:2003"
   session:
     timeout: 15m
 
