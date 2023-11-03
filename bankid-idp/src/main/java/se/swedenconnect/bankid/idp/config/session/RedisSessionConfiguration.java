@@ -15,13 +15,12 @@
  */
 package se.swedenconnect.bankid.idp.config.session;
 
-import lombok.Setter;
-import org.redisson.api.NatMapper;
+import java.io.IOException;
+import java.time.Duration;
+
 import org.redisson.api.RedissonClient;
 import org.redisson.config.BaseConfig;
-import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.Config;
-import org.redisson.misc.RedisURI;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,16 +31,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
+import lombok.Setter;
 import se.swedenconnect.bankid.idp.authn.session.RedisSessionDao;
 import se.swedenconnect.bankid.idp.authn.session.SessionDao;
 import se.swedenconnect.bankid.idp.concurrency.RedisTryLockRepository;
 import se.swedenconnect.bankid.idp.concurrency.TryLockRepository;
 import se.swedenconnect.bankid.idp.config.RedisTlsProperties;
 import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Map;
 
 /**
  * Redis session security configuration.
