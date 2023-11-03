@@ -10,7 +10,7 @@
   xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
   Name="https://md.swedenconnect.se/local-metadata.xml" ID="_20181019T120516Z">
   
-  <md:EntityDescriptor ID="_ed6ca3f0237e3c30ae66e8d02edae370c6da55c77dc59a418fa2ca1250bb3766" entityID="http://sandbox.swedenconnect.se/testmyeidx">
+  <md:EntityDescriptor ID="_ed6ca3f0237e3c30ae66e8d02edae370c6da55c77dc59a418fa2ca1250bb3766" entityID="http://sandbox.swedenconnect.se/testmyeid">
     <md:Extensions>
       <mdattr:EntityAttributes>
         <saml2:Attribute xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
