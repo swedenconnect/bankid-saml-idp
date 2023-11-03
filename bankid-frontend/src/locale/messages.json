@@ -2,6 +2,7 @@
   "en": {
     "idp": {
       "error": {
+        "notregistered": "The service you are using has not been registered for usage with BankID.",
         "unrecoverable": {
           "internal": "An internal error occurred",
           "unknown-peer": "The sender of the authentication request has not been registered at the Identity Provider",
@@ -92,6 +93,7 @@
   "sv": {
     "idp": {
       "error": {
+        "notregistered": "Tjänsten du använder är inte registrerad för att använda BankID.",
         "unrecoverable": {
           "internal": "Ett internt fel har inträffat",
           "unknown-peer": "Avsändaren av autentiseringsförsöket är inte registrerad hos IdP-leverantören",

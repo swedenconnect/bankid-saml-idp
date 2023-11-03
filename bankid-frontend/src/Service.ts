@@ -6,9 +6,11 @@ import type {
   ApiResponseStatus,
   CustomerContactInformation,
   RetryResponse,
-  SelectedDeviceInformation, SessionExpiredResponse, UserErrorResponse,
+  SelectedDeviceInformation,
+  SessionExpiredResponse,
   Status,
   UiInformation,
+  UserErrorResponse,
 } from './types';
 
 const CONTEXT_PATH = import.meta.env.BASE_URL;
@@ -27,7 +29,7 @@ export async function poll(showQr: boolean) {
       return { retry: true, time: retryAfter } as RetryResponse;
     }
     if (response.status === 403) {
-      return {"sessionExpired": true } as SessionExpiredResponse;
+      return { sessionExpired: true } as SessionExpiredResponse;
     }
     if (response.status === 400) {
       return data as UserErrorResponse;
@@ -48,7 +50,7 @@ function isSessionExpiredResponse(obj: any): obj is SessionExpiredResponse {
   return obj && 'sessionExpired' in obj;
 }
 
-function isUserErrorResponse(obj: any): obj is UserErrorResponse {
+export function isUserErrorResponse(obj: any): obj is UserErrorResponse {
   return obj && 'errorMessage' in obj;
 }
 
@@ -77,6 +79,15 @@ export const pollingAutoStart = (
   });
 };
 
+export function handleApiError(response: UserErrorResponse) {
+  console.log('User error!');
+  let location = import.meta.env.BASE_URL + '/bankid#/error/' + response.errorMessage;
+  if (response.traceId !== '') {
+    location = location + '/' + response.traceId;
+  }
+  window.location.href = location;
+}
+
 const handleResponse = (
   response: ApiResponse | RetryResponse | SessionExpiredResponse | UserErrorResponse,
   pollFunction: () => Promise<ApiResponse | RetryResponse | SessionExpiredResponse | UserErrorResponse>,
@@ -88,15 +99,11 @@ const handleResponse = (
   cancelRetry?: Ref<boolean>,
 ) => {
   if (isSessionExpiredResponse(response)) {
-      window.location.href = PATHS.ERROR;
+    window.location.href = PATHS.ERROR;
   }
+
   if (isUserErrorResponse(response)) {
-    console.log("User error!");
-    let location = import.meta.env.BASE_URL + "/bankid#/error/" + response.errorMessage;
-    if (response.traceId !== "") {
-      location = location + "/" + response.traceId;
-    }
-    window.location.href = location;
+    handleApiError(response);
   }
 
   if (isApiResponse(response)) {
@@ -165,6 +172,6 @@ const fetchData = async (endpoint: string): Promise<any> => (await fetch(CONTEXT
 export const status = async (): Promise<Status> => fetchData('/api/status');
 export const contactInformation = async (): Promise<CustomerContactInformation> => fetchData('/api/contact');
 export const cancel = async () => await fetch(CONTEXT_PATH + '/api/cancel', requestOptions);
-export const uiInformation = async (): Promise<UiInformation> => fetchData('/api/ui');
+export const uiInformation = async (): Promise<UiInformation | UserErrorResponse> => fetchData('/api/ui');
 export const selectedDevice = async (): Promise<SelectedDeviceInformation> => fetchData('/api/device');
 export const getOverrides = async () => await fetchData('/api/overrides');

@@ -1,0 +1,63 @@
+version: '3.5'
+services:
+  redis-cluster:
+    image: 'redis:7.0-alpine'
+    command: redis-cli -a supersecret --tls --cert /tls/redis.crt --key /tls/redis.key --cacert /tls/ca.crt --cluster create redis1.local.dev.swedenconnect.se:2001 redis2.local.dev.swedenconnect.se:2002 redis3.local.dev.swedenconnect.se:2003  --cluster-yes
+    volumes:
+      - ./certificates:/tls
+    networks:
+      redisnetwork:
+        ipv4_address: 172.20.0.30
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+  redis-node-1:
+    hostname: redis1.local.dev.swedenconnect.se
+    ports:
+      - 2001:2001
+    expose:
+      - 16379
+    image: 'redis:7.0-alpine'
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./docker/redis-1.conf:/usr/local/etc/redis/redis.conf
+      - ./certificates:/tls
+    networks:
+      redisnetwork:
+        ipv4_address: 172.20.0.31
+
+  redis-node-2:
+    hostname: redis2.local.dev.swedenconnect.se
+    ports:
+      - 2002:2002
+    expose:
+      - 16379
+    image: 'redis:7.0-alpine'
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./docker/redis-2.conf:/usr/local/etc/redis/redis.conf
+      - ./certificates:/tls
+    networks:
+      redisnetwork:
+        ipv4_address: 172.20.0.32
+  redis-node-3:
+    hostname: redis3.local.dev.swedenconnect.se
+    ports:
+      - 2003:2003
+    expose:
+      - 16379
+    image: 'redis:7.0-alpine'
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./docker/redis-3.conf:/usr/local/etc/redis/redis.conf
+      - ./certificates:/tls
+    networks:
+      redisnetwork:
+        ipv4_address: 172.20.0.33
+networks:
+  redisnetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

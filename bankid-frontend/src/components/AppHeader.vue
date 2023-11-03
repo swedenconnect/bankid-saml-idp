@@ -1,19 +1,13 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import type { SpInformation } from '@/types';
-
   const props = defineProps<{
-    spInfo?: SpInformation;
+    logo: string;
   }>();
-
-  const getImage = computed(() => props.spInfo?.imageUrl ?? '');
 </script>
 
 <template>
   <header>
     <div class="top-logo-container main-width">
-      <img v-if="getImage" class="top-logo-dim" :src="getImage" alt="Logo" />
-      <img v-else class="top-logo-dim" src="@/assets/logo.svg" alt="Logo" />
+      <img class="top-logo" :src="props.logo" alt="Logo" />
     </div>
   </header>
 </template>
@@ -25,21 +19,18 @@
   }
 
   .top-logo-container {
+    --logo-height: 60px;
     box-sizing: content-box;
     padding: 20px;
-  }
-
-  @media (min-width: 576px) {
-    .top-logo-dim {
-      height: 60px;
-      width: auto;
-    }
+    height: var(--logo-height);
   }
 
   @media (max-width: 576px) {
-    .top-logo-dim {
-      height: 40px;
-      width: auto;
+    .top-logo-container {
+      --logo-height: 40px;
     }
+  }
+  .top-logo {
+    height: 100%;
   }
 </style>

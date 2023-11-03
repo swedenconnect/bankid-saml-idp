@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.redisson.api.RedissonClient;
-import org.redisson.config.SingleServerConfig;
+import org.redisson.config.BaseConfig;
+import org.redisson.config.Config;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ import se.swedenconnect.bankid.idp.ext.RedisReplayChecker;
  */
 @Configuration
 @ConditionalOnProperty(value = "bankid.session.module", havingValue = "redis")
-@Import({ RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
+@Import({RedissonAutoConfiguration.class, RedisAutoConfiguration.class})
 @EnableRedisHttpSession
 public class RedisSessionConfiguration {
 
@@ -65,32 +66,45 @@ public class RedisSessionConfiguration {
   }
 
   @Bean
+  @ConfigurationProperties(prefix = "spring.data.redis.cluster-ext")
+  RedisClusterProperties redisClusterProperties() {
+    return new RedisClusterProperties();
+  }
+
+  @Bean
   @ConditionalOnProperty(value = "spring.data.redis.ssl.enabled", havingValue = "true", matchIfMissing = false)
-  RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties) {
+  RedissonAutoConfigurationCustomizer sslCustomizer(final RedisTlsProperties tlsProperties, final RedisClusterProperties clusterProperties) {
     return c -> {
       try {
-        final SingleServerConfig config = c.useSingleServer();
+        final BaseConfig<?> config = getConfiguration(c, clusterProperties);
         config.setSslEnableEndpointIdentification(tlsProperties.isEnableHostnameVerification());
-        String rediAddress = config.getAddress();
-        if (rediAddress.contains("redis://")) {
-          // The protocol part has not been configured by spring even though we have enabled ssl
-          config.setAddress(rediAddress.replace("redis://", "rediss://"));
-        }
         if (tlsProperties.getCredential() != null) {
           config
-            .setSslKeystore(tlsProperties.getCredential().getResource().getURL())
-            .setSslKeystorePassword(tlsProperties.getCredential().getPassword());
+              .setSslKeystore(tlsProperties.getCredential().getResource().getURL())
+              .setSslKeystorePassword(tlsProperties.getCredential().getPassword());
         }
         if (tlsProperties.getTrust() != null) {
           config
-            .setSslTruststore(tlsProperties.getTrust().getResource().getURL())
-            .setSslTruststorePassword(tlsProperties.getTrust().getPassword());
+              .setSslTruststore(tlsProperties.getTrust().getResource().getURL())
+              .setSslTruststorePassword(tlsProperties.getTrust().getPassword());
         }
-      }
-      catch (final IOException e) {
+      } catch (final IOException e) {
         throw new RuntimeException(e);
       }
     };
+  }
+
+  private BaseConfig<?> getConfiguration(Config config, RedisClusterProperties clusterProperties) {
+    if (config.isSingleConfig()) {
+      return RedissonAddressCustomizers.singleServerSslCustomizer.apply(config.useSingleServer());
+    }
+    if (config.isClusterConfig()) {
+      return RedissonAddressCustomizers.clusterServerCustomizer.apply(config.useClusterServers(), clusterProperties);
+    }
+    if (config.isSentinelConfig()) {
+      throw new IllegalArgumentException("Sentinel Configuration is not implementend");
+    }
+    throw new IllegalStateException("Could not determine configuration type");
   }
 
   @Bean

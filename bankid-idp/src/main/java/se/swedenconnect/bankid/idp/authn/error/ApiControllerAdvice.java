@@ -45,10 +45,11 @@ public class ApiControllerAdvice {
       """;
 
   /**
-   * Handles exception for CallNotPermitted (resilience4j)
+   * Handles exception for CallNotPermitted (resilience4j).
+   *
    * @return an error response with a randomized backoff timer for the frontend to handle
    */
-  @ExceptionHandler(value = {CallNotPermittedException.class})
+  @ExceptionHandler(value = { CallNotPermittedException.class })
   public ResponseEntity<String> handleException() {
     final int random = ThreadLocalRandom.current().nextInt(5) + 1;
     final int delay = 5 + random;
@@ -60,11 +61,12 @@ public class ApiControllerAdvice {
   }
 
   /**
-   * Handles uncaught exceptions for /api routes
-   * @param e Uncaught exception to handle
+   * Handles uncaught exceptions for /api routes.
+   *
+   * @param e uncaught exception to handle
    * @return redirect to error view (as json)
    */
-  @ExceptionHandler(value = {Exception.class})
+  @ExceptionHandler(value = { Exception.class })
   public ResponseEntity<UserErrorResponse> defaultHandler(final Exception e) {
     log.error("Generic API exception handler used for exception:{}", e.getClass().getCanonicalName(), e);
     UserErrorResponse userError = this.userErrorFactory.getUserError(e);

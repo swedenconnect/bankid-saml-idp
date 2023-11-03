@@ -104,6 +104,9 @@ public class UserErrorFactory {
     if (e instanceof UnrecoverableSaml2IdpException unrecoverableSaml2IdpException) {
       return unrecoverableSaml2IdpException.getError().getMessageCode();
     }
+    if (e instanceof NoSuchRelyingPartyException) {
+      return "idp.error.notregistered";
+    }
     return ErrorMessage.UNKNOWN.getMessage();
   }
 }

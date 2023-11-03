@@ -1,23 +1,30 @@
 <script setup lang="ts">
-  import { onBeforeMount, ref } from 'vue';
+  import { computed, onBeforeMount, ref } from 'vue';
   import AppFooter from '@/components/AppFooter.vue';
   import AppHeader from '@/components/AppHeader.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import LocaleChanger from '@/components/LocaleChanger.vue';
-  import { selectedDevice, uiInformation } from '@/Service';
+  import { handleApiError, isUserErrorResponse, selectedDevice, uiInformation } from '@/Service';
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
   const uiInfo = ref<UiInformation>();
   const device = ref<SelectedDeviceInformation>();
 
+  const logo = computed(() => uiInfo.value?.sp?.imageUrl);
+
   onBeforeMount(async () => {
-    uiInfo.value = await uiInformation();
+    var information = await uiInformation();
+    if (isUserErrorResponse(information)) {
+      handleApiError(information);
+    } else {
+      uiInfo.value = information;
+    }
     device.value = await selectedDevice();
   });
 </script>
 
 <template>
-  <AppHeader :sp-info="uiInfo?.sp" />
+  <AppHeader v-if="logo" :logo="logo" />
   <LocaleChanger />
   <main class="main-width">
     <CustomContent position="above" />
