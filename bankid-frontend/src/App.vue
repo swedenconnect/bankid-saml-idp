@@ -4,7 +4,7 @@
   import AppHeader from '@/components/AppHeader.vue';
   import CustomContent from '@/components/CustomContent.vue';
   import LocaleChanger from '@/components/LocaleChanger.vue';
-  import { selectedDevice, uiInformation } from '@/Service';
+  import { handleApiError, isUserErrorResponse, selectedDevice, uiInformation } from '@/Service';
   import type { SelectedDeviceInformation, UiInformation } from '@/types';
 
   const uiInfo = ref<UiInformation>();
@@ -13,7 +13,12 @@
   const logo = computed(() => uiInfo.value?.sp?.imageUrl);
 
   onBeforeMount(async () => {
-    uiInfo.value = await uiInformation();
+    var information = await uiInformation();
+    if (isUserErrorResponse(information)) {
+      handleApiError(information);
+    } else {
+      uiInfo.value = information;
+    }
     device.value = await selectedDevice();
   });
 </script>
