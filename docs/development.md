@@ -92,6 +92,18 @@ To start Redis, simply run:
 > docker compose -f ${CODE_ROOT}/bankid-idp/env/local/redis/docker-compose.yml up
 ```
 
+<a name="local-redis-cluster-instance"></a>
+### Local Redis Cluster Instance
+
+There is an additional docker compose file that can be used if you wish to develop with a Redis cluster:
+
+```
+> docker compose -f ${CODE_ROOT}/bankid-idp/env/local/redis-cluster/docker-compose.yml up
+```
+
+**Note**: When running with this setup there is an additional profile `cluster` that should be used
+which configures the cluster. You need both profiles to be active `SPRING_PROFILES_ACTIVE=local,cluster`.
+
 <a name="using-docker"></a>
 ## Using Docker
 
