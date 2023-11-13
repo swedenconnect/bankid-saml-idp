@@ -15,13 +15,13 @@
  */
 package se.swedenconnect.bankid.idp.config.session;
 
+import org.redisson.config.ClusterServersConfig;
+import org.redisson.config.SingleServerConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.redisson.config.ClusterServersConfig;
-import org.redisson.config.SingleServerConfig;
 
 /**
  * Customizers to handle a bug where the protocol section of the address becomes non-TLS when TLS is enabled.
@@ -42,7 +42,9 @@ public class RedissonAddressCustomizers {
           addresses.add(addr);
         });
         config.setNodeAddresses(addresses);
-        config.setNatMapper(clusterProperties.createNatMapper());
+        if (clusterProperties.getNatTranslation() != null) {
+          config.setNatMapper(clusterProperties.createNatMapper());
+        }
         return config;
       };
 
