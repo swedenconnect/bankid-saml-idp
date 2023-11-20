@@ -269,6 +269,36 @@
             </ports>
           </container>
         </configuration>
+        <executions>
+          <execution>
+            <phase>none</phase>
+            <id>local</id>
+            <goals>
+              <goal>dockerBuild</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-cli</id>
+            <phase>none</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <from>
+                <platforms>
+                  <platform>
+                    <os>linux</os>
+                    <architecture>amd64</architecture>
+                  </platform>
+                  <platform>
+                    <os>linux</os>
+                    <architecture>arm64</architecture>
+                  </platform>
+                </platforms>
+              </from>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
@@ -379,7 +409,7 @@
     </profile>
     
     <!--
-      Build backend only: mvn clean install -Dbackend-only 
+      Build backend only: mvn clean install -Dbackend-only
     -->
     <profile>
       

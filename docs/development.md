@@ -116,11 +116,11 @@ mvn -f bankid-idp/bankid-idp jib:build
 ```
 
 **Building, local Docker image only:**
-
+Since MultiArch build is not supported locally, we need to limit the execution to a specific execution-id
 ```bash
 export DOCKER_REPO=local
 mvn clean install
-mvn -f bankid-idp/bankid-idp jib:dockerBuild
+mvn -f bankid-idp/bankid-idp jib:dockerBuild@local
 ```
 
 -----
