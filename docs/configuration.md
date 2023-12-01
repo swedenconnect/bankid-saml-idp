@@ -144,7 +144,7 @@ bankid:
     user-message-defaults:
       fallback-sign-text:
         text: "I hereby sign the text that was displayed on the previous page."
-        format: plain-text
+        format: plain_text
       login-text:
         text: "*Note!*\n\nNever login using your BankID when someone is asking you to do this over the phone"
         format: simple-markdown-v1
