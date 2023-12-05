@@ -1,5 +1,12 @@
 <script setup lang="ts">
+  import { onMounted, ref } from 'vue';
+
   defineEmits(['acceptError', 'retry']);
+  const retryButton = ref<HTMLButtonElement>();
+
+  onMounted(() => {
+    retryButton.value?.focus();
+  });
 </script>
 
 <template>
