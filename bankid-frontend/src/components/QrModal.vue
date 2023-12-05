@@ -5,9 +5,9 @@
   import type { ApiResponseStatus, UiInformation } from '@/types';
   import CustomContent from './CustomContent.vue';
   import ErrorButtons from './ErrorButtons.vue';
+  import LoadingSpinner from './LoadingSpinner.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
-  import LoadingSpinner from './LoadingSpinner.vue';
 
   const props = defineProps<{
     uiInfo?: UiInformation;
