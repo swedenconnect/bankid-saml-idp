@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
 
+  const props = defineProps<{
+    describedBy?: string;
+  }>();
+
   defineEmits(['acceptError', 'retry']);
   const retryButton = ref<HTMLButtonElement>();
 
@@ -11,10 +15,16 @@
 
 <template>
   <div class="buttons">
-    <button class="btn-default" @click="$emit('acceptError')">
+    <button id="cancel-button" class="btn-default" @click="$emit('acceptError')" :aria-describedby="props.describedBy">
       <span>{{ $t('bankid.msg.btn-error-continue') }}</span>
     </button>
-    <button class="btn-default" @click="$emit('retry')">
+    <button
+      id="retry-button"
+      ref="retryButton"
+      class="btn-default"
+      @click="$emit('retry')"
+      :aria-describedby="props.describedBy"
+    >
       <span>{{ $t('bankid.msg.btn-retry') }}</span>
     </button>
   </div>
