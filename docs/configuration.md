@@ -107,7 +107,7 @@ RP.
 | `fallback-sign-text.*` | If no `SignMessage` was received in the SAML `AuthnRequest` message, and no specific text is set for an RP (see [Relying Party Configuration](#relying-party-configuration) below), this text will be displayed in the BankID app during a BankID signature operation. | [DisplayText](#display-text) | - |
 
 <a name="display-text"></a>
-##### DisplayText
+##### Display Text
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
@@ -176,9 +176,9 @@ the ordinary SAML SP used for authentication and the Signature Service SP used f
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
-| `text` | The text string. | String | - |
-| `format` | The format on the above text string. Can be either `plain_text` or `simple_markdown_v1` (see https://www.bankid.com/utvecklare/guider/formatera-text) | String | `plain_text` |
-| `inherit-default-login-text` | If the default user message login text has been assigned, and a specific RP wishes to not use login messages it should set this flag to `false` (and not assign `login-text`). | Boolean | `true` |
+| `login-text.*` | RP specific text to display when authenticating. See [Display Text](#display-text). | [DisplayText](#display-text) | - |
+| `inherit-default-login-text` | If the default user message login text has been assigned, and a specific RP wishes to not use login messages it should set this flag to `false` (and not assign `login-text` above). | Boolean | `true` |
+| `fallback-sign-text.*` | RP specific text to display when signing (if no SignMessage extension was received in the AuthnRequest message). | [DisplayText](#display-text) | - |
 
 <a name="relying-party-ui-info"></a>
 ##### Relying Party UI Info
