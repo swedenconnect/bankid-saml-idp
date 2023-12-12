@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -254,7 +254,7 @@
             <image>openjdk:18.0.2.1-slim</image>
           </from>
           <to>
-            <image>${DOCKER_REPO}/bankid-saml-idp</image>
+            <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>
           </to>
           <container>
             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
