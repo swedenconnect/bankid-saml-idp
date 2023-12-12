@@ -107,7 +107,7 @@ RP.
 | `fallback-sign-text.*` | If no `SignMessage` was received in the SAML `AuthnRequest` message, and no specific text is set for an RP (see [Relying Party Configuration](#relying-party-configuration) below), this text will be displayed in the BankID app during a BankID signature operation. | [DisplayText](#display-text) | - |
 
 <a name="display-text"></a>
-##### DisplayText
+##### Display Text
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
@@ -144,7 +144,7 @@ bankid:
     user-message-defaults:
       fallback-sign-text:
         text: "I hereby sign the text that was displayed on the previous page."
-        format: plain-text
+        format: plain_text
       login-text:
         text: "*Note!*\n\nNever login using your BankID when someone is asking you to do this over the phone"
         format: simple-markdown-v1
@@ -176,9 +176,9 @@ the ordinary SAML SP used for authentication and the Signature Service SP used f
 
 | Property | Description | Type | Default value |
 | :--- | :--- | :--- | :--- |
-| `text` | The text string. | String | - |
-| `format` | The format on the above text string. Can be either `plain_text` or `simple_markdown_v1` (see https://www.bankid.com/utvecklare/guider/formatera-text) | String | `plain_text` |
-| `inherit-default-login-text` | If the default user message login text has been assigned, and a specific RP wishes to not use login messages it should set this flag to `false` (and not assign `login-text`). | Boolean | `true` |
+| `login-text.*` | RP specific text to display when authenticating. See [Display Text](#display-text). | [DisplayText](#display-text) | - |
+| `inherit-default-login-text` | If the default user message login text has been assigned, and a specific RP wishes to not use login messages it should set this flag to `false` (and not assign `login-text` above). | Boolean | `true` |
+| `fallback-sign-text.*` | RP specific text to display when signing (if no SignMessage extension was received in the AuthnRequest message). | [DisplayText](#display-text) | - |
 
 <a name="relying-party-ui-info"></a>
 ##### Relying Party UI Info
@@ -325,8 +325,9 @@ Good resources for how to configure Redis under Spring Boot are:
 
 - [https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 
-Example:
+- [https://github.com/redisson/redisson/wiki/2.-Configuration](https://github.com/redisson/redisson/wiki/2.-Configuration)
 
+Example:
 ```yml
 spring:
   config:
@@ -350,9 +351,9 @@ In order to configure the TLS connection against the Redis server regarding:
 
 - CLient TLS authentication, and/or,
 - Specific TLS trust, and/or,
-- Verification of TLS server hostname
+- Verification of TLS server hostname.
 
-we have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
+We have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
 the following configuration settings:
 
 | Property | Description | Type | Default value |
@@ -393,9 +394,11 @@ This can be done under the key `spring.redis.data.cluster-ext`. This property ke
 entries as described below:
 
 | Property | Description | Type |
-| :--- | :--- | :--- | :--- |
-| `from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
-| `to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
+| :--- | :--- | :--- |
+| `nat-translation[].from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
+| `nat-translation[].to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
+| `read-mode`| Set cluster read mode to either `SLAVE`, `MASTER` or `MASTER_SLAVE`. The default value is `MASTER` since read/write is highly coupled in Spring Session, selecting `SLAVE` can result in race-conditions leading to the session not being synchronized to the slave in time causing errors. | String |
+
 
 **Example:**
 
