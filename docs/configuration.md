@@ -351,9 +351,9 @@ In order to configure the TLS connection against the Redis server regarding:
 
 - CLient TLS authentication, and/or,
 - Specific TLS trust, and/or,
-- Verification of TLS server hostname
+- Verification of TLS server hostname.
 
-we have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
+We have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
 the following configuration settings:
 
 | Property | Description | Type | Default value |
@@ -395,9 +395,9 @@ entries as described below:
 
 | Property | Description | Type |
 | :--- | :--- | :--- |
-| `nat-translation[*].from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
-| `nat-translation[*].to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
-| `read-mode`| Set cluster read mode to either "SLAVE,MASTER,MASTER_SLAVE" default value is MASTER since read/write is highly coupled in spring session, selecting SLAVE can result in race-conditions leading to the session not being synchronized to the slave in time causing errors. | String |
+| `nat-translation[].from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
+| `nat-translation[].to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
+| `read-mode`| Set cluster read mode to either `SLAVE`, `MASTER` or `MASTER_SLAVE`. The default value is `MASTER` since read/write is highly coupled in Spring Session, selecting `SLAVE` can result in race-conditions leading to the session not being synchronized to the slave in time causing errors. | String |
 
 
 **Example:**
