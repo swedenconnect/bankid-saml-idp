@@ -57,7 +57,7 @@ public class RedisSessionConfiguration {
    */
   @Setter
   @Value("${saml.idp.replay-ttl:PT5M}")
-  private Duration replayTtl;
+  public Duration replayTtl;
 
   @Bean
   @ConfigurationProperties(prefix = "spring.data.redis.ssl-ext")
