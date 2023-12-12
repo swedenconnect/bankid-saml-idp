@@ -325,8 +325,9 @@ Good resources for how to configure Redis under Spring Boot are:
 
 - [https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 
-Example:
+- [https://github.com/redisson/redisson/wiki/2.-Configuration](https://github.com/redisson/redisson/wiki/2.-Configuration)
 
+Example:
 ```yml
 spring:
   config:
@@ -393,9 +394,11 @@ This can be done under the key `spring.redis.data.cluster-ext`. This property ke
 entries as described below:
 
 | Property | Description | Type |
-| :--- | :--- | :--- | :--- |
-| `from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
-| `to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
+| :--- | :--- | :--- |
+| `nat-translation[*].from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
+| `nat-translation[*].to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
+| `read-mode`| Set cluster read mode to either "SLAVE,MASTER,MASTER_SLAVE" default value is MASTER since read/write is highly coupled in spring session, selecting SLAVE can result in race-conditions leading to the session not being synchronized to the slave in time causing errors. | String |
+
 
 **Example:**
 

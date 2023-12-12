@@ -42,6 +42,17 @@ public class RedisClusterProperties implements InitializingBean {
   private List<NatTranslationEntry> natTranslation;
 
   /**
+   * Default value: MASTER
+   * Set node type used for read operation. Available values:
+   * SLAVE - Read from slave nodes, uses MASTER if no SLAVES are available,
+   * MASTER - Read from master node,
+   * MASTER_SLAVE - Read from master and slave nodes
+   */
+  @Getter
+  @Setter
+  private String readMode = "MASTER";
+
+  /**
    * Creates a {@link NatMapper} given the configuration.
    * @return a {@link NatMapper}
    */

@@ -16,6 +16,7 @@
 package se.swedenconnect.bankid.idp.config.session;
 
 import org.redisson.config.ClusterServersConfig;
+import org.redisson.config.ReadMode;
 import org.redisson.config.SingleServerConfig;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class RedissonAddressCustomizers {
         if (clusterProperties.getNatTranslation() != null) {
           config.setNatMapper(clusterProperties.createNatMapper());
         }
+        config.setReadMode(ReadMode.valueOf(clusterProperties.getReadMode()));
         return config;
       };
 
