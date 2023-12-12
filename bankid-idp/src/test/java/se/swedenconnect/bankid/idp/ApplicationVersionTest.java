@@ -15,10 +15,10 @@
  */
 package se.swedenconnect.bankid.idp;
 
-import java.util.Properties;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
 
 /**
  * Test cases for ApplicationVersion.
@@ -33,7 +33,6 @@ public class ApplicationVersionTest {
   public ApplicationVersionTest() throws Exception {
     final Properties properties = new Properties();
     properties.load(this.getClass().getClassLoader().getResourceAsStream("version.properties"));
-
     this.version = properties.getProperty("bankid.idp.version");
     if (this.version.endsWith("-SNAPSHOT")) {
       this.version = this.version.substring(0, version.length() - 9);

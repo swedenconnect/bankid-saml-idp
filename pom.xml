@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.bankid</groupId>
   <artifactId>saml-bankid-idp-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
 
   <name>Sweden Connect :: BankID :: Parent POM</name>
   <description>Parent POM for BankID SAML Identity Provider</description>
@@ -156,7 +156,7 @@
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-addons</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
       
       <dependency>
@@ -476,7 +476,7 @@
             <configuration>
               <serverId>ossrh</serverId>
               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
               <!--
                 Allows manual inspection of the staging repo before deploying it to the central repo.
                 Use 'mvn nexus-staging:release -Prelease' to release and 'mvn nexus-staging:drop' to abort.

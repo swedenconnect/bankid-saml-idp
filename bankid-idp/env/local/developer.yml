@@ -74,7 +74,7 @@ bankid:
     user-message-defaults:
       fallback-sign-text:
         text: "Jag skriver härmed under den information som visades på föregående sida."
-        format: plain-text
+        format: plain_text
       login-text:
         text: "*Tänk på!* Logga aldrig in med ditt BankID då någon ringer och ber dig logga in."
         format: simple-markdown-v1
@@ -187,3 +187,4 @@ spring:
             to: "redis2.local.dev.swedenconnect.se:2002"
           - from: "172.20.0.33:2003"
             to: "redis3.local.dev.swedenconnect.se:2003"
+

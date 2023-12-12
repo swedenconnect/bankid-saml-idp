@@ -5,9 +5,9 @@
   import type { ApiResponseStatus, UiInformation } from '@/types';
   import CustomContent from './CustomContent.vue';
   import ErrorButtons from './ErrorButtons.vue';
+  import LoadingSpinner from './LoadingSpinner.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
-  import LoadingSpinner from './LoadingSpinner.vue';
 
   const props = defineProps<{
     uiInfo?: UiInformation;
@@ -62,8 +62,8 @@
     <QrDisplay :dialog="qrDialog" :image="qrImage" :size="props.uiInfo?.qrSize" />
     <CustomContent position="qrcode" />
     <QrInstructions v-if="showQrInstructions" class="small-sr-only" />
-    <p v-else>{{ $t(messageCode) }}</p>
-    <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" />
+    <p id="message" v-else>{{ $t(messageCode) }}</p>
+    <ErrorButtons v-if="showErrorButtons" @acceptError="acceptError" @retry="retry" described-by="message" />
     <button v-else class="btn-default" @click="closeDialog">{{ $t('bankid.msg.qr.close') }}</button>
   </dialog>
 </template>

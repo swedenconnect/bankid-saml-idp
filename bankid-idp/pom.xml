@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -94,7 +94,7 @@
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
       <artifactId>saml-idp-spring-boot-starter</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
     </dependency>
 
     <dependency>
@@ -254,7 +254,7 @@
             <image>openjdk:18.0.2.1-slim</image>
           </from>
           <to>
-            <image>${DOCKER_REPO}/bankid-saml-idp</image>
+            <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>
           </to>
           <container>
             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
@@ -269,6 +269,36 @@
             </ports>
           </container>
         </configuration>
+        <executions>
+          <execution>
+            <phase>none</phase>
+            <id>local</id>
+            <goals>
+              <goal>dockerBuild</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-cli</id>
+            <phase>none</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <from>
+                <platforms>
+                  <platform>
+                    <os>linux</os>
+                    <architecture>amd64</architecture>
+                  </platform>
+                  <platform>
+                    <os>linux</os>
+                    <architecture>arm64</architecture>
+                  </platform>
+                </platforms>
+              </from>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
@@ -379,7 +409,7 @@
     </profile>
     
     <!--
-      Build backend only: mvn clean install -Dbackend-only 
+      Build backend only: mvn clean install -Dbackend-only
     -->
     <profile>
       
