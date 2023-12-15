@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3-SNAPSHOT</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -259,7 +259,6 @@
           <container>
             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
             <jvmFlags>
-              <jvmFlag>-Dtomcat.ajp.enabled=true</jvmFlag>
               <jvmFlag>-Djava.net.preferIPv4Stack=true</jvmFlag>
               <jvmFlag>-Dorg.apache.xml.security.ignoreLineBreaks=true</jvmFlag>
             </jvmFlags>
