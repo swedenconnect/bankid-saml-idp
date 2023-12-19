@@ -50,7 +50,9 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdUserException;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -143,8 +145,8 @@ public class BankIdApiController {
       return this.service.poll(pollRequest)
           .onErrorResume(e -> e instanceof BankIdServerException,
               e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIDException,
-              e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIdUserException && ((BankIdUserException) e).getErrorCode() == ErrorCode.INVALID_PARAMETERS, e -> Mono.just(ApiResponseFactory.createUnknownError()))
+          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
