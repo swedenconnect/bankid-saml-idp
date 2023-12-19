@@ -262,10 +262,6 @@
               <jvmFlag>-Djava.net.preferIPv4Stack=true</jvmFlag>
               <jvmFlag>-Dorg.apache.xml.security.ignoreLineBreaks=true</jvmFlag>
             </jvmFlags>
-            <ports>
-              <port>8012</port>
-              <port>8082</port>
-            </ports>
           </container>
         </configuration>
         <executions>
