@@ -187,28 +187,3 @@ spring:
             to: "redis2.local.dev.swedenconnect.se:2002"
           - from: "172.20.0.33:2003"
             to: "redis3.local.dev.swedenconnect.se:2003"
----
-spring:
-  config:
-    activate:
-      on-profile: invalid-message
-bankid:
-  relying-parties:
-    - id: test-my-eid
-      entity-ids:
-        - http://sandbox.swedenconnect.se/testmyeid
-        - http://sandbox.swedenconnect.se/testmyeid-sign
-      credential:
-        name: "test-cred"
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
-        alias: "1"
-        password: "qwerty123"
-        type: "PKCS12"
-      user-message:
-        inherit-default-login-text: false
-        login-text:
-          text: "Du loggar nu in till en utländsk e-tjänst.\nVi delar följande data om dig:\n+ Ditt personnummer\n+Ditt för- och efternamn"
-          format: simple-markdown-v1
-      bankid-requirements:
-        pin-code-auth: false
-        pin-code-sign: true
