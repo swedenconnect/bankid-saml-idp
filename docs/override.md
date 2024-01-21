@@ -32,6 +32,23 @@ bankid:
 
 **Note:** This logotype must in SVG format.
 
+### Changing the favicon
+
+By default the BankID logotype is used as the favicon (the website icon used in browser tabs and bookmarks), but this
+can be changed, preferably to the providing organizations logotype.
+
+```yaml
+bankid:
+  ...
+  ui: 
+    provider:
+      svg-favicon: "file:/path/to/my/favicon.svg"
+      png-favicon: "file:/path/to/my/favicon.png"
+```
+
+**Note:** The favicon should be provided both in PNG format (32 x 32 pixels, for legacy browsers) and in SVG format
+(resolution independent, for modern browsers)
+
 ### CSS, Message and Content Overrides
 
 Enable customization of the BankID's UI by creating override files (see below), placing them in a
