@@ -26,10 +26,11 @@ of the copyright statement).
 bankid:
   ...
   ui: 
-    provider-svg-logotype: "file:/path/to/my/logo.svg"
+    provider:
+      svg-logotype: "file:/path/to/my/logo.svg"
 ```
 
-**Note:** This logotype must in SVG-format.
+**Note:** This logotype must in SVG format.
 
 ### CSS, Message and Content Overrides
 
