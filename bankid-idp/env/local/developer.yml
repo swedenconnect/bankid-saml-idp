@@ -187,4 +187,3 @@ spring:
             to: "redis2.local.dev.swedenconnect.se:2002"
           - from: "172.20.0.33:2003"
             to: "redis3.local.dev.swedenconnect.se:2003"
-

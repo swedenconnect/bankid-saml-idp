@@ -18,8 +18,10 @@ package se.swedenconnect.bankid.rpapi.service.impl;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.function.Function;
 /**
  * Body Extractors for BankIdErrors
@@ -36,6 +38,10 @@ public class BankIdErrorBodyExtractors {
   public static Function<ClientResponse, Mono<? extends Throwable>> userErrorBodyExtractor() {
     return c -> {
       return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+        final String errorCode = (String) m.get("errorCode");
+        if (Objects.nonNull(errorCode)) {
+          return new BankIdUserException(ErrorCode.forValue(errorCode), "Error to communicate with BankID API response:" + m.toString());
+        }
         return new BankIdUserException("Error to communicate with BankID API response:" + m.toString());
       });
     };
@@ -48,6 +54,10 @@ public class BankIdErrorBodyExtractors {
   public static Function<ClientResponse, Mono<? extends Throwable>> serverErrorBodyExtractor() {
     return c -> {
       return c.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
+        final String errorCode = (String) m.get("errorCode");
+        if (Objects.nonNull(errorCode)) {
+          return new BankIdUserException(ErrorCode.forValue(errorCode), "Error to communicate with BankID API response:" + m.toString());
+        }
         return new BankIdServerException("Error to communicate with BankID API response:" + m.toString());
       });
     };

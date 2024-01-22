@@ -92,4 +92,14 @@ public class ApiResponseFactory {
   public static ApiResponse createUserCancelResponse() {
     return new ApiResponse(ApiResponse.Status.CANCEL, "", "", "bankid.msg.error.userCancel");
   }
+
+  /**
+   * Creates an {@link ApiResponse} representing an unknown error.
+   * This does not necessarily mean that the error is unknown but should not be presented to the user.
+   *
+   * @return an {@link ApiResponse}
+   */
+  public static ApiResponse createUnknownError() {
+    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.unknown");
+  }
 }
