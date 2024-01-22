@@ -173,6 +173,30 @@ public class BankIdApiController {
   }
 
   /**
+   * Gets the provider SVG favicon to be displayed.
+   *
+   * @return SVG image as bytes
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  @GetMapping(value = "/favicon.svg", produces = "image/svg+xml")
+  @ResponseBody
+  public byte[] getProviderSvgFavicon() throws IOException {
+    return this.uiInformation.getProviderSvgFavicon();
+  }
+
+    /**
+   * Gets the provider PNG favicon to be displayed.
+   *
+   * @return PNG image as bytes
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  @GetMapping(value = "/favicon.png", produces = "image/png")
+  @ResponseBody
+  public byte[] getProviderPngFavicon() throws IOException {
+    return this.uiInformation.getProviderPngFavicon();
+  }
+
+  /**
    * Lazy load of message, if no message is set, it is calculated and published to be persisted.
    *
    * @param request current http servlet
