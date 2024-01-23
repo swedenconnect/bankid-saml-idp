@@ -2,6 +2,21 @@ spring:
   config:
     activate:
       on-profile: local
+  ssl:
+    bundle:
+      jks:
+        redis:
+          key:
+            alias: 1
+            password: changeit
+          keystore:
+            location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
+            password: changeit
+            type: pkcs12
+          truststore:
+            location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
+            password: changeit
+            type: pkcs12
   data:
     redis:
       host: local.dev.swedenconnect.se
@@ -9,14 +24,9 @@ spring:
       password: supersecret
       ssl:
         enabled: true
+        bundle: redis
       ssl-ext:
         enable-hostname-verification: true
-        credential:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/redis.p12
-          password: changeit
-        trust:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis/certificates/trust.p12
-          password: changeit
   session:
     timeout: 15m
 
@@ -52,14 +62,9 @@ logging:
 
 bankid:
   start-retry-duration: "PT2M"
-  audit:
-    repository: "redistimeseries"
-    log-file: ${BANKID_INSTALL_DIR}/bankid-idp/target/audit.log
   built-in-frontend: true
   server-root-certificate: classpath:bankid-trust-test.crt
   service-url: https://appapi2.test.bankid.com/rp/v6.0
-  session:
-    module: redis
   ui:
     provider:
       svg-logotype: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
@@ -103,7 +108,7 @@ bankid:
         pin-code-auth: false
         pin-code-sign: true
 
-saml:
+saml: 
   idp:
     entity-id: https://bankid.swedenconnect.se/idp/local
     base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
@@ -156,29 +161,46 @@ saml:
           company: "Sweden Connect"
           email-addresses:
             - operations@swedenconnect.se
+    session:
+      module: "redis"
+    replay:
+      expiration: 10m 
+    audit:
+      file:
+        log-file: ${BANKID_INSTALL_DIR}/bankid-idp/target/audit.log
+      redis:
+        type: "timeseries"
+        name: "audit:ts"
+      in-memory:
+        capacity: 1000
 ---
 spring:
   config:
     activate:
       on-profile: cluster
+  ssl:
+    bundle:
+      jks:
+        redis-cluster:
+          key:
+            alias: 1
+            password: changeit
+          keystore:
+            location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/redis.p12
+            password: changeit
+            type: pkcs12
+          truststore:
+            location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/trust.p12
+            password: changeit
+            type: pkcs12      
   data:
     redis:
+      password: supersecret
       cluster:
         nodes:
           - redis1.local.dev.swedenconnect.se:2001
           - redis2.local.dev.swedenconnect.se:2002
-          - redis3.local.dev.swedenconnect.se:2003
-      password: supersecret
-      ssl:
-        enabled: true
-      ssl-ext:
-        enable-hostname-verification: true
-        credential:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/redis.p12
-          password: changeit
-        trust:
-          resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/redis-cluster/certificates/trust.p12
-          password: changeit
+          - redis3.local.dev.swedenconnect.se:2003      
       cluster-ext:
         nat-translation:
           - from: "172.20.0.31:2001"
@@ -186,5 +208,10 @@ spring:
           - from: "172.20.0.32:2002"
             to: "redis2.local.dev.swedenconnect.se:2002"
           - from: "172.20.0.33:2003"
-            to: "redis3.local.dev.swedenconnect.se:2003"
+            to: "redis3.local.dev.swedenconnect.se:2003"      
+      ssl:
+        enabled: true
+        bundle: "redis-cluster"
+      ssl-ext:
+        enable-hostname-verification: true        
 

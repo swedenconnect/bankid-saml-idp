@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * In-memory {@link TryLockRepository}.
  * <p>
@@ -29,9 +31,17 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Slf4j
 public class InMemoryTryLockRepository implements TryLockRepository {
 
   private final Map<String, Lock> stringLockMap = new ConcurrentHashMap<>();
+
+  /**
+   * Default constructor.
+   */
+  public InMemoryTryLockRepository() {
+    log.warn("Starting application with in memory repository, this is not meant for production use");
+  }
 
   /** {@inheritDoc} */
   @Override

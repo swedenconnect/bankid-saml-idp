@@ -298,10 +298,7 @@ The BankID IdP offers two session handling modules: `memory` and `redis`. By ext
 BankID IdP Backend application you can write your own module, for example session handling using 
 MySQL.
 
-To implement your own module, study how we have configured the Redis module in the
-[RedisSessionConfiguration](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/config/session/RedisSessionConfiguration.java) class.
-
-You need to supply implementations for the following interfaces:
+To implement your own module, you need to supply implementations for the following interfaces:
 
 - [TryLockRepository](https://github.com/swedenconnect/bankid-saml-idp/blob/main/bankid-idp/src/main/java/se/swedenconnect/bankid/idp/concurrency/TryLockRepository.java) - Locking repository responsible for providing locks by key.
 
@@ -318,8 +315,8 @@ Furthermore, the [Spring Security SAML Identity Provider](https://github.com/swe
 choice of implementation (for example Spring Session JDBC).
 
 Finally, when you have written your session module, you need to activate it. This is done by
-assigning the configuration setting `bankid.session.module` to the name of your module (for example `mysql`).
+assigning the configuration setting `saml.idp.session.module` to the name of your module (for example `mysql`).
 
 ---
 
-Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2023-2024, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
