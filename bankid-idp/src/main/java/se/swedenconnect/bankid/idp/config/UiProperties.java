@@ -183,6 +183,23 @@ public class UiProperties implements InitializingBean {
     private Resource svgLogotype;
 
     /**
+     * The favicon to be displayed in the browser tab, etc. This favicon must be in SVG format. SVG favicons are
+     * supported in Firefox and Chromium-based browsers. If no favicon is assigned, the BankID logo will be used.
+     */
+    @Getter
+    @Setter
+    private Resource svgFavicon;
+
+    /**
+     * The favicon to be displayed in the browser tab, etc. This favicon must be in PNG format and should be 32 x 32
+     * pixels in dimension. PNG favicons are supported by all modern browsers, including Internet Explorer 11. If no
+     * favicon is assigned, the BankID logo will be used.
+     */
+    @Getter
+    @Setter
+    private Resource pngFavicon;
+
+    /**
      * The name for the provider as a map where the keys are language codes and the values the name in respective
      * language. This name will primarily be used at the bottom of the page in the copyright statement, but may later by
      * used in other UI places as well.

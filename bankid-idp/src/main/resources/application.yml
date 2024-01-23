@@ -167,7 +167,7 @@ saml:
         logotypes:
         - path: /images/BankID_logo.svg
           height: 171
-          width: 20
+          width: 206
 #      organization:
 #        names:
 #          en: "My Organization" 
