@@ -50,7 +50,9 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyRepository;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
+import se.swedenconnect.bankid.rpapi.service.impl.BankIdUserException;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.opensaml.sweid.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -143,8 +145,8 @@ public class BankIdApiController {
       return this.service.poll(pollRequest)
           .onErrorResume(e -> e instanceof BankIdServerException,
               e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIDException,
-              e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIdUserException && ((BankIdUserException) e).getErrorCode() == ErrorCode.INVALID_PARAMETERS, e -> Mono.just(ApiResponseFactory.createUnknownError()))
+          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
@@ -168,6 +170,30 @@ public class BankIdApiController {
   @ResponseBody
   public byte[] getProviderLogotype() throws IOException {
     return this.uiInformation.getProviderLogo();
+  }
+
+  /**
+   * Gets the provider SVG favicon to be displayed.
+   *
+   * @return SVG image as bytes
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  @GetMapping(value = "/favicon.svg", produces = "image/svg+xml")
+  @ResponseBody
+  public byte[] getProviderSvgFavicon() throws IOException {
+    return this.uiInformation.getProviderSvgFavicon();
+  }
+
+    /**
+   * Gets the provider PNG favicon to be displayed.
+   *
+   * @return PNG image as bytes
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  @GetMapping(value = "/favicon.png", produces = "image/png")
+  @ResponseBody
+  public byte[] getProviderPngFavicon() throws IOException {
+    return this.uiInformation.getProviderPngFavicon();
   }
 
   /**

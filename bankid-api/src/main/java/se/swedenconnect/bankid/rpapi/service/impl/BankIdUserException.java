@@ -17,6 +17,7 @@ package se.swedenconnect.bankid.rpapi.service.impl;
 
 import se.swedenconnect.bankid.rpapi.LibraryVersion;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
+import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 
 /**
  * Exception class for 4XX API errors.
@@ -38,4 +39,7 @@ public class BankIdUserException extends BankIDException {
     super(message);
   }
 
+  public BankIdUserException(ErrorCode errorCode, String message) {
+    super(errorCode, message);
+  }
 }

@@ -68,6 +68,8 @@ bankid:
   ui:
     provider:
       svg-logotype: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/icon.svg
+      svg-favicon: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/favicon.svg
+      png-favicon: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/icon/favicon.png
       name:
         sv: "Sweden Connect"
         en: "Sweden Connect"

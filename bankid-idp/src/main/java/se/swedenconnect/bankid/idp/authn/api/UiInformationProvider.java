@@ -92,6 +92,38 @@ public class UiInformationProvider {
   }
 
   /**
+   * Gets the provider favicon in SVG format.
+   *
+   * @return an SVG favicon as byte array
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  public byte[] getProviderSvgFavicon() throws IOException {
+
+    Resource logoResource = Optional.ofNullable(this.uiProperties.getProvider())
+        .map(UiProperties.ApplicationProviderProperties::getSvgFavicon)
+        // Otherwise. Deliver an BankID SVG Favicon ...
+        .orElseGet(() -> new ClassPathResource("static/images/favicon.svg"));
+
+    return IOUtils.toByteArray(logoResource.getInputStream());
+  }
+
+  /**
+   * Gets the provider favicon in PNG format.
+   *
+   * @return an PNG favicon as byte array
+   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   */
+  public byte[] getProviderPngFavicon() throws IOException {
+
+    Resource logoResource = Optional.ofNullable(this.uiProperties.getProvider())
+        .map(UiProperties.ApplicationProviderProperties::getPngFavicon)
+        // Otherwise. Deliver an BankID PNG Favicon ...
+        .orElseGet(() -> new ClassPathResource("static/images/favicon.png"));
+
+    return IOUtils.toByteArray(logoResource.getInputStream());
+  }
+
+  /**
    * Obtains the information for the current SP information.
    *
    * @param uiInfo the SP UI info

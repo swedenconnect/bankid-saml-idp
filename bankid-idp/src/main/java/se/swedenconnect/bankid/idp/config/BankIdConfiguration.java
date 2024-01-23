@@ -102,7 +102,7 @@ public class BankIdConfiguration {
         })
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .requestMatchers("/images/**", "/logo.svg", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
+            .requestMatchers("/images/**", "/logo.svg", "/favicon.svg", "/favicon.png", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
                 "/css/**", "/api/**", "/resume/**")
             .permitAll()
             .requestMatchers(EndpointRequest.toAnyEndpoint())
