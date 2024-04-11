@@ -52,7 +52,8 @@
   </developers>
 
   <properties>
-    <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
+    <resilience4j.version>2.2.0</resilience4j.version>
+    <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
   </properties>
 
   <dependencyManagement>
@@ -61,7 +62,7 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
-        <version>1.19.0</version>
+        <version>1.19.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -134,7 +135,7 @@
     <dependency>
       <groupId>org.redisson</groupId>
       <artifactId>redisson-spring-boot-starter</artifactId>
-      <version>3.25.2</version>
+      <version>3.27.2</version>
     </dependency>
 
     <!--
@@ -158,19 +159,19 @@
     <dependency>
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-circuitbreaker</artifactId>
-      <version>2.1.0</version>
+      <version>${resilience4j.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-reactor</artifactId>
-      <version>2.1.0</version>
+      <version>${resilience4j.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.github.resilience4j</groupId>
       <artifactId>resilience4j-micrometer</artifactId>
-      <version>2.1.0</version>
+      <version>${resilience4j.version}</version>
     </dependency>
 
     <dependency>

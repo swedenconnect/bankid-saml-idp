@@ -337,8 +337,8 @@ spring:
   config:
     activate:
       on-profile: local
-  redis:
-    data:
+  data:
+    redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT:6379}
       password: supersecret
@@ -351,87 +351,66 @@ spring:
 <a name="redis-ssltls-configuration-extension"></a>
 #### Redis SSL/TLS Configuration Extension
 
-In order to configure the TLS connection against the Redis server regarding:
+Spring Boot 3.1 introduced the concept of **SslBundles**, where the SSL credentials are configured separately and referred to as a bundle. See the article [Securing Spring Boot Applications With SSL](https://spring.io/blog/2023/06/07/securing-spring-boot-applications-with-ssl) for a good overview. 
 
-- CLient TLS authentication, and/or,
-- Specific TLS trust, and/or,
-- Verification of TLS server hostname.
-
-We have extended Spring Boot's Redis configuration under the key `spring.data.redis.ssl-ext` with 
-the following configuration settings:
-
-| Property | Description | Type | Default value |
-| :--- | :--- | :--- | :--- |
-| `credential.resource` | The path to the `KeyStore` holding the client TLS credential (private key and certificate). | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
-| `credential.password` | The password to unlock the above `KeyStore`. <br />**Note:** Due to Spring's poor handling of SSL/TLS in general there is no way of having separate passwords for the store itself and the key entries of the `KeyStore`. | String | - |
-| `trust.resource` | The path to the `KeyStore` holding the trusted certificates for verifying the server certificate in the SSL/TLS handshake. If not assigned, the system defaults are used. | [Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html) | - |
-| `trust.password` | The password to unlock the trust `KeyStore`. If this `KeyStore` does not have a password, no setting should be supplied. | - |
-| `enable-hostname-verification` | Should we verify the the peer's hostname as part of the SSL/TLS handshake? | Boolean | `true` |
-
-The settings will be active if `spring.redis.data.ssl.enabled` is set to `true`.
+The Redis support in Spring offers possibilities to use bundles when configuring TLS for Redis connections. This is the recommended way of configuring TLS for Redis.
 
 **Example:**
 
 ```yaml
 spring:
+  ...
+  ssl:
+    bundle:
+      jks:
+        redis-tls:
+          key:
+            alias: 1
+            password: changeit
+          keystore:
+            location: classpath:redis.p12
+            password: changeit
+            type: pkcs12
+          truststore:
+            location: classpath:trust.p12
+            password: changeit
+            type: pkcs12
+  ...
   data:
     redis:
-      ...
-      ssl: 
+      host: redis.example.com
+      port: 6379
+      password: supersecret
+      ssl:
         enabled: true
+        bundle: redis
       ssl-ext:
-        enable-hostname-verification: true
-        credential:
-          resource: classpath:local/redis/redis.p12
-          password: changeit
-        trust:
-          resource: classpath:local/redis/trust.p12
-          password: changeit    
+        enable-hostname-verification: true        
+
 ```
+
+See the [Redis Configuration](https://docs.swedenconnect.se/saml-identity-provider/configuration.html#redis-configuration) in the Spring Security SAML Identity Provider for details.
+
+The previous configuration settings for how to set up TLS for connections against the Redis server is deprecated. The only extension still remaining is:
+
+- `spring.data.redis.ssl-ext.enable-hostname-verification` - Should we verify the the peer's hostname as part of the SSL/TLS handshake? The default is `true`.
+
+The following settings under the key `spring.data.redis.ssl-ext` are deprecated and will be removed in future releases:
+
+| Property | Description | Type | Default value |
+| :--- | :--- | :--- | :--- |
+| ~~`credential.resource`~~ | ~~The path to the `KeyStore` holding the client TLS credential (private key and certificate).~~ | ~~[Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html)~~ | - |
+| ~~`credential.password`~~ | ~~The password to unlock the above `KeyStore`. <br />**Note:** Due to Spring's poor handling of SSL/TLS in general there is no way of having separate passwords for the store itself and the key entries of the `KeyStore`.~~ | ~~String~~ | - |
+| ~~`trust.resource`~~ | ~~The path to the `KeyStore` holding the trusted certificates for verifying the server certificate in the SSL/TLS handshake. If not assigned, the system defaults are used.~~ | ~~[Resource](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html)~~ | - |
+| ~~`trust.password`~~ | ~~The password to unlock the trust `KeyStore`. If this `KeyStore` does not have a password, no setting should be supplied.~~ | - |
+
+*The settings will be active if `spring.redis.data.ssl.enabled` is set to `true`.*
 
 <a name="redis-cluster-configuration"></a>
 #### Redis Cluster Configuration
 
-In order to configure Redis Clusters NAT translation for addresses have been added. This is done
-so that the application knows how to reach the Redis cluster if it is not located on the same network.
-This can be done under the key `spring.redis.data.cluster-ext`. This property key is a list of
-entries as described below:
-
-| Property | Description | Type |
-| :--- | :--- | :--- |
-| `nat-translation[].from` | Address to translate from. e.g. "172.20.0.31:2001". | String |
-| `nat-translation[].to`| Address to translate to, e.g., "redis1.local.dev.swedenconnect.se:2001". | String |
-| `read-mode`| Set cluster read mode to either `SLAVE`, `MASTER` or `MASTER_SLAVE`. The default value is `MASTER` since read/write is highly coupled in Spring Session, selecting `SLAVE` can result in race-conditions leading to the session not being synchronized to the slave in time causing errors. | String |
-
-
-**Example:**
-
-The three Redis nodes are exposed via NAT to the application on redis(1-3).local.dev.swedenconnect.se.
-But internally they refer to eachother as 172.20.0.3(1-3).
-When the application connects to the first node, it will reconfigure itself by reading the configuration
-from redis1.
-
-Since the application is not located on the same network the connection will the fail since those addresses are not located on the same network.
-
-This solution is to add the configuration below that will re-map outgoing connections to the correct node.
-
-```yaml
-  data:
-    redis:
-      cluster:
-        nodes:
-          - redis1.local.dev.swedenconnect.se:2001
-          - redis2.local.dev.swedenconnect.se:2002
-          - redis3.local.dev.swedenconnect.se:2003
-      cluster-ext:
-        nat-translation:
-          - from: "172.20.0.31:2001"
-            to: "redis1.local.dev.swedenconnect.se:2001"
-          - from: "172.20.0.32:2002"
-            to: "redis2.local.dev.swedenconnect.se:2002"
-          - from: "172.20.0.33:2003"
-            to: "redis3.local.dev.swedenconnect.se:2003"
-```
+See the [Redis Configuration](https://docs.swedenconnect.se/saml-identity-provider/configuration.html#redis-configuration) in the Spring Security SAML Identity Provider for details
+on how to configure Redis Clusters NAT translation for addresses.
 
 <a name="adding-your-own-application-yml-file"></a>
 ### Adding Your Own application.yml File
@@ -468,4 +447,4 @@ spring:
 
 -----
 
-Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2023-2024, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
