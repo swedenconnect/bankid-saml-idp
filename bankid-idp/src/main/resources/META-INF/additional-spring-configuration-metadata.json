@@ -1,5 +1,0 @@
-{"properties": [{
-  "name": "saml.idp.replay-ttl",
-  "type": "java.time.Duration",
-  "description": "The time-to-live for items in the Replay Checker"
-}]}

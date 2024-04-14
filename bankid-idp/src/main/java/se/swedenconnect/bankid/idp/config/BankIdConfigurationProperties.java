@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import se.swedenconnect.bankid.idp.audit.AbstractBankIdAuditEventRepository;
+import se.swedenconnect.bankid.idp.audit.AuditRepositoryConfiguration;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
@@ -163,7 +163,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
     }
     this.authn.afterPropertiesSet();
     this.health.afterPropertiesSet();
-    this.session.afterPropertiesSet();
     this.audit.afterPropertiesSet();
     this.ui.afterPropertiesSet();
 
@@ -379,7 +378,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   /**
    * Session handling configuration.
    */
-  public static class SessionConfiguration implements InitializingBean {
+  public static class SessionConfiguration {
 
     /**
      * The session module to use. Supported values are "memory" and "redis". Set to other value if you extend the BankID
@@ -388,14 +387,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Getter
     @Setter
     private String module;
-
-    /** {@inheritDoc} */
-    @Override
-    public void afterPropertiesSet() throws Exception {
-      if (!StringUtils.hasText(this.module)) {
-        this.module = "memory";
-      }
-    }
 
   }
 
@@ -423,7 +414,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
     /**
      * The supported events that will be logged to the given repository (and possibly the file). The default is
-     * {@link AbstractBankIdAuditEventRepository#DEFAULT_SUPPORTED_EVENTS}.
+     * {@link AuditRepositoryConfiguration#DEFAULT_SUPPORTED_EVENTS}.
      */
     @Getter
     private List<String> supportedEvents = new ArrayList<>();
@@ -436,7 +427,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
         log.info("bankid.audit.repository has not been assigned, defaulting to '{}'", this.repository);
       }
       if (this.supportedEvents.isEmpty()) {
-        this.supportedEvents = AbstractBankIdAuditEventRepository.DEFAULT_SUPPORTED_EVENTS;
+        this.supportedEvents = AuditRepositoryConfiguration.DEFAULT_SUPPORTED_EVENTS;
       }
     }
 

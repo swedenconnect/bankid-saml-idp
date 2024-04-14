@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,16 @@ import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
+import se.swedenconnect.spring.saml.idp.autoconfigure.redis.RedissonClusterProperties;
 
 /**
  * Class for containing additional redis cluster properties.
  *
+ * @deprecated Use {@link RedissonClusterProperties} instead
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Deprecated(forRemoval = true, since = "1.1.3")
 public class RedisClusterProperties implements InitializingBean {
 
   /**

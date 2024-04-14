@@ -19,11 +19,12 @@ server:
   #
   ssl:
     enabled: true
-    key-store: classpath:ssl.jks
-    key-store-type: JKS
-    key-alias: local
-    key-store-password: secret
-    key-password: secret
+    bundle: server
+#    key-store: classpath:ssl.jks
+#    key-store-type: JKS
+#    key-alias: local
+#    key-store-password: secret
+#    key-password: secret
   error:
     include-message: always
     #include-exception: true
@@ -62,6 +63,17 @@ management:
 spring:        
   messages:
     basename: messages,idp-errors/idp-error-messages
+  ssl:
+    bundle:
+      jks:
+        server:
+          key:
+            alias: local
+            password: secret
+          keystore:
+            location: classpath:ssl.jks
+            password: secret
+            type: jks          
 
 #
 # BankID configuration

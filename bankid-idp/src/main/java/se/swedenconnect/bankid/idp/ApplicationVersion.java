@@ -24,8 +24,8 @@ package se.swedenconnect.bankid.idp;
 public final class ApplicationVersion {
 
   private static final int MAJOR = 1;
-  private static final int MINOR = 1;
-  private static final int PATCH = 3;
+  private static final int MINOR = 2;
+  private static final int PATCH = 0;
 
   /**
    * Global serialization value for classes.
