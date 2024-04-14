@@ -257,13 +257,16 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.4.2</version>
         <configuration>
           <from>
             <image>openjdk:18.0.2.1-slim</image>
           </from>
           <to>
             <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>
+            <tags>
+              <tag>${project.version}</tag>
+            </tags>            
           </to>
           <container>
             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
@@ -271,6 +274,11 @@
               <jvmFlag>-Djava.net.preferIPv4Stack=true</jvmFlag>
               <jvmFlag>-Dorg.apache.xml.security.ignoreLineBreaks=true</jvmFlag>
             </jvmFlags>
+            <labels>
+              <org.opencontainers.image.source>https://github.com/swedenconnect/bankid-saml-idp</org.opencontainers.image.source>
+              <org.opencontainers.image.description>BankID SAML IdP</org.opencontainers.image.description>
+              <org.opencontainers.image.licenses>Apache-2.0</org.opencontainers.image.licenses>
+            </labels>            
           </container>
         </configuration>
         <executions>
@@ -280,6 +288,11 @@
             <goals>
               <goal>dockerBuild</goal>
             </goals>
+            <configuration>
+              <to>
+                <image>bankid-saml-idp</image>
+              </to>
+            </configuration>            
           </execution>
           <execution>
             <id>default-cli</id>
