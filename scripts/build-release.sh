@@ -80,7 +80,7 @@ cp -r target/site/apidocs/* docs/apidocs
 # Commit
 if [ "$CHECK_IN_FLAG" == true ]; then
     git add docs/apidocs
-    git commit -m "Added javadoc for ${VERSION}"
+    git commit -S -m "Added javadoc for ${VERSION}"
 fi
 
 echo "Building BankID IdP and BankID RP API ..."
