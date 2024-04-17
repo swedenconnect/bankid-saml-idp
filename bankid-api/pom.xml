@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: Relying Party API</name>
@@ -27,7 +27,7 @@
   <scm>
     <connection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</connection>
     <developerConnection>scm:git:https://github.com/swedenconnect/bankid-saml-idp.git</developerConnection>
-    <url>https://github.com/swedenconnect/bankid-saml-idp/tree/master</url>
+    <url>https://github.com/swedenconnect/bankid-saml-idp/tree/main</url>
   </scm>
 
   <organization>
