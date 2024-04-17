@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,12 @@ import se.swedenconnect.spring.saml.idp.audit.Saml2AuditEvents;
 /**
  * The base {@link AuditEventRepository} for the BankID IdP.
  *
+ * @deprecated Use the Audit support from the SAML IdP project instead
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Deprecated(forRemoval = true, since = "1.1.3")
 public abstract class AbstractBankIdAuditEventRepository implements AuditEventRepository, DisposableBean {
 
   /** Logger. */

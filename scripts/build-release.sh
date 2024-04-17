@@ -80,7 +80,7 @@ cp -r target/site/apidocs/* docs/apidocs
 # Commit
 if [ "$CHECK_IN_FLAG" == true ]; then
     git add docs/apidocs
-    git commit -m "Added javadoc for ${VERSION}"
+    git commit -S -m "Added javadoc for ${VERSION}"
 fi
 
 echo "Building BankID IdP and BankID RP API ..."
@@ -89,7 +89,7 @@ mvn -f ${SCRIPT_DIR}/../pom.xml clean install -Prelease
 mvn -f ${SCRIPT_DIR}/../pom.xml deploy -Prelease
 
 if [ "$PUBLISH_IMAGE_FLAG" == true ]; then
-  mvn -f ${SCRIPT_DIR}/../bankid-idp/pom.xml jib:build -Djib.to.tags=${VERSION},latest
+  mvn -f ${SCRIPT_DIR}/../bankid-idp/pom.xml jib:build
 fi
 
 echo "Version ${VERSION} was successfully deployed"

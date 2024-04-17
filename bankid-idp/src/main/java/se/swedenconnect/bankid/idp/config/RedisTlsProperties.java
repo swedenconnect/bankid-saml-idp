@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,11 @@ import lombok.Setter;
  * Spring Boot's Redis support does not enable us to configure SSL/TLS against the Redis server in a good way.
  * Therefore, we extend Spring's Redis configuration with this configuration properties class.
  *
+ * @deprecated Use {@link se.swedenconnect.spring.saml.idp.autoconfigure.redis.RedisTlsProperties} instead
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Deprecated(forRemoval = true, since = "1.1.3")
 public class RedisTlsProperties implements InitializingBean {
 
   /**

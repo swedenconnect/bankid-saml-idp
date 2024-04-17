@@ -25,6 +25,20 @@ to customize, extend, and build and deploy the application.
 
 You may also want to read the [Sweden Connect eID Framework](https://docs.swedenconnect.se/technical-framework/) specifications and [BankID Development Guides](https://www.bankid.com/utvecklare/guider).
 
+## Notices
+
+### Upgrading to 1.2.0
+
+The configuration for Redis and Audit logging has been changed.
+
+- The `bankid.session.module` setting is deprecated and has been replaced with `saml.idp.session.module`.
+
+- Settings for Audit logging previously configured under `bankid.audit.*` has been moved to `saml.idp.audit.*`.
+
+- Redis configuration has been updated to use SslBundles for configuration of TLS. See [Redis Configuration](https://docs.swedenconnect.se/bank-saml-idp/configuration.html#redis-configuration).
+
+See [Configuration of the BankID SAML IdP](https://docs.swedenconnect.se/bank-saml-idp/configuration.html) for details.
+
 ## Contributing
 
 Pull requests are welcome. See the [Contributor Guidelines](CONTRIBUTING.md) for details.
@@ -35,5 +49,5 @@ The BankID SAML IdP is Open Source software released under the [Apache License](
 
 -----
 
-Copyright &copy; 2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2023-2024, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 

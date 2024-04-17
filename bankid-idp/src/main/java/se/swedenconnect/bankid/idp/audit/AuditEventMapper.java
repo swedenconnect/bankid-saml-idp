@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,13 @@ import se.swedenconnect.bankid.idp.ApplicationVersion;
 /**
  * Wrapper for ObjectMapper to handle AuditEvent.
  *
+ * @deprecated Use {@link se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper
+ *               se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper} instead
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Deprecated(forRemoval = true, since = "1.1.3")
 public class AuditEventMapper {
 
   /** The underlying {@link ObjectMapper}. */

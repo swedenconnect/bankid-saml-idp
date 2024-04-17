@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,18 @@ import java.util.SortedSet;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 
+import se.swedenconnect.opensaml.saml2.response.replay.MessageReplayCheckerImpl;
 import se.swedenconnect.spring.saml.idp.authnrequest.validation.AbstractMessageReplayChecker;
+import se.swedenconnect.spring.saml.idp.authnrequest.validation.replay.RedisReplayCache;
 
 /**
  * ReplayChecker using two Redis sorted set. One for replays and one for expiration.
  *
+ * @deprecated Use {@link RedisReplayCache} and {@link MessageReplayCheckerImpl} instead
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Deprecated(forRemoval = true, since = "2.1.0")
 public class RedisReplayChecker extends AbstractMessageReplayChecker {
 
   /** The client for redisson. */

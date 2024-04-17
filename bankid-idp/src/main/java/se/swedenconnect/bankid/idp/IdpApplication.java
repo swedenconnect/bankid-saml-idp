@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2023-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
  */
 package se.swedenconnect.bankid.idp;
 
-import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
 import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
@@ -28,17 +26,17 @@ import se.swedenconnect.opensaml.sweid.xmlsec.config.SwedishEidSecurityConfigura
 
 /**
  * Application main.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
-@SpringBootApplication(exclude = { RedissonAutoConfiguration.class, RedisAutoConfiguration.class })
+@SpringBootApplication
 @EnableConfigurationProperties
 public class IdpApplication {
 
   /**
    * Program main.
-   * 
+   *
    * @param args program arguments
    */
   public static void main(String[] args) {
