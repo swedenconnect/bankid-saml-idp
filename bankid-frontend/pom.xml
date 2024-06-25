@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider :: Frontend Distribution</name>
@@ -53,13 +53,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <node.version>v18.12.1</node.version>
+    <node.version>v18.18.0</node.version>
   </properties>
 
   <build>
 
     <plugins>
-      
+
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <configuration>
@@ -70,15 +70,15 @@
             </fileset>
           </filesets>
         </configuration>
-      </plugin>      
-      
+      </plugin>
+
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>1.12.1</version>
         <configuration>
           <workingDirectory>${project.basedir}</workingDirectory>
-        </configuration>        
+        </configuration>
         <executions>
           <execution>
             <id>install node and npm</id>
@@ -118,7 +118,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -129,10 +129,10 @@
             </descriptors>
             <finalName>${project.artifactId}-${project.version}</finalName>
             <appendAssemblyId>false</appendAssemblyId>
-          </configuration>                
+          </configuration>
         <executions>
           <execution>
-            <id>build-zip</id>            
+            <id>build-zip</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
@@ -140,9 +140,9 @@
           </execution>
         </executions>
       </plugin>
-            
+
     </plugins>
 
   </build>
-  
+
 </project>
