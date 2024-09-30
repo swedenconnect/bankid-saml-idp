@@ -15,8 +15,6 @@
  */
 package se.swedenconnect.bankid.idp.integration;
 
-import java.util.List;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +23,14 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
+import se.swedenconnect.opensaml.OpenSAMLInitializer;
+import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
+import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
 import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
+import se.swedenconnect.opensaml.sweid.xmlsec.config.SwedishEidSecurityConfiguration;
+
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles({"integrationtest"})
@@ -47,12 +50,17 @@ public class BankIdIdpIntegrationSetup extends TestContainerSetup {
 
   static {
     try {
+      OpenSAMLInitializer.getInstance()
+          .initialize(
+              new OpenSAMLSecurityDefaultsConfig(new SwedishEidSecurityConfiguration()),
+              new OpenSAMLSecurityExtensionConfig());
       testSp = new TestSp(false);
       signSp = new TestSp(true);
       testSp.setWantsAssertionsSigned(true);
       signSp.setWantsAssertionsSigned(true);
       signSp.setEntityCategories(List.of(EntityCategoryConstants.SERVICE_ENTITY_CATEGORY_LOA3_NAME.getUri(),
-          EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri()));    } catch (Exception e) {
+          EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri()));
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

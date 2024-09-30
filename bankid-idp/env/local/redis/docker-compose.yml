@@ -1,4 +1,3 @@
-version: '3.9'
 name: bankid-idp-local
 networks:
   idp:
