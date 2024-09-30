@@ -24,7 +24,7 @@ function getDefaultRedirect(token: string) {
 }
 
 function getMobileRedirect(token: string, location: string) {
-  return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location + "#anchor";
+  return 'https://app.bankid.com/?autostarttoken=' + token + '&redirect=' + location + '#anchor';
 }
 
 export function shallSelectDeviceAutomatically(userAgent: string) {
@@ -57,8 +57,8 @@ export function getType(ua: UAParser.IResult) {
 
 function getIphoneRedirect(token: string, location: string, browser: string) {
   let appLink = getIphoneAppLink(browser);
-  if (appLink !== "missing") {
-    return getMobileRedirect(token, appLink).replace("#anchor", "");
+  if (appLink !== 'missing') {
+    return getMobileRedirect(token, appLink).replace('#anchor', '');
   }
   // Fallback to let the user switch app
   return getDefaultRedirect(token);
@@ -66,7 +66,7 @@ function getIphoneRedirect(token: string, location: string, browser: string) {
 
 function getIphoneAppLink(browser: string) {
   if (browser === 'Chrome') {
-    return "googlechromes://";
+    return 'googlechromes://';
   }
-  return "missing";
+  return 'missing';
 }
