@@ -65,7 +65,8 @@
           "service": "This service is currently experiencing some issues, please try again later",
           "unknown": "Something went wrong. Please try again later.",
           "sign": "Signature is invalid. Please try again later.",
-          "server": "The underlying BankID service has responded with errors, please try again later"
+          "server": "The underlying BankID service has responded with errors, please try again later",
+          "security": "Security violation detected"
         },
         "qr": {
           "instructions": {
@@ -156,7 +157,8 @@
           "service": "Just nu har vi driftstörningar, försök igen senare",
           "unknown": "Någonting har gått fel, försök igen senare",
           "sign": "Signaturen är inte korrekt, försök igen senare",
-          "server": "Den underliggande tjänsten svarar med fel, försök igen senare"
+          "server": "Den underliggande tjänsten svarar med fel, försök igen senare",
+          "security": "En säkerhetsöverträdelse detekterades"
         },
         "qr": {
           "instructions": {

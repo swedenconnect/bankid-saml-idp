@@ -22,17 +22,17 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 
 /**
  * Represents a collect response event.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
 @AllArgsConstructor
 @Data
 public class CollectResponseEvent {
-  
+
   /** The polling request. */
   private final PollRequest request;
-  
+
   /** The collect response. */
   private final CollectResponse collectResponse;
 }

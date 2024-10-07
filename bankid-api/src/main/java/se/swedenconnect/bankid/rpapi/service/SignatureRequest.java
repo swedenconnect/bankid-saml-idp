@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.bankid.rpapi.service;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
 
@@ -24,57 +26,47 @@ import se.swedenconnect.bankid.rpapi.types.Requirement;
  * @author Martin Lindström
  * @author Felix Hellman
  */
-public class SignatureRequest {
-
-  /** The The user IP address as seen by RP. */
-  private final String endUserIp;
-
-  /** The data to sign (and display). */
-  private final DataToSign dataToSign;
-
-  /** Requirements on how the sign order must be performed. */
-  private final Requirement requirement;
+public class SignatureRequest extends AuthenticateRequest {
 
   /**
    * Creates parameter object for an {@link BankIDClient#sign(SignatureRequest)} call.
    *
    * @param endUserIp the user IP address as seen by the relying party
    * @param dataToSign the data to sign
-   * @param requirement used by the relying party to set requirements how the sign operation must be performed. Default
-   *          rules are applied if omitted
+   * @param requirement used by the relying party to set requirements how the sign operation must be performed.
+   *     Default rules are applied if omitted
    * @throws BankIDException for errors
    */
-  public SignatureRequest(final String endUserIp, final DataToSign dataToSign, final Requirement requirement) {
-    this.endUserIp = endUserIp;
-    this.dataToSign = dataToSign;
-    this.requirement = requirement;
+  /*
+  public SignatureRequest(@Nonnull final String endUserIp, @Nonnull final DataToSign dataToSign,
+      @Nullable final Requirement requirement) {
+    super(endUserIp, dataToSign, requirement);
   }
+   */
 
   /**
-   * Gets the user IP address as seen by the relying party.
+   * Creates parameter object for an {@link BankIDClient#sign(SignatureRequest)} call.
    *
-   * @return the user IP
+   * @param endUserIp the user IP address as seen by the relying party
+   * @param dataToSign the data to sign
+   * @param requirement used by the relying party to set requirements how the sign operation must be performed.
+   *     Default rules are applied if omitted
+   * @param returnUrl the returnUrl given when starting the app on the same device
+   * @param nonce the nonce given when starting the app on the same device
+   * @throws BankIDException for errors
    */
-  public String getEndUserIp() {
-    return this.endUserIp;
+  public SignatureRequest(@Nonnull final String endUserIp, @Nonnull final DataToSign dataToSign,
+      @Nullable final Requirement requirement, @Nullable final String returnUrl, @Nullable final String nonce) {
+    super(endUserIp, dataToSign, requirement, returnUrl, nonce);
   }
 
   /**
    * Gets the data to sign.
-   * 
+   *
    * @return the data to sign
    */
   public DataToSign getDataToSign() {
-    return this.dataToSign;
+    return (DataToSign) this.getUserVisibleData();
   }
 
-  /**
-   * Gets the signing requirements.
-   * 
-   * @return the {@link Requirement} or {@code null}
-   */
-  public Requirement getRequirement() {
-    return this.requirement;
-  }
-  
 }

@@ -15,13 +15,11 @@
  */
 package se.swedenconnect.bankid.rpapi.service.impl;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -30,13 +28,6 @@ import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.rpapi.service.AuthenticateRequest;
 import se.swedenconnect.bankid.rpapi.service.BankIDClient;
@@ -50,6 +41,13 @@ import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ErrorResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * An implementation of the BankID Relying Party API methods.
@@ -82,7 +80,7 @@ public class BankIDClientImpl implements BankIDClient {
   /**
    * Object mapper for JSON.
    */
-  private static ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   private static final String AUTH_PATH = "/auth";
   private static final String SIGN_PATH = "/sign";
@@ -122,7 +120,8 @@ public class BankIDClientImpl implements BankIDClient {
     // Set up the request data.
     //
     final AuthnRequest authnRequest =
-        new AuthnRequest(request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData());
+        new AuthnRequest(request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData(),
+            request.getReturnUrl(), request.getNonce());
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
     try {
       log.debug("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
@@ -143,7 +142,7 @@ public class BankIDClientImpl implements BankIDClient {
             log.debug("{}: authenticate. response: [{}]", this.identifier, m.toString());
             return m;
           })
-          .doOnError(e -> log.info("Error in request to bankid: " + request.toString(), e));
+          .doOnError(e -> log.info("Error in request to bankid: {} ", request, e));
     }
     catch (final WebClientResponseException e) {
       log.info("{}: authenticate. Error during auth-call - {} - {} - {}",
@@ -166,7 +165,8 @@ public class BankIDClientImpl implements BankIDClient {
     Assert.hasText(request.getDataToSign().getUserVisibleData(), "'dataToSign.userVisibleData' must not be null");
 
     final SignRequest signRequest =
-        new SignRequest(request.getEndUserIp(), request.getRequirement(), request.getDataToSign());
+        new SignRequest(request.getEndUserIp(), request.getRequirement(), request.getDataToSign(),
+            request.getReturnUrl(), request.getNonce());
     log.debug("{}: sign. request: [{}] [path: {}]", this.identifier, signRequest, SIGN_PATH);
 
     return this.webClient.post()
@@ -226,9 +226,8 @@ public class BankIDClientImpl implements BankIDClient {
 
   @SuppressWarnings("unused")
   private Mono<? extends Throwable> defaultErrorHandler(final ClientResponse clientResponse) {
-    return clientResponse.body(BodyExtractors.toMono(HashMap.class)).map(m -> {
-      return new BankIDException("Error to communicate with BankID API response:" + m.toString());
-    });
+    return clientResponse.body(BodyExtractors.toMono(HashMap.class))
+        .map(m -> new BankIDException("Error to communicate with BankID API response:" + m.toString()));
   }
 
   /**
@@ -305,13 +304,19 @@ public class BankIDClientImpl implements BankIDClient {
     private Requirement requirement;
     private String userVisibleData;
     private String userVisibleDataFormat;
+    private String returnUrl;
 
-    public AuthnRequest(final String endUserIp, final Requirement requirement, final UserVisibleData userVisibleData) {
+    public AuthnRequest(final String endUserIp, final Requirement requirement, final UserVisibleData userVisibleData,
+        final String returnUrl, final String nonce) {
       this.endUserIp = endUserIp;
       this.requirement = requirement;
       this.userVisibleData = Optional.ofNullable(userVisibleData).map(UserVisibleData::getUserVisibleData).orElse(null);
       this.userVisibleDataFormat =
           Optional.ofNullable(userVisibleData).map(UserVisibleData::getUserVisibleDataFormat).orElse(null);
+      this.returnUrl = returnUrl;
+      if (this.returnUrl != null && nonce != null) {
+        this.returnUrl += "#nonce=" + nonce;
+      }
     }
 
     public AuthnRequest() {
@@ -320,10 +325,12 @@ public class BankIDClientImpl implements BankIDClient {
     @Override
     public String toString() {
       return String.format(
-          "endUserIp='%s', requirement=[%s], userVisibleData='%s', userVisibleDataFormat='%s'",
+          "endUserIp='%s', requirement=[%s], userVisibleData='%s', userVisibleDataFormat='%s', returnUrl='%s'",
           this.endUserIp, this.requirement,
-          Optional.ofNullable(this.userVisibleData).orElseGet(() -> "not-set"),
-          Optional.ofNullable(this.userVisibleDataFormat).orElseGet(() -> "not-set"));
+          Optional.ofNullable(this.userVisibleData).orElse("not-set"),
+          Optional.ofNullable(this.userVisibleDataFormat).orElse("not-set"),
+          Optional.ofNullable(this.returnUrl).orElse("not-set")
+      );
     }
 
     public void setEndUserIp(final String endUserIp) {
@@ -341,6 +348,10 @@ public class BankIDClientImpl implements BankIDClient {
     public void setUserVisibleDataFormat(final String userVisibleDataFormat) {
       this.userVisibleDataFormat = userVisibleDataFormat;
     }
+
+    public void setReturnUrl(final String returnUrl) {
+      this.returnUrl = returnUrl;
+    }
   }
 
   /**
@@ -352,15 +363,16 @@ public class BankIDClientImpl implements BankIDClient {
 
     private final String userNonVisibleData;
 
-    public SignRequest(final String endUserIp, final Requirement requirement, final DataToSign dataToSign) {
-      super(endUserIp, requirement, dataToSign);
+    public SignRequest(final String endUserIp, final Requirement requirement, final DataToSign dataToSign,
+        final String returnUrl, final String nonce) {
+      super(endUserIp, requirement, dataToSign, returnUrl, nonce);
       this.userNonVisibleData = dataToSign.getUserNonVisibleData();
     }
 
     @Override
     public String toString() {
       return String.format("%s, userNonVisibleData='%s'",
-          super.toString(), Optional.ofNullable(this.userNonVisibleData).orElseGet(() -> "not-set"));
+          super.toString(), Optional.ofNullable(this.userNonVisibleData).orElse("not-set"));
     }
 
   }

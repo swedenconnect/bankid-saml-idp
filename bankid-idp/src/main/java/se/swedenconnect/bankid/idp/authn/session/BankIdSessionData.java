@@ -15,10 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.Optional;
-
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +24,17 @@ import lombok.NoArgsConstructor;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
 import se.swedenconnect.bankid.idp.authn.api.StatusCodeFactory;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSecurityViolationException;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Representation of an ongoing BankID session.
@@ -41,9 +45,10 @@ import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class BankIdSessionData implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
   /**
@@ -60,6 +65,16 @@ public class BankIdSessionData implements Serializable {
    * The start secret.
    */
   private String qrStartSecret;
+
+  /**
+   * The autostart nonce (created by backend).
+   */
+  private String nonce;
+
+  /**
+   * The nonce value as received by the frontend (when the app directed back to the browser).
+   */
+  private String receivedNonce;
 
   /**
    * The start time.
@@ -99,7 +114,12 @@ public class BankIdSessionData implements Serializable {
   /**
    * Whether we should display a QR code.
    */
-  private Boolean showQr;
+  private boolean showQr;
+
+  /**
+   * Whether we should autostart the app and supply a return URL.
+   */
+  private boolean autoStartWithReturnUrl;
 
   /**
    * Sign or auth operation
@@ -109,26 +129,53 @@ public class BankIdSessionData implements Serializable {
   /**
    * Creates a {@link BankIdSessionData} given a {@link PollRequest} and an {@link OrderResponse}.
    *
-   * @param request  the {@link PollRequest}
+   * @param request the {@link PollRequest}
    * @param response the {@link OrderResponse}
+   * @param nonce the none for autostart of app (may be {@code null})
    * @return a {@link BankIdSessionData}
    */
-  public static BankIdSessionData of(final PollRequest request, final OrderResponse response) {
+  @Nonnull
+  public static BankIdSessionData initialize(
+      @Nonnull final PollRequest request, @Nonnull final OrderResponse response, @Nullable final String nonce) {
     return BankIdSessionData.builder()
         .autoStartToken(response.getAutoStartToken())
         .qrStartToken(response.getQrStartToken())
         .qrStartSecret(response.getQrStartSecret())
+        .nonce(nonce)
+        .receivedNonce(null) // This is init - impossible that we have received a nonce
         .startTime(response.getOrderTime())
         .orderReference(response.getOrderReference())
         .status(ProgressStatus.STARTED)
         .startFailed(false)
         .sessionExpired(false)
         .messageCode(request.getContext().getOperation() == BankIdOperation.AUTH
-          ? "bankid.msg.rfa21-auth"
-          : "bankid.msg.rfa21-sign")
-        .showQr(request.getQr())
+            ? "bankid.msg.rfa21-auth"
+            : "bankid.msg.rfa21-sign")
+        .showQr(request.isQr())
+        .autoStartWithReturnUrl(request.isAutoStartWithReturnUrl())
         .operation(request.getContext().getOperation())
         .build();
+  }
+
+  /**
+   * Creates a new {@link BankIdSessionData} given a received {@link PollRequest}.
+   *
+   * @param previous the original {@link BankIdSessionData}
+   * @param pollRequest the {@link PollRequest}
+   * @return an updated {@link BankIdSessionData}
+   * @throws BankIdSecurityViolationException for nonce mismatch errors
+   */
+  @Nonnull
+  public static BankIdSessionData updateFromPolling(
+      @Nonnull final BankIdSessionData previous, @Nonnull final PollRequest pollRequest) {
+
+    final BankIdSessionDataBuilder builder = previous.toBuilder()
+        .showQr(pollRequest.isQr());
+
+    if (pollRequest.getReceivedNonce() != null) {
+      builder.receivedNonce(pollRequest.getReceivedNonce());
+    }
+    return builder.build();
   }
 
   /**
@@ -138,20 +185,16 @@ public class BankIdSessionData implements Serializable {
    * @param response the {@link CollectResponse}
    * @return a {@link BankIdSessionData}
    */
-  public static BankIdSessionData of(final BankIdSessionData previous, final CollectResponse response, boolean showQr) {
-    return BankIdSessionData.builder()
-        .autoStartToken(previous.getAutoStartToken())
-        .qrStartToken(previous.getQrStartToken())
-        .qrStartSecret(previous.getQrStartSecret())
-        .startTime(previous.getStartTime())
-        .orderReference(previous.getOrderReference())
+  @Nonnull
+  public static BankIdSessionData updateFromResponse(@Nonnull final BankIdSessionData previous,
+      @Nonnull final CollectResponse response) {
+
+    return previous.toBuilder()
         .status(Optional.ofNullable(response.getProgressStatus()).orElse(previous.getStatus()))
         .startFailed(response.getErrorCode() == ErrorCode.START_FAILED)
         .sessionExpired(response.getErrorCode() == ErrorCode.EXPIRED_TRANSACTION)
-        .messageCode(StatusCodeFactory.statusCode(response, showQr, previous.getOperation()))
-        .showQr(showQr)
+        .messageCode(StatusCodeFactory.statusCode(response, previous.isShowQr(), previous.getOperation()))
         .errorCode(response.getErrorCode())
-        .operation(previous.getOperation())
         .build();
   }
 }

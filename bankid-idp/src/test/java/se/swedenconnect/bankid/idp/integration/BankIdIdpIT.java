@@ -48,51 +48,51 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   void emptyRequestContext_WillFail() {
-    HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
+    final HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
     Mockito.when(servletRequest.getSession()).thenReturn(Mockito.mock(HttpSession.class));
-    Assertions.assertThrows(UnrecoverableSaml2IdpException.class, () -> controller.poll(servletRequest, false).block());
+    Assertions.assertThrows(UnrecoverableSaml2IdpException.class, () -> this.controller.poll(servletRequest, null).block());
   }
 
   @Test
   @WithSamlUser
-  void genericFailureOnPoll(FrontendClient client) {
-    OrderResponse start = BankIdResponseFactory.start();
+  void genericFailureOnPoll(final FrontendClient client) {
+    final OrderResponse start = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(start);
-    ApiResponse apiResponse = client.poll(true).block();
+    final ApiResponse apiResponse = client.poll(true).block();
     Assertions.assertNotNull(apiResponse);
     Assertions.assertNotNull(apiResponse.getAutoStartToken());
-    CollectResponse collect = BankIdResponseFactory.collect(start, c -> c.status(CollectResponse.Status.FAILED));
+    final CollectResponse collect = BankIdResponseFactory.collect(start, c -> c.status(CollectResponse.Status.FAILED));
     BankIdApiMock.nextCollect(collect);
-    ApiResponse failed = client.poll(true).block();
+    final ApiResponse failed = client.poll(true).block();
     Assertions.assertNotNull(failed);
     Assertions.assertEquals(ApiResponse.Status.ERROR, failed.getStatus());
   }
 
   @Test
   @WithSamlUser
-  void userCanCompleteLogin(FrontendClient client) throws JsonProcessingException {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void userCanCompleteLogin(final FrontendClient client) throws JsonProcessingException {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
-    ApiResponse apiResponse = client.poll(true).block();
+    final ApiResponse apiResponse = client.poll(true).block();
     Assertions.assertNotNull(apiResponse);
     Assertions.assertNotNull(apiResponse.getAutoStartToken());
     BankIdApiMock.completeCollect(orderResponse);
-    ApiResponse completed = client.poll(true).block();
+    final ApiResponse completed = client.poll(true).block();
     Assertions.assertNotNull(completed);
     Assertions.assertNotNull(completed.getAutoStartToken());
     Assertions.assertEquals(ApiResponse.Status.COMPLETE, completed.getStatus());
-    String completionUrl = client.complete();
+    final String completionUrl = client.complete();
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", completionUrl);
   }
 
   @Test
   @WithSamlUser
-  void userCanRenewSessionOnStartFailed(FrontendClient client) {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void userCanRenewSessionOnStartFailed(final FrontendClient client) {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
     ApiResponse apiResponse = client.poll(true).block();
     Assertions.assertEquals(orderResponse.getAutoStartToken(), apiResponse.getAutoStartToken());
-    OrderResponse next = BankIdResponseFactory.start();
+    final OrderResponse next = BankIdResponseFactory.start();
     BankIdApiMock.failStart(orderResponse, next);
     apiResponse = client.poll(true).block();
     Assertions.assertEquals(next.getAutoStartToken(), apiResponse.getAutoStartToken());
@@ -100,42 +100,42 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser(isSign = true)
-  void userCanSign(FrontendClient client) throws JsonProcessingException {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void userCanSign(final FrontendClient client) throws JsonProcessingException {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockSign(orderResponse);
-    ApiResponse polled = client.poll(true).block();
+    final ApiResponse polled = client.poll(true).block();
     Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
     BankIdApiMock.completeCollect(orderResponse);
-    ApiResponse completed = client.poll(true).block();
+    final ApiResponse completed = client.poll(true).block();
     Assertions.assertEquals("COMPLETE", completed.getStatus().name());
-    String complete = client.complete();
+    final String complete = client.complete();
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", complete);
   }
 
   @Test
   @WithSamlUser
-  void userCanCancelSession(FrontendClient client) {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void userCanCancelSession(final FrontendClient client) {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
     BankIdApiMock.mockCancel(orderResponse);
-    ApiResponse polled = client.poll(true).block();
+    final ApiResponse polled = client.poll(true).block();
     Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
     client.cancelApi().block();
-    String cancel = client.cancel();
+    final String cancel = client.cancel();
     Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse,
         c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
-    ApiResponse poll = client.poll(true).block();
+    final ApiResponse poll = client.poll(true).block();
     Assertions.assertEquals("CANCEL", poll.getStatus().name());
   }
 
   @Test
   @WithSamlUser
-  void userCanNotPollInParallel(FrontendClient client) {
+  void userCanNotPollInParallel(final FrontendClient client) {
     BankIdApiMock.setDelay(200);
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
-    List<String> dummyList = List.of("NOT USED ON PURPOSE", "NOT USED ON PURPOSE");
+    final List<String> dummyList = List.of("NOT USED ON PURPOSE", "NOT USED ON PURPOSE");
     StepVerifier.create(Flux.fromIterable(dummyList).flatMap(dnu -> client.poll(true)))
         .expectErrorMatches(e -> e instanceof CannotAcquireLockException)
         .verify();
@@ -144,8 +144,8 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser
-  void userCanChangeBetweenShowingQrCode(FrontendClient client) {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void userCanChangeBetweenShowingQrCode(final FrontendClient client) {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())));
     Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
@@ -155,14 +155,14 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser
-  void previousSelectedDeviceIsUsedDevice(FrontendClient client) {
-    OrderResponse orderResponse = BankIdResponseFactory.start();
+  void previousSelectedDeviceIsUsedDevice(final FrontendClient client) {
+    final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse, c -> c.hintCode(ProgressStatus.OUTSTANDING_TRANSACTION.getValue())));
     Assertions.assertEquals("bankid.msg.ext2", client.poll(true).block().getMessageCode());
     Assertions.assertEquals("bankid.msg.rfa13", client.poll(false).block().getMessageCode());
     BankIdApiMock.nextCollect(BankIdResponseFactory.complete(orderResponse));
-    ApiResponse apiResponse = client.poll(false).block();
+    final ApiResponse apiResponse = client.poll(false).block();
     Assertions.assertEquals(ApiResponse.Status.COMPLETE, apiResponse.getStatus());
     client.complete();
     Assertions.assertEquals("this", client.device().block().getDevice());
@@ -171,8 +171,8 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @ParameterizedTest
   @MethodSource({"se.swedenconnect.bankid.idp.integration.fixtures.MessageValidationArguments#getAll"})
-  void testUserMessage(String expectedMessageCode, Boolean sign, OrderAndCollectResponse response, Boolean showQr) {
-    FrontendClient client = AuthenticatedClientResolver.createFrontEndClient(sign);
+  void testUserMessage(final String expectedMessageCode, final Boolean sign, final OrderAndCollectResponse response, final Boolean showQr) {
+    final FrontendClient client = AuthenticatedClientResolver.createFrontEndClient(sign);
     if (sign) {
       BankIdApiMock.mockSign(response.getOrderResponse());
     }
@@ -187,12 +187,12 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
 
   @Test
   @WithSamlUser
-  void testUserSessionExpiredWillReturn400(FrontendClient client) {
-    OrderResponse start = BankIdResponseFactory.start();
+  void testUserSessionExpiredWillReturn400(final FrontendClient client) {
+    final OrderResponse start = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(start);
-    ApiResponse apiResponse = client.poll(false).block();
+    final ApiResponse apiResponse = client.poll(false).block();
     Assertions.assertEquals(start.getAutoStartToken(), apiResponse.getAutoStartToken());
-    clearSessions();
+    this.clearSessions();
     Assertions.assertThrows(HttpServerErrorException.class, () -> client.poll(false).block());
   }
 }

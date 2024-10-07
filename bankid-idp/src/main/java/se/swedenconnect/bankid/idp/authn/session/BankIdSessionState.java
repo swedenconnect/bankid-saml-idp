@@ -60,7 +60,7 @@ public class BankIdSessionState {
 
   /**
    * Gets the most current session data.
-   * 
+   *
    * @return most current bankid session data
    */
   public BankIdSessionData getBankIdSessionData() {
@@ -69,7 +69,7 @@ public class BankIdSessionState {
 
   /**
    * Gets the instant for the first response.
-   * 
+   *
    * @return point in time of the first response
    */
   public Instant getInitialOrderTime() {

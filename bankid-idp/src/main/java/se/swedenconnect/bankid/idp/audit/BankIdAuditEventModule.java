@@ -15,22 +15,17 @@
  */
 package se.swedenconnect.bankid.idp.audit;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.events.AbstractBankIdEvent;
 import se.swedenconnect.bankid.idp.authn.events.BankIdErrorEvent;
+import se.swedenconnect.bankid.idp.authn.events.BankIdSecurityViolationEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCancellationEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
@@ -41,6 +36,11 @@ import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.CompletionData;
 import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthenticationInputToken;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Bean responsible of creating BankID audit events by listening to BankID events.
@@ -106,7 +106,7 @@ public class BankIdAuditEventModule {
   public AuditApplicationEvent handleOrderResponse(final OrderResponseEvent event) {
 
     final AuditEvent auditEvent = this.createAuditEvent(event, BankIdAuditEventTypes.INIT,
-        BankIdSessionData.of(event.getPollRequest(), event.getResponse()));
+        BankIdSessionData.initialize(event.getPollRequest(), event.getResponse(), event.getNonce()));
 
     log.info("Publishing audit event: {} - {}", auditEvent.getType(), auditEvent.getPrincipal());
     return new AuditApplicationEvent(auditEvent);
@@ -181,7 +181,8 @@ public class BankIdAuditEventModule {
   }
 
   /**
-   * Translates a {@link BankIdErrorEvent} to a {@link BankIdAuditEventTypes#BANKID_ERROR} audit event.
+   * Translates a {@link BankIdErrorEvent} to a {@link BankIdAuditEventTypes#BANKID_ERROR} audit event or a
+   * {@link BankIdSecurityViolationEvent} to a {@link BankIdAuditEventTypes#BANKID_SECURITY_VIOLATION} audit event.
    *
    * @param event the event
    * @return the audit event
@@ -203,7 +204,12 @@ public class BankIdAuditEventModule {
     if (event.getErrorDescription() != null) {
       auditIdentifier.put("error-description", event.getErrorDescription());
     }
-    final AuditEvent auditEvent = new AuditEvent(principal, BankIdAuditEventTypes.BANKID_ERROR.getTypeName(), auditIdentifier);
+    final BankIdAuditEventTypes type = (event instanceof BankIdSecurityViolationEvent)
+        ? BankIdAuditEventTypes.BANKID_SECURITY_VIOLATION
+        : BankIdAuditEventTypes.BANKID_ERROR;
+
+    final AuditEvent auditEvent =
+        new AuditEvent(principal, type.getTypeName(), auditIdentifier);
 
     log.info("Publishing audit event: {} - {}", auditEvent.getType(), auditEvent.getPrincipal());
     return new AuditApplicationEvent(auditEvent);

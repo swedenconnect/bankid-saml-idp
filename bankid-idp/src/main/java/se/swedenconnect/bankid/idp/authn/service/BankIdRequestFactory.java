@@ -15,16 +15,17 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import java.util.Optional;
-
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Component;
-
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.config.BankIdRequirement;
 import se.swedenconnect.bankid.rpapi.service.AuthenticateRequest;
 import se.swedenconnect.bankid.rpapi.service.DataToSign;
 import se.swedenconnect.bankid.rpapi.service.SignatureRequest;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
+
+import java.util.Optional;
 
 /**
  * Component for sending authentication and signature requests to the BankID server.
@@ -39,27 +40,33 @@ public class BankIdRequestFactory {
    * Creates a BankID authentication request.
    *
    * @param request the {@link PollRequest}
+   * @param returnUrl the return URL for app autostart (may be {@code null})
+   * @param nonce the nonce for app autostart (may be {@code null})
    * @return an {@link AuthenticateRequest}
    */
-  public AuthenticateRequest createAuthenticateRequest(final PollRequest request) {
-    return new AuthenticateRequest(
-        request.getRequest().getRemoteAddr(),
-        request.getData(),
-        createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.AUTH));
+  @Nonnull
+  public AuthenticateRequest createAuthenticateRequest(@Nonnull final PollRequest request,
+      @Nullable final String returnUrl, @Nullable final String nonce) {
+    return new AuthenticateRequest(request.getRequest().getRemoteAddr(), request.getData(),
+        createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.AUTH),
+        returnUrl, nonce);
   }
 
   /**
    * Creates a BankID signature request.
    *
    * @param request the {@link PollRequest}
+   * @param returnUrl the return URL for app autostart (may be {@code null})
+   * @param nonce the nonce for app autostart (may be {@code null})
    * @return an {@link AuthenticateRequest}
    */
-  public SignatureRequest createSignRequest(final PollRequest request) {
+  @Nonnull
+  public SignatureRequest createSignRequest(@Nonnull final PollRequest request,
+      @Nullable final String returnUrl, @Nullable final String nonce) {
     if (request.getData() instanceof final DataToSign dataToSign) {
-      return new SignatureRequest(
-          request.getRequest().getRemoteAddr(),
-          dataToSign,
-          createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.SIGN));
+      return new SignatureRequest(request.getRequest().getRemoteAddr(), dataToSign,
+          createRequirement(request, request.getContext().getPersonalNumber(), BankIdOperation.SIGN),
+          returnUrl, nonce);
     }
     else {
       throw new IllegalArgumentException(
@@ -80,7 +87,8 @@ public class BankIdRequestFactory {
     return builder.build();
   }
 
-  private static Requirement fromEntityRequirement(final BankIdRequirement entityRequirement, final BankIdOperation operation) {
+  private static Requirement fromEntityRequirement(final BankIdRequirement entityRequirement,
+      final BankIdOperation operation) {
     final Requirement requirement = new Requirement();
     requirement.setPinCode(operation == BankIdOperation.AUTH
         ? entityRequirement.isPinCodeAuth()

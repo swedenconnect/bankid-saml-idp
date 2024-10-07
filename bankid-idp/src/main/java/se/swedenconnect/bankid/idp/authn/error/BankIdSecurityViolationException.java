@@ -13,44 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package se.swedenconnect.bankid.idp.authn.error;
 
+import lombok.Getter;
 import se.swedenconnect.bankid.idp.ApplicationVersion;
-import se.swedenconnect.bankid.idp.authn.service.PollRequest;
-import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
 import java.io.Serial;
 
 /**
- * Exception for expired BankID sessions.
- *
  * @author Martin Lindström
- * @author Felix Hellman
  */
-public class BankIdSessionExpiredException extends BankIDException {
+public class BankIdSecurityViolationException extends RuntimeException {
 
   @Serial
   private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
-  private final PollRequest request;
+  @Getter
+  private final BankIdSecurityViolationError error;
 
   /**
    * Constructor.
    *
-   * @param request the {@link PollRequest}
+   * @param error the violation error code
    */
-  public BankIdSessionExpiredException(final PollRequest request) {
-    super("The session towards BankID has timed out");
-    this.request = request;
+  public BankIdSecurityViolationException(final BankIdSecurityViolationError error) {
+    this(error, "BankID Security Violation error: " + error.getValue());
   }
 
   /**
-   * Gets the {@link PollRequest} that were active when the session timed out.
+   * Constructor.
    *
-   * @return a {@link PollRequest}
+   * @param error the violation error code
+   * @param msg the error message
    */
-  public PollRequest getRequest() {
-    return this.request;
+  public BankIdSecurityViolationException(final BankIdSecurityViolationError error, final String msg) {
+    super(msg);
+    this.error = error;
   }
 
 }

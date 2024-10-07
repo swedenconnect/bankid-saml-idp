@@ -15,19 +15,21 @@
  */
 package se.swedenconnect.bankid.idp.authn.events;
 
-import java.util.Optional;
-
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSecurityViolationError;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
 import se.swedenconnect.bankid.rpapi.service.UserVisibleData;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
+
+import java.util.Optional;
 
 /**
  * The BankID event publisher.
@@ -54,11 +56,14 @@ public class BankIdEventPublisher {
    *
    * @param request the polling request
    * @param response the order response
+   * @param nonce (optional) nonce included in return URL (for autostart of app)
    * @return an event to be published
    */
-  public EventBuilder orderResponse(final PollRequest request, final OrderResponse response) {
+  public EventBuilder orderResponse(@Nonnull final PollRequest request, @Nonnull final OrderResponse response,
+      @Nullable final String nonce) {
     return new EventBuilder(
-        new OrderResponseEvent(request.getRequest(), request.getRelyingPartyData(), request, response), this.publisher);
+        new OrderResponseEvent(request.getRequest(), request.getRelyingPartyData(), request, response, nonce),
+        this.publisher);
   }
 
   /**
@@ -121,8 +126,16 @@ public class BankIdEventPublisher {
   public EventBuilder bankIdErrorEvent(final HttpServletRequest request, final RelyingPartyData data,
       final ErrorCode error, final String errorMessage) {
     return new EventBuilder(new BankIdErrorEvent(request, data,
-        Optional.ofNullable(error).map(ErrorCode::getValue).orElseGet(() -> ErrorCode.UNKNOWN_ERROR.getValue()),
+        Optional.ofNullable(error).map(ErrorCode::getValue).orElseGet(ErrorCode.UNKNOWN_ERROR::getValue),
         errorMessage), this.publisher);
+  }
+
+  /**
+   * Builds an event to inform about a security violation.
+   */
+  public EventBuilder bankIdSecurityViolationEvent(final HttpServletRequest request, final RelyingPartyData data,
+      final BankIdSecurityViolationError errorCode, final String errorMessage) {
+    return new EventBuilder(new BankIdSecurityViolationEvent(request, data, errorCode, errorMessage), this.publisher);
   }
 
   /**
