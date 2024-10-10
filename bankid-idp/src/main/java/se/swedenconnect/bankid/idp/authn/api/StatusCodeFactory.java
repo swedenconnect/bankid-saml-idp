@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.authn.api;
 import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.FAILED;
 import static se.swedenconnect.bankid.rpapi.types.CollectResponse.Status.PENDING;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,33 +36,52 @@ import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 public class StatusCodeFactory {
 
   private static final List<StatusResolver> RESOLVES = new ArrayList<>() {
+
+    @Serial
     private static final long serialVersionUID = ApplicationVersion.SERIAL_VERSION_UID;
 
     {
-      add(new StatusResolver("rfa1", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.NO_CLIENT.equals(c.getCollectResponse().getProgressStatus()) && !c.getShowQr()));
-      add(new StatusResolver("rfa3", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.CANCELLED.equals(c.getCollectResponse().getErrorCode())));
-      add(new StatusResolver("rfa4", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.ALREADY_IN_PROGRESS.equals(c.getCollectResponse().getErrorCode())));
-      add(new StatusResolver("rfa5", c -> FAILED.equals(c.getCollectResponse().getStatus()) && Objects.nonNull(c.getCollectResponse().getErrorCode()) && List.of(ErrorCode.REQUEST_TIMEOUT, ErrorCode.MAINTENANCE, ErrorCode.INTERNAL_ERROR).contains(c.getCollectResponse().getErrorCode())));
-      add(new StatusResolver("rfa6", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.USER_CANCEL.equals(c.getCollectResponse().getErrorCode())));
-      add(new StatusResolver("rfa8", c -> FAILED.equals(c.getCollectResponse().getStatus()) && ErrorCode.EXPIRED_TRANSACTION.equals(c.getCollectResponse().getErrorCode())));
-      add(new StatusResolver("rfa9-auth", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()) && BankIdOperation.AUTH.equals(c.getOperation())));
-      add(new StatusResolver("rfa9-sign", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_SIGN.equals(c.getCollectResponse().getProgressStatus()) && BankIdOperation.SIGN.equals(c.getOperation())));
-      add(new StatusResolver("rfa13", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus()) && !c.getShowQr()));
-      add(new StatusResolver("rfa21-auth", c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.AUTH) && Objects.isNull(c.getCollectResponse().getHintCode())));
-      add(new StatusResolver("rfa21-sign", c -> PENDING.equals(c.getCollectResponse().getStatus()) && Objects.equals(c.getOperation(), BankIdOperation.SIGN) && Objects.isNull(c.getCollectResponse().getHintCode())));
-      add(new StatusResolver("rfa22", c -> FAILED.equals(c.getCollectResponse().getStatus())));
-      add(new StatusResolver("rfa23", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.USER_MRTD.equals(c.getCollectResponse().getProgressStatus())));
-      add(new StatusResolver("ext2", c -> PENDING.equals(c.getCollectResponse().getStatus()) && ProgressStatus.OUTSTANDING_TRANSACTION.equals(c.getCollectResponse().getProgressStatus()) && c.getShowQr()));
+      this.add(new StatusResolver("rfa1", c -> PENDING == c.getCollectResponse().getStatus() && ProgressStatus.NO_CLIENT
+          == c.getCollectResponse().getProgressStatus() && !c.getShowQr()));
+      this.add(new StatusResolver("rfa3", c -> FAILED == c.getCollectResponse().getStatus() && ErrorCode.CANCELLED
+          == c.getCollectResponse().getErrorCode()));
+      this.add(new StatusResolver("rfa4", c -> FAILED == c.getCollectResponse().getStatus() &&
+          ErrorCode.ALREADY_IN_PROGRESS == c.getCollectResponse().getErrorCode()));
+      this.add(new StatusResolver("rfa5",
+          c -> FAILED == c.getCollectResponse().getStatus() && Objects.nonNull(c.getCollectResponse().getErrorCode())
+              && List.of(ErrorCode.REQUEST_TIMEOUT, ErrorCode.MAINTENANCE, ErrorCode.INTERNAL_ERROR)
+              .contains(c.getCollectResponse().getErrorCode())));
+      this.add(new StatusResolver("rfa6", c -> FAILED == c.getCollectResponse().getStatus() && ErrorCode.USER_CANCEL
+          == c.getCollectResponse().getErrorCode()));
+      this.add(new StatusResolver("rfa8", c -> FAILED == c.getCollectResponse().getStatus() &&
+          ErrorCode.EXPIRED_TRANSACTION == c.getCollectResponse().getErrorCode()));
+      this.add(new StatusResolver("rfa9-auth", c -> PENDING == c.getCollectResponse().getStatus() &&
+          ProgressStatus.USER_SIGN == c.getCollectResponse().getProgressStatus() &&
+          BankIdOperation.AUTH == c.getOperation()));
+      this.add(new StatusResolver("rfa9-sign", c -> PENDING == c.getCollectResponse().getStatus() &&
+          ProgressStatus.USER_SIGN == c.getCollectResponse().getProgressStatus() &&
+          BankIdOperation.SIGN == c.getOperation()));
+      this.add(new StatusResolver("rfa13", c -> PENDING == c.getCollectResponse().getStatus() &&
+          ProgressStatus.OUTSTANDING_TRANSACTION == c.getCollectResponse().getProgressStatus() && !c.getShowQr()));
+      this.add(new StatusResolver("rfa21-auth", c -> PENDING == c.getCollectResponse().getStatus() && c.getOperation()
+          == BankIdOperation.AUTH && Objects.isNull(c.getCollectResponse().getHintCode())));
+      this.add(new StatusResolver("rfa21-sign", c -> PENDING == c.getCollectResponse().getStatus() && c.getOperation()
+          == BankIdOperation.SIGN && Objects.isNull(c.getCollectResponse().getHintCode())));
+      this.add(new StatusResolver("rfa22", c -> FAILED == c.getCollectResponse().getStatus()));
+      this.add(new StatusResolver("rfa23", c -> PENDING == c.getCollectResponse().getStatus() &&
+          ProgressStatus.USER_MRTD == c.getCollectResponse().getProgressStatus()));
+      this.add(new StatusResolver("ext2", c -> PENDING == c.getCollectResponse().getStatus() &&
+          ProgressStatus.OUTSTANDING_TRANSACTION == c.getCollectResponse().getProgressStatus() && c.getShowQr()));
     }
   };
 
   public static String statusCode(final CollectResponse json, final Boolean showQr, final BankIdOperation operation) {
-    StatusData statusData = new StatusData(json, showQr, operation);
-    Optional<String> message = RESOLVES.stream()
+    final StatusData statusData = new StatusData(json, showQr, operation);
+    final Optional<String> message = RESOLVES.stream()
         .filter(r -> r.getPredicate().test(statusData))
         .map(StatusResolver::getResult)
         .findFirst();
-    return "bankid.msg." + message.orElseGet(() -> "blank");
+    return "bankid.msg." + message.orElse("blank");
   }
 
   @AllArgsConstructor

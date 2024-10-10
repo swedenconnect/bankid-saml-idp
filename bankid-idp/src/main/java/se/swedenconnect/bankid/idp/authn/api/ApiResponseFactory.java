@@ -15,13 +15,13 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Helper class for creating an {@link ApiResponse} object.
@@ -34,14 +34,14 @@ public class ApiResponseFactory {
   /**
    * Creates an {@link ApiResponse}.
    *
-   * @param data      the BankID session data
+   * @param data the BankID session data
    * @param generator the QR code generator bean
-   * @param showQr    whether to display the QR code
+   * @param showQr whether to display the QR code
    * @return an {@link ApiResponse}
    */
   public static ApiResponse create(final BankIdSessionData data, final QRGenerator generator, final boolean showQr) {
-    if(Objects.nonNull(data.getErrorCode())) {
-      if (data.getErrorCode().equals(ErrorCode.USER_CANCEL)) {
+    if (Objects.nonNull(data.getErrorCode())) {
+      if (data.getErrorCode() == ErrorCode.USER_CANCEL) {
         return createUserCancelResponse();
       }
       return createUserErrorResponse(data);
@@ -53,11 +53,11 @@ public class ApiResponseFactory {
       qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(),
           data.getStartTime());
     }
-    return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
+    return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode(), data.getNonce());
   }
 
-  private static ApiResponse createUserErrorResponse(BankIdSessionData data) {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", data.getMessageCode());
+  private static ApiResponse createUserErrorResponse(final BankIdSessionData data) {
+    return ApiResponse.error(ApiResponse.Status.ERROR,  data.getMessageCode());
   }
 
   /**
@@ -66,11 +66,25 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createErrorResponseTimeExpired() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.timeout");
+    return ApiResponse.error(ApiResponse.Status.ERROR, "bankid.msg.error.timeout");
   }
 
+  /**
+   * Creates an {@link ApiResponse} indicating a server error.
+   *
+   * @return an {@link ApiResponse}
+   */
   public static ApiResponse createErrorResponseBankIdServerException() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.server");
+    return ApiResponse.error(ApiResponse.Status.ERROR, "bankid.msg.error.server");
+  }
+
+  /**
+   * Creates an {@link ApiResponse} indicating a security violation.
+   *
+   * @return an {@link ApiResponse}
+   */
+  public static ApiResponse createErrorSecurityViolation() {
+    return ApiResponse.error(ApiResponse.Status.ERROR,  "bankid.msg.error.security");
   }
 
   private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
@@ -90,16 +104,17 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createUserCancelResponse() {
-    return new ApiResponse(ApiResponse.Status.CANCEL, "", "", "bankid.msg.error.userCancel");
+    return ApiResponse.error(ApiResponse.Status.CANCEL ,"bankid.msg.error.userCancel");
   }
 
   /**
-   * Creates an {@link ApiResponse} representing an unknown error.
-   * This does not necessarily mean that the error is unknown but should not be presented to the user.
+   * Creates an {@link ApiResponse} representing an unknown error. This does not necessarily mean that the error is
+   * unknown but should not be presented to the user.
    *
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createUnknownError() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.unknown");
+    return ApiResponse.error(ApiResponse.Status.ERROR,  "bankid.msg.error.unknown");
   }
+
 }

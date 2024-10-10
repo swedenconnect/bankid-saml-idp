@@ -15,11 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import java.util.List;
-
-import org.mockito.Mockito;
-
 import jakarta.servlet.http.HttpServletRequest;
+import org.mockito.Mockito;
 import se.swedenconnect.bankid.idp.authn.DisplayText;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
@@ -33,9 +30,11 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
+import java.util.List;
+
 public class BankIdResponseFixture {
-  public static OrderResponse createOrderResponse(int index) {
-    OrderResponse data = new OrderResponse(); // TODO: 2023-08-18 Builder
+  public static OrderResponse createOrderResponse(final int index) {
+    final OrderResponse data = new OrderResponse(); // TODO: 2023-08-18 Builder
     data.setQrStartToken("qrs-" + index);
     data.setOrderReference("or-" + index);
     data.setAutoStartToken("ast-" + index);
@@ -43,16 +42,16 @@ public class BankIdResponseFixture {
     return data;
   }
 
-  public static CollectResponse createInitial(OrderResponse response) {
-    CollectResponse collectResponse = new CollectResponse();
+  public static CollectResponse createInitial(final OrderResponse response) {
+    final CollectResponse collectResponse = new CollectResponse();
     collectResponse.setOrderReference(response.getOrderReference());
     collectResponse.setHintCode("hint");
     collectResponse.setStatus(CollectResponse.Status.PENDING);
     return collectResponse;
   }
 
-  public static CollectResponse createStartFailed(CollectResponse previous) {
-    CollectResponse collectResponse = new CollectResponse();
+  public static CollectResponse createStartFailed(final CollectResponse previous) {
+    final CollectResponse collectResponse = new CollectResponse();
     collectResponse.setOrderReference(previous.getOrderReference());
     collectResponse.setHintCode("hint");
     collectResponse.setStatus(CollectResponse.Status.FAILED);
@@ -60,8 +59,8 @@ public class BankIdResponseFixture {
     return collectResponse;
   }
 
-  public static CollectResponse createTransactionExpired(CollectResponse previous) {
-    CollectResponse collectResponse = new CollectResponse();
+  public static CollectResponse createTransactionExpired(final CollectResponse previous) {
+    final CollectResponse collectResponse = new CollectResponse();
     collectResponse.setOrderReference(previous.getOrderReference());
     collectResponse.setHintCode("hint");
     collectResponse.setStatus(CollectResponse.Status.FAILED);
@@ -70,20 +69,20 @@ public class BankIdResponseFixture {
   }
 
   public static BankIdContext createAuth() {
-    BankIdContext context = new BankIdContext(); // TODO: 2023-08-18 Builder
+    final BankIdContext context = new BankIdContext(); // TODO: 2023-08-18 Builder
     context.setOperation(BankIdOperation.AUTH);
     return context;
   }
 
-  public static BankIdSessionState create(PollRequest request, OrderResponse response) {
-    BankIdSessionState sessionState = new BankIdSessionState();
-    sessionState.push(BankIdSessionData.of(request, response));
+  public static BankIdSessionState create(final PollRequest request, final OrderResponse response, final String nonce) {
+    final BankIdSessionState sessionState = new BankIdSessionState();
+    sessionState.push(BankIdSessionData.initialize(request, response, nonce));
     return sessionState;
   }
 
-  public static BankIdSessionState update(BankIdSessionState state, CollectResponse response) {
-    BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
-    BankIdSessionData data = BankIdSessionData.of(bankIdSessionData, response, bankIdSessionData.getShowQr());
+  public static BankIdSessionState update(final BankIdSessionState state, final CollectResponse response) {
+    final BankIdSessionData bankIdSessionData = state.getBankIdSessionData();
+    final BankIdSessionData data = BankIdSessionData.updateFromResponse(bankIdSessionData, response);
     state.pop();
     state.push(data);
     return state;
@@ -98,18 +97,17 @@ public class BankIdResponseFixture {
     return getPollRequestBuilder(client).state(state).build();
   }
 
-  private static PollRequest.PollRequestBuilder getPollRequestBuilder(BankIDClient client) {
-    HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
+  private static PollRequest.PollRequestBuilder getPollRequestBuilder(final BankIDClient client) {
+    final HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
     Mockito.when(servletRequest.getRemoteAddr()).thenReturn("1.1.1.1");
-    UserVisibleData userVisibleData = new UserVisibleData();
+    final UserVisibleData userVisibleData = new UserVisibleData();
     userVisibleData.setUserVisibleData("Uservisibledata");
-    PollRequest.PollRequestBuilder builder = PollRequest.builder()
+    return PollRequest.builder()
         .qr(false)
         .request(servletRequest)
         .context(BankIdResponseFixture.createAuth())
         .data(userVisibleData)
         .relyingPartyData(new RelyingPartyData(client, List.of("relying-party"), new DisplayText(), new DisplayText(),
             null, new BankIdRequirement()));
-    return builder;
   }
 }

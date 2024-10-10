@@ -15,11 +15,10 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import java.util.Objects;
-
 import org.springframework.stereotype.Component;
-
 import se.swedenconnect.bankid.idp.config.UiProperties.UserErrorProperties;
+
+import java.util.Objects;
 
 /**
  * Supplies customer information.
@@ -35,7 +34,7 @@ public class CustomerContactInformationFactory {
   /**
    * Constructor.
    *
-   * @param properties
+   * @param properties the user error properties
    */
   public CustomerContactInformationFactory(final UserErrorProperties properties) {
     this.properties = Objects.requireNonNull(properties, "properties must not be null");

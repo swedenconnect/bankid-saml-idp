@@ -24,6 +24,7 @@ export interface ApiResponse {
   qrCode: string;
   autoStartToken: string;
   messageCode: string;
+  nonce: string;
 }
 
 export interface RetryResponse {

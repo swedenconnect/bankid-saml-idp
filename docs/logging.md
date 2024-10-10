@@ -167,6 +167,20 @@ published before any communication with the BankID server is initiated.
 | `error-code` | The code for the error. | 
 | `error-description` | A textual description of the error (if available). |
 
+### Security Violation
+
+**Type:**: `BANKID_SECURITY_VIOLATION`
+
+**Description:** A security violation was detected.
+
+**Additional Parameters:**
+
+| Parameter | Description |
+|:--- |:--- |
+| `order-ref` | The BankID order reference (if known). |
+| `error-code` | The code for the error. | 
+| `error-description` | A textual description of the error (if available). |
+
 -----
 
 <a name="saml-audit-events"></a>

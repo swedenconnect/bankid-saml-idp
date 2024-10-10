@@ -15,19 +15,19 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponseFactory;
 import se.swedenconnect.bankid.idp.authn.api.ServiceInformation;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSecurityViolationError;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSecurityViolationException;
 import se.swedenconnect.bankid.idp.authn.error.BankIdSessionExpiredException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
@@ -38,12 +38,19 @@ import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 /**
- * The BankID service. This component is responsible of communicating with the BankID server using the RP API.
+ * The BankID service. This component is responsible for communicating with the BankID server using the RP API.
  *
  * @author Martin Lindström
  * @author Felix Hellman
  */
+@Slf4j
 public class BankIdService {
 
   /** The BankID event publisher. */
@@ -58,6 +65,9 @@ public class BankIdService {
   /** Duration to allow retry session start */
   private final Duration bankIdStartRetryDuration;
 
+  /** The return URL to use when autostarting the app. */
+  private final String returnUrl;
+
   /**
    * Constructor.
    *
@@ -65,13 +75,15 @@ public class BankIdService {
    * @param circuitBreaker the circuit breaker (for resilliance)
    * @param requestFactory for generating requests to the BankID server
    * @param bankIdStartRetryDuration duration to allow retry session start
+   * @param returnUrl the return URL to use when autostarting the app
    */
   public BankIdService(final BankIdEventPublisher eventPublisher, final CircuitBreaker circuitBreaker,
-      final BankIdRequestFactory requestFactory, Duration bankIdStartRetryDuration) {
+      final BankIdRequestFactory requestFactory, final Duration bankIdStartRetryDuration, final String returnUrl) {
     this.eventPublisher = Objects.requireNonNull(eventPublisher, "eventPublisher must not be null");
     this.circuitBreaker = Objects.requireNonNull(circuitBreaker, "circuitBreaker must not be null");
     this.requestFactory = Optional.ofNullable(requestFactory).orElseGet(BankIdRequestFactory::new);
     this.bankIdStartRetryDuration = Objects.requireNonNull(bankIdStartRetryDuration);
+    this.returnUrl = Objects.requireNonNull(returnUrl, "returnUrl must not be null");
   }
 
   /**
@@ -83,13 +95,27 @@ public class BankIdService {
   public Mono<ApiResponse> poll(final PollRequest request) {
     return Optional.ofNullable(request.getState())
         .map(BankIdSessionState::getBankIdSessionData)
+        .map(s -> BankIdSessionData.updateFromPolling(s, request))
+        .map(this::checkMatchingNonce)
         .map(sessionData -> this.collect(request)
-            .map(c -> BankIdSessionData.of(sessionData, c, request.getQr()))
+            .map(c -> BankIdSessionData.updateFromResponse(sessionData, c))
             .flatMap(b -> this.reInitIfExpired(request, b))
             .map(b -> ApiResponseFactory.create(b, request.getRelyingPartyData().getClient().getQRGenerator(),
-                request.getQr()))
+                request.isQr()))
             .onErrorResume(e -> this.handleError(e, request)))
-        .orElseGet(() -> this.onNoSession(request));
+        .orElseGet(() -> this.onNoSession(request))
+        .onErrorResume(e -> this.handleError(e, request));
+  }
+
+  private BankIdSessionData checkMatchingNonce(final BankIdSessionData sessionData)
+      throws BankIdSecurityViolationException {
+    if (sessionData.getNonce() != null && sessionData.getReceivedNonce() != null) {
+      if (!Objects.equals(sessionData.getNonce(), sessionData.getReceivedNonce())) {
+        throw new BankIdSecurityViolationException(BankIdSecurityViolationError.NONCE_MISMATCH,
+            "Received nonce does not match expected nonce value");
+      }
+    }
+    return sessionData;
   }
 
   /**
@@ -113,24 +139,30 @@ public class BankIdService {
    * Initiates an operation.
    *
    * @param request the {@link PollRequest}
+   * @param nonce if autostart with return URL is active, this method contains the nonce (otherwise {@code null})
    * @return an {@link OrderResponse}
    */
-  private Mono<OrderResponse> init(final PollRequest request) {
-    if (request.getContext().getOperation().equals(BankIdOperation.SIGN)) {
+  @Nonnull
+  private Mono<OrderResponse> init(
+      @Nonnull final PollRequest request,
+      @Nullable final String nonce) {
+    final String appReturnUrl = nonce != null ? this.returnUrl : null;
+
+    if (request.getContext().getOperation() == BankIdOperation.SIGN) {
       return request.getRelyingPartyData().getClient()
-          .sign(this.requestFactory.createSignRequest(request))
+          .sign(this.requestFactory.createSignRequest(request, appReturnUrl, nonce))
           .transformDeferred(CircuitBreakerOperator.of(this.circuitBreaker))
           .map(o -> {
-            this.eventPublisher.orderResponse(request, o).publish();
+            this.eventPublisher.orderResponse(request, o, nonce).publish();
             return o;
           });
     }
     else {
       return request.getRelyingPartyData().getClient()
-          .authenticate(this.requestFactory.createAuthenticateRequest(request))
+          .authenticate(this.requestFactory.createAuthenticateRequest(request, appReturnUrl, nonce))
           .transformDeferred(CircuitBreakerOperator.of(this.circuitBreaker))
           .map(o -> {
-            this.eventPublisher.orderResponse(request, o).publish();
+            this.eventPublisher.orderResponse(request, o, nonce).publish();
             return o;
           });
     }
@@ -145,13 +177,15 @@ public class BankIdService {
   private Mono<ApiResponse> onNoSession(final PollRequest pollRequest) {
     this.eventPublisher.receivedRequest(pollRequest.getRequest(), pollRequest.getRelyingPartyData(), pollRequest)
         .publish();
-    return this.init(pollRequest)
-        .map(orderResponse -> BankIdSessionData.of(pollRequest, orderResponse))
+    final String nonce = pollRequest.isAutoStartWithReturnUrl() ? UUID.randomUUID().toString() : null;
+    return this.init(pollRequest, nonce)
+        .map(orderResponse -> BankIdSessionData.initialize(pollRequest, orderResponse, nonce))
         .flatMap(sessionData -> pollRequest.getRelyingPartyData().getClient().collect(sessionData.getOrderReference())
             .map(collectResponse -> {
-              eventPublisher.collectResponse(pollRequest, collectResponse).publish();
-              return ApiResponseFactory.create(BankIdSessionData.of(sessionData, collectResponse, pollRequest.getQr()),
-                  pollRequest.getRelyingPartyData().getClient().getQRGenerator(), pollRequest.getQr());
+              this.eventPublisher.collectResponse(pollRequest, collectResponse).publish();
+              return ApiResponseFactory.create(BankIdSessionData.updateFromResponse(sessionData, collectResponse),
+                  pollRequest.getRelyingPartyData().getClient().getQRGenerator(),
+                  pollRequest.isQr());
             }));
   }
 
@@ -165,9 +199,14 @@ public class BankIdService {
   private Mono<ApiResponse> handleError(final Throwable e, final PollRequest request) {
     if (e instanceof final BankIdSessionExpiredException bankIdSessionExpiredException) {
       this.eventPublisher.bankIdErrorEvent(request.getRequest(), request.getRelyingPartyData(),
-          ErrorCode.EXPIRED_TRANSACTION, bankIdSessionExpiredException.getMessage())
+              ErrorCode.EXPIRED_TRANSACTION, bankIdSessionExpiredException.getMessage())
           .publish();
       return this.sessionExpired(bankIdSessionExpiredException.getRequest().getRequest(), request);
+    }
+    if (e instanceof final BankIdSecurityViolationException violationException) {
+      this.eventPublisher.bankIdSecurityViolationEvent(request.getRequest(), request.getRelyingPartyData(),
+          violationException.getError(), violationException.getMessage()).publish();
+      return this.securityViolation(request.getRequest(), request, violationException);
     }
     if (e.getCause() instanceof final BankIDException bankIdException) {
       if (ErrorCode.USER_CANCEL == bankIdException.getErrorCode()) {
@@ -197,20 +236,25 @@ public class BankIdService {
    * @param request the {@link PollRequest}
    * @return a {@link BankIdSessionData}
    */
-  private Mono<BankIdSessionData> reInitIfExpired(final PollRequest request, final BankIdSessionData bankIdSessionData) {
+  private Mono<BankIdSessionData> reInitIfExpired(
+      final PollRequest request, final BankIdSessionData bankIdSessionData) {
     if (bankIdSessionData.getStartFailed()) {
-      Instant initialOrderTime = request.getState().getInitialOrderTime();
-      Instant now = Instant.now();
-      if (initialOrderTime.isBefore(now) && initialOrderTime.plus(bankIdStartRetryDuration).isBefore(now)) {
+      final Instant initialOrderTime = request.getState().getInitialOrderTime();
+      final Instant now = Instant.now();
+      if (initialOrderTime.isBefore(now) && initialOrderTime.plus(this.bankIdStartRetryDuration).isBefore(now)) {
         return Mono.error(new BankIdSessionExpiredException(request));
       }
-      return this.init(request)
-          .map(orderResponse -> BankIdSessionData.of(request, orderResponse))
-          .flatMap(updatedSessionData -> request.getRelyingPartyData().getClient().collect(updatedSessionData.getOrderReference())
-              .map(collectResponse -> {
-                eventPublisher.collectResponse(request, collectResponse).publish();
-                return BankIdSessionData.of(updatedSessionData, collectResponse, request.getQr());
-              }));
+
+      final String nonce = request.isAutoStartWithReturnUrl() ? UUID.randomUUID().toString() : null;
+      return this.init(request, nonce)
+          .map(orderResponse -> BankIdSessionData.initialize(request, orderResponse, nonce))
+          .flatMap(updatedSessionData -> {
+            return request.getRelyingPartyData().getClient().collect(updatedSessionData.getOrderReference())
+                .map(collectResponse -> {
+                  this.eventPublisher.collectResponse(request, collectResponse).publish();
+                  return BankIdSessionData.updateFromResponse(updatedSessionData, collectResponse);
+                });
+          });
     }
     else {
       return Mono.just(bankIdSessionData);
@@ -245,17 +289,34 @@ public class BankIdService {
     return Mono.just(ApiResponseFactory.createErrorResponseTimeExpired());
   }
 
+  private Mono<ApiResponse> securityViolation(final HttpServletRequest request, final PollRequest pollRequest,
+      final BankIdSecurityViolationException securityViolationException) {
+
+    // We have detected a security violation, first cancel the operation ...
+    //
+    try {
+      // TODO: This will send an event that removes the session ... and there is no way we can send back a useful response ...
+      //
+      this.cancel(request, pollRequest.getState(), pollRequest.getRelyingPartyData());
+    }
+    catch (final Exception e) {
+      log.info("Error while cancelling order after security violation", e);
+    }
+    return Mono.just(ApiResponseFactory.createErrorSecurityViolation());
+  }
+
   /**
    * Delivers service information.
    *
    * @return a {@link ServiceInformation}
    */
   public Mono<ServiceInformation> getServiceInformation() {
-    if (this.circuitBreaker.getState().equals(CircuitBreaker.State.CLOSED)) {
+    if (this.circuitBreaker.getState() == CircuitBreaker.State.CLOSED) {
       return Mono.just(new ServiceInformation(ServiceInformation.Status.OK));
     }
     else {
       return Mono.just(new ServiceInformation(ServiceInformation.Status.ISSUES));
     }
   }
+
 }

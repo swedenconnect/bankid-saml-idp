@@ -20,35 +20,38 @@ public class BankIdIT {
   @Test
   void clientWillCallEndpoints() {
     mockBankId();
-    WebClient webClient = WebClient.builder().baseUrl("http://localhost:9000").build();
-    BankIDClient client = new BankIDClientImpl("id", webClient, null);
+    final WebClient webClient = WebClient.builder().baseUrl("http://localhost:9000").build();
+    final BankIDClient client = new BankIDClientImpl("id", webClient, null);
 
-    Mono<OrderResponse> authenticateStep = client.authenticate(new AuthenticateRequest("1.1.1.1", new UserVisibleData(), new Requirement()));
+    final Mono<OrderResponse> authenticateStep =
+        client.authenticate(new AuthenticateRequest("1.1.1.1", new UserVisibleData(), new Requirement(), null, null));
     StepVerifier.create(authenticateStep)
         .expectNextMatches(o -> o.getOrderReference() != null)
         .verifyComplete();
 
-    Mono<? extends CollectResponse> collectStep = authenticateStep.flatMap(o -> client.collect(o.getOrderReference()));
+    final Mono<? extends CollectResponse> collectStep =
+        authenticateStep.flatMap(o -> client.collect(o.getOrderReference()));
     StepVerifier.create(collectStep)
         .expectNextMatches(collect -> collect.getOrderReference() != null)
         .verifyComplete();
 
-    DataToSign dataToSign = new DataToSign();
+    final DataToSign dataToSign = new DataToSign();
     dataToSign.setUserVisibleData("Data visible to user!");
-    Mono<OrderResponse> signStep = client.sign(new SignatureRequest("1.1.1.1", dataToSign, new Requirement()));
+    final Mono<OrderResponse> signStep =
+        client.sign(new SignatureRequest("1.1.1.1", dataToSign, new Requirement(), null, null));
     StepVerifier.create(signStep)
         .expectNextMatches(sign -> sign.getOrderReference() != null)
         .verifyComplete();
 
-    Mono<Void> cancelStep = authenticateStep.flatMap(a -> client.cancel(a.getOrderReference()));
+    final Mono<Void> cancelStep = authenticateStep.flatMap(a -> client.cancel(a.getOrderReference()));
     StepVerifier.create(cancelStep)
         .verifyComplete();
   }
 
   private static void mockBankId() {
-    WireMockServer wireMockServer = new WireMockServer(9000);
+    final WireMockServer wireMockServer = new WireMockServer(9000);
     wireMockServer.start();
-    String response = """
+    final String response = """
         {
           "orderRef": "%s",
           "autoStartToken": "%s",
@@ -63,9 +66,12 @@ public class BankIdIT {
         UUID.randomUUID().toString(),
         "PENDING"
     );
-    wireMockServer.stubFor(post("/auth").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
-    wireMockServer.stubFor(post("/collect").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
-    wireMockServer.stubFor(post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
+    wireMockServer.stubFor(
+        post("/auth").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
+    wireMockServer.stubFor(
+        post("/collect").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
+    wireMockServer.stubFor(
+        post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(response)));
     wireMockServer.stubFor(post("/cancel").willReturn(aResponse()));
   }
 }

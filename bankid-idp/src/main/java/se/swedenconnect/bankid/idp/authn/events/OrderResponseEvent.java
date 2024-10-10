@@ -38,17 +38,27 @@ public class OrderResponseEvent extends AbstractBankIdEvent {
    */
   private final OrderResponse response;
 
-  public OrderResponseEvent(final HttpServletRequest request, final RelyingPartyData data, final PollRequest request1, final OrderResponse response) {
+  /** The (optional) nonce. */
+  private final String nonce;
+
+  public OrderResponseEvent(final HttpServletRequest request, final RelyingPartyData data, final PollRequest request1,
+      final OrderResponse response, final String nonce) {
     super(request, data);
     this.request = request1;
     this.response = response;
+    this.nonce = nonce;
   }
 
   public PollRequest getPollRequest() {
-    return request;
+    return this.request;
   }
 
   public OrderResponse getResponse() {
-    return response;
+    return this.response;
   }
+
+  public String getNonce() {
+    return this.nonce;
+  }
+
 }

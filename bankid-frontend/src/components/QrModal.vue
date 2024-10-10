@@ -18,6 +18,7 @@
   const qrImage = ref('');
   const messageCode = ref('');
   const responseStatus = ref<ApiResponseStatus>();
+  const nonce = ref('');
   const cancelRetry = ref(false);
 
   const showQrInstructions = computed(() => messageCode.value === 'bankid.msg.ext2');
@@ -36,7 +37,7 @@
 
   const startPolling = () => {
     cancelRetry.value = false;
-    pollingQr(qrImage, messageCode, responseStatus, cancelRetry);
+    pollingQr(qrImage, messageCode, responseStatus,nonce, cancelRetry);
   };
 
   const acceptError = async () => {

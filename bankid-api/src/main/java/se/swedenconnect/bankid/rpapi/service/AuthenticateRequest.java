@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.bankid.rpapi.service;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import se.swedenconnect.bankid.rpapi.types.BankIDException;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
 
@@ -38,20 +40,46 @@ public class AuthenticateRequest {
   /** Requirements on how the auth order must be performed. */
   private final Requirement requirement;
 
+  /** The returnUrl given when starting the app on the same device. */
+  private final String returnUrl;
+
+  /** The nonce given when starting the app on the same device. */
+  private final String nonce;
+
   /**
    * Creates parameter object for an {@link BankIDClient#authenticate(AuthenticateRequest)} call.
    *
    * @param endUserIp the user IP address as seen by the relying party
    * @param userVisibleData data to display to the user during authentication (optional)
    * @param requirement used by the relying party to set requirements how the authentication operation must be
-   *          performed. Default rules are applied if omitted
+   *     performed. Default rules are applied if omitted
    * @throws BankIDException for errors
    */
-  public AuthenticateRequest(
-      final String endUserIp, final UserVisibleData userVisibleData, final Requirement requirement) {
+  /*
+  public AuthenticateRequest(@Nonnull final String endUserIp, @Nullable final UserVisibleData userVisibleData,
+      @Nullable final Requirement requirement) {
+    this(endUserIp, userVisibleData, requirement, null, null);
+  }
+   */
+
+  /**
+   * Creates parameter object for an {@link BankIDClient#authenticate(AuthenticateRequest)} call.
+   *
+   * @param endUserIp the user IP address as seen by the relying party
+   * @param userVisibleData data to display to the user during authentication (optional)
+   * @param requirement used by the relying party to set requirements how the authentication operation must be
+   *     performed. Default rules are applied if omitted
+   * @param returnUrl the returnUrl given when starting the app on the same device
+   * @param nonce the nonce given when starting the app on the same device
+   * @throws BankIDException for errors
+   */
+  public AuthenticateRequest(@Nonnull final String endUserIp, @Nullable final UserVisibleData userVisibleData,
+      @Nullable final Requirement requirement, @Nullable final String returnUrl, @Nullable final String nonce) {
     this.endUserIp = endUserIp;
     this.userVisibleData = userVisibleData;
     this.requirement = requirement;
+    this.returnUrl = returnUrl;
+    this.nonce = nonce;
   }
 
   /**
@@ -59,25 +87,48 @@ public class AuthenticateRequest {
    *
    * @return the user IP
    */
+  @Nonnull
   public String getEndUserIp() {
     return this.endUserIp;
   }
 
   /**
    * Gets the data to display to the user during authentication.
-   * 
+   *
    * @return the data to display or {@code null}
    */
+  @Nullable
   public UserVisibleData getUserVisibleData() {
     return this.userVisibleData;
   }
 
   /**
    * Gets the authentication requirements.
-   * 
+   *
    * @return the {@link Requirement} or {@code null}
    */
+  @Nullable
   public Requirement getRequirement() {
     return this.requirement;
+  }
+
+  /**
+   * Gets the returnUrl given when starting the app on the same device.
+   *
+   * @return the return URL or {@code null}
+   */
+  @Nullable
+  public String getReturnUrl() {
+    return this.returnUrl;
+  }
+
+  /**
+   * Gets the nonce given when starting the app on the same device.
+   *
+   * @return the nonce or {@code null}
+   */
+  @Nullable
+  public String getNonce() {
+    return this.nonce;
   }
 }

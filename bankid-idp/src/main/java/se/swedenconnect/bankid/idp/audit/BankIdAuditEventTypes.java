@@ -39,7 +39,10 @@ public enum BankIdAuditEventTypes {
   BANKID_CANCEL("BANKID_CANCEL"),
 
   /** An error occurred when processing a BankID request. */
-  BANKID_ERROR("BANKID_ERROR");
+  BANKID_ERROR("BANKID_ERROR"),
+
+  /** An security violation was detected. */
+  BANKID_SECURITY_VIOLATION("BANKID_SECURITY_VIOLATION");
 
   /** The event type name. */
   private final String typeName;

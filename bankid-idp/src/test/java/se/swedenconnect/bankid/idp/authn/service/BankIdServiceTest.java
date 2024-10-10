@@ -15,20 +15,13 @@
  */
 package se.swedenconnect.bankid.idp.authn.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-
-import java.time.Duration;
-
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.api.ApiResponse;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
@@ -39,53 +32,54 @@ import se.swedenconnect.bankid.rpapi.service.impl.BankIdServerException;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 
+import java.time.Duration;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+
 class BankIdServiceTest {
   @Test
   void pollAndReInit() {
-    ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
-    CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
+    final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+    final CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
     when(circuitBreaker.tryAcquirePermission()).thenReturn(true);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker,
-        new BankIdRequestFactory(), Duration.ofMinutes(3));
-    BankIDClient client = Mockito.mock(BankIDClient.class);
-    OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
-    OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
-    CollectResponse initialCollect = BankIdResponseFixture.createInitial(expectedFirstSession);
+    final BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker,
+        new BankIdRequestFactory(), Duration.ofMinutes(3), "https://www.example.se/return");
+    final BankIDClient client = Mockito.mock(BankIDClient.class);
+    final OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
+    final OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
+    final CollectResponse initialCollect = BankIdResponseFixture.createInitial(expectedFirstSession);
 
     when(client.authenticate(any())).thenReturn(Mono.just(expectedFirstSession))
         .thenReturn(Mono.just(expectedSecondSession));
-    when(client.collect(any())).thenAnswer(a -> {
-      return Mono.just(initialCollect);
-    });
+    when(client.collect(any())).thenAnswer(a -> Mono.just(initialCollect));
 
-    // First request should trigger a authenticate and then collect
+    // First request should trigger an authenticate and then collect
     // ---
-    PollRequest pollRequest1 = BankIdResponseFixture.createPollRequest(client);
-    ApiResponse response1 = service.poll(pollRequest1).block();
+    final PollRequest pollRequest1 = BankIdResponseFixture.createPollRequest(client);
+    final ApiResponse response1 = service.poll(pollRequest1).block();
     Assertions.assertNotNull(response1);
     Assertions.assertEquals(response1.getAutoStartToken(), expectedFirstSession.getAutoStartToken());
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(1)).collect(any());
-    BankIdSessionState sessionState = BankIdResponseFixture.create(pollRequest1, expectedFirstSession);
+    final BankIdSessionState sessionState = BankIdResponseFixture.create(pollRequest1, expectedFirstSession, null);
 
     // Second request should trigger collect
     // ---
-    ApiResponse response2 = service.poll(BankIdResponseFixture.createPollrequest(client, sessionState)).block();
+    final ApiResponse response2 = service.poll(BankIdResponseFixture.createPollrequest(client, sessionState)).block();
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(2)).collect(any());
     Assertions.assertNotNull(response2);
     Assertions.assertEquals(response2.getAutoStartToken(), expectedFirstSession.getAutoStartToken());
-    CollectResponse collectResponse = BankIdResponseFixture.createStartFailed(initialCollect);
-    Mockito.when(client.collect(any())).thenAnswer(a -> {
-      return Mono.just(collectResponse);
-    }).thenAnswer(a -> {
-      return Mono.just(BankIdResponseFixture.createInitial(expectedSecondSession));
-    });
+    final CollectResponse collectResponse = BankIdResponseFixture.createStartFailed(initialCollect);
+    Mockito.when(client.collect(any())).thenAnswer(a -> Mono.just(collectResponse))
+        .thenAnswer(a -> Mono.just(BankIdResponseFixture.createInitial(expectedSecondSession)));
     BankIdResponseFixture.update(sessionState, collectResponse);
 
     // Third request should trigger authenticate and collect again with a new autostartToken
     // ---
-    ApiResponse response3 = service.poll(BankIdResponseFixture.createPollrequest(client, sessionState)).block();
+    final ApiResponse response3 = service.poll(BankIdResponseFixture.createPollrequest(client, sessionState)).block();
     Mockito.verify(client, times(2)).authenticate(any());
     Mockito.verify(client, times(4)).collect(any());
     Assertions.assertNotNull(response3);
@@ -94,40 +88,38 @@ class BankIdServiceTest {
 
   @Test
   void pollToExpiration() {
-    ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
-    CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
+    final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+    final CircuitBreaker circuitBreaker = Mockito.mock(CircuitBreaker.class);
     when(circuitBreaker.tryAcquirePermission()).thenReturn(true);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker,
-        new BankIdRequestFactory(), Duration.ofMinutes(3));
-    BankIDClient client = Mockito.mock(BankIDClient.class);
-    OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
-    OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
-    CollectResponse initialCollect = BankIdResponseFixture.createInitial(expectedFirstSession);
+    final BankIdService service = new BankIdService(new BankIdEventPublisher(publisher), circuitBreaker,
+        new BankIdRequestFactory(), Duration.ofMinutes(3), "https://www.example.se/return");
+    final BankIDClient client = Mockito.mock(BankIDClient.class);
+    final OrderResponse expectedFirstSession = BankIdResponseFixture.createOrderResponse(1);
+    final OrderResponse expectedSecondSession = BankIdResponseFixture.createOrderResponse(2);
+    final CollectResponse initialCollect = BankIdResponseFixture.createInitial(expectedFirstSession);
 
     when(client.authenticate(any())).thenReturn(Mono.just(expectedFirstSession))
         .thenReturn(Mono.just(expectedSecondSession));
-    when(client.collect(any())).thenAnswer(a -> {
-      return Mono.just(initialCollect);
-    });
+    when(client.collect(any())).thenAnswer(a -> Mono.just(initialCollect));
 
-    // First request should trigger a authenticate and then collect
+    // First request should trigger an authenticate and then collect
     // ---
-    PollRequest pollRequest1 = BankIdResponseFixture.createPollRequest(client);
-    ApiResponse response1 = service.poll(pollRequest1).block();
+    final PollRequest pollRequest1 = BankIdResponseFixture.createPollRequest(client);
+    final ApiResponse response1 = service.poll(pollRequest1).block();
     Assertions.assertNotNull(response1);
     Assertions.assertEquals(response1.getAutoStartToken(), expectedFirstSession.getAutoStartToken());
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(1)).collect(any());
-    BankIdSessionState sessionState = BankIdResponseFixture.create(pollRequest1, expectedFirstSession);
+    final BankIdSessionState sessionState = BankIdResponseFixture.create(pollRequest1, expectedFirstSession, null);
 
     // Second request should return a timeout message
     // ---
-    PollRequest pollrequest2 = BankIdResponseFixture.createPollrequest(client, sessionState);
+    final PollRequest pollrequest2 = BankIdResponseFixture.createPollrequest(client, sessionState);
     when(client.collect(any())).thenAnswer(a -> {
-      CollectResponse transactionExpired = BankIdResponseFixture.createTransactionExpired(initialCollect);
+      final CollectResponse transactionExpired = BankIdResponseFixture.createTransactionExpired(initialCollect);
       return Mono.just(transactionExpired);
     });
-    ApiResponse response2 = service.poll(pollrequest2).block();
+    final ApiResponse response2 = service.poll(pollrequest2).block();
     Assertions.assertEquals("bankid.msg.rfa8", response2.getMessageCode());
     Mockito.verify(client, times(1)).authenticate(any());
     Mockito.verify(client, times(2)).collect(any());
@@ -135,14 +127,15 @@ class BankIdServiceTest {
 
   @Test
   void circuitBreakerWillNeverBeOpen() {
-    ResilienceConfiguration resilienceConfiguration = new ResilienceConfiguration();
-    CircuitBreakerConfig config = resilienceConfiguration.circuitBreakerConfig();
-    CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
-    CircuitBreaker circuitBreaker = resilienceConfiguration.circuitBreaker(registry);
-    BankIdService service = new BankIdService(new BankIdEventPublisher(Mockito.mock(ApplicationEventPublisher.class)),
-        circuitBreaker, new BankIdRequestFactory(), Duration.ofMinutes(3));
+    final ResilienceConfiguration resilienceConfiguration = new ResilienceConfiguration();
+    final CircuitBreakerConfig config = resilienceConfiguration.circuitBreakerConfig();
+    final CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
+    final CircuitBreaker circuitBreaker = resilienceConfiguration.circuitBreaker(registry);
+    final BankIdService service =
+        new BankIdService(new BankIdEventPublisher(Mockito.mock(ApplicationEventPublisher.class)),
+            circuitBreaker, new BankIdRequestFactory(), Duration.ofMinutes(3), "https://www.example.se/return");
 
-    BankIDClient client = Mockito.mock(BankIDClient.class);
+    final BankIDClient client = Mockito.mock(BankIDClient.class);
     when(client.collect(any())).thenReturn(Mono.error(new BankIdServerException("")));
     when(client.authenticate(any())).thenReturn(Mono.error(new BankIdServerException("")));
     for (int x = 0; x < config.getMinimumNumberOfCalls(); x++) {
@@ -152,7 +145,7 @@ class BankIdServiceTest {
     try {
       Thread.sleep(50);
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       // Do nothing
     }
     Assertions.assertSame(CircuitBreaker.State.HALF_OPEN, circuitBreaker.getState());

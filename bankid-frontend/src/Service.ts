@@ -20,8 +20,18 @@ const requestOptions: RequestInit = {
   credentials: 'include',
 };
 
-export async function poll(showQr: boolean) {
-  const response = await fetch(CONTEXT_PATH + '/api/poll?qr=' + showQr, requestOptions);
+export async function poll(showQr: boolean, nonce: string) {
+  const pollOptions: RequestInit = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
+    credentials: 'include',
+    body: JSON.stringify({
+      "display-qr": showQr,
+      "autostart-with-return-url": true,
+      "nonce": nonce
+    })
+  };
+  const response = await fetch(CONTEXT_PATH + '/api/poll?qr=' + showQr, pollOptions);
   const data = await response.json();
   if (!response.ok) {
     if (response.status === 429) {
@@ -58,11 +68,12 @@ export const pollingQr = (
   qrImage: Ref<string>,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | undefined>,
+  nonce: Ref<string>,
   cancelRetry?: Ref<boolean>,
 ) => {
-  const pollFunction = () => poll(true);
+  const pollFunction = () => poll(true, nonce? nonce.value : "");
   pollFunction().then((response) => {
-    handleResponse(response, pollFunction, qrImage, null, null, messageCode, responseStatus, cancelRetry);
+    handleResponse(response, pollFunction, qrImage, null, null, messageCode, responseStatus,nonce, cancelRetry);
   });
 };
 
@@ -71,11 +82,12 @@ export const pollingAutoStart = (
   token: Ref<string>,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | undefined>,
+  nonce: Ref<string>,
   cancelRetry?: Ref<boolean>,
 ) => {
-  const pollFunction = () => poll(false);
+  const pollFunction = () => poll(false, nonce? nonce.value : "");
   pollFunction().then((response) => {
-    handleResponse(response, pollFunction, null, hideAutoStart, token, messageCode, responseStatus, cancelRetry);
+    handleResponse(response, pollFunction, null, hideAutoStart, token, messageCode, responseStatus, nonce, cancelRetry);
   });
 };
 
@@ -96,7 +108,8 @@ const handleResponse = (
   token: Ref<string> | null,
   messageCode: Ref<string>,
   responseStatus: Ref<ApiResponseStatus | undefined>,
-  cancelRetry?: Ref<boolean>,
+  nonce: Ref<string>,
+  cancelRetry?: Ref<boolean>
 ) => {
   if (isSessionExpiredResponse(response)) {
     window.location.href = PATHS.ERROR;
@@ -108,6 +121,7 @@ const handleResponse = (
 
   if (isApiResponse(response)) {
     responseStatus.value = response.status;
+    nonce.value = response.nonce;
 
     if (qrImage && response.qrCode !== '') {
       qrImage.value = response.qrCode;
@@ -158,6 +172,7 @@ const handleResponse = (
               token,
               messageCode,
               responseStatus,
+              nonce,
               cancelRetry,
             ),
           ),

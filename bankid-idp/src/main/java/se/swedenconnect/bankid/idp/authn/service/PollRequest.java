@@ -39,7 +39,10 @@ public class PollRequest {
   private final HttpServletRequest request;
 
   /** Whether QR code should be displayed. */
-  private final Boolean qr;
+  private final boolean qr;
+
+  /** Whether to autostart app with return URL. */
+  private final boolean autoStartWithReturnUrl;
 
   /** The session state. */
   private final BankIdSessionState state;
@@ -49,6 +52,9 @@ public class PollRequest {
 
   /** The data to display in the BankID app. */
   private final UserVisibleData data;
+
+  /** The nonce as received by the frontend. */
+  private final String receivedNonce;
 
   /** The BankID context. */
   private final BankIdContext context;

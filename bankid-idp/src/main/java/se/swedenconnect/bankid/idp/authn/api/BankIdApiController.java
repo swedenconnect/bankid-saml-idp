@@ -15,21 +15,15 @@
  */
 package se.swedenconnect.bankid.idp.authn.api;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
-
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.UserVisibleDataFactory;
@@ -39,10 +33,12 @@ import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
 import se.swedenconnect.bankid.idp.authn.context.BankIdContext;
 import se.swedenconnect.bankid.idp.authn.context.BankIdOperation;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
+import se.swedenconnect.bankid.idp.authn.error.BankIdSecurityViolationException;
 import se.swedenconnect.bankid.idp.authn.error.NoSuchRelyingPartyException;
 import se.swedenconnect.bankid.idp.authn.events.BankIdEventPublisher;
 import se.swedenconnect.bankid.idp.authn.service.BankIdService;
 import se.swedenconnect.bankid.idp.authn.service.PollRequest;
+import se.swedenconnect.bankid.idp.authn.session.BankIdSessionData;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionReader;
 import se.swedenconnect.bankid.idp.authn.session.BankIdSessionState;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyData;
@@ -61,6 +57,11 @@ import se.swedenconnect.spring.saml.idp.authentication.provider.external.Redirec
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpError;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * REST controller for the BankID backend API.
  *
@@ -69,7 +70,6 @@ import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
  */
 @RestController
 @ApiController
-@AllArgsConstructor
 @Slf4j
 public class BankIdApiController {
 
@@ -91,11 +91,37 @@ public class BankIdApiController {
   /** Factory for handling customer contacts in the UI. */
   private final CustomerContactInformationFactory customerContactInformationFactory;
 
-  /** Service for generating overrides for front-end content */
+  /** Service for generating overrides for front-end content. */
   private final OverrideService overrides;
 
   /** Provides UI information to the frontend. */
   private final UiInformationProvider uiInformation;
+
+  /**
+   * Constructor.
+   *
+   * @param rpRepository the relying parties that we serve
+   * @param provider the authentication provider that is the "manager" for this authentication
+   * @param sessionReader for loading session data
+   * @param eventPublisher for publishing events
+   * @param service the BankID service that communicates with the BankID server
+   * @param customerContactInformationFactory factory for handling customer contacts in the UI
+   * @param overrides service for generating overrides for front-end content
+   * @param uiInformation provides UI information to the frontend
+   */
+  public BankIdApiController(final RelyingPartyRepository rpRepository, final BankIdAuthenticationProvider provider,
+      final BankIdSessionReader sessionReader, final BankIdEventPublisher eventPublisher, final BankIdService service,
+      final CustomerContactInformationFactory customerContactInformationFactory, final OverrideService overrides,
+      final UiInformationProvider uiInformation) {
+    this.rpRepository = rpRepository;
+    this.provider = provider;
+    this.sessionReader = sessionReader;
+    this.eventPublisher = eventPublisher;
+    this.service = service;
+    this.customerContactInformationFactory = customerContactInformationFactory;
+    this.overrides = overrides;
+    this.uiInformation = uiInformation;
+  }
 
   /**
    * Gets information about the selected device.
@@ -106,7 +132,7 @@ public class BankIdApiController {
   @GetMapping("/api/device")
   public Mono<SelectedDeviceInformation> getSelectedDevice(final HttpServletRequest request) {
     final BankIdContext bankIdContext = this.getContext(request);
-    final boolean sign = bankIdContext.getOperation().equals(BankIdOperation.SIGN);
+    final boolean sign = bankIdContext.getOperation() == BankIdOperation.SIGN;
     PreviousDeviceSelection previousDeviceSelection = bankIdContext.getPreviousDeviceSelection();
     if (previousDeviceSelection == null) {
       previousDeviceSelection = PreviousDeviceSelection.UNKNOWN;
@@ -119,34 +145,54 @@ public class BankIdApiController {
    * API method for making a BankID polling request.
    *
    * @param request the HTTP servlet request
-   * @param qr whether to display the QR code
+   * @param apiRequest the API request body
    * @return an {@link ApiResponse}
    */
   @PostMapping("/api/poll")
   public Mono<ApiResponse> poll(final HttpServletRequest request,
-      @RequestParam(value = "qr", defaultValue = "false") final Boolean qr) {
+      @RequestBody final ApiRequest apiRequest) {
 
     final BankIdSessionState state = this.sessionReader.loadSessionData(request);
     final BankIdContext bankIdContext = this.getContext(request);
     final RelyingPartyData relyingParty = this.getRelyingParty(bankIdContext.getClientId());
     final BankIDClient client = relyingParty.getClient();
     if (state != null && state.getBankIdSessionData().getStatus() == ProgressStatus.COMPLETE) {
-      return Mono.just(ApiResponseFactory.create(state.getBankIdSessionData(), client.getQRGenerator(), qr));
+
+      final BankIdSessionData sessionData = state.getBankIdSessionData();
+
+      // This covers the special case where autostart was used (including a return URL and nonce),
+      // the app was started, AND, the user managed to complete the operation before the first
+      // poll request from the frontend ...
+      //
+      if (apiRequest.getNonce() != null) {
+        sessionData.setReceivedNonce(apiRequest.getNonce());
+      }
+
+      return Mono.just(
+          ApiResponseFactory.create(sessionData, client.getQRGenerator(), apiRequest.getDisplayQr()));
     }
     else {
       final PollRequest pollRequest = PollRequest.builder()
           .request(request)
           .relyingPartyData(relyingParty)
-          .qr(qr)
+          .qr(apiRequest.getDisplayQr())
+          .autoStartWithReturnUrl(apiRequest.getAutoStartWithReturnUrl())
           .context(bankIdContext)
           .data(this.getMessage(request, bankIdContext, relyingParty))
           .state(state)
+          .receivedNonce(apiRequest.getNonce())
           .build();
       return this.service.poll(pollRequest)
-          .onErrorResume(e -> e instanceof BankIdServerException,
+          // TODO: or return error to SP only?
+//          .onErrorResume(BankIdSecurityViolationException.class::isInstance,
+//              e -> Mono.just(ApiResponseFactory.createErrorSecurityViolation()))
+          .onErrorResume(BankIdServerException.class::isInstance,
               e -> Mono.just(ApiResponseFactory.createErrorResponseBankIdServerException()))
-          .onErrorResume(e -> e instanceof BankIdUserException && ((BankIdUserException) e).getErrorCode() == ErrorCode.INVALID_PARAMETERS, e -> Mono.just(ApiResponseFactory.createUnknownError()))
-          .onErrorResume(e -> e instanceof BankIDException, e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
+          .onErrorResume(e -> e instanceof BankIdUserException
+                  && ((BankIdUserException) e).getErrorCode() == ErrorCode.INVALID_PARAMETERS,
+              e -> Mono.just(ApiResponseFactory.createUnknownError()))
+          .onErrorResume(BankIDException.class::isInstance,
+              e -> Mono.just(ApiResponseFactory.createErrorResponseTimeExpired()));
     }
   }
 
@@ -164,7 +210,7 @@ public class BankIdApiController {
    * Gets the provider logotype to be displayed.
    *
    * @return SVG image as bytes
-   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   * @throws IOException see {@link IOUtils#toByteArray(InputStream)}
    */
   @GetMapping(value = "/logo.svg", produces = "image/svg+xml")
   @ResponseBody
@@ -176,7 +222,7 @@ public class BankIdApiController {
    * Gets the provider SVG favicon to be displayed.
    *
    * @return SVG image as bytes
-   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   * @throws IOException see {@link IOUtils#toByteArray(InputStream)}
    */
   @GetMapping(value = "/favicon.svg", produces = "image/svg+xml")
   @ResponseBody
@@ -184,11 +230,11 @@ public class BankIdApiController {
     return this.uiInformation.getProviderSvgFavicon();
   }
 
-    /**
+  /**
    * Gets the provider PNG favicon to be displayed.
    *
    * @return PNG image as bytes
-   * @throws IOException see {@link IOUtils} method toByteArray(InputStream inputStream)
+   * @throws IOException see {@link IOUtils#toByteArray(InputStream)}
    */
   @GetMapping(value = "/favicon.png", produces = "image/png")
   @ResponseBody
@@ -267,7 +313,7 @@ public class BankIdApiController {
    */
   @GetMapping(value = "/api/contact", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<CustomerContactInformation> customerContactInormationMono() {
-    return Mono.just(customerContactInformationFactory.getContactInformation());
+    return Mono.just(this.customerContactInformationFactory.getContactInformation());
   }
 
   /**

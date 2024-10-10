@@ -15,14 +15,11 @@
  */
 package se.swedenconnect.bankid.idp.authn.session;
 
-import java.util.Map;
-
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-
-import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.authn.context.PreviousDeviceSelection;
 import se.swedenconnect.bankid.idp.authn.events.AbortAuthEvent;
 import se.swedenconnect.bankid.idp.authn.events.CollectResponseEvent;
@@ -31,6 +28,8 @@ import se.swedenconnect.bankid.idp.authn.events.OrderCompletionEvent;
 import se.swedenconnect.bankid.idp.authn.events.OrderResponseEvent;
 import se.swedenconnect.bankid.idp.authn.events.UserVisibleDataEvent;
 import se.swedenconnect.bankid.rpapi.types.CollectResponse;
+
+import java.util.Map;
 
 /**
  * A listener for BankID session events.
@@ -66,7 +65,7 @@ public class BankIdSessionDataListener {
    * Removes BankID data from the current session
    *
    * @param event event to be processed
-   * @see OrderResponseEvent
+   * @see AbortAuthEvent
    */
   @EventListener
   public void handleAbortAuthEvent(final AbortAuthEvent event) {
@@ -84,7 +83,8 @@ public class BankIdSessionDataListener {
     log.debug("Order response event was published {} for session {}",
         event.getResponse(), event.getRequest().getSession().getId());
 
-    final BankIdSessionData bankIdSessionData = BankIdSessionData.of(event.getPollRequest(), event.getResponse());
+    final BankIdSessionData bankIdSessionData =
+        BankIdSessionData.initialize(event.getPollRequest(), event.getResponse(), event.getNonce());
     this.writer.save(event.getRequest(), bankIdSessionData);
   }
 
@@ -102,9 +102,10 @@ public class BankIdSessionDataListener {
 
     final BankIdSessionData previous =
         this.reader.loadSessionData(event.getRequest().getRequest()).getBankIdSessionData();
-    this.writer.save(event.getRequest().getRequest(), BankIdSessionData.of(previous, event.getCollectResponse(), event.getRequest().getQr()));
+    this.writer.save(event.getRequest().getRequest(),
+        BankIdSessionData.updateFromResponse(previous, event.getCollectResponse()));
 
-    if (event.getCollectResponse().getStatus().equals(CollectResponse.Status.COMPLETE)) {
+    if (event.getCollectResponse().getStatus() == CollectResponse.Status.COMPLETE) {
       this.writer.save(event.getRequest().getRequest(), event.getCollectResponse());
     }
   }
@@ -119,7 +120,7 @@ public class BankIdSessionDataListener {
   @Order(Integer.MAX_VALUE)
   public void handleCompletion(final OrderCompletionEvent event) {
     final BankIdSessionState sessionState = this.reader.loadSessionData(event.getRequest());
-    final Boolean otherDevice = sessionState.getBankIdSessionData().getShowQr();
+    final Boolean otherDevice = sessionState.getBankIdSessionData().isShowQr();
     final PreviousDeviceSelection previousDeviceSelection = PREVIOUS_DEVICE_SELECTION_MAP.get(otherDevice);
     this.writer.save(event.getRequest(), previousDeviceSelection);
     this.writer.delete(event.getRequest());
