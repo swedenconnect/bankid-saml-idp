@@ -51,7 +51,7 @@ public class ApiRequest {
   /**
    * The user agent string.
    */
-  @JsonProperty(value = "user-agent", required = true)
+  @JsonProperty(value = "user-agent", required = false)
   private String userAgent;
 
   /**

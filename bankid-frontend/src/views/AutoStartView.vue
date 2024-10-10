@@ -12,6 +12,7 @@
   const messageCode = ref('bankid.msg.rfa13');
   const responseStatus = ref<ApiResponseStatus>();
   const hideAutoStart = ref(false);
+  const nonce = ref('')
 
   const showErrorButtons = computed(() => responseStatus.value === 'ERROR');
 
@@ -26,7 +27,7 @@
   };
 
   const startPolling = () => {
-    pollingAutoStart(hideAutoStart, token, messageCode, responseStatus);
+    pollingAutoStart(hideAutoStart, token, messageCode, responseStatus, nonce);
   };
 
   onMounted(() => {

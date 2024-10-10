@@ -62,4 +62,17 @@ public class ApiResponse {
 
   /** The code for the detailed message. */
   private String messageCode;
+
+  /** Nonce for this session. */
+  private String nonce;
+
+  /**
+   * For creating error responses.
+   * @param status of this repsonse
+   * @param messageCode of this response
+   * @return response to be consumed by the client
+   */
+  public static ApiResponse error(final Status status, final String messageCode) {
+    return new ApiResponse(status, "", "", messageCode, "");
+  }
 }

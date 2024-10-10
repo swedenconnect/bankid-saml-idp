@@ -53,11 +53,11 @@ public class ApiResponseFactory {
       qrCode = generator.generateAnimatedQRCodeBase64Image(data.getQrStartToken(), data.getQrStartSecret(),
           data.getStartTime());
     }
-    return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode());
+    return new ApiResponse(statusOf(data), qrCode, data.getAutoStartToken(), data.getMessageCode(), data.getNonce());
   }
 
   private static ApiResponse createUserErrorResponse(final BankIdSessionData data) {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", data.getMessageCode());
+    return ApiResponse.error(ApiResponse.Status.ERROR,  data.getMessageCode());
   }
 
   /**
@@ -66,7 +66,7 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createErrorResponseTimeExpired() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.timeout");
+    return ApiResponse.error(ApiResponse.Status.ERROR, "bankid.msg.error.timeout");
   }
 
   /**
@@ -75,7 +75,7 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createErrorResponseBankIdServerException() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.server");
+    return ApiResponse.error(ApiResponse.Status.ERROR, "bankid.msg.error.server");
   }
 
   /**
@@ -84,7 +84,7 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createErrorSecurityViolation() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.security");
+    return ApiResponse.error(ApiResponse.Status.ERROR,  "bankid.msg.error.security");
   }
 
   private static ApiResponse.Status statusOf(final BankIdSessionData sessionData) {
@@ -104,7 +104,7 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createUserCancelResponse() {
-    return new ApiResponse(ApiResponse.Status.CANCEL, "", "", "bankid.msg.error.userCancel");
+    return ApiResponse.error(ApiResponse.Status.CANCEL ,"bankid.msg.error.userCancel");
   }
 
   /**
@@ -114,6 +114,7 @@ public class ApiResponseFactory {
    * @return an {@link ApiResponse}
    */
   public static ApiResponse createUnknownError() {
-    return new ApiResponse(ApiResponse.Status.ERROR, "", "", "bankid.msg.error.unknown");
+    return ApiResponse.error(ApiResponse.Status.ERROR,  "bankid.msg.error.unknown");
   }
+
 }
