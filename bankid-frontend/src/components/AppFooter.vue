@@ -7,8 +7,7 @@
     providerName?: LangObject;
   }>();
 
-  const CONTEXT_PATH = import.meta.env.BASE_URL;
-  const LOGO_PATH = CONTEXT_PATH + '/logo.svg';
+  const LOGO_PATH = './logo.svg';
 
   const { locale } = useI18n();
 

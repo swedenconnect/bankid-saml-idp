@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
-    "build-only": "vite build --base=/bankid/idp",
+    "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "preview": "vite preview",
     "test": "vitest run",

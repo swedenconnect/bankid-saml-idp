@@ -101,6 +101,8 @@ public class BankIdConfiguration {
           csrf.csrfTokenRequestHandler(requestHandler);
         })
         .authorizeHttpRequests((authorize) -> authorize
+            .requestMatchers("/**").permitAll()
+            .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
             .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
             .requestMatchers("/images/**", "/logo.svg", "/favicon.svg", "/favicon.png", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
                 "/css/**", "/api/**", "/resume/**")
