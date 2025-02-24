@@ -12,6 +12,7 @@ import type {
   UiInformation,
   UserErrorResponse,
 } from './types';
+import router from "@/router";
 
 const requestOptions: RequestInit = {
   method: 'POST',
@@ -79,12 +80,12 @@ export const pollingAutoStart = (
 };
 
 export function handleApiError(response: UserErrorResponse) {
-  console.log('User error!');
-  let location = './#/error/' + response.errorMessage;
   if (response.traceId !== '') {
-    location = location + '/' + response.traceId;
+    router.push({ name: "error", params: { msg: response.errorMessage, trace: response.traceId } });
+
+  } else {
+    router.push({ name: "error", params: { msg: response.errorMessage } });
   }
-  window.location.href = location;
 }
 
 const handleResponse = (
@@ -98,7 +99,7 @@ const handleResponse = (
   cancelRetry?: Ref<boolean>,
 ) => {
   if (isSessionExpiredResponse(response)) {
-    window.location.href = PATHS.ERROR;
+    router.push({ name: "error"});
   }
 
   if (isUserErrorResponse(response)) {

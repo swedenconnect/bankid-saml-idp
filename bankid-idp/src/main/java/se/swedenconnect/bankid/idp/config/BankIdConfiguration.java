@@ -15,11 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -34,8 +30,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import se.swedenconnect.bankid.idp.authn.BankIdAttributeProducer;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationProvider;
 import se.swedenconnect.bankid.idp.authn.api.UiInformationProvider;
@@ -54,6 +48,11 @@ import se.swedenconnect.bankid.rpapi.service.impl.ZxingQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * BankID IdP configuration.
@@ -100,16 +99,10 @@ public class BankIdConfiguration {
           requestHandler.setCsrfRequestAttributeName(null);
           csrf.csrfTokenRequestHandler(requestHandler);
         })
-        .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers("/**").permitAll()
-            .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
-            .requestMatchers(this.properties.getAuthn().getAuthnPath() + "/**").permitAll()
-            .requestMatchers("/images/**", "/logo.svg", "/favicon.svg", "/favicon.png", "/error", "/assets/**", "/scripts/**", "/webjars/**", "/view/**",
-                "/css/**", "/api/**", "/resume/**")
-            .permitAll()
-            .requestMatchers(EndpointRequest.toAnyEndpoint())
-            .permitAll()
-            .anyRequest().denyAll());
+        .authorizeHttpRequests((authorize) -> {
+          authorize
+              .requestMatchers("/**").permitAll();
+        });
 
     return http.build();
   }
@@ -151,10 +144,9 @@ public class BankIdConfiguration {
             this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
         webClientFactory.afterPropertiesSet();
         return webClientFactory.createInstance();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new RuntimeException("Failed to create bean for webclient supplier ", e); // TODO: 2023-09-11 Better
-                                                                                        // exception
+        // exception
       }
     };
   }
@@ -162,14 +154,14 @@ public class BankIdConfiguration {
   /**
    * Gets the {@link RelyingPartyRepository} bean.
    *
-   * @param qrGenerator the {@link QRGenerator} bean
+   * @param qrGenerator      the {@link QRGenerator} bean
    * @param webClientFactory the WebClientMapper bean (function to create webclient from RelyingParty)
    * @return a {@link RelyingPartyRepository}
    * @throws Exception for errors creating the RP data
    */
   @Bean
   RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator,
-      Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
+                                                Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
 
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
     for (final RelyingPartyConfiguration rp : this.properties.getRelyingParties()) {
@@ -258,7 +250,7 @@ public class BankIdConfiguration {
 
   @Bean
   BankIdService bankIdService(BankIdEventPublisher publisher, CircuitBreaker circuitBreaker, BankIdRequestFactory factory, BankIdConfigurationProperties properties) {
-    return new BankIdService(publisher, circuitBreaker, factory,  properties.getStartRetryDuration());
+    return new BankIdService(publisher, circuitBreaker, factory, properties.getStartRetryDuration());
   }
 
 }

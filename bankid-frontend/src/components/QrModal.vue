@@ -8,6 +8,7 @@
   import LoadingSpinner from './LoadingSpinner.vue';
   import QrDisplay from './QrDisplay.vue';
   import QrInstructions from './QrInstructions.vue';
+  import router from "@/router";
 
   const props = defineProps<{
     uiInfo?: UiInformation;
@@ -41,7 +42,7 @@
 
   const acceptError = async () => {
     await cancel();
-    window.location.href = PATHS.ERROR;
+    router.push({ name: "error"});
   };
 
   const retry = () => {

@@ -1,11 +1,19 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import AutoStartView from '@/views/AutoStartView.vue';
 import DeviceSelectView from '@/views/DeviceSelectView.vue';
 import ErrorView from '@/views/ErrorView.vue';
 import QrInstructionView from '@/views/QrInstructionView.vue';
 
+let base = import.meta.env.BASE_URL;
+let baseHref = (document.getElementById('router-href-id'));
+if (typeof(baseHref) != 'undefined' && baseHref != null) {
+  let attr = baseHref.attributes.getNamedItem("href");
+  if (attr !== null) {
+    base = attr.value;
+  }
+}
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(base),
   routes: [
     {
       path: '/',
