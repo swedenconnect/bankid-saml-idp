@@ -96,8 +96,8 @@ bankid:
         - http://sandbox.swedenconnect.se/testmyeid
         - http://sandbox.swedenconnect.se/testmyeid-sign
       credential:
-        name: "test-cred"
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert4_20220818.p12
+        name: "test-cred" # FPTestcert5_20240610.p12
+        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert5_20240610.p12
         alias: "1"
         password: "qwerty123"
         type: "PKCS12"

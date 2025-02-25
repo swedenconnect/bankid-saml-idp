@@ -12,8 +12,8 @@ import type {
   UiInformation,
   UserErrorResponse,
 } from './types';
+import router from "@/router";
 
-const CONTEXT_PATH = import.meta.env.BASE_URL;
 const requestOptions: RequestInit = {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getXSRFCookie() },
@@ -21,7 +21,7 @@ const requestOptions: RequestInit = {
 };
 
 export async function poll(showQr: boolean) {
-  const response = await fetch(CONTEXT_PATH + '/api/poll?qr=' + showQr, requestOptions);
+  const response = await fetch('./api/poll?qr=' + showQr, requestOptions);
   const data = await response.json();
   if (!response.ok) {
     if (response.status === 429) {
@@ -80,12 +80,12 @@ export const pollingAutoStart = (
 };
 
 export function handleApiError(response: UserErrorResponse) {
-  console.log('User error!');
-  let location = import.meta.env.BASE_URL + '/bankid#/error/' + response.errorMessage;
   if (response.traceId !== '') {
-    location = location + '/' + response.traceId;
+    router.push({ name: "error", params: { msg: response.errorMessage, trace: response.traceId } });
+
+  } else {
+    router.push({ name: "error", params: { msg: response.errorMessage } });
   }
-  window.location.href = location;
 }
 
 const handleResponse = (
@@ -99,7 +99,7 @@ const handleResponse = (
   cancelRetry?: Ref<boolean>,
 ) => {
   if (isSessionExpiredResponse(response)) {
-    window.location.href = PATHS.ERROR;
+    router.push({ name: "error"});
   }
 
   if (isUserErrorResponse(response)) {
@@ -167,11 +167,11 @@ const handleResponse = (
   }
 };
 
-const fetchData = async (endpoint: string): Promise<any> => (await fetch(CONTEXT_PATH + endpoint)).json();
+const fetchData = async (endpoint: string): Promise<any> => (await fetch(endpoint)).json();
 
-export const status = async (): Promise<Status> => fetchData('/api/status');
-export const contactInformation = async (): Promise<CustomerContactInformation> => fetchData('/api/contact');
-export const cancel = async () => await fetch(CONTEXT_PATH + '/api/cancel', requestOptions);
-export const uiInformation = async (): Promise<UiInformation | UserErrorResponse> => fetchData('/api/ui');
-export const selectedDevice = async (): Promise<SelectedDeviceInformation> => fetchData('/api/device');
-export const getOverrides = async () => await fetchData('/api/overrides');
+export const status = async (): Promise<Status> => fetchData('./api/status');
+export const contactInformation = async (): Promise<CustomerContactInformation> => fetchData('./api/contact');
+export const cancel = async () => await fetch('./api/cancel', requestOptions);
+export const uiInformation = async (): Promise<UiInformation | UserErrorResponse> => fetchData('./api/ui');
+export const selectedDevice = async (): Promise<SelectedDeviceInformation> => fetchData('./api/device');
+export const getOverrides = async () => await fetchData('./api/overrides');

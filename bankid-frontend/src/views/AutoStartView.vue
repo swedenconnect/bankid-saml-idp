@@ -7,6 +7,7 @@
   import { PATHS } from '@/Redirects';
   import { cancel, pollingAutoStart } from '@/Service';
   import type { ApiResponseStatus } from '@/types';
+  import router from "@/router";
 
   const token = ref('');
   const messageCode = ref('bankid.msg.rfa13');
@@ -22,7 +23,7 @@
 
   const acceptError = async () => {
     await cancel();
-    window.location.href = PATHS.ERROR;
+    router.push({ name: "error"});
   };
 
   const startPolling = () => {
