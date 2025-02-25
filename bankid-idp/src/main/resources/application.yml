@@ -12,6 +12,7 @@ server:
       cookie:
         name: BANKIDSESSION
       timeout: 15m
+    context-path: /bankid/idp
   # SSL/TLS configuration
   # Replace with your TLS JKS/P12 ...
   #
@@ -100,7 +101,7 @@ bankid:
     - http://id.swedenconnect.se/ec/1.0/loa3-name
     - http://id.elegnamnden.se/sprop/1.0/mobile-auth
     - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
-    authn-path: /
+    authn-path: /bankid
   
   # Also see UI settings ...  
       

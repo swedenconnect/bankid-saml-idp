@@ -16,7 +16,7 @@
 package se.swedenconnect.bankid.idp.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import jakarta.servlet.ServletContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * BankID IdP configuration.
@@ -101,10 +102,28 @@ public class BankIdConfiguration {
         })
         .authorizeHttpRequests((authorize) -> {
           authorize
-              .requestMatchers("/**").permitAll();
+              .requestMatchers(internalEndpoints()).permitAll()
+              .requestMatchers(properties.getAuthn().getAuthnPath()).permitAll()
+              .requestMatchers(frontendRoutes()).permitAll()
+              .anyRequest().denyAll();
         });
 
     return http.build();
+  }
+
+  private String[] internalEndpoints() {
+    return new String[]{"/api/**", "/logo.svg", "/favicon.png", "/favicon.svg", "/assets/**", "/view/**", "/images/**"};
+  }
+
+  private String[] frontendRoutes() {
+    return Stream.of("/", "/auto", "qr", "/error/**", "/error").map(route -> {
+      final StringBuilder builder = new StringBuilder(this.properties.getAuthn().getAuthnPath());
+      if (!this.properties.getAuthn().getAuthnPath().endsWith("/")) {
+        builder.append("/");
+      }
+      builder.append(route);
+      return builder.toString();
+    }).toList().toArray(new String[]{});
   }
 
   /**
