@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>bankid-idp-frontend</artifactId>
@@ -19,7 +19,7 @@
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -75,7 +75,7 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.12.1</version>
+        <version>1.15.1</version>
         <configuration>
           <workingDirectory>${project.basedir}</workingDirectory>
         </configuration>
@@ -122,14 +122,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.6.0</version>
-          <configuration>
-            <descriptors>
-              <descriptor>${project.basedir}/dist-assembly.xml</descriptor>
-            </descriptors>
-            <finalName>${project.artifactId}-${project.version}</finalName>
-            <appendAssemblyId>false</appendAssemblyId>
-          </configuration>
+        <version>3.7.1</version>
+        <configuration>
+          <descriptors>
+            <descriptor>${project.basedir}/dist-assembly.xml</descriptor>
+          </descriptors>
+          <finalName>${project.artifactId}-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
         <executions>
           <execution>
             <id>build-zip</id>

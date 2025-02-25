@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,7 @@
  */
 package se.swedenconnect.bankid.idp.integration;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import lombok.Setter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,7 +30,6 @@ import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.Extensions;
 import org.opensaml.security.credential.UsageType;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -58,8 +39,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import lombok.Setter;
 import se.swedenconnect.opensaml.common.utils.LocalizedString;
 import se.swedenconnect.opensaml.saml2.metadata.build.AssertionConsumerServiceBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.build.AttributeConsumingServiceBuilder;
@@ -84,7 +63,27 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectEncrypter;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.factory.KeyStoreBuilder;
 import se.swedenconnect.security.credential.opensaml.OpenSamlCredential;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TestSp {
 
@@ -94,8 +93,8 @@ public class TestSp {
   private final boolean signMode;
   public static final String ACS = "https://demo.swedenconnect.se/sp/sso";
 
-  private PkiCredential spSignCredential;
-  private PkiCredential spEncryptCredential;
+  private final PkiCredential spSignCredential;
+  private final PkiCredential spEncryptCredential;
 
   private ResponseProcessor responseProcessor;
 
@@ -118,13 +117,14 @@ public class TestSp {
    *
    * @throws Exception for errors
    */
-  public TestSp(boolean signMode) throws Exception {
-    this.spSignCredential = new KeyStoreCredential(
-        new ClassPathResource("test-sp.jks"), "JKS", "secret".toCharArray(), "sign", "secret".toCharArray());
-    this.spSignCredential.init();
-    this.spEncryptCredential = new KeyStoreCredential(
-        new ClassPathResource("test-sp.jks"), "JKS", "secret".toCharArray(), "encrypt", "secret".toCharArray());
-    this.spEncryptCredential.init();
+  public TestSp(final boolean signMode) throws Exception {
+    final KeyStore keyStore = new KeyStoreBuilder()
+        .location("classpath:test-sp.jks")
+        .password("secret")
+        .type("JKS")
+        .build();
+    this.spSignCredential = new KeyStoreCredential(keyStore, "sign", "secret".toCharArray());
+    this.spEncryptCredential = new KeyStoreCredential(keyStore, "encrypt", "secret".toCharArray());
     this.signMode = signMode;
   }
 
@@ -151,8 +151,8 @@ public class TestSp {
     final EntityAttributes entityAttributes = this.getEntityAttributes();
     final Extensions extensions = entityAttributes != null
         ? ExtensionsBuilder.builder()
-            .extension(entityAttributes)
-            .build()
+        .extension(entityAttributes)
+        .build()
         : null;
 
     return EntityDescriptorBuilder.builder()

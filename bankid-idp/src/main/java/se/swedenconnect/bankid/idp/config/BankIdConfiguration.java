@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package se.swedenconnect.bankid.idp.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import jakarta.servlet.ServletContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +45,10 @@ import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIDClientImpl;
 import se.swedenconnect.bankid.rpapi.service.impl.ZxingQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
+import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.bundle.CredentialBundles;
+import se.swedenconnect.security.credential.config.ConfigurationResourceLoader;
+import se.swedenconnect.security.credential.factory.PkiCredentialFactory;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
 
@@ -65,18 +68,27 @@ import java.util.stream.Stream;
 @EnableConfigurationProperties(BankIdConfigurationProperties.class)
 public class BankIdConfiguration {
 
-  /**
-   * BankID configuration properties.
-   */
+  /** BankID configuration properties. */
   private final BankIdConfigurationProperties properties;
+
+  /** Credential bundles. */
+  private final CredentialBundles credentialBundles;
+
+  /** Resource loader. */
+  private final ConfigurationResourceLoader resourceLoader;
 
   /**
    * Constructor.
    *
    * @param properties the BankID configuration properties
+   * @param credentialBundles the credential bundles
+   * @param resourceLoader for loading resources
    */
-  public BankIdConfiguration(final BankIdConfigurationProperties properties) {
+  public BankIdConfiguration(final BankIdConfigurationProperties properties, final CredentialBundles credentialBundles,
+      final ConfigurationResourceLoader resourceLoader) {
     this.properties = Objects.requireNonNull(properties, "properties must not be null");
+    this.credentialBundles = credentialBundles;
+    this.resourceLoader = resourceLoader;
   }
 
   /**
@@ -96,23 +108,22 @@ public class BankIdConfiguration {
         .securityContext(sc -> sc.requireExplicitSave(false))
         .csrf(csrf -> {
           csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-          CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+          final CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
           requestHandler.setCsrfRequestAttributeName(null);
           csrf.csrfTokenRequestHandler(requestHandler);
         })
-        .authorizeHttpRequests((authorize) -> {
-          authorize
-              .requestMatchers(internalEndpoints()).permitAll()
-              .requestMatchers(properties.getAuthn().getAuthnPath()).permitAll()
-              .requestMatchers(frontendRoutes()).permitAll()
-              .anyRequest().denyAll();
-        });
+        .authorizeHttpRequests((authorize) -> authorize
+            .requestMatchers(this.internalEndpoints()).permitAll()
+            .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
+            .requestMatchers(this.frontendRoutes()).permitAll()
+            .anyRequest().denyAll());
 
     return http.build();
   }
 
   private String[] internalEndpoints() {
-    return new String[]{"/api/**", "/logo.svg", "/favicon.png", "/favicon.svg", "/assets/**", "/view/**", "/images/**"};
+    return new String[] { "/api/**", "/logo.svg", "/favicon.png", "/favicon.svg", "/assets/**", "/view/**",
+        "/images/**" };
   }
 
   private String[] frontendRoutes() {
@@ -123,7 +134,7 @@ public class BankIdConfiguration {
       }
       builder.append(route);
       return builder.toString();
-    }).toList().toArray(new String[]{});
+    }).toList().toArray(new String[] {});
   }
 
   /**
@@ -150,22 +161,41 @@ public class BankIdConfiguration {
   }
 
   /**
+   * Gets a lambda function that returns the {@link PkiCredential} to use for a specific relying party.
+   *
+   * @return a lambda function for creating the credential for a relying party
+   */
+  @Bean
+  Function<RelyingPartyConfiguration, PkiCredential> relyingPartyCredentialProvider() {
+    return rp -> {
+      try {
+        return PkiCredentialFactory.createCredential(rp.getCredential(), this.resourceLoader,
+            this.credentialBundles.getCredentialProvider(), this.credentialBundles.getKeyStoreProvider(), null);
+      }
+      catch (final Exception e) {
+        throw new SecurityException("Failed to get credential for relying party", e);
+      }
+    };
+  }
+
+  /**
    * Gets the bankIdWebClientFactory bean
    *
-   * @return Lambda function to create webclient from RelyingParty
+   * @return lambda function to create webclient from RelyingParty
    */
 
   @Bean
   Function<RelyingPartyConfiguration, WebClient> bankIdWebClientFactory() {
     return rp -> {
       try {
-        final WebClientFactoryBean webClientFactory = new WebClientFactoryBean(
-            this.properties.getServiceUrl(), this.properties.getServerRootCertificate(), rp.createCredential());
+        final WebClientFactoryBean webClientFactory =
+            new WebClientFactoryBean(this.properties.getServiceUrl(), this.properties.getServerRootCertificate(),
+                this.relyingPartyCredentialProvider().apply(rp));
         webClientFactory.afterPropertiesSet();
         return webClientFactory.createInstance();
-      } catch (Exception e) {
+      }
+      catch (final Exception e) {
         throw new RuntimeException("Failed to create bean for webclient supplier ", e); // TODO: 2023-09-11 Better
-        // exception
       }
     };
   }
@@ -173,14 +203,13 @@ public class BankIdConfiguration {
   /**
    * Gets the {@link RelyingPartyRepository} bean.
    *
-   * @param qrGenerator      the {@link QRGenerator} bean
+   * @param qrGenerator the {@link QRGenerator} bean
    * @param webClientFactory the WebClientMapper bean (function to create webclient from RelyingParty)
    * @return a {@link RelyingPartyRepository}
-   * @throws Exception for errors creating the RP data
    */
   @Bean
   RelyingPartyRepository relyingPartyRepository(final QRGenerator qrGenerator,
-                                                Function<RelyingPartyConfiguration, WebClient> webClientFactory) throws Exception {
+      final Function<RelyingPartyConfiguration, WebClient> webClientFactory) {
 
     final List<RelyingPartyData> relyingParties = new ArrayList<>();
     for (final RelyingPartyConfiguration rp : this.properties.getRelyingParties()) {
@@ -206,10 +235,10 @@ public class BankIdConfiguration {
   }
 
   /**
-   * Creates the {@link SimulatedAuthenticationProvider} which is the {@link AuthenticationProvider} that is responsible
-   * of the user authentication.
+   * Creates the {@link BankIdAuthenticationProvider} which is the {@link AuthenticationProvider} that is responsible
+   * for the user authentication.
    *
-   * @return a {@link SimulatedAuthenticationProvider}
+   * @return a {@link BankIdAuthenticationProvider}
    */
   @Bean
   BankIdAuthenticationProvider bankIdAuthenticationProvider() {
@@ -228,16 +257,10 @@ public class BankIdConfiguration {
    */
   @Bean
   Saml2IdpConfigurerAdapter samlIdpSettingsAdapter(final SignatureMessagePreprocessor signMessageProcessor) {
-    return (http, configurer) -> {
-      configurer
-          .authnRequestProcessor(c -> c.authenticationProvider(
-              pc -> pc.signatureMessagePreprocessor(signMessageProcessor)))
-          .userAuthentication(c -> {
-            c.attributeProducers(producers -> {
-              producers.add(new BankIdAttributeProducer());
-            });
-          });
-    };
+    return (http, configurer) -> configurer
+        .authnRequestProcessor(c -> c.authenticationProvider(
+            pc -> pc.signatureMessagePreprocessor(signMessageProcessor)))
+        .userAuthentication(c -> c.attributeProducers(producers -> producers.add(new BankIdAttributeProducer())));
   }
 
   /**
@@ -252,7 +275,7 @@ public class BankIdConfiguration {
 
   @Bean
   FilterRegistrationBean<OncePerRequestFilter> errorHandlerFilterRegistration(final ErrorhandlerFilter filter) {
-    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
+    final FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(filter);
     registration.setUrlPatterns(List.of("/view/**"));
     registration.setOrder(Integer.MIN_VALUE + 1);
     registration.setName("ERROR_HANDLER_FILTER_REGISTRATION");
@@ -261,14 +284,16 @@ public class BankIdConfiguration {
 
   @Bean
   FilterRegistrationBean<OncePerRequestFilter> csrfFilterRegistration() {
-    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>(new CsrfCookieFilter());
+    final FilterRegistrationBean<OncePerRequestFilter> registration =
+        new FilterRegistrationBean<>(new CsrfCookieFilter());
     registration.setOrder(SecurityWebFiltersOrder.REACTOR_CONTEXT.getOrder());
     registration.setName("CSRF_HANDLER_FILTER_REGISTRATION");
     return registration;
   }
 
   @Bean
-  BankIdService bankIdService(BankIdEventPublisher publisher, CircuitBreaker circuitBreaker, BankIdRequestFactory factory, BankIdConfigurationProperties properties) {
+  BankIdService bankIdService(final BankIdEventPublisher publisher, final CircuitBreaker circuitBreaker,
+      final BankIdRequestFactory factory, final BankIdConfigurationProperties properties) {
     return new BankIdService(publisher, circuitBreaker, factory, properties.getStartRetryDuration());
   }
 

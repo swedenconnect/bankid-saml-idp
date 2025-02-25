@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package se.swedenconnect.bankid.idp.config;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -26,18 +25,16 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.bankid.idp.audit.AuditRepositoryConfiguration;
 import se.swedenconnect.bankid.idp.authn.BankIdAuthenticationController;
 import se.swedenconnect.bankid.idp.rp.RelyingPartyUiInfo;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
 import se.swedenconnect.opensaml.sweid.saml2.authn.LevelOfAssuranceUris;
-import se.swedenconnect.security.credential.PkiCredential;
 import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
-import se.swedenconnect.security.credential.factory.PkiCredentialFactoryBean;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * BankID configuration properties.
@@ -64,7 +61,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
   private Resource serverRootCertificate;
 
   /**
-   * Whether we are using a built-in frontend, i.e., if we are using the built in Vue frontend app, this controller
+   * Whether we are using a built-in frontend, i.e., if we are using the built-in Vue frontend app, this controller
    * redirects calls made from the underlying SAML IdP library to our frontend start page.
    */
   @Getter
@@ -85,10 +82,10 @@ public class BankIdConfigurationProperties implements InitializingBean {
    * </p>
    * <p>
    * The BankID session will enter the state "startFailed" if no client application connects within 30 seconds. If the
-   * current time is between start and start + startRetryDuration the application will silently start a new
-   * session. If the current time is outside this duration the user will be presented with an error. The duration will
-   * only be checked on startFailed i.e. every 30 seconds. If you want to disable silent retries set the duration to
-   * something lower than 30 seconds, e.g., 0 seconds.
+   * current time is between start and start + startRetryDuration the application will silently start a new session. If
+   * the current time is outside this duration the user will be presented with an error. The duration will only be
+   * checked on startFailed i.e. every 30 seconds. If you want to disable silent retries set the duration to something
+   * lower than 30 seconds, e.g., 0 seconds.
    * </p>
    */
   @Getter
@@ -212,9 +209,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
     @Setter
     private PkiCredentialConfigurationProperties credential;
 
-    // Internal use only ...
-    private PkiCredential _credential;
-
     /**
      * Relying Party specific display text for authentication (and signature). Overrides the default text.
      */
@@ -252,21 +246,6 @@ public class BankIdConfigurationProperties implements InitializingBean {
         this.userMessage = new RpUserMessage();
       }
       this.userMessage.afterPropertiesSet();
-    }
-
-    /**
-     * Creates a {@link PkiCredential} given the {@link PkiCredentialConfigurationProperties}.
-     *
-     * @return a {@link PkiCredential}
-     * @throws Exception for errors creating the object
-     */
-    public PkiCredential createCredential() throws Exception {
-      if (this._credential == null) {
-        final PkiCredentialFactoryBean factory = new PkiCredentialFactoryBean(this.credential);
-        factory.afterPropertiesSet();
-        this._credential = factory.getObject();
-      }
-      return this._credential;
     }
 
     /**
@@ -327,7 +306,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
     /** {@inheritDoc} */
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
       if (!StringUtils.hasText(this.providerName)) {
         this.providerName = "BankID";
         log.info("bankid.authn.provider-name is not assigned, defaulting to '{}'", this.providerName);
@@ -367,7 +346,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
     /** {@inheritDoc} */
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
       if (this.rpCertificateWarnThreshold == null) {
         this.rpCertificateWarnThreshold = RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT;
       }
@@ -421,7 +400,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
 
     /** {@inheritDoc} */
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
       if (!StringUtils.hasText(this.repository)) {
         this.repository = "memory";
         log.info("bankid.audit.repository has not been assigned, defaulting to '{}'", this.repository);
