@@ -27,6 +27,33 @@ tomcat:
     secret: REDACTED
     port: 8012
 
+credential:
+  bundles:
+    keystore:
+      idp-ks:
+        location: file:/opt/bankid-idp/config/idp-keystore.jks
+        password: REDACTED
+        type: JKS
+    jks:
+      idp-sign:
+        store-reference: idp-ks
+        name: "IdP signing"
+        key:
+          alias: SIGNALIAS
+          key-password: REDACTED
+      idp-encrypt:
+        store-reference: idp-ks
+        name: "IdP encrypt"
+        key:
+          alias: ENCRYPTALIAS
+          key-password: REDACTED
+      idp-md-sign:
+        store-reference: idp-ks
+        name: "IdP metadata sign"
+        key:
+          alias: METADATAALIAS
+          key-password: REDACTED
+
 bankid:
   session:
     module: redis
@@ -41,7 +68,7 @@ bankid:
       svg-logotype: file:/opt/bankid-idp/config/logo-notext.svg
       name:
         sv: "Sweden Connect"
-        en: "Sweden Connect"   
+        en: "Sweden Connect"
     override:
       directory-path: "/opt/bankid-idp/config/overrides/"
     user-error:
@@ -59,10 +86,13 @@ bankid:
     - id: "test-rp"
       credential:
         name: "test-cred"
-        resource: file:/opt/bankid-idp/config/testcertificate.p12
-        alias: "ALIAS"
-        password: "REDACTED"
-        type: "PKCS12"
+        jks:
+          store:
+            location: file:/opt/bankid-idp/config/testcertificate.p12
+            password: REDACTED
+            type: PKCS12
+          key:
+            alias: ALIAS
       user-message:
         inherit-default-login-text: true
 
@@ -76,20 +106,11 @@ saml:
         validation-certificate: file:/opt/bankid-idp/config/certificates/sandbox-metadata.crt
     credentials:
       sign:
-        resource: file:/opt/bankid-idp/config/idp-keystore.jks
-        alias: SIGNALIAS
-        password: REDACTED
-        type: JKS
+        bundle: idp-sign
       encrypt:
-        resource: file:/opt/bankid-idp/config/idp-keystore.jks
-        alias: ENCRYPTALIAS
-        password: REDACTED
-        type: JKS
+        bundle: idp-encrypt
       metadata-sign:
-        resource: file:/opt/bankid-idp/config/idp-keystore.jks
-        alias: METADATAALIAS
-        password: REDACTED
-        type: JKS
+        bundle: idp-md-sign
     metadata:
       ui-info:
         display-names:
@@ -99,15 +120,15 @@ saml:
           en: BankID Identity Provider (Sandbox)
           sv: BankID legitimeringstjänst (Sandbox)
         logotypes:
-        - path: /images/BankID_logo.svg
-          height: 171
-          width: 20
+          - path: /images/BankID_logo.svg
+            height: 171
+            width: 20
       organization:
         names:
-          en: "Sweden Connect" 
+          en: "Sweden Connect"
           sv: "Sweden Connect"
         display-names:
-          en: "Sweden Connect" 
+          en: "Sweden Connect"
           sv: "Sweden Connect"
         urls:
           en: https://www.swedenconnect.se/en
@@ -116,13 +137,13 @@ saml:
         technical:
           company: "Sweden Connect"
           email-addresses:
-          - operations@swedenconnect.se
+            - operations@swedenconnect.se
         support:
           company: "Sweden Connect"
           email-addresses:
-          - operations@swedenconnect.se
-        
-        
+            - operations@swedenconnect.se
+
+
 logging:
   level:
     se:
