@@ -19,11 +19,11 @@ server:
   ssl:
     enabled: true
     bundle: server
-#    key-store: classpath:ssl.jks
-#    key-store-type: JKS
-#    key-alias: local
-#    key-store-password: secret
-#    key-password: secret
+  #    key-store: classpath:ssl.jks
+  #    key-store-type: JKS
+  #    key-alias: local
+  #    key-store-password: secret
+  #    key-password: secret
   error:
     include-message: always
     #include-exception: true
@@ -39,11 +39,11 @@ management:
     health:
       status:
         order:
-        - DOWN
-        - OUT_OF_SERVICE
-        - UP
-        - WARNING
-        - UNKNOWN
+          - DOWN
+          - OUT_OF_SERVICE
+          - UP
+          - WARNING
+          - UNKNOWN
         http-mapping:
           WARNING: 503
       show-details: always
@@ -51,15 +51,15 @@ management:
       enabled: true
   endpoints:
     web:
-# Quarkus-style ...
-#      base-path: /q
-#      path-mapping:
-#        metrics: spring-metrics
-#        prometheus: metrics
+      # Quarkus-style ...
+      #      base-path: /q
+      #      path-mapping:
+      #        metrics: spring-metrics
+      #        prometheus: metrics
       exposure:
         include: health, metrics, prometheus, loggers
-        
-spring:        
+
+spring:
   messages:
     basename: messages,idp-errors/idp-error-messages
   ssl:
@@ -72,102 +72,102 @@ spring:
           keystore:
             location: classpath:ssl.jks
             password: secret
-            type: jks          
+            type: jks
 
 #
 # BankID configuration
 #   See https://docs.swedenconnect.se/bankid-saml-idp/configuration.html
-#   
+#
 bankid:
 
-  # The root for the BankID server certificate. For test, the value is 
+  # The root for the BankID server certificate. For test, the value is
   # classpath:trust/bankid-trust-test.crt.
   #
   server-root-certificate: classpath:trust/bankid-trust-prod.crt
-  
+
   # The base URL for the BankID API. For test, the value is https://appapi2.test.bankid.com/rp/v6.0
   #
   service-url: https://appapi2.bankid.com/rp/v6.0
 
   # SAML authentication settings
-  #        
+  #
   authn:
-    resume-path: /resume 
+    resume-path: /resume
     provider-name: "BankID"
     supported-loas:
-    - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
+      - http://id.swedenconnect.se/loa/1.0/uncertified-loa3
     entity-categories:
-    - http://id.elegnamnden.se/ec/1.0/loa3-pnr
-    - http://id.swedenconnect.se/ec/1.0/loa3-name
-    - http://id.elegnamnden.se/sprop/1.0/mobile-auth
-    - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding    
+      - http://id.elegnamnden.se/ec/1.0/loa3-pnr
+      - http://id.swedenconnect.se/ec/1.0/loa3-name
+      - http://id.elegnamnden.se/sprop/1.0/mobile-auth
+      - http://id.swedenconnect.se/general-ec/1.0/secure-authenticator-binding
     authn-path: /bankid
-  
-  # Also see UI settings ...  
-      
+
+      # Also see UI settings ...
+
 #
 # The SAML IdP configuration
 #   See https://docs.swedenconnect.se/saml-identity-provider/configuration.html
-#    
+#
 saml:
-  idp:    
+  idp:
     entity-id: https://my.domain.com/idp
     base-url: https://my.domain.com${server.servlet.context-path}
-    # credentials is required ... 
-    # See https://docs.swedenconnect.se/saml-identity-provider/configuration.html#credentials-configuration    
+    # credentials is required ...
+    # See https://docs.swedenconnect.se/saml-identity-provider/configuration.html#credentials-configuration
 
     endpoints:
       metadata: /saml2/metadata
-      
+
     # Metadata providers, i.e., how to download federation metadata.
     # See swedenconnect/readme.txt for QA and Sandbox
     # Note: Set BACKUP_DIR ...
     #
     metadata-providers:
-    - location: https://md.swedenconnect.se/role/sp.xml
-      backup-location: ${BACKUP_DIR}/metadata/metadata-backup.xml
-      validation-certificate: classpath:swedenconnect/prod-metadata.crt
-      
+      - location: https://md.swedenconnect.se/role/sp.xml
+        backup-location: ${BACKUP_DIR}/metadata/metadata-backup.xml
+        validation-certificate: classpath:swedenconnect/prod-metadata.crt
+
     # Metadata config - how should the IdP SAML metadata look like?
-    # 
+    #
     metadata:
       digest-methods:
-      - http://www.w3.org/2001/04/xmlenc#sha256
-      - http://www.w3.org/2001/04/xmldsig-more#sha384
-      - http://www.w3.org/2001/04/xmlenc#sha512
+        - http://www.w3.org/2001/04/xmlenc#sha256
+        - http://www.w3.org/2001/04/xmldsig-more#sha384
+        - http://www.w3.org/2001/04/xmlenc#sha512
       include-digest-methods-under-role: true
       signing-methods:
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
-        min-key-size: 2048
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha384
-        min-key-size: 2048
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha512
-        min-key-size: 2048      
-      - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1
-        min-key-size: 2048
-      - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1
-        min-key-size: 2048
-      - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1
-        min-key-size: 2048
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256
-        min-key-size: 256
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384
-        min-key-size: 256
-      - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512
-        min-key-size: 256
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha384
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha512
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1
+          min-key-size: 2048
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256
+          min-key-size: 256
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384
+          min-key-size: 256
+        - algorithm: http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512
+          min-key-size: 256
       include-signing-methods-under-role: true
       encryption-methods:
-      - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
-      - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
-        digest-method: http://www.w3.org/2001/04/xmlenc#sha256
-      - algorithm: http://www.w3.org/2009/xmlenc11#aes256-gcm
-      - algorithm: http://www.w3.org/2009/xmlenc11#aes192-gcm
-      - algorithm: http://www.w3.org/2009/xmlenc11#aes128-gcm
-      - algorithm: http://www.w3.org/2001/04/xmlenc#aes256-cbc
-      - algorithm: http://www.w3.org/2001/04/xmlenc#aes192-cbc
-      - algorithm: http://www.w3.org/2001/04/xmlenc#aes128-cbc    
+        - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
+        - algorithm: http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
+          digest-method: http://www.w3.org/2001/04/xmlenc#sha256
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes256-gcm
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes192-gcm
+        - algorithm: http://www.w3.org/2009/xmlenc11#aes128-gcm
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes256-cbc
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes192-cbc
+        - algorithm: http://www.w3.org/2001/04/xmlenc#aes128-cbc
       requested-principal-selection:
-      - "urn:oid:1.2.752.29.4.13"
+        - "urn:oid:1.2.752.29.4.13"
       ui-info:
         display-names:
           en: BankID
@@ -176,33 +176,33 @@ saml:
           en: BankID Identity Provider
           sv: BankID legitimeringstjänst
         logotypes:
-        - path: /images/BankID_logo.svg
-          height: 171
-          width: 206
-#      organization:
-#        names:
-#          en: "My Organization" 
-#          sv: "Min organisation"
-#        display-names:
-#          en: "My Organization" 
-#          sv: "Min organisation"
-#        urls:
-#          en: https://www.example.com
-#          sv: https://www.example.com
-#      contact-persons:
-#        technical:
-#          company: "My Organization"
-#          email-addresses:
-#          - operations@example.com
-#        support:
-#          company: "My Organization"
-#          email-addresses:
-#          - operations@example.com 
-              
+          - path: /images/BankID_logo.svg
+            height: 171
+            width: 206
+              #      organization:
+              #        names:
+              #          en: "My Organization"
+              #          sv: "Min organisation"
+              #        display-names:
+              #          en: "My Organization"
+              #          sv: "Min organisation"
+              #        urls:
+              #          en: https://www.example.com
+              #          sv: https://www.example.com
+              #      contact-persons:
+              #        technical:
+              #          company: "My Organization"
+              #          email-addresses:
+              #          - operations@example.com
+              #        support:
+              #          company: "My Organization"
+              #          email-addresses:
+              #          - operations@example.com
+
 logging:
   level:
     se:
-      swedenconnect:      
+      swedenconnect:
         spring:
           saml: INFO
         bankid: INFO
