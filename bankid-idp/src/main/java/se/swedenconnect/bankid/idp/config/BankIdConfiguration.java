@@ -45,9 +45,6 @@ import se.swedenconnect.bankid.rpapi.service.QRGenerator;
 import se.swedenconnect.bankid.rpapi.service.impl.BankIDClientImpl;
 import se.swedenconnect.bankid.rpapi.service.impl.ZxingQRGenerator;
 import se.swedenconnect.bankid.rpapi.support.WebClientFactoryBean;
-import se.swedenconnect.security.credential.PkiCredential;
-import se.swedenconnect.security.credential.bundle.CredentialBundles;
-import se.swedenconnect.security.credential.config.ConfigurationResourceLoader;
 import se.swedenconnect.security.credential.factory.PkiCredentialFactory;
 import se.swedenconnect.spring.saml.idp.config.configurers.Saml2IdpConfigurerAdapter;
 import se.swedenconnect.spring.saml.idp.extensions.SignatureMessagePreprocessor;
@@ -71,24 +68,19 @@ public class BankIdConfiguration {
   /** BankID configuration properties. */
   private final BankIdConfigurationProperties properties;
 
-  /** Credential bundles. */
-  private final CredentialBundles credentialBundles;
-
-  /** Resource loader. */
-  private final ConfigurationResourceLoader resourceLoader;
+  /** For loading credentials. */
+  private final PkiCredentialFactory pkiCredentialFactory;
 
   /**
    * Constructor.
    *
    * @param properties the BankID configuration properties
-   * @param credentialBundles the credential bundles
-   * @param resourceLoader for loading resources
+   * @param pkiCredentialFactory for loading credentials
    */
-  public BankIdConfiguration(final BankIdConfigurationProperties properties, final CredentialBundles credentialBundles,
-      final ConfigurationResourceLoader resourceLoader) {
+  public BankIdConfiguration(final BankIdConfigurationProperties properties,
+      final PkiCredentialFactory pkiCredentialFactory) {
     this.properties = Objects.requireNonNull(properties, "properties must not be null");
-    this.credentialBundles = credentialBundles;
-    this.resourceLoader = resourceLoader;
+    this.pkiCredentialFactory = Objects.requireNonNull(pkiCredentialFactory, "pkiCredentialFactory must not be null");
   }
 
   /**
@@ -161,24 +153,6 @@ public class BankIdConfiguration {
   }
 
   /**
-   * Gets a lambda function that returns the {@link PkiCredential} to use for a specific relying party.
-   *
-   * @return a lambda function for creating the credential for a relying party
-   */
-  @Bean
-  Function<RelyingPartyConfiguration, PkiCredential> relyingPartyCredentialProvider() {
-    return rp -> {
-      try {
-        return PkiCredentialFactory.createCredential(rp.getCredential(), this.resourceLoader,
-            this.credentialBundles.getCredentialProvider(), this.credentialBundles.getKeyStoreProvider(), null);
-      }
-      catch (final Exception e) {
-        throw new SecurityException("Failed to get credential for relying party", e);
-      }
-    };
-  }
-
-  /**
    * Gets the bankIdWebClientFactory bean
    *
    * @return lambda function to create webclient from RelyingParty
@@ -190,7 +164,7 @@ public class BankIdConfiguration {
       try {
         final WebClientFactoryBean webClientFactory =
             new WebClientFactoryBean(this.properties.getServiceUrl(), this.properties.getServerRootCertificate(),
-                this.relyingPartyCredentialProvider().apply(rp));
+                this.pkiCredentialFactory.createCredential(rp.getCredential()));
         webClientFactory.afterPropertiesSet();
         return webClientFactory.createInstance();
       }

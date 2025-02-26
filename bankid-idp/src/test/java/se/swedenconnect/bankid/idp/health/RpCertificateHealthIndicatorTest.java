@@ -26,6 +26,8 @@ import org.springframework.boot.actuate.health.Status;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.factory.PkiCredentialConfigurationProperties;
+import se.swedenconnect.security.credential.factory.PkiCredentialFactory;
 
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -34,7 +36,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Test cases for RpCertificateHealthIndicator.
@@ -54,9 +55,9 @@ public class RpCertificateHealthIndicatorTest {
     final Rp rp2 = new Rp("ID2", NOW.plus(15, ChronoUnit.DAYS));
 
     final BankIdConfigurationProperties props = buildProps(rp1, rp2);
-    final Function<RelyingPartyConfiguration, PkiCredential> credProvider = buildCredentialFunction(rp1, rp2);
+    final PkiCredentialFactory factory = buildPkiCredentialFactory(rp1, rp2);
 
-    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, credProvider);
+    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
     final Health health = indicator.getHealth(true);
     Assertions.assertEquals(Status.UP, health.getStatus());
@@ -80,9 +81,9 @@ public class RpCertificateHealthIndicatorTest {
     final Rp rp2 = new Rp("ID2", NOW.minus(2, ChronoUnit.DAYS));
 
     final BankIdConfigurationProperties props = buildProps(rp1, rp2);
-    final Function<RelyingPartyConfiguration, PkiCredential> credProvider = buildCredentialFunction(rp1, rp2);
+    final PkiCredentialFactory factory = buildPkiCredentialFactory(rp1, rp2);
 
-    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, credProvider);
+    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
     final Health health = indicator.getHealth(true);
     Assertions.assertEquals(Status.DOWN, health.getStatus());
@@ -107,9 +108,9 @@ public class RpCertificateHealthIndicatorTest {
 
     final BankIdConfigurationProperties props = buildProps(rp1, rp2);
     props.getHealth().setRpCertificateWarnThreshold(Duration.ofDays(7));
-    final Function<RelyingPartyConfiguration, PkiCredential> credProvider = buildCredentialFunction(rp1, rp2);
+    final PkiCredentialFactory factory = buildPkiCredentialFactory(rp1, rp2);
 
-    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, credProvider);
+    final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
     final Health health = indicator.getHealth(true);
     Assertions.assertEquals(CustomStatus.WARNING, health.getStatus());
@@ -125,24 +126,24 @@ public class RpCertificateHealthIndicatorTest {
     JSONAssert.assertEquals(expected, json, false);
   }
 
-  private static BankIdConfigurationProperties buildProps(final Rp... rps) throws Exception {
+  private static BankIdConfigurationProperties buildProps(final Rp... rps) {
     final BankIdConfigurationProperties props = new BankIdConfigurationProperties();
     for (final Rp rp : rps) {
-      final RelyingPartyConfiguration relyingParty = Mockito.mock(RelyingPartyConfiguration.class);
-      Mockito.when(relyingParty.getId()).thenReturn(rp.id());
+      final RelyingPartyConfiguration relyingParty = new RelyingPartyConfiguration();
+      relyingParty.setId(rp.id());
+      final PkiCredentialConfigurationProperties cp = new PkiCredentialConfigurationProperties();
+      cp.setBundle(rp.id());
+      relyingParty.setCredential(cp);
       props.getRelyingParties().add(relyingParty);
     }
 
     return props;
   }
 
-  private static Function<RelyingPartyConfiguration, PkiCredential> buildCredentialFunction(final Rp... rps) {
+  private static PkiCredentialFactory buildPkiCredentialFactory(final Rp... rps) {
+
     final Map<String, PkiCredential> credentials = new HashMap<>();
-
     for (final Rp rp : rps) {
-      final RelyingPartyConfiguration relyingParty = Mockito.mock(RelyingPartyConfiguration.class);
-      Mockito.when(relyingParty.getId()).thenReturn(rp.id());
-
       final X509Certificate cert = Mockito.mock(X509Certificate.class);
       Mockito.when(cert.getNotAfter()).thenReturn(Date.from(rp.expires()));
 
@@ -152,7 +153,7 @@ public class RpCertificateHealthIndicatorTest {
       credentials.put(rp.id(), cred);
     }
 
-    return conf -> credentials.get(conf.getId());
+    return new PkiCredentialFactory(credentials::get, null, null, false);
   }
 
   private record Rp(String id, Instant expires) {
