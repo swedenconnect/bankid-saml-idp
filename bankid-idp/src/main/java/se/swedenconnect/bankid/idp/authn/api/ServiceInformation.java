@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Represents status information.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -29,14 +29,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ServiceInformation {
-  
+
   /**
    * Represents the service status.
    */
   public enum Status {
     /** No issues. */
     OK,
-    
+
     /** There are issues. */
     ISSUES
   }

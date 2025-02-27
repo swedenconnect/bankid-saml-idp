@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Keys for storing BankID objects in the session.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -55,8 +55,8 @@ public class BankIdSessionAttributeKeys {
    */
   public static final List<String> BANKID_VOLATILE_ATTRIBUTES =
       List.of(BANKID_USER_VISIBLE_DATA_ATTRIBUTE, BANKID_STATE_ATTRIBUTE, BANKID_COMPLETION_DATA_ATTRIBUTE);
-  
+
   // Hidden constructor
-  private BankIdSessionAttributeKeys() {    
+  private BankIdSessionAttributeKeys() {
   }
 }

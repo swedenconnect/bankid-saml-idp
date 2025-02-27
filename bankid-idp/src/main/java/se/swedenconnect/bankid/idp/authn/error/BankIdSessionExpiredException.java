@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import se.swedenconnect.bankid.rpapi.types.BankIDException;
 
 /**
  * Exception for expired BankID sessions.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -33,7 +33,7 @@ public class BankIdSessionExpiredException extends BankIDException {
 
   /**
    * Constructor.
-   * 
+   *
    * @param request the {@link PollRequest}
    */
   public BankIdSessionExpiredException(final PollRequest request) {
@@ -43,7 +43,7 @@ public class BankIdSessionExpiredException extends BankIDException {
 
   /**
    * Gets the {@link PollRequest} that were active when the session timed out.
-   * 
+   *
    * @return a {@link PollRequest}
    */
   public PollRequest getRequest() {

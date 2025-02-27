@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents an order response, i.e., the response message received from an auth or sign request.
- * 
+ *
  * @author Martin Lindström
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -54,7 +54,7 @@ public class OrderResponse {
 
   /**
    * Returns the order reference string.
-   * 
+   *
    * @return the order reference
    */
   public String getOrderReference() {
@@ -63,7 +63,7 @@ public class OrderResponse {
 
   /**
    * Assigns the order reference string.
-   * 
+   *
    * @param orderReference the order reference
    */
   public void setOrderReference(final String orderReference) {
@@ -72,7 +72,7 @@ public class OrderResponse {
 
   /**
    * Returns the auto start token.
-   * 
+   *
    * @return the auto start token
    */
   public String getAutoStartToken() {
@@ -81,7 +81,7 @@ public class OrderResponse {
 
   /**
    * Assigns the auto start token.
-   * 
+   *
    * @param autoStartToken the auto start token
    */
   public void setAutoStartToken(final String autoStartToken) {
@@ -93,7 +93,7 @@ public class OrderResponse {
    * <p>
    * Available for BankID RP API v5.1 and later.
    * </p>
-   * 
+   *
    * @return QR start token, or null if not available (pre v5.1)
    */
   public String getQrStartToken() {
@@ -105,7 +105,7 @@ public class OrderResponse {
    * <p>
    * Available for BankID RP API v5.1 and later.
    * </p>
-   * 
+   *
    * @param qrStartToken the QR start token
    */
   public void setQrStartToken(final String qrStartToken) {
@@ -117,7 +117,7 @@ public class OrderResponse {
    * <p>
    * Available for BankID RP API v5.1 and later.
    * </p>
-   * 
+   *
    * @return the QR start secrret, or null if not available (pre v5.1)
    */
   public String getQrStartSecret() {
@@ -129,7 +129,7 @@ public class OrderResponse {
    * <p>
    * Available for BankID RP API v5.1 and later.
    * </p>
-   * 
+   *
    * @param qrStartSecret the QR start secret string
    */
   public void setQrStartSecret(final String qrStartSecret) {
@@ -139,7 +139,7 @@ public class OrderResponse {
   /**
    * Gets the orderTime property that is used when generating "animated" QR codes. The property is instantiated with the
    * current time when the object is created.
-   * 
+   *
    * @return the instant when the response object was instantited
    */
   public Instant getOrderTime() {

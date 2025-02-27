@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import se.swedenconnect.bankid.rpapi.LibraryVersion;
 
 /**
  * Class the represents "to-be-signed" input for a signature operation.
- * 
+ *
  * @author Martin Lindström
  */
 public class DataToSign extends UserVisibleData {
@@ -35,11 +35,11 @@ public class DataToSign extends UserVisibleData {
   /**
    * Assigns the data that is part of the signature process but should not be displayed to the user. This supplied data
    * is the raw bytes and the method will Base64 encode it.
-   * 
+   *
    * <p>
    * See also {@link DataToSign#setUserNonVisibleData(String)}.
    * </p>
-   * 
+   *
    * @param bytes the data that is part of the signature process but should not be displayed to the user (raw data)
    */
   public void setUserNonVisibleDataRaw(final byte[] bytes) {
@@ -54,7 +54,7 @@ public class DataToSign extends UserVisibleData {
    * <p>
    * See also {@link DataToSign#setUserNonVisibleDataRaw(byte[])}.
    * </p>
-   * 
+   *
    * @param userNonVisibleData the data that is part of the signature process but should not be displayed to the user
    *          (base64-encoded)
    */
@@ -64,7 +64,7 @@ public class DataToSign extends UserVisibleData {
 
   /**
    * Returns the data that is part of the signature process but should not be displayed to the user.
-   * 
+   *
    * @return data to be signed, but not displayed to the user
    */
   public String getUserNonVisibleData() {

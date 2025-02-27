@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@ package se.swedenconnect.bankid.rpapi.support;
 
 /**
  * Defines a repository for BankID messages.
- * 
+ *
  * @author Martin Lindström (martin@litsec.se)
  */
 public interface BankIDMessageRepository {
 
   /**
    * Based on the message ID (short name), the method finds the message.
-   * 
+   *
    * @param id the short name for the message
    * @return the {@code BankIDMessage} or {@code null} if no message is found
    */

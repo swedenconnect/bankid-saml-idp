@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * An enum representing a BankID operation.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -37,7 +37,7 @@ public enum BankIdOperation {
 
   /**
    * Constructor.
-   * 
+   *
    * @param value the string representation of the enum
    */
   private BankIdOperation(final String value) {
@@ -46,7 +46,7 @@ public enum BankIdOperation {
 
   /**
    * Given a string representation its enum object is returned.
-   * 
+   *
    * @param value the string representation
    * @return a {@link BankIdOperation}
    */
@@ -62,7 +62,7 @@ public enum BankIdOperation {
 
   /**
    * Returns the string representation of the enum.
-   * 
+   *
    * @return the string representation
    */
   @JsonValue

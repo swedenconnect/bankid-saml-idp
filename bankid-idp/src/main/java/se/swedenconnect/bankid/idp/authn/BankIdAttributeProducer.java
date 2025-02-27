@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import se.swedenconnect.spring.saml.idp.authentication.Saml2UserAuthentication;
 /**
  * An {@link AttributeProducer} that makes sure that the {@code authContextParam} and {@code transactionId} attributes
  * are released even if they are not explicitly requested.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -72,7 +72,7 @@ public class BankIdAttributeProducer implements AttributeProducer {
           .orElse(null);
       if (userSignature != null) {
         attributes.add(userSignature);
-      } 
+      }
     }
 
     return attributes;

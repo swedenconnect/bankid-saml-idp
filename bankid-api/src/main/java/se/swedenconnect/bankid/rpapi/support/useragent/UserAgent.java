@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,28 @@ package se.swedenconnect.bankid.rpapi.support.useragent;
 
 /**
  * An interface for representing user agent information.
- * 
+ *
  * @author Martin Lindström
  */
 public interface UserAgent {
 
   /**
    * Returns the type of the device the user has, for example "mobile" or "desktop".
-   * 
+   *
    * @return user device type
    */
   UserDeviceType getUserDeviceType();
 
   /**
    * Returns the "User-Agent" header received from when the user connected to the service.
-   * 
+   *
    * @return the "User-Agent" header
    */
   String getUserAgentHeader();
 
   /**
    * Returns the IP address for the user.
-   * 
+   *
    * @return the IP address
    */
   String getUserIpAddress();
@@ -57,7 +57,7 @@ public interface UserAgent {
    * The reason that we need special handling of iOS and Safari is that the BankID app needs to be started with an extra
    * parameter for those cases.
    * </p>
-   * 
+   *
    * @return true if the "User-Agent" header indicates that Safari is used and false otherwise
    */
   boolean isNonEmbeddedMobileSafari();
@@ -67,7 +67,7 @@ public interface UserAgent {
    * starting since iOS requires an app to whitelist all URL-schemes that an app should be able to invoke. And BankID is
    * pretty unknown to the major apps, so in those cases we need to ask the user to manually start the app. This
    * predicate checks if the "User-Agent" header indicates that an embedded browser is in use.
-   * 
+   *
    * @return true if the "User-Agent" header indicates that an embedded browser is used and false otherwise
    */
   boolean isEmbeddedBrowser();

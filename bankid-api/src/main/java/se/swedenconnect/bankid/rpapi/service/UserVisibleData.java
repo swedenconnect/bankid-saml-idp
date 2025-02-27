@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import se.swedenconnect.bankid.rpapi.LibraryVersion;
 /**
  * Class that represents the BankID {@code userVisibleData} and {@code userVisibleDataFormat} parameters that may be
  * used in calls to authenticate and sign.
- * 
+ *
  * @author Martin Lindström
  */
 public class UserVisibleData implements Serializable {
@@ -53,7 +53,7 @@ public class UserVisibleData implements Serializable {
    * By using this method, the caller can assign the text that will be displayed to the user. The method will take care
    * of Base64-encoding.
    * </p>
-   * 
+   *
    * @param displayText the (non-encoded) display text
    * @see #setUserVisibleData(String)
    */
@@ -67,7 +67,7 @@ public class UserVisibleData implements Serializable {
    * <p>
    * See also {@link #setDisplayText(String)}.
    * </p>
-   * 
+   *
    * @param userVisibleData base64-encoded data to be displayed
    */
   public void setUserVisibleData(final String userVisibleData) {
@@ -76,8 +76,8 @@ public class UserVisibleData implements Serializable {
 
   /**
    * Returns the text to be displayed. The returned string is Base64 encoded.
-   * 
-   * 
+   *
+   *
    * @return text to be displayed and signed (base64-encoded)
    */
   public String getUserVisibleData() {
@@ -86,7 +86,7 @@ public class UserVisibleData implements Serializable {
 
   /**
    * Gets the identifier for formatting the user visible data.
-   * 
+   *
    * @return formatting identifier or {@code null} if not assigned
    */
   public String getUserVisibleDataFormat() {
@@ -95,7 +95,7 @@ public class UserVisibleData implements Serializable {
 
   /**
    * Assigns the identifier for formatting the user visible data.
-   * 
+   *
    * @param userVisibleDataFormat formatting identifier
    */
   public void setUserVisibleDataFormat(final String userVisibleDataFormat) {

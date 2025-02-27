@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class SignatureRequest {
 
   /**
    * Gets the data to sign.
-   * 
+   *
    * @return the data to sign
    */
   public DataToSign getDataToSign() {
@@ -70,11 +70,11 @@ public class SignatureRequest {
 
   /**
    * Gets the signing requirements.
-   * 
+   *
    * @return the {@link Requirement} or {@code null}
    */
   public Requirement getRequirement() {
     return this.requirement;
   }
-  
+
 }
