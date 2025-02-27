@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import se.swedenconnect.bankid.idp.ApplicationVersion;
 
 /**
  * Exception class for validation errors in BankID data received from the BankID server.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -29,21 +29,21 @@ public class BankIdValidationException extends BankIdTraceableException {
 
   /**
    * Constructor.
-   * 
+   *
    * @param orderRef the order reference
    * @param msg the error message
-   */  
+   */
   public BankIdValidationException(final String orderRef, final String msg) {
     super(orderRef, msg);
   }
 
   /**
    * Constructor.
-   * 
+   *
    * @param orderRef the order reference
    * @param msg the error message
    * @param cause the cause of the error
-   */  
+   */
   public BankIdValidationException(final String orderRef, final String msg, final Throwable cause) {
     super(orderRef, msg, cause);
   }

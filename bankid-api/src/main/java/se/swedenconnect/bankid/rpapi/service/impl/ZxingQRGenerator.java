@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
  * <p>
  * <b>Note:</b> This implementation does not support the SVG image format.
  * </p>
- * 
+ *
  * @author Martin Lindström
  */
 public class ZxingQRGenerator extends AbstractQRGenerator {
@@ -57,7 +57,7 @@ public class ZxingQRGenerator extends AbstractQRGenerator {
 
   /**
    * Generates the QR code image based on the supplied input string.
-   * 
+   *
    * @param input the input
    * @param size the width and height of the generated QR code (in pixels)
    * @param format the format for the generated QR code

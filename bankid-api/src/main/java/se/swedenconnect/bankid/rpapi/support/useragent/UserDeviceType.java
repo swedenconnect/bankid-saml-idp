@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@ package se.swedenconnect.bankid.rpapi.support.useragent;
 
 /**
  * Represents the user device type that is being used.
- * 
+ *
  * @author Martin Lindström
  */
 public enum UserDeviceType {
 
   /** A mobile phone. */
   MOBILE,
-  
+
   /** A tablet. */
   TABLET,
-  
+
   /** A desktop computer. */
   DESKTOP;
 

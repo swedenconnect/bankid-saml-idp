@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ public interface TryLock {
 
   /**
    * Tries to get a lock.
-   * 
+   *
    * @return {@code true} if the lock was acquired and {@code false} otherwise
    */
   boolean tryLock();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 
 /**
  * Exception class errors during BankID operations that we assign a trace ID to. This is useful for display purposes.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
@@ -38,7 +38,7 @@ public class BankIdTraceableException extends BankIDException {
 
   /**
    * Constructor.
-   * 
+   *
    * @param orderRef the order reference
    * @param msg the error message
    */
@@ -48,7 +48,7 @@ public class BankIdTraceableException extends BankIDException {
 
   /**
    * Constructor.
-   * 
+   *
    * @param orderRef the order reference
    * @param msg the error message
    * @param cause the cause of the error
@@ -64,7 +64,7 @@ public class BankIdTraceableException extends BankIDException {
 
   /**
    * Gets the BankID order reference.
-   * 
+   *
    * @return the BankID order reference
    */
   public String getOrderRef() {
@@ -73,7 +73,7 @@ public class BankIdTraceableException extends BankIDException {
 
   /**
    * Gets the trace ID.
-   * 
+   *
    * @return the trace ID
    */
   public String getTraceId() {

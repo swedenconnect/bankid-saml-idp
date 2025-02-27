@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ public class CompletionData implements Serializable {
   /**
    * Gets the date the BankID was issued to the user. The issue date of the ID expressed using ISO 8601 date format
    * YYYY-MM-DD with a UTC time zone offset.
-   * 
+   *
    * @return issue date
    */
   public String getBankIdIssueDate() {
@@ -101,7 +101,7 @@ public class CompletionData implements Serializable {
   /**
    * Assigns the date the BankID was issued to the user. The issue date of the ID expressed using ISO 8601 date format
    * YYYY-MM-DD with a UTC time zone offset.
-   * 
+   *
    * @param bankIdIssueDate issue date
    */
   public void setBankIdIssueDate(final String bankIdIssueDate) {
@@ -110,7 +110,7 @@ public class CompletionData implements Serializable {
 
   /**
    * Gets the information about extra verifications that were part of the transaction.
-   * 
+   *
    * @return information or {@code null}
    */
   public StepUp getStepUp() {
@@ -119,7 +119,7 @@ public class CompletionData implements Serializable {
 
   /**
    * Assigns the information about extra verifications that were part of the transaction.
-   * 
+   *
    * @param stepUp information
    */
   public void setStepUp(final StepUp stepUp) {
@@ -303,7 +303,7 @@ public class CompletionData implements Serializable {
 
     /**
      * Returns the unique hardware identifier for the user’s device.
-     * 
+     *
      * @return unique hardware identifier
      */
     public String getUhi() {
@@ -312,7 +312,7 @@ public class CompletionData implements Serializable {
 
     /**
      * Assigns the unique hardware identifier for the user’s device.
-     * 
+     *
      * @param uhi unique hardware identifier
      */
     public void setUhi(final String uhi) {
@@ -342,7 +342,7 @@ public class CompletionData implements Serializable {
      * Gets the MRTD status that indicates if there was a check of the MRTD (machine readable travel document).
      * {@code true} means that the MRTD check was performed and passed, and {@code false} means that the check was
      * performed but failed.
-     * 
+     *
      * @return the MRTD status
      */
     public Boolean getMrtd() {
@@ -353,7 +353,7 @@ public class CompletionData implements Serializable {
      * Assigns the MRTD status that indicates if there was a check of the MRTD (machine readable travel document).
      * {@code true} means that the MRTD check was performed and passed, and {@code false} means that the check was
      * performed but failed.
-     * 
+     *
      * @param mrtd the MRTD status
      */
     public void setMrtd(final Boolean mrtd) {

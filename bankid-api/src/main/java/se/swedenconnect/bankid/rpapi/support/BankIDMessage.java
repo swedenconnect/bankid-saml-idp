@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Litsec AB
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * An abstraction for messages that are displayed for the user during a BankID operation.
- * 
+ *
  * @author Martin Lindström
  */
 public interface BankIDMessage {
@@ -29,7 +29,7 @@ public interface BankIDMessage {
    * <p>
    * See section 6 of the BankID Relying Party Guidelines.
    * </p>
-   * 
+   *
    * @return the message short name
    */
   ShortName getShortName();
@@ -40,7 +40,7 @@ public interface BankIDMessage {
    * If more than one message code is returned, the idea is to display the message divided into parts, for example in
    * separate p-tags.
    * </p>
-   * 
+   *
    * @return a (non-empty) list of message codes
    */
   List<String> getMessageCodes();
@@ -173,7 +173,7 @@ public interface BankIDMessage {
 
     /** Unknown error. Please try again. */
     RFA22,
-    
+
     /** Process your machine-readable travel document using the BankID app. */
     RFA23,
 

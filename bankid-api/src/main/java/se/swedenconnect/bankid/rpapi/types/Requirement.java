@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class Requirement {
 
   /**
    * Creates a {@code RequirementBuilder} given an already existing requirement.
-   * 
+   *
    * @param req the template requirement
    * @return a builder
    */
@@ -124,7 +124,7 @@ public class Requirement {
   /**
    * Gets the pin code requirement that tells whether users are required to sign the transaction with their PIN code,
    * even if they have biometrics activated.
-   * 
+   *
    * @return whether pin code is required
    */
   public Boolean getPinCode() {
@@ -134,7 +134,7 @@ public class Requirement {
   /**
    * Sets whether users are required to sign the transaction with their PIN code, even if they have biometrics
    * activated.
-   * 
+   *
    * @param pinCode whether pin code is required
    */
   public void setPinCode(final Boolean pinCode) {
@@ -144,7 +144,7 @@ public class Requirement {
   /**
    * Gets the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
    * information to complete the order.Only Swedish passports and national ID cards are supported.
-   * 
+   *
    * @return the MRTD flag
    */
   public Boolean getMrtd() {
@@ -154,7 +154,7 @@ public class Requirement {
   /**
    * Assigns the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
    * information to complete the order.Only Swedish passports and national ID cards are supported.
-   * 
+   *
    * @param mrtd the MRTD flag
    */
   public void setMrtd(final Boolean mrtd) {
@@ -207,7 +207,7 @@ public class Requirement {
   /**
    * Gets the personal eidentification number to be used to complete the transaction. If a BankID with another personal
    * number attempts to sign the transaction, it fails.
-   * 
+   *
    * @return the personal number or {@code null}
    */
   public String getPersonalNumber() {
@@ -217,7 +217,7 @@ public class Requirement {
   /**
    * Assigns the personal eidentification number to be used to complete the transaction. If a BankID with another
    * personal number attempts to sign the transaction, it fails.
-   * 
+   *
    * @param personalNumber the personal number
    */
   public void setPersonalNumber(final String personalNumber) {
@@ -351,7 +351,7 @@ public class Requirement {
     /**
      * Sets whether users are required to sign the transaction with their PIN code, even if they have biometrics
      * activated.
-     * 
+     *
      * @param pinCode whether pin code is required
      * @return the builder
      */
@@ -363,7 +363,7 @@ public class Requirement {
     /**
      * Assigns the MRTD flag. If set to "true", the client needs to provide MRTD (Machine readable travel document)
      * information to complete the order.Only Swedish passports and national ID cards are supported.
-     * 
+     *
      * @param mrtd the MRTD flag
      * @return the builder
      */
@@ -375,7 +375,7 @@ public class Requirement {
     /**
      * Assigns the personal eidentification number to be used to complete the transaction. If a BankID with another
      * personal number attempts to sign the transaction, it fails.
-     * 
+     *
      * @param personalNumber the personal number
      * @return the builder
      */

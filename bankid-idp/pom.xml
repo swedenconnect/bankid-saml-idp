@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.2</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -52,8 +52,8 @@
   </developers>
 
   <properties>
-    <resilience4j.version>2.2.0</resilience4j.version>
-    <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+    <resilience4j.version>2.3.0</resilience4j.version>
+    <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
   </properties>
 
   <dependencyManagement>
@@ -95,7 +95,7 @@
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
       <artifactId>saml-idp-spring-boot-starter</artifactId>
-      <version>2.3.5</version>
+      <version>2.3.6</version>
     </dependency>
 
     <dependency>

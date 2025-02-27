@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Sweden Connect
+ * Copyright 2023-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import lombok.Setter;
 
 /**
  * Configuration properties for Tomcat AJP.
- * 
+ *
  * @author Martin Lindström
  * @author Felix Hellman
  */
