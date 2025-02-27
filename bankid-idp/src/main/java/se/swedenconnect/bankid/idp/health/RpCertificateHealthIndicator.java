@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.HealthConfiguration;
 import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.factory.PkiCredentialFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Health check indicator for the installed BankID Relying Party certificates.
@@ -52,18 +52,18 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
    * Constructor.
    *
    * @param properties the BankID IdP configuration properties
-   * @param relyingPartyCredentialProvider for getting the RP credential
+   * @param pkiCredentialFactory for loading credentials
    */
   public RpCertificateHealthIndicator(final BankIdConfigurationProperties properties,
-      final Function<BankIdConfigurationProperties.RelyingPartyConfiguration, PkiCredential> relyingPartyCredentialProvider) {
+      final PkiCredentialFactory pkiCredentialFactory) {
     this.warnThreshold = Optional.ofNullable(properties.getHealth())
         .map(HealthConfiguration::getRpCertificateWarnThreshold)
-        .orElseGet(() -> HealthConfiguration.RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT);
+        .orElse(HealthConfiguration.RP_CERTIFICATE_WARN_THRESHOLD_DEFAULT);
 
     this.certificateInformation = properties.getRelyingParties().stream()
         .map(rp -> {
           try {
-            final PkiCredential credential = relyingPartyCredentialProvider.apply(rp);
+            final PkiCredential credential = pkiCredentialFactory.createCredential(rp.getCredential());
             Objects.requireNonNull(credential);
             return new CertificateInformation(rp.getId(), credential.getCertificate().getNotAfter());
           }
@@ -95,10 +95,10 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
         })
         .toList();
 
-    if (list.stream().anyMatch(ch -> ch.expired())) {
+    if (list.stream().anyMatch(CertificateHealth::expired)) {
       return builder.down().build();
     }
-    else if (list.stream().anyMatch(ch -> ch.expiresSoon())) {
+    else if (list.stream().anyMatch(CertificateHealth::expiresSoon)) {
       return builder.status(CustomStatus.WARNING).build();
     }
     else {
@@ -111,9 +111,7 @@ public class RpCertificateHealthIndicator implements HealthIndicator {
         final Duration warnThreshold) {
       final Date notAfter = certificateInformation.notAfter();
       final boolean expired = notAfter.before(new Date());
-      final boolean expiresSoon = !expired
-          ? notAfter.before(Date.from(Instant.now().plus(warnThreshold)))
-          : false;
+      final boolean expiresSoon = !expired && notAfter.before(Date.from(Instant.now().plus(warnThreshold)));
       return new CertificateHealth(certificateInformation.id(), expired, expiresSoon, notAfter);
     }
   }
