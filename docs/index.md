@@ -38,6 +38,8 @@ See below for instructions on how to build your own BankID SAML IdP application.
 <a name="documentation">
 ## Documentation
 
+- [Release notes](https://docs.swedenconnect.se/bankid-saml-idp/release-notes.html)
+
 - [BankID and Sweden Connect Resources](https://docs.swedenconnect.se/bankid-saml-idp/bankid-sc-resources.html)
   - Links to relevant information about how to sign BankID contracts and how to find technical information published by BankID and Sweden Connect.
   
