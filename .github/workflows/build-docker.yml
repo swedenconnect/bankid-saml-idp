@@ -1,0 +1,26 @@
+name: Automated Docker Build
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - docs
+      - code-style
+      - samples
+      - scripts
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      - run: mvn clean install --no-transfer-progress
+      - run: cd bankid-idp; DOCKER_REPO=ghcr.io mvn jib:build
