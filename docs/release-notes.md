@@ -4,6 +4,10 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
+### Version 1.2.3
+
+- Bugfix: The BankID frontend can be refreshed when a user has navigated to a sub route
+
 
 ### Version 1.2.2
 

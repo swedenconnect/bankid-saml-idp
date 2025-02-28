@@ -57,7 +57,7 @@ public class ForwardRouter {
             builder.GET(route, (request -> {
               return ServerResponse.status(302).location(forward).build();
             })));
-    
+
     return builder.build();
   }
 }
