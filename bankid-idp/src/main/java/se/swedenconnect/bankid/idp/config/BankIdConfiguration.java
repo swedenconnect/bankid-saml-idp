@@ -107,7 +107,7 @@ public class BankIdConfiguration {
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(this.internalEndpoints()).permitAll()
             .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
-            .requestMatchers(this.frontendRoutes()).permitAll()
+            .requestMatchers(this.frontendRoutes(this.properties.getAuthn().getAuthnPath())).permitAll()
             .anyRequest().denyAll());
 
     return http.build();
@@ -118,14 +118,16 @@ public class BankIdConfiguration {
         "/images/**" };
   }
 
-  private String[] frontendRoutes() {
-    return Stream.of("/", "/auto", "qr", "/error/**", "/error").map(route -> {
-      final StringBuilder builder = new StringBuilder(this.properties.getAuthn().getAuthnPath());
-      if (!this.properties.getAuthn().getAuthnPath().endsWith("/")) {
-        builder.append("/");
+  /**
+   * @return array of routes that needs to be forwarded to frontend
+   * @param authnPath
+   */
+  public static String[] frontendRoutes(final String authnPath) {
+    return Stream.of("/", "/auto", "/qr", "/error/**", "/error").map(route -> {
+      if (authnPath.equals("/")) {
+        return route;
       }
-      builder.append(route);
-      return builder.toString();
+      return authnPath + route;
     }).toList().toArray(new String[] {});
   }
 
