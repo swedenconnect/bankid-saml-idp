@@ -35,7 +35,6 @@ import java.util.Arrays;
  *
  * @author Felix Hellman
  */
-
 @Configuration
 public class ForwardRouter {
 
