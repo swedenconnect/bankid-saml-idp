@@ -30,6 +30,33 @@ spring:
   session:
     timeout: 15m
 
+credential:
+  bundles:
+    keystore:
+      idp-ks:
+        location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
+        password: secret
+        type: JKS
+    jks:
+      idp-sign:
+        store-reference: idp-ks
+        name: "IdP signing"
+        key:
+          alias: sign
+          key-password: secret
+      idp-encrypt:
+        store-reference: idp-ks
+        name: "IdP encrypt"
+        key:
+          alias: encrypt
+          key-password: secret
+      idp-md-sign:
+        store-reference: idp-ks
+        name: "IdP metadata sign"
+        key:
+          alias: metadata
+          key-password: secret
+
 server:
   error:
     whitelabel:
@@ -96,11 +123,14 @@ bankid:
         - http://sandbox.swedenconnect.se/testmyeid
         - http://sandbox.swedenconnect.se/testmyeid-sign
       credential:
-        name: "test-cred" # FPTestcert5_20240610.p12
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert5_20240610.p12
-        alias: "1"
-        password: "qwerty123"
-        type: "PKCS12"
+        name: "test-cred"
+        jks:
+          store:
+            location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/swedenconnect/sandbox/certificate/FPTestcert5_20240610.p12
+            password: "qwerty123"
+            type: "PKCS12"
+          key:
+            alias: "1"
       user-message:
         inherit-default-login-text: false
         login-text:
@@ -118,20 +148,11 @@ saml:
       - location: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/metadata/local-metadata.xml
     credentials:
       sign:
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
-        alias: sign
-        password: secret
-        type: JKS
+        bundle: idp-sign
       encrypt:
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
-        alias: encrypt
-        password: secret
-        type: JKS
+        bundle: idp-encrypt
       metadata-sign:
-        resource: file:${BANKID_INSTALL_DIR}/bankid-idp/env/local/idp-credentials/idp-credentials.jks
-        alias: metadata
-        password: secret
-        type: JKS
+        bundle: idp-md-sign
     metadata:
       ui-info:
         display-names:
