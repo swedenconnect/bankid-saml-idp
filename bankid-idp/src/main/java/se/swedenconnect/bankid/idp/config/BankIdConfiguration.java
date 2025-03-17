@@ -107,7 +107,7 @@ public class BankIdConfiguration {
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(this.internalEndpoints()).permitAll()
             .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
-            .requestMatchers(this.frontendRoutes(this.properties.getAuthn().getAuthnPath())).permitAll()
+            .requestMatchers(frontendRoutes(this.properties.getAuthn().getAuthnPath())).permitAll()
             .anyRequest().denyAll());
 
     return http.build();
@@ -120,7 +120,7 @@ public class BankIdConfiguration {
 
   /**
    * @return array of routes that needs to be forwarded to frontend
-   * @param authnPath
+   * @param authnPath the authentication path
    */
   public static String[] frontendRoutes(final String authnPath) {
     return Stream.of("/", "/auto", "/qr", "/error/**", "/error").map(route -> {

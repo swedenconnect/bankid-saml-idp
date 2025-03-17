@@ -242,6 +242,7 @@ public class BankIdConfigurationProperties implements InitializingBean {
       if (this.credential.isEmpty()) {
         throw new IllegalArgumentException("bankid.relying-parties[].credential.* must be set");
       }
+      this.credential.afterPropertiesSet();
       if (this.userMessage == null) {
         this.userMessage = new RpUserMessage();
       }
