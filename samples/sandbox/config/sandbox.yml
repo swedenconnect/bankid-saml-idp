@@ -85,8 +85,8 @@ bankid:
   relying-parties:
     - id: "test-rp"
       credential:
-        name: "test-cred"
         jks:
+          name: "test-cred"
           store:
             location: file:/opt/bankid-idp/config/testcertificate.p12
             password: REDACTED
