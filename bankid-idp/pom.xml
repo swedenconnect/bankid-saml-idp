@@ -386,7 +386,7 @@
                   <goal>copy-resources</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${project.build.outputDirectory}/templates/</outputDirectory>
+                  <outputDirectory>${project.build.outputDirectory}/static/</outputDirectory>
                   <resources>
                     <resource>
                       <directory>${project.build.directory}/frontend/dist</directory>
