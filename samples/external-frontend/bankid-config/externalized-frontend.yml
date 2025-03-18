@@ -14,7 +14,7 @@ spring:
         password: changeit
   session:
     timeout: 15m
-    
+
 server:
   port: 8445
   forward-headers-strategy: native
@@ -27,7 +27,7 @@ server:
   reactive:
     session:
       timeout: 15m
-      
+
 management:
   endpoint:
     health:
@@ -39,7 +39,7 @@ management:
       exposure:
         include: health, metrics, prometheus, loggers, auditevents
   server:
-    port: 8444      
+    port: 8444
 
 bankid:
   authn:
