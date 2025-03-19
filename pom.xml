@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.bankid</groupId>
   <artifactId>saml-bankid-idp-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.2.3</version>
 
   <name>Sweden Connect :: BankID :: Parent POM</name>
   <description>Parent POM for BankID SAML Identity Provider</description>
@@ -55,7 +55,7 @@
     <spring.version>6.2.3</spring.version>
     <bc.version>1.80</bc.version>
     <zxing.version>3.5.3</zxing.version>
-    <slf4j.version>2.0.16</slf4j.version>
+    <slf4j.version>2.0.17</slf4j.version>
     <credentials-support.version>2.0.4</credentials-support.version>
   </properties>
 
@@ -113,7 +113,7 @@
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <type>pom</type>
-        <version>5.12.0</version>
+        <version>5.12.1</version>
         <scope>import</scope>
       </dependency>
 
@@ -405,8 +405,8 @@
             <link>https://docs.swedenconnect.se/saml-identity-provider/apidoc/</link>
             <link>https://docs.swedenconnect.se/opensaml-addons/apidoc/</link>
             <link>https://www.javadoc.io/doc/javax.servlet/javax.servlet-api/3.1.0/</link>
-            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.18.2/</link>
-            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.18.2/</link>
+            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.18.3/</link>
+            <link>https://www.javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.18.3/</link>
           </links>
           <detectJavaApiLink>true</detectJavaApiLink>
         </configuration>
