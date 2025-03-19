@@ -6,8 +6,11 @@
 
 ### Version 1.2.3
 
-- Bugfix: The BankID frontend can be refreshed when a user has navigated to a sub route
+**Date:** 2025-03-19
 
+- Bugfix: The BankID frontend can be refreshed when a user has navigated to a sub route.
+
+- Dependency updates.
 
 ### Version 1.2.2
 
