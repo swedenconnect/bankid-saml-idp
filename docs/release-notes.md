@@ -10,7 +10,7 @@
 
 - Bugfix: The BankID frontend can be refreshed when a user has navigated to a sub route.
 
-- Dependency updates.
+- Dependency updates, and most specifically update to latest Tomcat version to avoid [CVE-2025-24813](https://thehackernews.com/2025/03/apache-tomcat-vulnerability-comes-under.html). 
 
 ### Version 1.2.2
 
