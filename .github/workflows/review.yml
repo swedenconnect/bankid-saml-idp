@@ -13,4 +13,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      - run: mvn clean verify --no-transfer-progress
+      - run: |
+          sudo echo "127.0.0.1 local.dev.swedenconnect.se" | sudo tee -a /etc/hosts
+          mvn clean verify --no-transfer-progress

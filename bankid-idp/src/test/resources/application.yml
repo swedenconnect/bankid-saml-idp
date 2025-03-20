@@ -1,3 +1,30 @@
+credential:
+  bundles:
+    keystore:
+      idp-ks:
+        location: classpath:testcredentials/test-credentials.jks
+        password: secret
+        type: JKS
+    jks:
+      idp-sign:
+        store-reference: idp-ks
+        name: "IdP signing"
+        key:
+          alias: sign
+          key-password: secret
+      idp-encrypt:
+        store-reference: idp-ks
+        name: "IdP encrypt"
+        key:
+          alias: encrypt
+          key-password: secret
+      idp-md-sign:
+        store-reference: idp-ks
+        name: "IdP metadata sign"
+        key:
+          alias: metadata
+          key-password: secret
+
 spring:
   config:
     activate:
@@ -58,20 +85,11 @@ saml:
     base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
     credentials:
       sign:
-        resource: classpath:testcredentials/test-credentials.jks
-        alias: sign
-        password: secret
-        type: JKS
+        bundle: idp-sign
       encrypt:
-        resource: classpath:testcredentials/test-credentials.jks
-        alias: encrypt
-        password: secret
-        type: JKS
+        bundle: idp-encrypt
       metadata-sign:
-        resource: classpath:testcredentials/test-credentials.jks
-        alias: metadata
-        password: secret
-        type: JKS
+        bundle: idp-md-sign
     endpoints:
       metadata: /saml2/metadata
     metadata:
