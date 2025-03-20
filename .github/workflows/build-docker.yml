@@ -8,6 +8,7 @@ on:
       - code-style
       - samples
       - scripts
+      - .github
 
 jobs:
   build-docker:
