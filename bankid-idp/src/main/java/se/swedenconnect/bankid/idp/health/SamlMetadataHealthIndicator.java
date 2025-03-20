@@ -29,6 +29,7 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,7 @@ import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
  */
 @Component
 @Slf4j
+@Profile("!integrationtest")
 public class SamlMetadataHealthIndicator implements HealthIndicator {
 
   /** The metadata feed. */
