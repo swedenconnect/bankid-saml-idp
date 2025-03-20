@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      spring-upgrade:
+        applies-to: version-updates
+        patterns:
+          - org.springframework:spring-framework-bom
+          - org.springframework.boot:spring-boot-dependencies
+      swedenconnect-upgrade:
+        applies-to: version-updates
+        patterns:
+          - se.swedenconnect.security:*
