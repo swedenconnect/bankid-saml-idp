@@ -51,7 +51,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
 
-    <spring.boot.version>3.4.3</spring.boot.version>
+    <spring.boot.version>3.4.4</spring.boot.version>
     <spring.version>6.2.5</spring.version>
     <bc.version>1.80</bc.version>
     <zxing.version>3.5.3</zxing.version>
