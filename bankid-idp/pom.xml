@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.swedenconnect.bankid</groupId>
     <artifactId>saml-bankid-idp-parent</artifactId>
-    <version>1.2.4-SNAPSHOT</version>
+    <version>1.2.4</version>
   </parent>
 
   <name>Sweden Connect :: BankID :: SAML Identity Provider</name>
@@ -53,7 +53,7 @@
 
   <properties>
     <resilience4j.version>2.3.0</resilience4j.version>
-    <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+    <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
   </properties>
 
   <dependencyManagement>
@@ -62,7 +62,7 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
-        <version>1.20.6</version>
+        <version>1.21.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -95,7 +95,7 @@
     <dependency>
       <groupId>se.swedenconnect.spring.saml.idp</groupId>
       <artifactId>saml-idp-spring-boot-starter</artifactId>
-      <version>2.3.7</version>
+      <version>2.3.9</version>
     </dependency>
 
     <dependency>
@@ -132,7 +132,7 @@
     <dependency>
       <groupId>org.redisson</groupId>
       <artifactId>redisson-spring-boot-starter</artifactId>
-      <version>3.45.1</version>
+      <version>3.46.0</version>
     </dependency>
 
     <!--
@@ -199,17 +199,16 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.19.1</version>
+      <version>1.20.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock-standalone</artifactId>
-      <version>3.12.1</version>
+      <version>3.13.0</version>
       <scope>test</scope>
     </dependency>
-
 
     <dependency>
       <groupId>org.springframework.security</groupId>
