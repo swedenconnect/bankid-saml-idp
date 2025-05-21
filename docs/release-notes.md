@@ -4,6 +4,14 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
+### Version 1.2.4
+
+**Date:** 2025-05-21
+
+- Bugfix: The actuator endpoint required authentication making it impossible to reach. This has been fixed.
+
+- Dependency updates where reported vulnerabilities were fixed.
+
 ### Version 1.2.3
 
 **Date:** 2025-03-19

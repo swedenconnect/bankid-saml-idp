@@ -16,6 +16,7 @@
 package se.swedenconnect.bankid.idp.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -108,6 +109,7 @@ public class BankIdConfiguration {
             .requestMatchers(this.internalEndpoints()).permitAll()
             .requestMatchers(this.properties.getAuthn().getAuthnPath()).permitAll()
             .requestMatchers(frontendRoutes(this.properties.getAuthn().getAuthnPath())).permitAll()
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
             .anyRequest().denyAll());
 
     return http.build();
