@@ -102,7 +102,7 @@
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <type>pom</type>
-        <version>5.12.2</version>
+        <version>5.13.1</version>
         <scope>import</scope>
       </dependency>
 
