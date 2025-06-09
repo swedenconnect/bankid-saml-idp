@@ -53,7 +53,7 @@
 
     <spring.boot.version>3.5.0</spring.boot.version>
     <spring.version>6.2.7</spring.version>
-    <bc.version>1.80</bc.version>
+    <bc.version>1.81</bc.version>
     <zxing.version>3.5.3</zxing.version>
     <slf4j.version>2.0.17</slf4j.version>
     <credentials-support.version>2.0.6</credentials-support.version>
