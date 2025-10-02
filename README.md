@@ -39,4 +39,4 @@ The BankID SAML IdP is Open Source software released under the [Apache License](
 
 Copyright &copy; 2023-2025, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
-<img align="right" src="docs/images/eu-funded.jpg"></img>
+![EU](docs/images/eu-funded.jpg)
