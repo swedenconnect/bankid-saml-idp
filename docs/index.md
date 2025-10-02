@@ -79,4 +79,4 @@ See below for instructions on how to build your own BankID SAML IdP application.
 
 Copyright &copy; 2023-2025, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
-<img align="right" src="images/eu-funded.png"></img>
+<img align="right" src="images/eu-funded.png"/>
