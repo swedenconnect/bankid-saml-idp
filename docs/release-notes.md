@@ -4,6 +4,21 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
+### Version 1.2.5
+
+**Date:** 2025-12-04
+
+* During high load, some incoming request messages would fail to decode.
+  This has been fixed. See <https://github.com/swedenconnect/saml-identity-provider/issues/127>.
+
+* Added support for configuring the `mdorgext:OrganizationNumber` metadata
+  extension. See <https://docs.swedenconnect.se/schemas/authn/1.0/OrganizationNumber-1.0.xsd>.
+
+* When building a Docker image using the `jib:build` Maven plugin, the base image
+will be `eclipse-temurin:21-jre-alpine` instead of `openjdk:18.0.2.1-slim` (which is deprecated).
+
+* Dependency updates.
+
 ### Version 1.2.4
 
 **Date:** 2025-05-21
