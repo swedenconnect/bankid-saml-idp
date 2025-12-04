@@ -32,7 +32,7 @@ public class BankIdApiMock {
   private static final WireMockServer server;
 
   static {
-    WireMockConfiguration wireMockConfiguration = WireMockConfiguration.options()
+    final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.options()
         .containerThreads(20)
         .port(9000);
 
@@ -40,26 +40,26 @@ public class BankIdApiMock {
     server.start();
   }
 
-  public static void mockAuth(OrderResponse orderResponse) {
-    String json = BankIdResponseFactory.serialize(orderResponse);
-    CollectResponse first = BankIdResponseFactory.collect(orderResponse);
-    String collectJson = BankIdResponseFactory.serialize(first);
+  public static void mockAuth(final OrderResponse orderResponse) {
+    final String json = BankIdResponseFactory.serialize(orderResponse);
+    final CollectResponse first = BankIdResponseFactory.collect(orderResponse);
+    final String collectJson = BankIdResponseFactory.serialize(first);
     server.stubFor(post("/auth").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
     server.stubFor(
         post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference())))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(collectJson)));
   }
 
-  public static void nextCollect(CollectResponse collectResponse) {
-    String json = BankIdResponseFactory.serialize(collectResponse);
+  public static void nextCollect(final CollectResponse collectResponse) {
+    final String json = BankIdResponseFactory.serialize(collectResponse);
     server.stubFor(
         post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(collectResponse.getOrderReference())))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
   }
 
-  public static void failStart(OrderResponse toExpire, OrderResponse next) {
-    CollectResponse expired = BankIdResponseFactory.failStart(toExpire);
-    String expiredJson = BankIdResponseFactory.serialize(expired);
+  public static void failStart(final OrderResponse toExpire, final OrderResponse next) {
+    final CollectResponse expired = BankIdResponseFactory.failStart(toExpire);
+    final String expiredJson = BankIdResponseFactory.serialize(expired);
     server
         .stubFor(post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(toExpire.getOrderReference())))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(expiredJson)));
@@ -71,15 +71,15 @@ public class BankIdApiMock {
   }
 
   public static CollectResponse completeCollect(final OrderResponse orderResponse) throws JsonProcessingException {
-    CollectResponse complete = BankIdResponseFactory.complete(orderResponse);
-    String json = BankIdResponseFactory.serialize(complete);
+    final CollectResponse complete = BankIdResponseFactory.complete(orderResponse);
+    final String json = BankIdResponseFactory.serialize(complete);
     server.stubFor(
         post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference())))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
     return complete;
   }
 
-  public static void setDelay(int millis) {
+  public static void setDelay(final int millis) {
     server.setGlobalFixedDelay(millis);
   }
 
@@ -87,17 +87,17 @@ public class BankIdApiMock {
     server.setGlobalFixedDelay(0);
   }
 
-  public static void mockSign(OrderResponse orderResponse) {
-    String json = BankIdResponseFactory.serialize(orderResponse);
-    CollectResponse first = BankIdResponseFactory.collect(orderResponse);
-    String collectJson = BankIdResponseFactory.serialize(first);
+  public static void mockSign(final OrderResponse orderResponse) {
+    final String json = BankIdResponseFactory.serialize(orderResponse);
+    final CollectResponse first = BankIdResponseFactory.collect(orderResponse);
+    final String collectJson = BankIdResponseFactory.serialize(first);
     server.stubFor(post("/sign").willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(json)));
     server.stubFor(
         post("/collect").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference())))
             .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(collectJson)));
   }
 
-  public static void mockCancel(OrderResponse orderResponse) {
+  public static void mockCancel(final OrderResponse orderResponse) {
     server.stubFor(
         post("/cancel").withRequestBody(matchingJsonPath("$.orderRef", equalTo(orderResponse.getOrderReference()))));
   }
