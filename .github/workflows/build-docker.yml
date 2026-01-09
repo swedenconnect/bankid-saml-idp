@@ -31,7 +31,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      - run: |
+      - env:
+          DOCKER_REPO: ghcr.io/${{ github.repository_owner }}
+        run: |
             sudo echo "127.0.0.1 local.dev.swedenconnect.se" | sudo tee -a /etc/hosts
             mvn clean install --no-transfer-progress
-            cd bankid-idp; DOCKER_REPO=ghcr.io/${{ github.actor }} mvn jib:build
+            cd bankid-idp; DOCKER_REPO=${DOCKER_REPO,,} mvn jib:build
