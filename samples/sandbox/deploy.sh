@@ -6,7 +6,7 @@
 #
 
 docker rm bankid-saml-idp --force
-docker pull ${DOCKER_REPO}/bankid-saml-idp
+docker pull ${DOCKER_REPO}/swedenconnect/bankid-saml-idp
 BANKID_IDP_HOME=/opt/bankid-idp
 
 echo Redeploying docker container bankid-idp ...
@@ -22,6 +22,6 @@ docker run -d --name bankid-saml-idp --restart=always \
   -v /etc/localtime:/etc/localtime:ro \
   -v /opt/docker/bankid-idp:${BANKID_IDP_HOME} \
   -v /home/ubuntu/deploy/bankid-idp/config:"${BANKID_IDP_HOME}/config" \
-  "{DOCKER_REPO}/bankid-saml-idp"
+  "{DOCKER_REPO}/swedenconnect/bankid-saml-idp"
 
 echo Done!

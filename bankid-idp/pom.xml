@@ -259,7 +259,7 @@
             <image>eclipse-temurin:21-jre-alpine</image>
           </from>
           <to>
-            <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>
+            <image>${DOCKER_REPO}/bankid-saml-idp</image>
             <tags>
               <tag>${project.version}</tag>
             </tags>

@@ -110,7 +110,7 @@ which configures the cluster. You need both profiles to be active `SPRING_PROFIL
 **Building Docker image and pushing to registry:**
 
 ```bash
-export DOCKER_REPO=yourdockerrepo:port
+export DOCKER_REPO=yourdockerrepo:port/yournamespace
 mvn clean install
 mvn -f bankid-idp/bankid-idp jib:build
 ```
