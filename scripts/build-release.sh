@@ -19,7 +19,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VERSION=""
 CHECK_IN_FLAG=false
 PUBLISH_IMAGE_FLAG=false
-export DOCKER_REPO=ghcr.io
+export DOCKER_REPO=ghcr.io/swedenconnect
 
 while :
 do

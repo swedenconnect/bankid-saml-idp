@@ -34,4 +34,4 @@ jobs:
       - run: |
             sudo echo "127.0.0.1 local.dev.swedenconnect.se" | sudo tee -a /etc/hosts
             mvn clean install --no-transfer-progress
-            cd bankid-idp; DOCKER_REPO=ghcr.io mvn jib:build
+            cd bankid-idp; DOCKER_REPO=ghcr.io/${{ github.actor }} mvn jib:build
