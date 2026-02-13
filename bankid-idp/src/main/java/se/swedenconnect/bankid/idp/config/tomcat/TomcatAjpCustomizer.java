@@ -20,7 +20,7 @@ import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +64,7 @@ public class TomcatAjpCustomizer implements WebServerFactoryCustomizer<TomcatSer
         protocol.setSecretRequired(false);
       }
 
-      factory.addAdditionalTomcatConnectors(ajpConnector);
+      factory.addAdditionalConnectors(ajpConnector);
     }
 
   }

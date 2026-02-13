@@ -18,8 +18,9 @@ package se.swedenconnect.bankid.idp.config.session;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.redisson.api.HostPortNatMapper;
-import org.redisson.api.NatMapper;
+
+import org.redisson.config.HostPortNatMapper;
+import org.redisson.config.NatMapper;
 import org.redisson.config.ReadMode;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

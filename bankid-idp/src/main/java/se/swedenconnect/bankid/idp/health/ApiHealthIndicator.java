@@ -15,8 +15,9 @@
  */
 package se.swedenconnect.bankid.idp.health;
 
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -49,7 +50,7 @@ public class ApiHealthIndicator implements HealthIndicator {
 
   /** {@inheritDoc} */
   @Override
-  public Health getHealth(final boolean includeDetails) {
-    return HealthIndicator.super.getHealth(true);
+  public Health health(final boolean includeDetails) {
+    return HealthIndicator.super.health(true);
   }
 }

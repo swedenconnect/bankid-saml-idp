@@ -15,7 +15,8 @@
  */
 package se.swedenconnect.bankid.idp.health;
 
-import org.springframework.boot.actuate.health.Status;
+
+import org.springframework.boot.health.contributor.Status;
 
 /**
  * Defines custom health status code(s).
