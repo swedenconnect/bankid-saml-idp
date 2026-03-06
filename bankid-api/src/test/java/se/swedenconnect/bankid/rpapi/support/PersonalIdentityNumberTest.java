@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package se.swedenconnect.bankid.rpapi.support;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import se.swedenconnect.bankid.rpapi.support.PersonalIdentityNumber.Format;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Test cases for {@code PersonalIdentityNumber}.

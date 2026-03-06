@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.bankid.rpapi.support;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Year;
 import java.util.Calendar;
@@ -37,6 +38,7 @@ import se.swedenconnect.bankid.rpapi.LibraryVersion;
 public class PersonalIdentityNumber implements Serializable {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /** Enum for formatting a personal identity number. */
