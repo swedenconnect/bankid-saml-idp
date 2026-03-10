@@ -226,6 +226,20 @@
     <plugins>
 
       <plugin>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok-maven-plugin</artifactId>
+        <version>1.18.20.0</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>delombok</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.5.5</version>
         <configuration>
@@ -274,7 +288,7 @@
         <version>3.5.1</version>
         <configuration>
           <from>
-            <image>eclipse-temurin:21-jre-alpine</image>
+            <image>25-alpine3.20</image>
           </from>
           <to>
             <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>

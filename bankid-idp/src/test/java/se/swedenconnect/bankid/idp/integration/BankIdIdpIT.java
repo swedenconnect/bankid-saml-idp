@@ -82,7 +82,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertNotNull(completed.getAutoStartToken());
     Assertions.assertEquals(ApiResponse.Status.COMPLETE, completed.getStatus());
     final String completionUrl = client.complete();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", completionUrl);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", completionUrl);
   }
 
   @Test
@@ -109,7 +109,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     final ApiResponse completed = client.poll(true).block();
     Assertions.assertEquals("COMPLETE", completed.getStatus().name());
     final String complete = client.complete();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", complete);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", complete);
   }
 
   @Test
@@ -122,7 +122,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
     client.cancelApi().block();
     final String cancel = client.cancel();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", cancel);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse,
         c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
     final ApiResponse poll = client.poll(true).block();

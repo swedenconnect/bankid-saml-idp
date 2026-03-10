@@ -93,7 +93,7 @@ public class FrontendClient {
     Function<UriBuilder, URI> uriBuilderURIFunction = (uriBuilder) -> {
       uriBuilder.scheme("https");
       uriBuilder.port(8443);
-      uriBuilder.host("local.dev.swedenconnect.se");
+      uriBuilder.host("localhost");
       uriBuilder.path(path);
       c.accept(uriBuilder);
       return uriBuilder.build();
@@ -161,7 +161,7 @@ public class FrontendClient {
         .uri(uriBuilder -> {
           uriBuilder.scheme("https");
           uriBuilder.port(8443);
-          uriBuilder.host("local.dev.swedenconnect.se");
+          uriBuilder.host("localhost");
           uriBuilder.path(authRequest.getRequestURI());
           return uriBuilder.build();
         })
@@ -194,7 +194,7 @@ public class FrontendClient {
     HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
     WebClient client = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
     byte[] result = client.get()
-        .uri("https://local.dev.swedenconnect.se:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT)
+        .uri("https://localhost:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT)
         .retrieve()
         .onStatus(HttpStatusCode::isError, clientResponse ->
             clientResponse.createException().flatMap(Mono::error))
@@ -211,7 +211,7 @@ public class FrontendClient {
 
   public String complete() {
     List<String> block = client.get()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/complete")
+        .uri("https://localhost:" + port + "/idp/view/complete")
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)
@@ -230,7 +230,7 @@ public class FrontendClient {
 
   public String cancel() {
     List<String> location = client.get()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/cancel")
+        .uri("https://localhost:" + port + "/idp/view/cancel")
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)

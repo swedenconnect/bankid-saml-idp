@@ -31,7 +31,7 @@ spring:
       on-profile: integrationtest
   redis:
     data:
-      host: ${REDIS_HOST:local.dev.swedenconnect.se}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: supersecret
       ssl:
@@ -82,7 +82,7 @@ bankid:
 saml:
   idp:
     entity-id: https://bankid.swedenconnect.se/idp
-    base-url: https://local.dev.swedenconnect.se:${server.port}${server.servlet.context-path}
+    base-url: https://localhost:${server.port}${server.servlet.context-path}
     credentials:
       sign:
         bundle: idp-sign
