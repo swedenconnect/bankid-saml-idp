@@ -132,7 +132,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
   @Test
   @WithSamlUser
   void userCanNotPollInParallel(final FrontendClient client) {
-    BankIdApiMock.setDelay(200);
+    BankIdApiMock.setDelay(2000);
     final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
     final List<String> dummyList = List.of("NOT USED ON PURPOSE", "NOT USED ON PURPOSE");
