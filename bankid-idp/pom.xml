@@ -288,7 +288,7 @@
         <version>3.5.1</version>
         <configuration>
           <from>
-            <image>25-alpine3.20</image>
+            <image>amazoncorretto:25-alpine3.20</image>
           </from>
           <to>
             <image>${DOCKER_REPO}/swedenconnect/bankid-saml-idp</image>
