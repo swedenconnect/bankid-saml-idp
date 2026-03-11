@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -266,10 +266,10 @@ public class TestSp {
         generator.generateAuthnRequest(idpEntityId, relayState, context);
     this.authnRequest = requestObject.getRequest();
     this.authnRequest
-        .setDestination("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort));
+        .setDestination("https://localhost:%d/idp/saml2/post/authn".formatted(serverPort));
     this.relayState = relayState;
     final UriComponents components = UriComponentsBuilder
-        .fromUriString("https://local.dev.swedenconnect.se:%d/idp/saml2/post/authn".formatted(serverPort)).build();
+        .fromUriString("https://localhost:%d/idp/saml2/post/authn".formatted(serverPort)).build();
     MockHttpServletRequestBuilder builder;
 
     if ("GET".equals(requestObject.getMethod())) {
@@ -293,7 +293,7 @@ public class TestSp {
     return builder.with(r -> {
       r.setScheme("https");
       r.setServerPort(serverPort);
-      r.setServerName("local.dev.swedenconnect.se");
+      r.setServerName("localhost");
       return r;
     }).contextPath("/idp");
   }

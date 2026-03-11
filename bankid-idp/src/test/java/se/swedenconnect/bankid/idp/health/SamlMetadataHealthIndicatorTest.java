@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.shibboleth.shared.resolver.CriteriaSet;
 import net.shibboleth.shared.resolver.ResolverException;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 
@@ -63,7 +63,7 @@ public class SamlMetadataHealthIndicatorTest {
 
     final SamlMetadataHealthIndicator indicator = new SamlMetadataHealthIndicator(metadata, props);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.UP, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());
@@ -117,7 +117,7 @@ public class SamlMetadataHealthIndicatorTest {
 
     final SamlMetadataHealthIndicator indicator = new SamlMetadataHealthIndicator(metadata, props);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.DOWN, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());
@@ -146,7 +146,7 @@ public class SamlMetadataHealthIndicatorTest {
     final MetadataResolver metadata = Mockito.mock(MetadataResolver.class);
     final SamlMetadataHealthIndicator indicator = new SamlMetadataHealthIndicator(metadata, props);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.UP, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());
@@ -170,7 +170,7 @@ public class SamlMetadataHealthIndicatorTest {
 
     final SamlMetadataHealthIndicator indicator = new SamlMetadataHealthIndicator(metadata, props);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.OUT_OF_SERVICE, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());

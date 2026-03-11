@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import se.swedenconnect.bankid.idp.authn.api.overrides.ContentOverride;
 import se.swedenconnect.bankid.idp.authn.api.overrides.CssOverride;
 import se.swedenconnect.bankid.idp.authn.api.overrides.MessageOverride;
 import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideFileLoader;
 import se.swedenconnect.bankid.idp.authn.api.overrides.OverrideService;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Configurations for front-end UI overrides.
@@ -49,7 +50,7 @@ public class OverrideConfiguration {
    */
   public OverrideConfiguration(final BankIdConfigurationProperties properties) {
     this.overrideProperties = Optional.ofNullable(properties.getUi().getOverride())
-        .orElseGet(() -> new OverrideProperties());
+        .orElseGet(OverrideProperties::new);
   }
 
   @Bean

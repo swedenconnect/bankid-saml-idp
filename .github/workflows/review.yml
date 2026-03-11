@@ -11,8 +11,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
           cache: 'maven'
       - run: |
-          sudo echo "127.0.0.1 local.dev.swedenconnect.se" | sudo tee -a /etc/hosts
           mvn clean verify --no-transfer-progress

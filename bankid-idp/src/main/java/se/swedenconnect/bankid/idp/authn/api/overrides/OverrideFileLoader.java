@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import se.swedenconnect.bankid.idp.config.OverrideProperties;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * The {@code OverrideFileLoader} is responsible of
@@ -73,23 +71,11 @@ public class OverrideFileLoader {
               switch (group) {
               case "css" -> this.cssOverrides.add(new CssOverride(this.readFileContents(filePath)));
               case "content" -> {
-                List<ContentOverride> contentOverridesRead = null;
-                try {
-                  contentOverridesRead = this.mapper.readerFor(List.class).readValue(this.readFileContents(filePath));
-                }
-                catch (final JsonProcessingException e) {
-                  throw new RuntimeException(e);
-                }
+                final List<ContentOverride> contentOverridesRead = this.mapper.readerFor(List.class).readValue(this.readFileContents(filePath));
                 this.contentOverrides.addAll(contentOverridesRead);
               }
               case "messages" -> {
-                List<MessageOverride> messageOverridesRead = null;
-                try {
-                  messageOverridesRead = this.mapper.readerFor(List.class).readValue(this.readFileContents(filePath));
-                }
-                catch (final JsonProcessingException e) {
-                  throw new RuntimeException(e);
-                }
+                final List<MessageOverride> messageOverridesRead = this.mapper.readerFor(List.class).readValue(this.readFileContents(filePath));
                 this.messageOverrides.addAll(messageOverridesRead);
               }
               }

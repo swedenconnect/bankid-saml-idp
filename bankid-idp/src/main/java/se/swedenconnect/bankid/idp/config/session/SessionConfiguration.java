@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 package se.swedenconnect.bankid.idp.config.session;
 
 import org.redisson.api.RedissonClient;
-import org.redisson.spring.starter.RedissonAutoConfigurationV2;
+import org.redisson.spring.starter.RedissonAutoConfigurationV4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.session.SessionProperties;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
+import org.springframework.boot.session.autoconfigure.SessionProperties;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -111,7 +111,7 @@ public class SessionConfiguration {
   @ConditionalOnProperty(name = "bankid.session.module", havingValue = "memory")
   @EnableSpringHttpSession
   @EnableScheduling
-  @ImportAutoConfiguration(exclude = { RedissonAutoConfigurationV2.class, RedisAutoConfiguration.class })
+  @ImportAutoConfiguration(exclude = { RedissonAutoConfigurationV4.class, DataRedisAutoConfiguration.class })
   public static class DeprecatedInMemorySessionConfiguration extends MemorySessionAutoConfiguration {
 
     public DeprecatedInMemorySessionConfiguration(final ServerProperties serverProperties,

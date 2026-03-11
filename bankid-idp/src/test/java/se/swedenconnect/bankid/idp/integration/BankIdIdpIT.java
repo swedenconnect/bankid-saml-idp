@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.integration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -39,6 +40,7 @@ import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
+import java.time.Duration;
 import java.util.List;
 
 public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
@@ -82,7 +84,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertNotNull(completed.getAutoStartToken());
     Assertions.assertEquals(ApiResponse.Status.COMPLETE, completed.getStatus());
     final String completionUrl = client.complete();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", completionUrl);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", completionUrl);
   }
 
   @Test
@@ -109,7 +111,7 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     final ApiResponse completed = client.poll(true).block();
     Assertions.assertEquals("COMPLETE", completed.getStatus().name());
     final String complete = client.complete();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", complete);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", complete);
   }
 
   @Test
@@ -122,23 +124,24 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertEquals(orderResponse.getAutoStartToken(), polled.getAutoStartToken());
     client.cancelApi().block();
     final String cancel = client.cancel();
-    Assertions.assertEquals("https://local.dev.swedenconnect.se:8443/idp/resume", cancel);
+    Assertions.assertEquals("https://localhost:8443/idp/resume", cancel);
     BankIdApiMock.nextCollect(BankIdResponseFactory.collect(orderResponse,
         c -> c.hintCode("userCancel").status(CollectResponse.Status.FAILED)));
     final ApiResponse poll = client.poll(true).block();
     Assertions.assertEquals("CANCEL", poll.getStatus().name());
   }
 
-  @Test
+  @RepeatedTest(10)
   @WithSamlUser
   void userCanNotPollInParallel(final FrontendClient client) {
-    BankIdApiMock.setDelay(200);
+    BankIdApiMock.setDelay(2000);
     final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
-    final List<String> dummyList = List.of("NOT USED ON PURPOSE", "NOT USED ON PURPOSE");
-    StepVerifier.create(Flux.fromIterable(dummyList).flatMap(dnu -> client.poll(true)))
+    client.poll(true).subscribe();
+    StepVerifier.create(
+        Mono.delay(Duration.ofMillis(40)).then(client.poll(true)))
         .expectErrorMatches(e -> e instanceof CannotAcquireLockException)
-        .verify();
+        .verify(Duration.ofSeconds(10));
     BankIdApiMock.resetDelay();
   }
 

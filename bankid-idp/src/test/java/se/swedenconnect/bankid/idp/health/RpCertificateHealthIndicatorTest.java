@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties;
 import se.swedenconnect.bankid.idp.config.BankIdConfigurationProperties.RelyingPartyConfiguration;
 import se.swedenconnect.security.credential.PkiCredential;
@@ -59,7 +59,7 @@ public class RpCertificateHealthIndicatorTest {
 
     final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.UP, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());
@@ -85,7 +85,7 @@ public class RpCertificateHealthIndicatorTest {
 
     final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(Status.DOWN, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());
@@ -112,7 +112,7 @@ public class RpCertificateHealthIndicatorTest {
 
     final RpCertificateHealthIndicator indicator = new RpCertificateHealthIndicator(props, factory);
 
-    final Health health = indicator.getHealth(true);
+    final Health health = indicator.health(true);
     Assertions.assertEquals(CustomStatus.WARNING, health.getStatus());
 
     final String json = objectMapper.writeValueAsString(health.getDetails());

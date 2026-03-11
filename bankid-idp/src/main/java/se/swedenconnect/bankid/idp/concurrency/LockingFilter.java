@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -76,7 +78,17 @@ public class LockingFilter extends OncePerRequestFilter {
           filterChain.doFilter(request, response);
         }
         finally {
-          lock.unlock();
+          if (request.isAsyncStarted()) {
+            request.getAsyncContext().addListener(new AsyncListener() {
+              @Override public void onComplete(final AsyncEvent event) { lock.unlock(); }
+              @Override public void onTimeout(final AsyncEvent event) { lock.unlock(); }
+              @Override public void onError(final AsyncEvent event) { lock.unlock(); }
+              @Override public void onStartAsync(final AsyncEvent event) {}
+            });
+          }
+          else {
+            lock.unlock();
+          }
         }
       }
       else {

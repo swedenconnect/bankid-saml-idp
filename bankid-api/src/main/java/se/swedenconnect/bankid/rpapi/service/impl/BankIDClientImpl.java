@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package se.swedenconnect.bankid.rpapi.service.impl;
 
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,8 +34,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Mono;
 import se.swedenconnect.bankid.rpapi.service.AuthenticateRequest;
@@ -50,6 +48,7 @@ import se.swedenconnect.bankid.rpapi.types.ErrorCode;
 import se.swedenconnect.bankid.rpapi.types.ErrorResponse;
 import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.Requirement;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * An implementation of the BankID Relying Party API methods.
@@ -124,12 +123,8 @@ public class BankIDClientImpl implements BankIDClient {
     final AuthnRequest authnRequest =
         new AuthnRequest(request.getEndUserIp(), request.getRequirement(), request.getUserVisibleData());
     log.debug("{}: authenticate. request: [{}] [path: {}]", this.identifier, request, AUTH_PATH);
-    try {
-      log.debug("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
-    }
-    catch (final JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+
+    log.debug("Request serialized {}", objectMapper.writerFor(AuthnRequest.class).writeValueAsString(authnRequest));
     try {
       return this.webClient.post()
           .uri(AUTH_PATH)
@@ -283,14 +278,7 @@ public class BankIDClientImpl implements BankIDClient {
     if (body == null) {
       return new ErrorResponse(ErrorCode.UNKNOWN_ERROR, null);
     }
-    try {
-      return objectMapper.readValue(body, ErrorResponse.class);
-    }
-    catch (final IOException e) {
-      log.error("{}: Failed to deserialize error response {} into ErrorResponse structure",
-          this.identifier, exception.getResponseBodyAsString(), e);
-      return new ErrorResponse(ErrorCode.UNKNOWN_ERROR, null);
-    }
+    return objectMapper.readValue(body, ErrorResponse.class);
   }
 
   /**

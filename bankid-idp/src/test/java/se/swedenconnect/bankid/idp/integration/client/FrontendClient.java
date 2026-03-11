@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.opensaml.saml.saml2.metadata.impl.IDPSSODescriptorImpl;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -92,7 +93,7 @@ public class FrontendClient {
     Function<UriBuilder, URI> uriBuilderURIFunction = (uriBuilder) -> {
       uriBuilder.scheme("https");
       uriBuilder.port(8443);
-      uriBuilder.host("local.dev.swedenconnect.se");
+      uriBuilder.host("localhost");
       uriBuilder.path(path);
       c.accept(uriBuilder);
       return uriBuilder.build();
@@ -160,25 +161,26 @@ public class FrontendClient {
         .uri(uriBuilder -> {
           uriBuilder.scheme("https");
           uriBuilder.port(8443);
-          uriBuilder.host("local.dev.swedenconnect.se");
+          uriBuilder.host("localhost");
           uriBuilder.path(authRequest.getRequestURI());
           return uriBuilder.build();
         })
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .body(BodyInserters.fromFormData("SAMLRequest", samlRequest))
-        .exchange()
+        .exchangeToMono(response -> Mono.just(response))
         .block();
     List<String> cookies = block.headers().header("Set-Cookie");
     Assertions.assertFalse(cookies.isEmpty());
     FrontendClient frontendClient = new FrontendClient(client, 8443);
     Assertions.assertFalse(cookies.isEmpty());
     frontendClient.session = cookies.get(0).split(";")[0].split("=")[1];
-    List<String> xsrfCookie = client.get().uri("https://localhost:" + 8443 + "/idp/api/sp")
+    List<String> xsrfCookie = client.get()
+        .uri("https://localhost:" + 8443 + "/idp/api/sp")
         .cookie("BANKIDSESSION", frontendClient.session)
-        .exchange()
-        .block()
-        .headers()
-        .header("Set-Cookie");
+        .exchangeToMono(response ->
+            Mono.just(response.headers().header("Set-Cookie"))
+        )
+        .block();
     frontendClient.xsrfToken = xsrfCookie.get(0).split(";")[0].split("=")[1];
     return frontendClient;
   }
@@ -192,10 +194,11 @@ public class FrontendClient {
     HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
     WebClient client = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
     byte[] result = client.get()
-        .uri("https://local.dev.swedenconnect.se:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT)
-        .exchange()
-        .flatMap(response -> response.bodyToMono(ByteArrayResource.class))
-        .map(ByteArrayResource::getByteArray)
+        .uri("https://localhost:8443/idp" + EndpointSettings.SAML_METADATA_PUBLISH_ENDPOINT_DEFAULT)
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, clientResponse ->
+            clientResponse.createException().flatMap(Mono::error))
+        .bodyToMono(byte[].class)
         .block();
 
     return OpenSamlTestBase.unmarshall(
@@ -208,7 +211,7 @@ public class FrontendClient {
 
   public String complete() {
     List<String> block = client.get()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/complete")
+        .uri("https://localhost:" + port + "/idp/view/complete")
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)
@@ -227,7 +230,7 @@ public class FrontendClient {
 
   public String cancel() {
     List<String> location = client.get()
-        .uri("https://local.dev.swedenconnect.se:" + port + "/idp/view/cancel")
+        .uri("https://localhost:" + port + "/idp/view/cancel")
         .cookie("BANKIDSESSION", session)
         .cookie("XSRF-TOKEN", xsrfToken)
         .header("X-XSRF-TOKEN", xsrfToken)

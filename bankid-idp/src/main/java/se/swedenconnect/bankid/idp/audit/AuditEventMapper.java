@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Sweden Connect
+ * Copyright 2023-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,30 @@
  */
 package se.swedenconnect.bankid.idp.audit;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.boot.actuate.audit.AuditEvent;
+import se.swedenconnect.bankid.idp.ApplicationVersion;
+import tools.jackson.databind.ObjectMapper;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.boot.actuate.audit.AuditEvent;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import se.swedenconnect.bankid.idp.ApplicationVersion;
-
 /**
  * Wrapper for ObjectMapper to handle AuditEvent.
  *
- * @deprecated Use {@link se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper
- *               se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper} instead
- *
  * @author Martin Lindström
  * @author Felix Hellman
+ * @deprecated Use {@link se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper
+ * se.swedenconnect.spring.saml.idp.audit.repository.AuditEventMapper} instead
  */
 @Deprecated(forRemoval = true, since = "1.1.3")
 public class AuditEventMapper {
 
-  /** The underlying {@link ObjectMapper}. */
+  /**
+   * The underlying {@link ObjectMapper}.
+   */
   private final ObjectMapper mapper;
 
   /**
@@ -60,12 +57,7 @@ public class AuditEventMapper {
    * @return json-string
    */
   public String write(final AuditEvent event) {
-    try {
-      return this.mapper.writerFor(AuditEvent.class).writeValueAsString(event);
-    }
-    catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    return this.mapper.writerFor(AuditEvent.class).writeValueAsString(event);
   }
 
   /**
@@ -76,14 +68,8 @@ public class AuditEventMapper {
    */
 
   public AuditEvent read(final String event) {
-    try {
-      // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
-      final BankidAuditEvent auditEvent = this.mapper.readerFor(BankidAuditEvent.class).readValue(event);
-      return auditEvent;
-    }
-    catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    // Read BankidAuditEvent which extends AuditEvent with @JsonCreator and cast to AuditEvent
+    return this.mapper.readerFor(BankidAuditEvent.class).<BankidAuditEvent>readValue(event);
   }
 
   /**
@@ -97,12 +83,12 @@ public class AuditEventMapper {
      * Adds a JsonCreator for Jackson to be able to serialize AuditEvnets
      *
      * @param principal to deserialize
-     * @param type to deserialize
-     * @param data to deserialize
+     * @param type      to deserialize
+     * @param data      to deserialize
      */
     @JsonCreator
     public BankidAuditEvent(@JsonProperty("principal") final String principal, @JsonProperty("type") final String type,
-        @JsonProperty("data") final Map<String, Object> data) {
+                            @JsonProperty("data") final Map<String, Object> data) {
       super(principal, type, Optional.ofNullable(data).orElse(Map.of()));
     }
   }
