@@ -46,7 +46,7 @@ public class RedisTryLockRepository implements TryLockRepository {
   @Override
   public TryLock get(final String key) {
     final RLock lock = this.client.getLock(key);
-    return TryLock.create(getTryLock(lock), lock::unlock);
+    return TryLock.create(getTryLock(lock), lock::forceUnlock);
   }
 
   /**
