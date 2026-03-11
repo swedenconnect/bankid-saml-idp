@@ -18,6 +18,7 @@ package se.swedenconnect.bankid.idp.integration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import se.swedenconnect.bankid.idp.argument.AuthenticatedClientResolver;
 import se.swedenconnect.bankid.idp.argument.WithSamlUser;
@@ -39,6 +40,7 @@ import se.swedenconnect.bankid.rpapi.types.OrderResponse;
 import se.swedenconnect.bankid.rpapi.types.ProgressStatus;
 import se.swedenconnect.spring.saml.idp.error.UnrecoverableSaml2IdpException;
 
+import java.time.Duration;
 import java.util.List;
 
 public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
@@ -129,16 +131,17 @@ public class BankIdIdpIT extends BankIdIdpIntegrationSetup {
     Assertions.assertEquals("CANCEL", poll.getStatus().name());
   }
 
-  @Test
+  @RepeatedTest(10)
   @WithSamlUser
   void userCanNotPollInParallel(final FrontendClient client) {
     BankIdApiMock.setDelay(2000);
     final OrderResponse orderResponse = BankIdResponseFactory.start();
     BankIdApiMock.mockAuth(orderResponse);
-    final List<String> dummyList = List.of("NOT USED ON PURPOSE", "NOT USED ON PURPOSE");
-    StepVerifier.create(Flux.fromIterable(dummyList).flatMap(dnu -> client.poll(true)))
+    client.poll(true).subscribe();
+    StepVerifier.create(
+        Mono.delay(Duration.ofMillis(40)).then(client.poll(true)))
         .expectErrorMatches(e -> e instanceof CannotAcquireLockException)
-        .verify();
+        .verify(Duration.ofSeconds(10));
     BankIdApiMock.resetDelay();
   }
 
