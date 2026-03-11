@@ -4,6 +4,12 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
+### Version 1.3.0
+
+**Date:** 2026-03-11
+
+* Upgraded to Java 25, Spring Boot 4 and Spring 7.
+
 ### Version 1.2.5
 
 **Date:** 2025-12-04
