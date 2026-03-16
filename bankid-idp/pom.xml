@@ -52,7 +52,7 @@
   </developers>
 
   <properties>
-    <resilience4j.version>2.3.0</resilience4j.version>
+    <resilience4j.version>2.4.0</resilience4j.version>
     <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
   </properties>
 
