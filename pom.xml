@@ -325,7 +325,7 @@
           <configuration>
             <includes>**/*IT</includes>
           </configuration>
-          <version>3.5.4</version>
+          <version>3.5.5</version>
         </plugin>
 
         <plugin>
