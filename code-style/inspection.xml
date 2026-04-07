@@ -1,0 +1,126 @@
+<profile version="1.0">
+  <option name="myName" value="Default" />
+  <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,com.opencsv.CSVReaderBuilder,build" />
+  </inspection_tool>
+  <inspection_tool class="BooleanMethodIsAlwaysInverted" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="ConstantValue" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="ControlFlowStatementWithoutBraces" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
+  <inspection_tool class="DataFlowIssue" enabled="false" level="WARNING" enabled_by_default="false">
+    <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
+    <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
+  </inspection_tool>
+  <inspection_tool class="DefaultAnnotationParam" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="EqualsCalledOnEnumConstant" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="EqualsWithItself" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="ExtractMethodRecommender" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="minLength" value="562" />
+  </inspection_tool>
+  <inspection_tool class="FieldCanBeLocal" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="HttpUrlsUsage" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+    <option name="ignoredUrls">
+      <list>
+        <option value="http://0.0.0.0" />
+        <option value="http://127.0.0.1" />
+        <option value="http://activemq.apache.org/schema/" />
+        <option value="http://apache.org" />
+        <option value="http://cxf.apache.org/schemas/" />
+        <option value="http://eidas.europa.eu" />
+        <option value="http://example.com" />
+        <option value="http://excluded.example.com" />
+        <option value="http://fstest.example.se" />
+        <option value="http://id.elegnamnden.se" />
+        <option value="http://id.swedenconnect.se" />
+        <option value="http://java.sun.com/" />
+        <option value="http://javafx.com/fxml" />
+        <option value="http://javafx.com/javafx/" />
+        <option value="http://json-schema.org/draft" />
+        <option value="http://localhost" />
+        <option value="http://macedir.org" />
+        <option value="http://maven.apache.org" />
+        <option value="http://maven.apache.org/POM/" />
+        <option value="http://maven.apache.org/xsd/" />
+        <option value="http://primefaces.org/ui" />
+        <option value="http://refeds.org" />
+        <option value="http://sandbox.swedenconnect.se" />
+        <option value="http://schema.cloudfoundry.org/spring/" />
+        <option value="http://schemas.xmlsoap.org/" />
+        <option value="http://test.swedenconnect.se" />
+        <option value="http://tiles.apache.org/" />
+        <option value="http://uri.etsi.org" />
+        <option value="http://www.aiim.org" />
+        <option value="http://www.example.com" />
+        <option value="http://www.ibm.com/webservices/xsd" />
+        <option value="http://www.jboss.com/xml/ns/" />
+        <option value="http://www.jboss.org/j2ee/schema/" />
+        <option value="http://www.springframework.org/schema/" />
+        <option value="http://www.springframework.org/security/tags" />
+        <option value="http://www.springframework.org/tags" />
+        <option value="http://www.thymeleaf.org" />
+        <option value="http://www.w3.org/" />
+        <option value="http://xml.apache.org" />
+        <option value="http://xml.org" />
+        <option value="http://xmlns.jcp.org/" />
+      </list>
+    </option>
+  </inspection_tool>
+  <inspection_tool class="IgnoreResultOfCall" enabled="false" level="WARNING" enabled_by_default="false">
+    <option name="m_reportAllNonLibraryCalls" value="false" />
+    <option name="callCheckString" value="java.io.File,.*,java.io.InputStream,read|skip|available|markSupported,java.io.Reader,read|skip|ready|markSupported,java.lang.AbstractStringBuilder,capacity|codePointAt|codePointBefore|codePointCount|indexOf|lastIndexOf|offsetByCodePoints|substring|subSequence,java.lang.Boolean,.*,java.lang.Byte,.*,java.lang.Character,.*,java.lang.Double,.*,java.lang.Float,.*,java.lang.Integer,.*,java.lang.Long,.*,java.lang.Math,.*,java.lang.Object,equals|hashCode|toString,java.lang.Short,.*,java.lang.StrictMath,.*,java.lang.String,.*,java.lang.Thread,interrupted,java.math.BigDecimal,.*,java.math.BigInteger,.*,java.net.InetAddress,.*,java.net.URI,.*,java.nio.channels.AsynchronousChannelGroup,.*,java.nio.channels.Channel,isOpen,java.nio.channels.FileChannel,open|map|lock|tryLock|write,java.nio.channels.ScatteringByteChannel,read,java.nio.channels.SocketChannel,open|socket|isConnected|isConnectionPending,java.util.Arrays,.*,java.util.Collections,(?!addAll).*,java.util.List,of,java.util.Map,of|ofEntries|entry,java.util.Set,of,java.util.UUID,.*,java.util.concurrent.BlockingQueue,offer|remove,java.util.concurrent.CountDownLatch,await|getCount,java.util.concurrent.ExecutorService,awaitTermination|isShutdown|isTerminated,java.util.concurrent.ForkJoinPool,awaitQuiescence,java.util.concurrent.Semaphore,tryAcquire|availablePermits|isFair|hasQueuedThreads|getQueueLength|getQueuedThreads,java.util.concurrent.locks.Condition,await|awaitNanos|awaitUntil,java.util.concurrent.locks.Lock,tryLock|newCondition,java.util.regex.Matcher,pattern|toMatchResult|start|end|group|groupCount|matches|find|lookingAt|quoteReplacement|replaceAll|replaceFirst|regionStart|regionEnd|hasTransparentBounds|hasAnchoringBounds|hitEnd|requireEnd,java.util.regex.Pattern,.*,java.util.stream.BaseStream,.*,java.util.stream.DoubleStream,.*,java.util.stream.IntStream,.*,java.util.stream.LongStream,.*,java.util.stream.Stream,.*" />
+  </inspection_tool>
+  <inspection_tool class="IncorrectFormatting" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+  <inspection_tool class="JavadocLinkAsPlainText" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="LocalCanBeFinal" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="REPORT_VARIABLES" value="true" />
+    <option name="REPORT_PARAMETERS" value="true" />
+  </inspection_tool>
+  <inspection_tool class="LoggingSimilarMessage" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+  <inspection_tool class="Lombok" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
+  <inspection_tool class="LombokGetterMayBeUsed" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="LombokSetterMayBeUsed" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="LongLine" enabled="false" level="WEAK WARNING" enabled_by_default="false" editorAttributes="INFO_ATTRIBUTES" />
+  <inspection_tool class="MarkedForRemoval" enabled="false" level="ERROR" enabled_by_default="false" />
+  <inspection_tool class="MissingDeprecatedAnnotation" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="NonSerializableFieldInSerializableClass" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="ignorableAnnotations">
+      <value>
+        <item value="com.fasterxml.jackson.annotation.JsonIgnore" />
+      </value>
+    </option>
+    <option name="ignoreAnonymousInnerClasses" value="false" />
+    <option name="superClassString" value="java.awt.Component" />
+  </inspection_tool>
+  <inspection_tool class="OnDemandImport" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="OptionalOfNullableMisuse" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="ReactiveStreamsUnusedPublisher" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="SameParameterValue" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="SerializableInnerClassHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="ignoreAnonymousInnerClasses" value="false" />
+    <option name="superClassString" value="java.awt.Component" />
+  </inspection_tool>
+  <inspection_tool class="SimplifiableAssertion" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="SingleStatementInBlock" enabled="false" level="INFORMATION" enabled_by_default="false" />
+  <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+    <option name="processCode" value="true" />
+    <option name="processLiterals" value="true" />
+    <option name="processComments" value="true" />
+  </inspection_tool>
+  <inspection_tool class="SpringBootApplicationProperties" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="UNCHECKED_WARNING" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="UnqualifiedFieldAccess" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="UnqualifiedMethodAccess" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="unused" enabled="true" level="WARNING" enabled_by_default="true" klass="packageLocal" field="private" method="private" parameter="private" INNER_CLASS="false" checkParameterExcludingHierarchy="false">
+    <option name="LOCAL_VARIABLE" value="true" />
+    <option name="FIELD" value="true" />
+    <option name="METHOD" value="true" />
+    <option name="CLASS" value="false" />
+    <option name="PARAMETER" value="true" />
+    <option name="REPORT_PARAMETER_FOR_PUBLIC_METHODS" value="true" />
+    <option name="ADD_MAINS_TO_ENTRIES" value="true" />
+    <option name="ADD_APPLET_TO_ENTRIES" value="true" />
+    <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
+    <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
+  </inspection_tool>
+</profile>
