@@ -4,6 +4,12 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.swedenconnect.bankid/bankid-idp)
 
+### Version 1.3.1
+
+**Date:** 2026-04-07
+
+- Fix where a checked in certificate had illegal PEM-encoding.
+
 ### Version 1.3.0
 
 **Date:** 2026-03-11
