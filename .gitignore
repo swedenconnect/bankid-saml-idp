@@ -35,3 +35,5 @@ hs_err_pid*
 
 ### Claude ###
 .claude/settings.local.json
+./idea
+.idea/

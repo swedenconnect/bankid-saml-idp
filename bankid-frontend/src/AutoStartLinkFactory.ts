@@ -56,7 +56,7 @@ export function getType(ua: UAParser.IResult) {
 }
 
 function getIphoneRedirect(token: string, location: string, browser: string) {
-  let appLink = getIphoneAppLink(browser);
+  const appLink = getIphoneAppLink(browser);
   if (appLink !== "missing") {
     return getMobileRedirect(token, appLink).replace("#anchor", "");
   }
